@@ -40,11 +40,12 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Current Focus
 
-The template is complete. The focus now is on:
-1. Helping users customize content for their specific background
-2. Adjusting colors/branding as needed
-3. Toggling features on/off based on user needs
-4. Adding portfolio projects
+The resume has been fully customized for **Nguyễn Quang Ngọc** (Full-Stack Developer, Hà Nội):
+- Profile: quangngoc201197@gmail.com, 0346238899, Đa Phúc Hà Nội
+- 3 work experiences: Paraline/MBBank (current), Bảo Việt, GMO Runsystem
+- Skills in Java/Spring Boot, Microservices, Kafka, ReactJS, OracleDB, ELK, Docker
+- Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
+- 5 projects: CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
 
 ## Quick Customization Guide
 
@@ -98,3 +99,4 @@ Edit `src/config/site.config.ts` → `features`:
 | Date | Activity |
 |------|----------|
 | 2026-01-22 | Memory bank updated to match .kilocode standard structure |
+| 2026-04-15 | Customized all data files for Nguyễn Quang Ngọc (Full-Stack Developer, Vietnam) |
