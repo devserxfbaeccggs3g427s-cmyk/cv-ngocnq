@@ -1,0 +1,407 @@
+@import "tailwindcss";
+
+/* Custom CSS Variables */
+:root {
+  --primary: 220 92% 50%;
+  --primary-foreground: 0 0% 100%;
+  --background: 0 0% 98%;
+  --foreground: 220 15% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 15% 10%;
+  --muted: 220 10% 95%;
+  --muted-foreground: 220 10% 45%;
+  --border: 220 15% 90%;
+  --ring: 220 92% 50%;
+}
+
+.dark {
+  --primary: 220 92% 60%;
+  --primary-foreground: 0 0% 100%;
+  --background: 220 20% 5%;
+  --foreground: 220 5% 95%;
+  --card: 220 15% 10%;
+  --card-foreground: 220 5% 95%;
+  --muted: 220 15% 15%;
+  --muted-foreground: 220 5% 60%;
+  --border: 220 15% 20%;
+  --ring: 220 92% 60%;
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Selection */
+::selection {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Focus Styles */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Link Styles */
+a {
+  text-decoration-skip-ink: auto;
+}
+
+/* Utility Classes */
+.no-print {
+  /* Hidden when printing */
+}
+
+.print-only {
+  display: none !important;
+}
+
+.page-break {
+  page-break-before: always;
+}
+
+/* Text Balance */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Animation Classes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Stagger Animation Delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Line Clamp Utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 50%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card Hover Effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+}
+
+/* ================================
+   PRINT STYLES
+   ================================ */
+@media print {
+  /* Hide non-printable elements */
+  .no-print,
+  header:not(.print-header),
+  footer,
+  nav,
+  .side-nav,
+  button:not(.print-button) {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Reset backgrounds and colors for printing */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Page settings */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+
+  /* Body settings */
+  body {
+    font-size: 11pt;
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Headings */
+  h1 {
+    font-size: 18pt;
+    margin-bottom: 0.5cm;
+  }
+
+  h2 {
+    font-size: 14pt;
+    margin-top: 0.5cm;
+    margin-bottom: 0.3cm;
+    border-bottom: 1pt solid #333;
+    padding-bottom: 0.2cm;
+  }
+
+  h3 {
+    font-size: 12pt;
+    margin-top: 0.3cm;
+    margin-bottom: 0.2cm;
+  }
+
+  /* Links */
+  a {
+    text-decoration: none;
+    color: black !important;
+  }
+
+  /* Show URLs after links (optional) */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666 !important;
+    word-break: break-all;
+  }
+
+  /* Don't show URLs for internal links or buttons */
+  a[href^="#"]:after,
+  a[href^="/"]:after,
+  .no-url-print:after {
+    content: none;
+  }
+
+  /* Page breaks */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  p, ul, ol {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+  }
+
+  table, th, td {
+    border: 1pt solid #ddd;
+  }
+
+  /* Cards become simple blocks */
+  .card, [class*="Card"] {
+    border: 1pt solid #ddd !important;
+    padding: 0.5cm !important;
+    margin-bottom: 0.3cm !important;
+    page-break-inside: avoid;
+  }
+
+  /* Badges become inline text */
+  .badge, [class*="Badge"] {
+    border: 1pt solid #999 !important;
+    padding: 0.1cm 0.2cm !important;
+    margin: 0.1cm !important;
+  }
+
+  /* Progress bars become text */
+  .progress, [class*="Progress"] {
+    height: auto !important;
+    background: none !important;
+  }
+
+  /* Grid becomes single column */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    margin-bottom: 0.3cm;
+  }
+
+  /* Flex wrapping */
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  /* Container max width */
+  .container, [class*="Container"] {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure content fits */
+  main {
+    padding-top: 0 !important;
+  }
+}
+
+/* ================================
+   PRINT PAGE SPECIFIC STYLES
+   ================================ */
+.print-resume {
+  background: white;
+  color: black;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.print-resume h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.print-resume h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.print-resume h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.print-resume p {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.print-resume ul {
+  font-size: 0.875rem;
+  margin-left: 1rem;
+}
+
+.print-resume li {
+  margin-bottom: 0.25rem;
+}
+
+/* ================================
+   RESPONSIVE TYPOGRAPHY
+   ================================ */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
