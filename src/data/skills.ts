@@ -82,17 +82,14 @@ export interface Language {
  * Add, remove, or rename categories as needed.
  */
 export const skillCategories: string[] = [
-  'Languages',    // Programming languages
-  'Frontend',     // Frontend frameworks & libraries
-  'Backend',      // Backend frameworks & technologies
-  'Databases',    // Database technologies
-  'Cloud',        // Cloud platforms & services
-  'DevOps',       // DevOps tools & practices
-  // Add more categories here:
-  // 'Mobile',
-  // 'Design',
-  // 'Soft Skills',
-  // 'Other',
+  'Languages',      // Programming languages & frameworks
+  'Frontend',       // Frontend frameworks & libraries
+  'Backend',        // Backend frameworks & technologies
+  'Architecture',   // System architecture & distributed systems
+  'Databases',      // Database technologies
+  'DevOps',         // DevOps tools & practices
+  'Security',       // Security & encryption
+  'Monitoring',     // Monitoring & logging
 ];
 
 /**
@@ -105,56 +102,74 @@ export const skillCategories: string[] = [
  */
 export const skills: Skill[] = [
   // ---------------------------------------------------------------------------
-  // PROGRAMMING LANGUAGES
+  // PROGRAMMING LANGUAGES & FRAMEWORKS
   // ---------------------------------------------------------------------------
   {
-    name: 'TypeScript',
-    level: 95,
-    category: 'Languages',
-    yearsOfExperience: 5,
-  },
-  {
-    name: 'JavaScript',
-    level: 95,
-    category: 'Languages',
-    yearsOfExperience: 8,
-  },
-  {
-    name: 'Python',
-    level: 80,
+    name: 'Java Core',
+    level: 90,
     category: 'Languages',
     yearsOfExperience: 4,
   },
   {
-    name: 'Go',
-    level: 65,
+    name: 'Spring Boot',
+    level: 90,
+    category: 'Languages',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Spring Framework',
+    level: 85,
+    category: 'Languages',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Hibernate',
+    level: 85,
+    category: 'Languages',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'MyBatis',
+    level: 75,
     category: 'Languages',
     yearsOfExperience: 2,
+  },
+  {
+    name: 'JavaScript',
+    level: 80,
+    category: 'Languages',
+    yearsOfExperience: 4,
   },
 
   // ---------------------------------------------------------------------------
   // FRONTEND
   // ---------------------------------------------------------------------------
   {
-    name: 'React',
-    level: 95,
-    category: 'Frontend',
-    yearsOfExperience: 6,
-  },
-  {
-    name: 'Next.js',
-    level: 90,
-    category: 'Frontend',
-    yearsOfExperience: 4,
-  },
-  {
-    name: 'Tailwind CSS',
-    level: 90,
+    name: 'ReactJS',
+    level: 85,
     category: 'Frontend',
     yearsOfExperience: 3,
   },
   {
-    name: 'Vue.js',
+    name: 'Thymeleaf',
+    level: 75,
+    category: 'Frontend',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'JSP / Servlet',
+    level: 70,
+    category: 'Frontend',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'HTML / CSS',
+    level: 80,
+    category: 'Frontend',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'jQuery',
     level: 70,
     category: 'Frontend',
     yearsOfExperience: 2,
@@ -164,89 +179,151 @@ export const skills: Skill[] = [
   // BACKEND
   // ---------------------------------------------------------------------------
   {
-    name: 'Node.js',
-    level: 90,
-    category: 'Backend',
-    yearsOfExperience: 6,
-  },
-  {
-    name: 'Express',
-    level: 88,
-    category: 'Backend',
-    yearsOfExperience: 5,
-  },
-  {
-    name: 'Django',
-    level: 75,
-    category: 'Backend',
-    yearsOfExperience: 3,
-  },
-  {
-    name: 'GraphQL',
+    name: 'Spring Cloud',
     level: 80,
     category: 'Backend',
-    yearsOfExperience: 3,
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Feign Client',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Pentaho PDI (ETL)',
+    level: 75,
+    category: 'Backend',
+    yearsOfExperience: 1,
+  },
+
+  // ---------------------------------------------------------------------------
+  // ARCHITECTURE
+  // ---------------------------------------------------------------------------
+  {
+    name: 'Microservices',
+    level: 85,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Event-Driven Architecture',
+    level: 85,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Apache Kafka',
+    level: 80,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'API Gateway (Apigee)',
+    level: 80,
+    category: 'Architecture',
+    yearsOfExperience: 2,
   },
 
   // ---------------------------------------------------------------------------
   // DATABASES
   // ---------------------------------------------------------------------------
   {
-    name: 'PostgreSQL',
+    name: 'OracleDB',
     level: 85,
     category: 'Databases',
-    yearsOfExperience: 5,
+    yearsOfExperience: 3,
   },
   {
-    name: 'MongoDB',
+    name: 'PostgreSQL',
     level: 80,
     category: 'Databases',
-    yearsOfExperience: 4,
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'MySQL',
+    level: 75,
+    category: 'Databases',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'SQL Server',
+    level: 65,
+    category: 'Databases',
+    yearsOfExperience: 1,
   },
   {
     name: 'Redis',
     level: 75,
     category: 'Databases',
-    yearsOfExperience: 3,
+    yearsOfExperience: 2,
   },
 
   // ---------------------------------------------------------------------------
-  // CLOUD & DEVOPS
+  // DEVOPS
   // ---------------------------------------------------------------------------
   {
-    name: 'AWS',
-    level: 85,
-    category: 'Cloud',
-    yearsOfExperience: 4,
-  },
-  {
     name: 'Docker',
-    level: 85,
+    level: 75,
     category: 'DevOps',
-    yearsOfExperience: 4,
+    yearsOfExperience: 2,
   },
   {
-    name: 'Kubernetes',
+    name: 'Jenkins',
     level: 70,
     category: 'DevOps',
     yearsOfExperience: 2,
   },
   {
-    name: 'CI/CD',
+    name: 'Git / GitHub / GitLab',
     level: 85,
     category: 'DevOps',
     yearsOfExperience: 4,
   },
+  {
+    name: 'CI/CD',
+    level: 75,
+    category: 'DevOps',
+    yearsOfExperience: 2,
+  },
 
   // ---------------------------------------------------------------------------
-  // ADD MORE SKILLS HERE
+  // SECURITY
   // ---------------------------------------------------------------------------
-  // {
-  //   name: 'Your Skill',
-  //   level: 85,
-  //   category: 'Category Name',
-  //   yearsOfExperience: 3,
-  // },
+  {
+    name: 'ECDH Encryption',
+    level: 75,
+    category: 'Security',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'RSA Encryption',
+    level: 70,
+    category: 'Security',
+    yearsOfExperience: 2,
+  },
+
+  // ---------------------------------------------------------------------------
+  // MONITORING
+  // ---------------------------------------------------------------------------
+  {
+    name: 'ELK Stack',
+    level: 75,
+    category: 'Monitoring',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Elasticsearch',
+    level: 70,
+    category: 'Monitoring',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Kibana',
+    level: 70,
+    category: 'Monitoring',
+    yearsOfExperience: 2,
+  },
 ];
 
 /**
@@ -257,11 +334,8 @@ export const skills: Skill[] = [
  * List the languages you speak and your proficiency level.
  */
 export const languages: Language[] = [
-  { name: 'English', level: 'Native' },
-  { name: 'Spanish', level: 'Professional' },
-  { name: 'French', level: 'Basic' },
-  // Add more languages here:
-  // { name: 'German', level: 'Intermediate' },
+  { name: 'Tiếng Việt', level: 'Native' },
+  { name: 'English', level: 'Intermediate' },
 ];
 
 // =============================================================================

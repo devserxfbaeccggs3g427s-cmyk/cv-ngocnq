@@ -117,34 +117,38 @@ export interface Experience {
  */
 export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
-  // CURRENT POSITION (or most recent)
+  // CURRENT POSITION
   // ---------------------------------------------------------------------------
   {
     id: 'exp-1',
-    title: 'Senior Software Engineer',
-    company: 'TechCorp Inc.',
-    // companyLogo: '/logos/techcorp.png',  // Uncomment and add logo if you have one
-    location: 'San Francisco, CA',
+    title: 'Full Stack Developer',
+    company: 'Paraline Software (Outsourced cho MBBank)',
+    location: 'Hà Nội, Việt Nam',
     type: 'full-time',
-    startDate: '2022-01',
-    // endDate: undefined,  // Omit or undefined for current position
+    startDate: '2023-05',
     current: true,
     description:
-      'Lead development of customer-facing web applications and mentor junior developers.',
+      'Fullstack Developer phụ trách hệ thống Collateral Management & Valuation (CMV) phục vụ nghiệp vụ thẩm định tài sản ngân hàng MBBank.',
     achievements: [
-      'Architected microservices platform handling 10M+ requests/day',
-      'Reduced deployment time by 80% through CI/CD improvements',
-      'Mentored 3 junior developers to mid-level positions',
-      'Led migration from monolith to microservices architecture',
+      'Thiết kế & triển khai kiến trúc Microservices và EDA (Apache Kafka), đảm bảo hiệu năng và khả năng mở rộng cao',
+      'Tích hợp AI để tự động trích xuất dữ liệu, kiểm tra trùng lặp hình ảnh tài sản, giảm 60% khối lượng nhập tay',
+      'Xây dựng & bảo mật API qua Apigee Gateway với ECDH Encryption cho trao đổi dữ liệu bảo mật',
+      'Tích hợp kho hàng CMS để tự động đồng bộ dữ liệu, giảm thiểu thời gian nhập liệu của chuyên viên chi nhánh',
+      'Xây dựng ETL Pipeline bằng Pentaho PDI để đồng bộ dữ liệu CMV MBBank sang CMV MBV (S600)',
+      'Áp dụng ELK Stack để giám sát hoạt động hệ thống',
     ],
     technologies: [
-      'React',
-      'TypeScript',
-      'Node.js',
-      'PostgreSQL',
-      'AWS',
+      'Spring Boot',
+      'ReactJS',
+      'Hibernate',
+      'OracleDB',
+      'Apache Kafka',
+      'Redis',
+      'Apigee API Gateway',
+      'Pentaho PDI',
+      'Microservices',
+      'ELK Stack',
       'Docker',
-      'Kubernetes',
     ],
   },
 
@@ -153,20 +157,22 @@ export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
   {
     id: 'exp-2',
-    title: 'Software Engineer',
-    company: 'StartupXYZ',
-    location: 'San Francisco, CA',
+    title: 'Backend Developer',
+    company: 'Bảo Hiểm Bảo Việt',
+    location: 'Hà Nội, Việt Nam',
     type: 'full-time',
-    startDate: '2019-03',
-    endDate: '2021-12',
+    startDate: '2022-11',
+    endDate: '2023-05',
     current: false,
-    description: 'Full-stack development for a fast-growing SaaS platform.',
+    description:
+      'Backend Developer trong dự án MyBV Life – Nền tảng bảo hiểm trực tuyến, phát triển API nghiệp vụ tài chính – bảo hiểm.',
     achievements: [
-      'Built real-time collaboration features used by 50K+ users',
-      'Implemented automated testing reducing bugs by 40%',
-      'Optimized database queries improving response time by 60%',
+      'Xây dựng API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
+      'Thiết kế API giao nhận hợp đồng điện tử (e-Contract) và đồng bộ với hệ thống lõi IMS',
+      'Tối ưu hiệu năng truy vấn và đồng bộ hóa dữ liệu hóa đơn với hệ thống đối tác DCS',
+      'Đảm bảo tính an toàn, toàn vẹn và bảo mật dữ liệu theo chuẩn ngành tài chính',
     ],
-    technologies: ['React', 'Python', 'Django', 'PostgreSQL', 'Redis', 'AWS'],
+    technologies: ['Spring Boot', 'AOP', 'Hibernate', 'Oracle'],
   },
 
   // ---------------------------------------------------------------------------
@@ -174,44 +180,34 @@ export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
   {
     id: 'exp-3',
-    title: 'Junior Developer',
-    company: 'WebAgency Co.',
-    location: 'Los Angeles, CA',
+    title: 'Full Stack Developer',
+    company: 'GMO-Z.com RUNSYSTEM',
+    location: 'Hà Nội, Việt Nam',
     type: 'full-time',
-    startDate: '2016-06',
-    endDate: '2019-02',
+    startDate: '2021-11',
+    endDate: '2022-11',
     current: false,
     description:
-      'Developed custom web solutions for various clients across different industries.',
+      'Fullstack Developer tham gia phát triển các sản phẩm cho khách hàng Nhật Bản, tiêu biểu là Veritas (quản lý phòng khám thẩm mỹ) và Hywork (đặt chỗ làm việc).',
     achievements: [
-      'Delivered 20+ client projects on time and within budget',
-      'Introduced component-based architecture improving code reuse',
-      'Created internal tools saving 10 hours/week of manual work',
+      'Phát triển module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn cho hệ thống Veritas',
+      'Phát triển tính năng quản lý chỗ ngồi, đồng bộ nhân sự từ AMIS trong hệ thống Hywork',
+      'Tối ưu SQL performance, xử lý các yêu cầu thay đổi dữ liệu từ phía khách hàng Nhật Bản',
+      'Tạo báo cáo thống kê sử dụng (Export Excel) phục vụ quản lý vận hành',
+      'Làm việc theo mô hình Agile – CI/CD, tiếp thu phong cách kỷ luật – chính xác – tinh gọn kiểu Nhật',
     ],
-    technologies: ['JavaScript', 'React', 'PHP', 'MySQL', 'WordPress'],
+    technologies: [
+      'Spring Boot',
+      'MyBatis',
+      'Hibernate',
+      'PostgreSQL',
+      'MySQL',
+      'JSP',
+      'Thymeleaf',
+      'JavaScript',
+      'JQuery',
+    ],
   },
-
-  // ---------------------------------------------------------------------------
-  // ADD MORE POSITIONS HERE
-  // Copy the template below and fill in your details
-  // ---------------------------------------------------------------------------
-  // {
-  //   id: 'exp-4',
-  //   title: 'Your Job Title',
-  //   company: 'Company Name',
-  //   companyLogo: '/logos/company.png',  // Optional
-  //   location: 'City, Country',
-  //   type: 'full-time',
-  //   startDate: 'YYYY-MM',
-  //   endDate: 'YYYY-MM',  // Remove for current position
-  //   current: false,
-  //   description: 'Brief description of your role and responsibilities.',
-  //   achievements: [
-  //     'Achievement with metrics...',
-  //     'Another achievement...',
-  //   ],
-  //   technologies: ['Tech1', 'Tech2', 'Tech3'],
-  // },
 ];
 
 // =============================================================================

@@ -155,61 +155,42 @@ export interface Award {
  */
 export const education: Education[] = [
   // ---------------------------------------------------------------------------
-  // HIGHEST DEGREE
+  // MOST RECENT DEGREE
   // ---------------------------------------------------------------------------
   {
     id: 'edu-1',
-    degree: 'Master of Science',
-    field: 'Computer Science',
-    school: 'Stanford University',
-    // schoolLogo: '/logos/stanford.png',  // Uncomment if you have a logo
-    location: 'Stanford, CA',
-    startYear: 2014,
-    endYear: 2016,
-    gpa: '3.9/4.0',
-    honors: ['Magna Cum Laude', "Dean's List"],
+    degree: 'Cử nhân Công nghệ Thông tin',
+    field: 'Phát triển phần mềm',
+    school: 'Trường Đại học Giao thông vận tải',
+    location: 'Hà Nội, Việt Nam',
+    startYear: 2023,
+    endYear: 2025,
+    gpa: '2.7/4.0',
     relevantCourses: [
-      'Distributed Systems',
-      'Machine Learning',
-      'Advanced Algorithms',
+      'Phát triển phần mềm',
+      'Kiến trúc hệ thống',
+      'Cơ sở dữ liệu',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // UNDERGRADUATE DEGREE
+  // EARLIER DEGREE
   // ---------------------------------------------------------------------------
   {
     id: 'edu-2',
-    degree: 'Bachelor of Science',
-    field: 'Computer Engineering',
-    school: 'UC Berkeley',
-    location: 'Berkeley, CA',
-    startYear: 2010,
-    endYear: 2014,
-    gpa: '3.7/4.0',
-    honors: ['Cum Laude'],
+    degree: 'Cử nhân Công nghệ Thông tin',
+    field: 'Ứng dụng phần mềm',
+    school: 'Cao đẳng FPT Polytechnic',
+    location: 'Hà Nội, Việt Nam',
+    startYear: 2020,
+    endYear: 2022,
+    gpa: '8.8/10.0',
     relevantCourses: [
-      'Data Structures',
-      'Operating Systems',
-      'Computer Networks',
+      'Lập trình hướng đối tượng',
+      'Phát triển Web',
+      'Cơ sở dữ liệu quan hệ',
     ],
   },
-
-  // ---------------------------------------------------------------------------
-  // ADD MORE EDUCATION HERE
-  // ---------------------------------------------------------------------------
-  // {
-  //   id: 'edu-3',
-  //   degree: 'Your Degree',
-  //   field: 'Your Field',
-  //   school: 'School Name',
-  //   location: 'City, Country',
-  //   startYear: 2018,
-  //   endYear: 2022,
-  //   gpa: '3.5/4.0',  // Optional
-  //   honors: ['Honor 1'],  // Optional
-  //   relevantCourses: ['Course 1', 'Course 2'],  // Optional
-  // },
 ];
 
 /**
@@ -223,43 +204,16 @@ export const education: Education[] = [
 export const certifications: Certification[] = [
   {
     id: 'cert-1',
-    name: 'AWS Solutions Architect - Professional',
-    issuer: 'Amazon Web Services',
-    // issuerLogo: '/logos/aws.png',  // Uncomment if you have a logo
-    date: '2023-06',
-    expirationDate: '2026-06',
-    credentialId: 'AWS-SAP-123456',
-    credentialUrl: 'https://aws.amazon.com/verification',
+    name: 'Top Notch 2 – Tiếng Anh',
+    issuer: 'Cao đẳng FPT Polytechnic',
+    date: '2022-06',
   },
   {
     id: 'cert-2',
-    name: 'Google Cloud Professional Developer',
-    issuer: 'Google Cloud',
-    date: '2023-01',
-    expirationDate: '2025-01',
-    credentialId: 'GCP-PD-789012',
+    name: 'Chứng chỉ Tin học Văn phòng',
+    issuer: 'Cao đẳng FPT Polytechnic',
+    date: '2022-06',
   },
-  {
-    id: 'cert-3',
-    name: 'Certified Kubernetes Administrator',
-    issuer: 'Cloud Native Computing Foundation',
-    date: '2022-08',
-    expirationDate: '2025-08',
-    credentialId: 'CKA-345678',
-  },
-
-  // ---------------------------------------------------------------------------
-  // ADD MORE CERTIFICATIONS HERE
-  // ---------------------------------------------------------------------------
-  // {
-  //   id: 'cert-4',
-  //   name: 'Certification Name',
-  //   issuer: 'Issuing Organization',
-  //   date: '2024-01',
-  //   expirationDate: '2027-01',  // Optional
-  //   credentialId: 'CERT-ID',    // Optional
-  //   credentialUrl: 'https://verify.example.com',  // Optional
-  // },
 ];
 
 /**
@@ -273,29 +227,18 @@ export const certifications: Certification[] = [
 export const awards: Award[] = [
   {
     id: 'award-1',
-    title: 'Employee of the Year',
-    issuer: 'TechCorp Inc.',
-    date: '2023',
-    description: 'Recognized for outstanding contributions to the engineering team',
+    title: 'Đồ án tốt nghiệp xuất sắc',
+    issuer: 'Trường Đại học Giao thông vận tải',
+    date: '2025',
+    description: 'Xây dựng Website Quản lý nhân sự sử dụng Spring Boot, ReactJS, OracleDB, Kafka, Redis, Docker, Microservices',
   },
   {
     id: 'award-2',
-    title: 'Best Technical Talk',
-    issuer: 'ReactConf 2022',
+    title: 'Đồ án tốt nghiệp xuất sắc',
+    issuer: 'Cao đẳng FPT Polytechnic',
     date: '2022',
-    description: 'Awarded for presentation on React performance optimization',
+    description: 'Xây dựng Website bán hàng sử dụng Spring Boot, ReactJS, MySQL',
   },
-
-  // ---------------------------------------------------------------------------
-  // ADD MORE AWARDS HERE
-  // ---------------------------------------------------------------------------
-  // {
-  //   id: 'award-3',
-  //   title: 'Award Title',
-  //   issuer: 'Organization',
-  //   date: '2024',
-  //   description: 'Brief description of the award',  // Optional
-  // },
 ];
 
 // =============================================================================

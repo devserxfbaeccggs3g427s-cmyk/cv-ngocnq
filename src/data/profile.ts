@@ -96,36 +96,33 @@ export const profile: Profile = {
   // -------------------------------------------------------------------------
   // BASIC INFO (Required)
   // -------------------------------------------------------------------------
-  name: 'Alex Johnson',
-  title: 'Senior Software Engineer',
+  name: 'Nguyễn Quang Ngọc',
+  title: 'Full-Stack Developer',
   photo: '/images/profile.jpg', // Set to '' to hide photo
-  email: 'alex.johnson@example.com',
-  location: 'San Francisco, CA',
+  email: 'quangngoc201197@gmail.com',
+  location: 'Đa Phúc, Hà Nội, Việt Nam',
 
   // -------------------------------------------------------------------------
   // CONTACT & SOCIAL (Optional - remove or set to undefined if not needed)
   // -------------------------------------------------------------------------
-  phone: '+1 (555) 123-4567',
-  website: 'https://alexjohnson.dev',
-  linkedin: 'https://linkedin.com/in/alexjohnson',
-  github: 'https://github.com/alexjohnson',
-  twitter: 'https://twitter.com/alexjohnson',
+  phone: '0346238899',
 
   // -------------------------------------------------------------------------
   // PROFESSIONAL SUMMARY
   // Keep this concise: 2-4 sentences that capture who you are professionally
   // -------------------------------------------------------------------------
-  summary: `Results-driven software engineer with 8+ years of experience building scalable web applications. Passionate about clean code, performance optimization, and mentoring junior developers. Expert in React, TypeScript, and cloud architecture.`,
+  summary: `Kỹ sư phần mềm với gần 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank) và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo kiến trúc Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway (Apigee) và xử lý bất đồng bộ với Kafka. Có kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật, mở rộng linh hoạt và tích hợp AI/CMS để tự động hóa quy trình, giảm lỗi và tăng minh bạch.`,
 
   // -------------------------------------------------------------------------
   // KEY HIGHLIGHTS
   // 3-5 achievement statements with metrics when possible
   // -------------------------------------------------------------------------
   highlights: [
-    'Led development of platform serving 1M+ users',
-    'Reduced page load time by 60%',
-    'Managed team of 5 engineers',
-    'Speaker at 3 tech conferences',
+    'Tích hợp AI giảm 60% khối lượng nhập tay trong hệ thống CMV MBBank',
+    'Thiết kế & triển khai Microservices + EDA (Kafka) cho hệ thống ngân hàng',
+    'Bảo mật API qua Apigee Gateway với ECDH Encryption',
+    'Xây dựng ETL Pipeline đồng bộ dữ liệu liên hệ thống với Pentaho PDI',
+    'Gần 4 năm kinh nghiệm hệ thống tài chính – ngân hàng, bảo hiểm và khách hàng Nhật Bản',
   ],
 };
 

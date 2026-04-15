@@ -129,16 +129,10 @@ export interface Project {
  */
 export const projectCategories: string[] = [
   'All',
-  'Web Application',
-  'SaaS',
-  'Mobile App',
-  'Data Visualization',
-  'Developer Tools',
-  // Add more categories here:
-  // 'E-Commerce',
-  // 'AI/ML',
-  // 'Open Source',
-  // 'Personal Project',
+  'Tài chính – Ngân hàng',
+  'Bảo hiểm',
+  'Nhật Bản',
+  'Đồ án',
 ];
 
 /**
@@ -151,168 +145,142 @@ export const projectCategories: string[] = [
  */
 export const projects: Project[] = [
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT 1
+  // FEATURED PROJECT 1 – CMV MBBank
   // ---------------------------------------------------------------------------
   {
     id: 'proj-1',
-    slug: 'e-commerce-platform',
-    title: 'E-Commerce Platform',
+    slug: 'cmv-mbbank',
+    title: 'Collateral Management & Valuation (CMV) – MBBank',
     description:
-      'Full-stack e-commerce solution with real-time inventory management and payment processing.',
-    longDescription: `Built a comprehensive e-commerce platform from scratch, featuring real-time inventory tracking, 
-    secure payment processing with Stripe, and an admin dashboard for order management. The platform handles 
-    thousands of concurrent users and processes over $2M in transactions monthly.`,
-    thumbnail: '/projects/ecommerce-thumb.jpg',
-    images: [
-      '/projects/ecommerce-1.jpg',
-      '/projects/ecommerce-2.jpg',
-      '/projects/ecommerce-3.jpg',
+      'Hệ thống thẩm định và quản lý tài sản thế chấp ngân hàng MBBank theo kiến trúc Microservices, tích hợp AI và Kafka.',
+    longDescription: `Hệ thống CMV phục vụ nghiệp vụ thẩm định tài sản thế chấp tại MBBank. Được xây dựng theo kiến trúc Microservices và Event-Driven Architecture (EDA) với Apache Kafka, đảm bảo hiệu năng cao và khả năng mở rộng linh hoạt. Tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ tài liệu pháp lý và hình ảnh, phát hiện trùng lặp tài sản, giúp giảm 60% khối lượng nhập tay. API được quản lý qua Apigee Gateway với ECDH Encryption. ETL Pipeline dùng Pentaho PDI để đồng bộ dữ liệu sang CMV MBV (S600). Giám sát hệ thống với ELK Stack.`,
+    thumbnail: '/projects/cmv-thumb.jpg',
+    images: [],
+    technologies: [
+      'Spring Boot',
+      'ReactJS',
+      'Apache Kafka',
+      'OracleDB',
+      'Redis',
+      'Apigee API Gateway',
+      'Pentaho PDI',
+      'ELK Stack',
+      'Microservices',
+      'Docker',
     ],
-    technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Stripe', 'Redis', 'AWS'],
-    category: 'Web Application',
-    role: 'Lead Developer',
-    duration: '6 months',
-    liveUrl: 'https://example-ecommerce.com',
-    githubUrl: 'https://github.com/alexjohnson/ecommerce',
+    category: 'Tài chính – Ngân hàng',
+    role: 'Fullstack Developer',
+    duration: '2023-05 – Nay',
     featured: true,
     highlights: [
-      'Processed $2M+ in transactions',
-      '99.9% uptime over 2 years',
-      '50ms average API response time',
-      'Handles 10K+ concurrent users',
+      'Giảm 60% khối lượng nhập tay nhờ tích hợp AI trích xuất dữ liệu',
+      'Kiến trúc Microservices + EDA (Kafka) đảm bảo hiệu năng cao',
+      'Bảo mật API qua Apigee Gateway với ECDH Encryption',
+      'ETL Pipeline Pentaho PDI đồng bộ dữ liệu liên hệ thống',
+      'Giám sát real-time với ELK Stack',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT 2
+  // FEATURED PROJECT 2 – MyBV Life
   // ---------------------------------------------------------------------------
   {
     id: 'proj-2',
-    slug: 'task-management-app',
-    title: 'TaskFlow - Task Management',
+    slug: 'mybv-life',
+    title: 'MyBV Life – Nền tảng bảo hiểm trực tuyến',
     description:
-      'Collaborative task management application with real-time updates and team features.',
-    longDescription: `A modern task management application designed for remote teams. Features include 
-    real-time collaboration, Kanban boards, time tracking, and integrations with popular tools like 
-    Slack and GitHub.`,
-    thumbnail: '/projects/taskflow-thumb.jpg',
-    images: ['/projects/taskflow-1.jpg', '/projects/taskflow-2.jpg'],
-    technologies: ['React', 'Node.js', 'Socket.io', 'MongoDB', 'Docker'],
-    category: 'SaaS',
-    role: 'Full-Stack Developer',
-    duration: '4 months',
-    liveUrl: 'https://taskflow-demo.com',
-    githubUrl: 'https://github.com/alexjohnson/taskflow',
+      'Nền tảng bảo hiểm trực tuyến của Bảo Việt Nhân Thọ với API thanh toán Napas, hợp đồng điện tử và tích hợp hệ thống lõi IMS.',
+    longDescription: `MyBV Life là nền tảng bảo hiểm trực tuyến của Bảo Việt Nhân Thọ. Xây dựng API nghiệp vụ tài chính – bảo hiểm bao gồm quy trình thanh toán qua Napas Gateway, quản lý hợp đồng điện tử (e-Contract), đồng bộ dữ liệu với hệ thống lõi IMS và đối tác DCS. Tối ưu hiệu năng truy vấn cơ sở dữ liệu và đảm bảo tính an toàn, toàn vẹn dữ liệu theo chuẩn ngành tài chính.`,
+    thumbnail: '/projects/mybv-thumb.jpg',
+    images: [],
+    technologies: ['Spring Boot', 'AOP', 'Hibernate', 'Oracle'],
+    category: 'Bảo hiểm',
+    role: 'Backend Developer',
+    duration: '2022-11 – 2023-05',
     featured: true,
     highlights: [
-      '5K+ active users',
-      'Real-time collaboration',
-      '15+ third-party integrations',
-      '4.8/5 user rating',
+      'API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
+      'Thiết kế API hợp đồng điện tử (e-Contract) + đồng bộ IMS',
+      'Tối ưu truy vấn DB, đảm bảo an toàn và bảo mật dữ liệu tài chính',
+      'Đồng bộ hóa dữ liệu hóa đơn với hệ thống đối tác DCS',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT 3
+  // PROJECT 3 – Veritas
   // ---------------------------------------------------------------------------
   {
     id: 'proj-3',
-    slug: 'analytics-dashboard',
-    title: 'DataViz Analytics Dashboard',
+    slug: 'veritas-clinic',
+    title: 'Veritas – Hệ thống quản lý phòng khám thẩm mỹ',
     description:
-      'Interactive analytics dashboard with customizable charts and real-time data visualization.',
-    thumbnail: '/projects/analytics-thumb.jpg',
-    images: ['/projects/analytics-1.jpg', '/projects/analytics-2.jpg'],
-    technologies: ['React', 'D3.js', 'Python', 'FastAPI', 'PostgreSQL'],
-    category: 'Data Visualization',
-    role: 'Frontend Lead',
-    duration: '3 months',
-    // liveUrl: undefined,  // No live demo
-    // githubUrl: undefined,  // Private repository
-    featured: true,
+      'Hệ thống quản lý phòng khám thẩm mỹ cho khách hàng Nhật Bản: đặt lịch khám, phân công bác sĩ, quản lý lịch hẹn.',
+    thumbnail: '/projects/veritas-thumb.jpg',
+    images: [],
+    technologies: ['Spring Boot', 'MyBatis', 'PostgreSQL', 'JSP', 'JavaScript', 'jQuery'],
+    category: 'Nhật Bản',
+    role: 'Fullstack Developer',
+    duration: '2022-03 – 2022-11',
+    featured: false,
     highlights: [
-      '20+ chart types',
-      'Export to PDF/Excel',
-      'Custom report builder',
-      'Role-based access control',
+      'Module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn',
+      'Tối ưu SQL performance theo yêu cầu khách hàng Nhật Bản',
+      'Làm việc theo chuẩn Agile – kỷ luật và chính xác kiểu Nhật',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // NON-FEATURED PROJECT
+  // PROJECT 4 – Hywork
   // ---------------------------------------------------------------------------
   {
     id: 'proj-4',
-    slug: 'mobile-fitness-app',
-    title: 'FitTrack Mobile App',
+    slug: 'hywork',
+    title: 'Hywork – Hệ thống đặt chỗ làm việc',
     description:
-      'Cross-platform fitness tracking application with workout plans and progress analytics.',
-    thumbnail: '/projects/fitness-thumb.jpg',
-    images: ['/projects/fitness-1.jpg', '/projects/fitness-2.jpg'],
-    technologies: ['React Native', 'TypeScript', 'Firebase', 'Node.js'],
-    category: 'Mobile App',
-    role: 'Mobile Developer',
-    duration: '5 months',
-    // liveUrl: undefined,  // App store link would go here
-    githubUrl: 'https://github.com/alexjohnson/fittrack',
+      'Hệ thống đặt chỗ làm việc và đồng bộ nhân sự từ AMIS cho khách hàng Nhật Bản.',
+    thumbnail: '/projects/hywork-thumb.jpg',
+    images: [],
+    technologies: ['Spring Boot', 'Hibernate', 'Thymeleaf', 'MySQL'],
+    category: 'Nhật Bản',
+    role: 'Fullstack Developer',
+    duration: '2021-11 – 2022-03',
     featured: false,
     highlights: [
-      'iOS & Android support',
-      'Offline-first architecture',
-      'Wearable device integration',
-      '10K+ downloads',
+      'Tính năng quản lý chỗ ngồi và đồng bộ nhân sự từ AMIS',
+      'Báo cáo thống kê sử dụng (Export Excel) phục vụ quản lý',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // NON-FEATURED PROJECT
+  // PROJECT 5 – Đồ án tốt nghiệp
   // ---------------------------------------------------------------------------
   {
     id: 'proj-5',
-    slug: 'open-source-cli',
-    title: 'DevToolkit CLI',
+    slug: 'hr-management-system',
+    title: 'Website Quản lý Nhân sự – Đồ án tốt nghiệp ĐH',
     description:
-      'Open-source command-line toolkit for developers with code generation and automation.',
-    thumbnail: '/projects/cli-thumb.jpg',
-    images: ['/projects/cli-1.jpg'],
-    technologies: ['Go', 'Cobra', 'Docker'],
-    category: 'Developer Tools',
-    role: 'Creator & Maintainer',
-    duration: 'Ongoing',
-    // liveUrl: undefined,  // CLI tools usually don't have live URLs
-    githubUrl: 'https://github.com/alexjohnson/devtoolkit',
-    featured: false,
+      'Hệ thống quản lý nhân sự xây dựng theo kiến trúc Microservices với Spring Boot, ReactJS, Kafka, Redis và Docker.',
+    thumbnail: '/projects/hrms-thumb.jpg',
+    images: [],
+    technologies: [
+      'Spring Boot',
+      'ReactJS',
+      'OracleDB',
+      'Apache Kafka',
+      'Redis',
+      'Docker',
+      'Microservices',
+    ],
+    category: 'Đồ án',
+    role: 'Tác giả',
+    duration: '2024 – 2025',
+    featured: true,
     highlights: [
-      '2K+ GitHub stars',
-      '500+ contributors',
-      'Used by 100+ companies',
-      'Weekly releases',
+      'Kiến trúc Microservices + Kafka + Redis',
+      'Containerized bằng Docker',
+      'Đồ án tốt nghiệp Đại học Giao thông vận tải',
     ],
   },
-
-  // ---------------------------------------------------------------------------
-  // ADD MORE PROJECTS HERE
-  // ---------------------------------------------------------------------------
-  // {
-  //   id: 'proj-6',
-  //   slug: 'your-project-slug',
-  //   title: 'Your Project Title',
-  //   description: 'Short description of your project...',
-  //   longDescription: 'Detailed description...',  // Optional
-  //   thumbnail: '/projects/your-project-thumb.jpg',
-  //   images: ['/projects/your-project-1.jpg'],
-  //   technologies: ['Tech1', 'Tech2', 'Tech3'],
-  //   category: 'Web Application',
-  //   role: 'Your Role',
-  //   duration: '3 months',
-  //   liveUrl: 'https://your-project.com',  // Optional
-  //   githubUrl: 'https://github.com/you/project',  // Optional
-  //   featured: false,
-  //   highlights: [
-  //     'Highlight 1 with metrics',
-  //     'Highlight 2',
-  //   ],
-  // },
 ];
 
 // =============================================================================
