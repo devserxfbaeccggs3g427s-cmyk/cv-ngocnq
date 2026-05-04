@@ -117,7 +117,48 @@ export interface Experience {
  */
 export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
-  // CURRENT POSITION
+  // CURRENT POSITION — Alphaway / SHB
+  // ---------------------------------------------------------------------------
+  {
+    id: 'exp-0',
+    title: 'Backend Developer',
+    company: 'Alphaway (Onsite tại Ngân hàng SHB)',
+    location: 'Hà Nội, Việt Nam',
+    type: 'full-time',
+    startDate: '2025-11',
+    current: true,
+    description:
+      'Backend Developer phát triển Cổng Thông Tin Xử Lý Nợ Xấu SHB Debit Collection Portal, hệ thống quản lý & đấu giá tài sản xử lý nợ trên nền tảng Microservices.',
+    achievements: [
+      'Xây dựng Dynamic Filter Engine dựa trên JPA Specification Pattern, hỗ trợ tìm kiếm đa tiêu chí với cấu hình filter động từ DB',
+      'Triển khai quy trình phê duyệt Maker-Checker (4 mắt) cho quản lý tài sản & thông báo đấu giá, đảm bảo Separation of Duties',
+      'Thiết kế cơ chế bảo mật 3 lớp cho Lead Generation: Rate Limiting (Redis) + Google reCAPTCHA v3 + Duplicate Prevention',
+      'Xây dựng kiến trúc Microservices với Spring Cloud Gateway, Eureka Service Discovery, OpenFeign giao tiếp liên service',
+      'Phát triển tính năng Dynamic Field Display dùng Java Reflection, hiển thị trường linh hoạt theo từng loại tài sản (BĐS, PTVT, MMTB)',
+      'Tích hợp Redis Cache cho danh mục & banner, tối ưu thời gian phản hồi; Atomic SQL UPDATE xử lý đồng thời lượt xem tài sản',
+    ],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Cloud',
+      'Spring Cloud Gateway',
+      'PostgreSQL',
+      'Redis',
+      'Keycloak OIDC',
+      'OpenFeign',
+      'Eureka',
+      'MinIO',
+      'Apache POI',
+      'iText',
+      'MapStruct',
+      'Docker',
+      'Kubernetes',
+      'GitLab CI/CD',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // PREVIOUS POSITION — MBBank
   // ---------------------------------------------------------------------------
   {
     id: 'exp-1',
@@ -126,7 +167,8 @@ export const experience: Experience[] = [
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
     startDate: '2023-05',
-    current: true,
+    endDate: '2025-10',
+    current: false,
     description:
       'Fullstack Developer phụ trách hệ thống Collateral Management & Valuation (CMV) phục vụ nghiệp vụ thẩm định tài sản ngân hàng MBBank.',
     achievements: [

@@ -180,12 +180,42 @@ export const skills: Skill[] = [
   // ---------------------------------------------------------------------------
   {
     name: 'Spring Cloud',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'Spring Cloud Gateway',
     level: 80,
     category: 'Backend',
-    yearsOfExperience: 2,
+    yearsOfExperience: 1,
   },
   {
     name: 'Feign Client',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'Eureka Service Discovery',
+    level: 75,
+    category: 'Backend',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'Apache POI',
+    level: 75,
+    category: 'Backend',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'iText PDF',
+    level: 70,
+    category: 'Backend',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'MapStruct',
     level: 80,
     category: 'Backend',
     yearsOfExperience: 2,
@@ -254,9 +284,15 @@ export const skills: Skill[] = [
   },
   {
     name: 'Redis',
-    level: 75,
+    level: 80,
     category: 'Databases',
-    yearsOfExperience: 2,
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'MinIO',
+    level: 70,
+    category: 'Databases',
+    yearsOfExperience: 1,
   },
 
   // ---------------------------------------------------------------------------
@@ -264,9 +300,21 @@ export const skills: Skill[] = [
   // ---------------------------------------------------------------------------
   {
     name: 'Docker',
-    level: 75,
+    level: 80,
     category: 'DevOps',
-    yearsOfExperience: 2,
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'Kubernetes',
+    level: 65,
+    category: 'DevOps',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'GitLab CI/CD',
+    level: 70,
+    category: 'DevOps',
+    yearsOfExperience: 1,
   },
   {
     name: 'Jenkins',
@@ -284,12 +332,18 @@ export const skills: Skill[] = [
     name: 'CI/CD',
     level: 75,
     category: 'DevOps',
-    yearsOfExperience: 2,
+    yearsOfExperience: 3,
   },
 
   // ---------------------------------------------------------------------------
   // SECURITY
   // ---------------------------------------------------------------------------
+  {
+    name: 'Keycloak / OAuth2 OIDC',
+    level: 75,
+    category: 'Security',
+    yearsOfExperience: 1,
+  },
   {
     name: 'ECDH Encryption',
     level: 75,
@@ -301,6 +355,12 @@ export const skills: Skill[] = [
     level: 70,
     category: 'Security',
     yearsOfExperience: 2,
+  },
+  {
+    name: 'reCAPTCHA v3',
+    level: 75,
+    category: 'Security',
+    yearsOfExperience: 1,
   },
 
   // ---------------------------------------------------------------------------

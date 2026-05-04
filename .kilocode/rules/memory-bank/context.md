@@ -8,6 +8,10 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added new work experience: Alphaway (Onsite SHB Bank) — Backend Developer from Nov 2025
+- [x] Updated MBBank experience: set end date Oct 2025, marked as not current
+- [x] Updated profile summary & highlights to reflect SHB Debit Collection Portal project
+- [x] Added new skills: Spring Cloud Gateway, Eureka, Keycloak OIDC, MinIO, Apache POI, iText, MapStruct, Kubernetes, GitLab CI/CD, reCAPTCHA v3
 - [x] Profile header with photo support
 - [x] Professional summary section
 - [x] Experience timeline with animations
@@ -42,8 +46,8 @@ The template is fully implemented with all core sections working. It's ready for
 
 The resume has been fully customized for **Nguyễn Quang Ngọc** (Full-Stack Developer, Hà Nội):
 - Profile: quangngoc201197@gmail.com, 0346238899, Đa Phúc Hà Nội
-- 3 work experiences: Paraline/MBBank (current), Bảo Việt, GMO Runsystem
-- Skills in Java/Spring Boot, Microservices, Kafka, ReactJS, OracleDB, ELK, Docker
+- 4 work experiences: Alphaway/SHB (current), Paraline/MBBank, Bảo Việt, GMO Runsystem
+- Skills in Java/Spring Boot, Spring Cloud, Microservices, Kafka, ReactJS, PostgreSQL, OracleDB, Redis, Keycloak, MinIO, ELK, Docker, Kubernetes
 - Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
 - 5 projects: CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
 
@@ -100,3 +104,4 @@ Edit `src/config/site.config.ts` → `features`:
 |------|----------|
 | 2026-01-22 | Memory bank updated to match .kilocode standard structure |
 | 2026-04-15 | Customized all data files for Nguyễn Quang Ngọc (Full-Stack Developer, Vietnam) |
+| 2026-05-04 | Added Alphaway/SHB experience (Nov 2025–present), SHB Debit Collection Portal project, updated skills |

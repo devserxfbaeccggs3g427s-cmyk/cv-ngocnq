@@ -111,18 +111,18 @@ export const profile: Profile = {
   // PROFESSIONAL SUMMARY
   // Keep this concise: 2-4 sentences that capture who you are professionally
   // -------------------------------------------------------------------------
-  summary: `Kỹ sư phần mềm với gần 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank) và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo kiến trúc Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway (Apigee) và xử lý bất đồng bộ với Kafka. Có kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật, mở rộng linh hoạt và tích hợp AI/CMS để tự động hóa quy trình, giảm lỗi và tăng minh bạch.`,
+  summary: `Kỹ sư phần mềm với hơn 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank, SHB) và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo kiến trúc Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway và xử lý bất đồng bộ với Kafka. Có kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật, mở rộng linh hoạt và tích hợp AI/CMS để tự động hóa quy trình, giảm lỗi và tăng minh bạch.`,
 
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // KEY HIGHLIGHTS
   // 3-5 achievement statements with metrics when possible
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   highlights: [
+    'Thiết kế Dynamic Filter Engine & Maker-Checker Workflow cho hệ thống xử lý nợ SHB',
     'Tích hợp AI giảm 60% khối lượng nhập tay trong hệ thống CMV MBBank',
+    'Triển khai bảo mật đa lớp: reCAPTCHA v3 + Rate Limiting + Duplicate Prevention',
     'Thiết kế & triển khai Microservices + EDA (Kafka) cho hệ thống ngân hàng',
-    'Bảo mật API qua Apigee Gateway với ECDH Encryption',
-    'Xây dựng ETL Pipeline đồng bộ dữ liệu liên hệ thống với Pentaho PDI',
-    'Gần 4 năm kinh nghiệm hệ thống tài chính – ngân hàng, bảo hiểm và khách hàng Nhật Bản',
+    'Hơn 4 năm kinh nghiệm hệ thống tài chính – ngân hàng, bảo hiểm và khách hàng Nhật Bản',
   ],
 };
 
