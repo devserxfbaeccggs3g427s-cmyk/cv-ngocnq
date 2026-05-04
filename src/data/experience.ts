@@ -122,7 +122,7 @@ export const experience: Experience[] = [
   {
     id: 'exp-0',
     title: 'Backend Developer',
-    company: 'Alphaway (Onsite tại Ngân hàng SHB)',
+    company: 'Alphaway (Onsite cho Ngân hàng SHB)',
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
     startDate: '2025-11',
