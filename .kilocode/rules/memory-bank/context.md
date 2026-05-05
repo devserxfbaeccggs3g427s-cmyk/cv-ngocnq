@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added SHB Debit Collection Portal project entry (featured), timeline 2025-11 – 2026-01
 - [x] Added SHB SAHA Mobile Banking Cambodia experience: Backend Developer at Alphaway/SHB (Jan 2026 – Apr 2026)
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry (featured)
 - [x] Updated skills: Spring Security, Oracle PL/SQL, JWT/Nimbus JOSE, SMS Gateway
@@ -53,7 +54,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Full-Stack D
 - 4 work experiences: Alphaway/SHB (current), Paraline/MBBank, Bảo Việt, GMO Runsystem
 - Skills in Java/Spring Boot, Spring Cloud, Microservices, Kafka, ReactJS, PostgreSQL, OracleDB, Redis, Keycloak, MinIO, ELK, Docker, Kubernetes
 - Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
-- 5 projects: SHB SAHA Mobile Banking Cambodia, CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
+- 6 projects: SHB Debit Collection Portal, SHB SAHA Mobile Banking Cambodia, CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
 
 ## Quick Customization Guide
 
@@ -110,3 +111,4 @@ Edit `src/config/site.config.ts` → `features`:
 | 2026-04-15 | Customized all data files for Nguyễn Quang Ngọc (Full-Stack Developer, Vietnam) |
 | 2026-05-04 | Added Alphaway/SHB experience (Nov 2025–present), SHB Debit Collection Portal project, updated skills |
 | 2026-05-05 | Added SHB SAHA Mobile Banking Cambodia experience & project (Jan–Apr 2026), updated skills & profile |
+| 2026-05-05 | Added SHB Debit Collection Portal project entry (2025-11 – 2026-01) |

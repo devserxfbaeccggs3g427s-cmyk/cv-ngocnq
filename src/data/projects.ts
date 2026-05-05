@@ -207,6 +207,50 @@ export const projects: Project[] = [
   },
 
   // ---------------------------------------------------------------------------
+  // FEATURED PROJECT — SHB Debit Collection Portal (Xử Lý Nợ Xấu)
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-7',
+    slug: 'shb-debit-collection-portal',
+    title: 'SHB Debit Collection Portal – Cổng Thông Tin Xử Lý Nợ Xấu',
+    description:
+      'Hệ thống quản lý và đấu giá tài sản xử lý nợ trên nền tảng Microservices, phục vụ quy trình xử lý nợ xấu tại Ngân hàng SHB.',
+    longDescription: `SHB Debit Collection Portal là hệ thống quản lý & đấu giá tài sản xử lý nợ xấu được xây dựng trên nền tảng Microservices với Spring Cloud. Hệ thống cung cấp Dynamic Filter Engine dựa trên JPA Specification Pattern hỗ trợ tìm kiếm đa tiêu chí với cấu hình filter động từ DB. Quy trình phê duyệt Maker-Checker (4 mắt) cho quản lý tài sản & thông báo đấu giá, đảm bảo Separation of Duties. Cơ chế bảo mật 3 lớp cho Lead Generation: Rate Limiting (Redis) + Google reCAPTCHA v3 + Duplicate Prevention. Hệ thống cũng có tính năng Dynamic Field Display dùng Java Reflection, hiển thị trường linh hoạt theo từng loại tài sản (BĐS, PTVT, MMTB).`,
+    thumbnail: '/projects/shb-debit-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Cloud',
+      'Spring Cloud Gateway',
+      'PostgreSQL',
+      'Redis',
+      'Keycloak OIDC',
+      'OpenFeign',
+      'Eureka',
+      'MinIO',
+      'Apache POI',
+      'iText',
+      'MapStruct',
+      'Docker',
+      'Kubernetes',
+      'GitLab CI/CD',
+    ],
+    category: 'Tài chính – Ngân hàng',
+    role: 'Backend Developer',
+    duration: '2025-11 – 2026-01',
+    featured: true,
+    highlights: [
+      'Dynamic Filter Engine với JPA Specification Pattern, hỗ trợ tìm kiếm đa tiêu chí',
+      'Quy trình phê duyệt Maker-Checker (4 mắt) cho quản lý tài sản & thông báo đấu giá',
+      'Bảo mật 3 lớp: Rate Limiting (Redis) + Google reCAPTCHA v3 + Duplicate Prevention',
+      'Kiến trúc Microservices: Spring Cloud Gateway, Eureka, OpenFeign',
+      'Dynamic Field Display với Java Reflection, hiển thị linh hoạt theo loại tài sản',
+      'Redis Cache danh mục & banner; Atomic SQL UPDATE xử lý đồng thời lượt xem',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
   // FEATURED PROJECT — SHB SAHA Mobile Banking Cambodia
   // ---------------------------------------------------------------------------
   {
