@@ -207,6 +207,47 @@ export const projects: Project[] = [
   },
 
   // ---------------------------------------------------------------------------
+  // FEATURED PROJECT — SHB SAHA Mobile Banking Cambodia
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-6',
+    slug: 'shb-saha-mobile-banking-cambodia',
+    title: 'SHB SAHA Mobile Banking – Campuchia',
+    description:
+      'Nền tảng ngân hàng di động phục vụ thị trường Campuchia với 3 microservices Spring Boot, hỗ trợ 3 ngôn ngữ và 2 loại tiền tệ, tích hợp Core Banking Intellect.',
+    longDescription: `SHB SAHA Mobile Banking Cambodia là nền tảng ngân hàng di động phục vụ thị trường Campuchia, hỗ trợ 3 ngôn ngữ (tiếng Anh, tiếng Việt, tiếng Khmer) và 2 loại tiền tệ (USD, KHR). Hệ thống được phân tách thành 3 microservices: Identity Service (xác thực JWT + RSA-4096, quản lý session Redis, Device Trust, OTP SMS), Account Service (quản lý tài khoản CASA/tiết kiệm/vay, người thụ hưởng, tích hợp Core Banking Intellect qua Oracle Stored Procedures), và Fund Transfer Service (chuyển khoản nội bộ SELF/INTRA với Two-Phase Commit, tích hợp Core Banking TCP cho bút toán tài chính). Hệ thống validation phân tầng 4 lớp, bảo mật đa lớp với JWT HS256, RSA-4096, rate limiting OTP, device fingerprinting và password policy.`,
+    thumbnail: '/projects/shb-saha-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Security',
+      'Oracle DB',
+      'PL/SQL',
+      'Redis',
+      'JWT (Nimbus JOSE)',
+      'RSA-4096',
+      'SMS Gateway',
+      'Docker',
+      'Maven',
+      'GitLab CI/CD',
+      'i18n (EN/VI/KM)',
+    ],
+    category: 'Tài chính – Ngân hàng',
+    role: 'Backend Developer',
+    duration: '2026-01 – 2026-04',
+    featured: true,
+    highlights: [
+      '3 Microservices: Identity, Account, Fund Transfer với Spring Boot 3',
+      'Xác thực JWT + RSA-4096, session Redis sliding expiration, Device Trust fingerprinting',
+      'Tích hợp Core Banking Intellect qua Oracle Stored Procedures & TCP',
+      'Two-Phase Commit Pattern cho chuyển khoản nội bộ SELF/INTRA',
+      'Validation phân tầng 4 lớp + i18n đa ngôn ngữ động (EN/VI/KM)',
+      'Bảo mật đa lớp: JWT HS256, RSA-4096, rate limiting, password policy',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
   // PROJECT 3 – Veritas
   // ---------------------------------------------------------------------------
   {

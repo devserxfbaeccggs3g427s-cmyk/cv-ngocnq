@@ -117,7 +117,7 @@ export interface Experience {
  */
 export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
-  // CURRENT POSITION — Alphaway / SHB
+  // CURRENT POSITION — Alphaway / SHB (Debit Collection Portal)
   // ---------------------------------------------------------------------------
   {
     id: 'exp-0',
@@ -154,6 +154,46 @@ export const experience: Experience[] = [
       'Docker',
       'Kubernetes',
       'GitLab CI/CD',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Alphaway / SHB — SHB SAHA Mobile Banking Cambodia
+  // ---------------------------------------------------------------------------
+  {
+    id: 'exp-0b',
+    title: 'Backend Developer',
+    company: 'ALPHAWAY TECHNOLOGY (Outsourced cho Ngân hàng SHB)',
+    location: 'Hà Nội, Việt Nam',
+    type: 'full-time',
+    startDate: '2026-01',
+    endDate: '2026-04',
+    current: false,
+    description:
+      'Backend Developer phát triển SHB SAHA Mobile Banking Cambodia – nền tảng ngân hàng di động phục vụ thị trường Campuchia, hỗ trợ 3 ngôn ngữ (EN/VI/KM) và 2 loại tiền tệ (USD/KHR) trên kiến trúc 3 Microservices Java Spring Boot.',
+    achievements: [
+      'Phát triển Identity Service: Xác thực JWT + RSA-4096, quản lý session Redis với sliding expiration (15 phút) & absolute timeout (8 giờ), Device Trust với device fingerprinting, OTP SMS Gateway tích hợp',
+      'Phát triển Account Service: Quản lý danh sách tài khoản CASA/tiết kiệm/vay, tích hợp Core Banking Intellect qua Oracle Stored Procedures (PKG_MBBANKING), quản lý người thụ hưởng, hỗ trợ i18n đa ngôn ngữ động',
+      'Phát triển Fund Transfer Service: Chuyển khoản nội bộ SELF/INTRA với Two-Phase Commit Pattern, tích hợp Core Banking TCP cho bút toán tài chính (Finance Posting), xử lý mapping phức tạp với FinancePostingMapper',
+      'Thiết kế hệ thống validation phân tầng 4 lớp: Bean Validation → Custom Validators → Business Validators → Database Constraints, tất cả mã lỗi được mapping đa ngôn ngữ qua TBL_ERROR_MESSAGES',
+      'Xây dựng JdbcCallStoreExecutor (Template Method Pattern) gọi Stored Procedures động với tham số linh hoạt, hỗ trợ REF CURSOR và OUT parameters',
+      'Triển khai bảo mật đa lớp: JWT HS256 authentication, RSA-4096 mã hóa mật khẩu, session Redis, rate limiting OTP, device fingerprinting, password policy (8-20 ký tự, chữ hoa/thường/số/ký tự đặc biệt)',
+    ],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Security',
+      'Oracle DB',
+      'PL/SQL',
+      'Redis',
+      'JWT (Nimbus JOSE)',
+      'RSA-4096',
+      'SMS Gateway',
+      'Docker',
+      'Maven',
+      'GitLab CI/CD',
+      'REST API (OpenAPI 3.0)',
+      'i18n (EN/VI/KM)',
     ],
   },
 

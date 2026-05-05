@@ -185,6 +185,12 @@ export const skills: Skill[] = [
     yearsOfExperience: 3,
   },
   {
+    name: 'Spring Security',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 4,
+  },
+  {
     name: 'Spring Cloud Gateway',
     level: 80,
     category: 'Backend',
@@ -223,6 +229,24 @@ export const skills: Skill[] = [
   {
     name: 'Pentaho PDI (ETL)',
     level: 75,
+    category: 'Backend',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'Oracle PL/SQL',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'JWT / Nimbus JOSE',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'SMS Gateway',
+    level: 70,
     category: 'Backend',
     yearsOfExperience: 1,
   },
