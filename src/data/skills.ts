@@ -82,14 +82,12 @@ export interface Language {
  * Add, remove, or rename categories as needed.
  */
 export const skillCategories: string[] = [
-  'Languages',      // Programming languages & frameworks
-  'Frontend',       // Frontend frameworks & libraries
-  'Backend',        // Backend frameworks & technologies
-  'Architecture',   // System architecture & distributed systems
-  'Databases',      // Database technologies
-  'DevOps',         // DevOps tools & practices
-  'Security',       // Security & encryption
-  'Monitoring',     // Monitoring & logging
+  'Testing Process',    // Quy trình & phương pháp kiểm thử
+  'API & Backend',      // Kiểm thử API và backend
+  'Databases',          // Cơ sở dữ liệu & đối soát dữ liệu
+  'Tools & Management', // Công cụ quản lý lỗi & dự án
+  'Domain Knowledge',   // Nghiệp vụ chuyên ngành
+  'Soft Skills',        // Kỹ năng mềm & tài liệu
 ];
 
 /**
@@ -102,180 +100,76 @@ export const skillCategories: string[] = [
  */
 export const skills: Skill[] = [
   // ---------------------------------------------------------------------------
-  // PROGRAMMING LANGUAGES & FRAMEWORKS
+  // TESTING PROCESS
   // ---------------------------------------------------------------------------
   {
-    name: 'Java Core',
+    name: 'Manual Testing',
+    level: 92,
+    category: 'Testing Process',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Test Plan / Test Case Design',
     level: 90,
-    category: 'Languages',
+    category: 'Testing Process',
     yearsOfExperience: 4,
   },
   {
-    name: 'Spring Boot',
+    name: 'Regression Testing & Retest',
     level: 90,
-    category: 'Languages',
+    category: 'Testing Process',
     yearsOfExperience: 4,
   },
   {
-    name: 'Spring Framework',
+    name: 'Requirement Analysis (SRS/Figma)',
     level: 85,
-    category: 'Languages',
+    category: 'Testing Process',
     yearsOfExperience: 4,
   },
   {
-    name: 'Hibernate',
-    level: 85,
-    category: 'Languages',
+    name: 'Bug Reporting & Bug Lifecycle',
+    level: 88,
+    category: 'Testing Process',
     yearsOfExperience: 4,
   },
   {
-    name: 'MyBatis',
-    level: 75,
-    category: 'Languages',
-    yearsOfExperience: 2,
+    name: 'UAT Support & Production Issue',
+    level: 82,
+    category: 'Testing Process',
+    yearsOfExperience: 3,
   },
   {
-    name: 'JavaScript',
+    name: 'Agile / Scrum',
     level: 80,
-    category: 'Languages',
+    category: 'Testing Process',
     yearsOfExperience: 4,
   },
 
   // ---------------------------------------------------------------------------
-  // FRONTEND
+  // API & BACKEND TESTING
   // ---------------------------------------------------------------------------
   {
-    name: 'ReactJS',
+    name: 'Postman (API Testing)',
     level: 85,
-    category: 'Frontend',
-    yearsOfExperience: 3,
-  },
-  {
-    name: 'Thymeleaf',
-    level: 75,
-    category: 'Frontend',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'JSP / Servlet',
-    level: 70,
-    category: 'Frontend',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'HTML / CSS',
-    level: 80,
-    category: 'Frontend',
+    category: 'API & Backend',
     yearsOfExperience: 4,
   },
   {
-    name: 'jQuery',
-    level: 70,
-    category: 'Frontend',
-    yearsOfExperience: 2,
-  },
-
-  // ---------------------------------------------------------------------------
-  // BACKEND
-  // ---------------------------------------------------------------------------
-  {
-    name: 'Spring Cloud',
-    level: 85,
-    category: 'Backend',
+    name: 'JSON Validation & Response Logic',
+    level: 82,
+    category: 'API & Backend',
     yearsOfExperience: 3,
   },
   {
-    name: 'Spring Security',
-    level: 85,
-    category: 'Backend',
-    yearsOfExperience: 4,
-  },
-  {
-    name: 'Spring Cloud Gateway',
-    level: 80,
-    category: 'Backend',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'Feign Client',
-    level: 80,
-    category: 'Backend',
+    name: 'Backend Flow Verification',
+    level: 78,
+    category: 'API & Backend',
     yearsOfExperience: 3,
   },
   {
-    name: 'Eureka Service Discovery',
-    level: 75,
-    category: 'Backend',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'Apache POI',
-    level: 75,
-    category: 'Backend',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'iText PDF',
-    level: 70,
-    category: 'Backend',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'MapStruct',
-    level: 80,
-    category: 'Backend',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'Pentaho PDI (ETL)',
-    level: 75,
-    category: 'Backend',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'Oracle PL/SQL',
-    level: 80,
-    category: 'Backend',
-    yearsOfExperience: 3,
-  },
-  {
-    name: 'JWT / Nimbus JOSE',
-    level: 80,
-    category: 'Backend',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'SMS Gateway',
-    level: 70,
-    category: 'Backend',
-    yearsOfExperience: 1,
-  },
-
-  // ---------------------------------------------------------------------------
-  // ARCHITECTURE
-  // ---------------------------------------------------------------------------
-  {
-    name: 'Microservices',
-    level: 85,
-    category: 'Architecture',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'Event-Driven Architecture',
-    level: 85,
-    category: 'Architecture',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'Apache Kafka',
-    level: 80,
-    category: 'Architecture',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'API Gateway (Apigee)',
-    level: 80,
-    category: 'Architecture',
+    name: 'Webhook Testing (Real-time Data)',
+    level: 72,
+    category: 'API & Backend',
     yearsOfExperience: 2,
   },
 
@@ -283,130 +177,112 @@ export const skills: Skill[] = [
   // DATABASES
   // ---------------------------------------------------------------------------
   {
-    name: 'OracleDB',
-    level: 85,
+    name: 'MySQL (SQL Query & Data Verify)',
+    level: 82,
     category: 'Databases',
-    yearsOfExperience: 3,
-  },
-  {
-    name: 'PostgreSQL',
-    level: 80,
-    category: 'Databases',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'MySQL',
-    level: 75,
-    category: 'Databases',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'SQL Server',
-    level: 65,
-    category: 'Databases',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'Redis',
-    level: 80,
-    category: 'Databases',
-    yearsOfExperience: 3,
-  },
-  {
-    name: 'MinIO',
-    level: 70,
-    category: 'Databases',
-    yearsOfExperience: 1,
-  },
-
-  // ---------------------------------------------------------------------------
-  // DEVOPS
-  // ---------------------------------------------------------------------------
-  {
-    name: 'Docker',
-    level: 80,
-    category: 'DevOps',
-    yearsOfExperience: 3,
-  },
-  {
-    name: 'Kubernetes',
-    level: 65,
-    category: 'DevOps',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'GitLab CI/CD',
-    level: 70,
-    category: 'DevOps',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'Jenkins',
-    level: 70,
-    category: 'DevOps',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'Git / GitHub / GitLab',
-    level: 85,
-    category: 'DevOps',
     yearsOfExperience: 4,
   },
   {
-    name: 'CI/CD',
+    name: 'MongoDB (Data Verification)',
+    level: 70,
+    category: 'Databases',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Data Tracing & Reconciliation',
+    level: 80,
+    category: 'Databases',
+    yearsOfExperience: 4,
+  },
+
+  // ---------------------------------------------------------------------------
+  // TOOLS & MANAGEMENT
+  // ---------------------------------------------------------------------------
+  {
+    name: 'Redmine (Bug Tracking)',
+    level: 90,
+    category: 'Tools & Management',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Google Sheets (Report & Tracking)',
+    level: 88,
+    category: 'Tools & Management',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Figma (UI/UX Review)',
     level: 75,
-    category: 'DevOps',
+    category: 'Tools & Management',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'UltraViewer / AnyDesk (Remote)',
+    level: 80,
+    category: 'Tools & Management',
     yearsOfExperience: 3,
   },
-
-  // ---------------------------------------------------------------------------
-  // SECURITY
-  // ---------------------------------------------------------------------------
   {
-    name: 'Keycloak / OAuth2 OIDC',
-    level: 75,
-    category: 'Security',
-    yearsOfExperience: 1,
-  },
-  {
-    name: 'ECDH Encryption',
-    level: 75,
-    category: 'Security',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'RSA Encryption',
-    level: 70,
-    category: 'Security',
-    yearsOfExperience: 2,
-  },
-  {
-    name: 'reCAPTCHA v3',
-    level: 75,
-    category: 'Security',
-    yearsOfExperience: 1,
+    name: 'Google Drive',
+    level: 85,
+    category: 'Tools & Management',
+    yearsOfExperience: 4,
   },
 
   // ---------------------------------------------------------------------------
-  // MONITORING
+  // DOMAIN KNOWLEDGE
   // ---------------------------------------------------------------------------
   {
-    name: 'ELK Stack',
-    level: 75,
-    category: 'Monitoring',
+    name: 'HRM / Attendance Management',
+    level: 90,
+    category: 'Domain Knowledge',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Access Control & Biometric',
+    level: 88,
+    category: 'Domain Knowledge',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'Multi-level Approval Workflow',
+    level: 85,
+    category: 'Domain Knowledge',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'Visitor Management (QR/CCCD)',
+    level: 82,
+    category: 'Domain Knowledge',
     yearsOfExperience: 2,
   },
   {
-    name: 'Elasticsearch',
-    level: 70,
-    category: 'Monitoring',
-    yearsOfExperience: 2,
+    name: 'Sync & Real-time Data Testing',
+    level: 82,
+    category: 'Domain Knowledge',
+    yearsOfExperience: 4,
+  },
+
+  // ---------------------------------------------------------------------------
+  // SOFT SKILLS
+  // ---------------------------------------------------------------------------
+  {
+    name: 'User Guide & Training Materials',
+    level: 85,
+    category: 'Soft Skills',
+    yearsOfExperience: 4,
   },
   {
-    name: 'Kibana',
-    level: 70,
-    category: 'Monitoring',
-    yearsOfExperience: 2,
+    name: 'Customer Training & Handover',
+    level: 82,
+    category: 'Soft Skills',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'Time Estimation & Planning',
+    level: 78,
+    category: 'Soft Skills',
+    yearsOfExperience: 4,
   },
 ];
 
@@ -419,7 +295,7 @@ export const skills: Skill[] = [
  */
 export const languages: Language[] = [
   { name: 'Tiếng Việt', level: 'Native' },
-  { name: 'English', level: 'Intermediate' },
+  { name: 'English', level: 'Basic' },
 ];
 
 // =============================================================================

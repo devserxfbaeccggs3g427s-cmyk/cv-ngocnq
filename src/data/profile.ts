@@ -96,33 +96,33 @@ export const profile: Profile = {
   // -------------------------------------------------------------------------
   // BASIC INFO (Required)
   // -------------------------------------------------------------------------
-  name: 'Nguyễn Quang Ngọc',
-  title: 'Full-Stack Developer',
+  name: 'Nguyễn Thị Thương',
+  title: 'QA Engineer / Manual Tester (Hướng Automation)',
   photo: '/images/profile.jpg', // Set to '' to hide photo
-  email: 'quangngoc201197@gmail.com',
-  location: 'Đa Phúc, Hà Nội, Việt Nam',
+  email: 'thuongnguyen22022@gmail.com',
+  location: 'Xuân Dương, Đa Phúc, Hà Nội, Việt Nam',
 
   // -------------------------------------------------------------------------
   // CONTACT & SOCIAL (Optional - remove or set to undefined if not needed)
   // -------------------------------------------------------------------------
-  phone: '0346238899',
+  phone: '0974519863',
 
   // -------------------------------------------------------------------------
   // PROFESSIONAL SUMMARY
   // Keep this concise: 2-4 sentences that capture who you are professionally
   // -------------------------------------------------------------------------
-  summary: `Kỹ sư phần mềm với hơn 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank, SHB) và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo kiến trúc Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway và xử lý bất đồng bộ với Kafka. Từng phát triển toàn bộ backend cho SHB Mobile Banking Cambodia với 3 microservices Java Spring Boot, tích hợp Core Banking Intellect qua Oracle Stored Procedures và TCP. Kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật đa lớp (JWT, RSA-4096, OTP), mở rộng linh hoạt và tích hợp AI/CMS để tự động hóa quy trình.`,
+  summary: `Kỹ sư Đảm bảo Chất lượng (QA Engineer) với gần 4 năm kinh nghiệm thực chiến kiểm thử hệ thống đa nền tảng (Web, Mobile, Tablet). Chuyên sâu kiểm thử các hệ thống doanh nghiệp quy mô lớn: Quản lý nhân sự (HRM), Chấm công thông minh, Kiểm soát truy cập (Access Control) và tích hợp nhận diện sinh trắc học. Thành thạo thiết kế Test Plan/Test Case, kiểm thử API bằng Postman, đối soát dữ liệu với MySQL/MongoDB và quản lý bug trên Redmine. Định hướng phát triển trở thành Automation Tester, tối ưu hóa quy trình kiểm thử và nâng cao chất lượng sản phẩm phần mềm.`,
 
   // ---------------------------------------------------------------------------
   // KEY HIGHLIGHTS
   // 3-5 achievement statements with metrics when possible
   // ---------------------------------------------------------------------------
   highlights: [
-    'Phát triển toàn bộ backend 3 Microservices cho SHB Mobile Banking Campuchia (Identity, Account, Fund Transfer)',
-    'Thiết kế Dynamic Filter Engine & Maker-Checker Workflow cho hệ thống xử lý nợ SHB',
-    'Tích hợp AI giảm 60% khối lượng nhập tay trong hệ thống CMV MBBank',
-    'Triển khai bảo mật đa lớp: JWT + RSA-4096 + reCAPTCHA v3 + Rate Limiting + Device Fingerprinting',
-    'Hơn 4 năm kinh nghiệm hệ thống tài chính – ngân hàng, bảo hiểm và khách hàng Nhật Bản',
+    'Gần 4 năm kinh nghiệm Manual Testing đa nền tảng (Web, iOS, Android, Tablet) tại VTI Technology',
+    'Kiểm thử thành công 5+ dự án lớn: FaceX Core, SMC, TIA, HOYA, VietJet Air',
+    'Giảm thời gian check-in khách xuống dưới 10 giây/lượt bằng cách đảm bảo chất lượng tính năng QR/CCCD/Passport',
+    'Phát hiện và xử lý triệt để lỗi ca qua đêm (Overnight Shift), đảm bảo Timesheet chính xác 100%',
+    'Kiểm thử workflow phê duyệt đa tầng (AND/OR) và tính năng Skip-level approval cho 10+ loại yêu cầu',
   ],
 };
 

@@ -135,10 +135,10 @@ export const siteConfig: SiteConfig = {
   // ---------------------------------------------------------------------------
   meta: {
     titleTemplate: '{{name}} | {{title}}',
-    defaultDescription: 'Professional resume and portfolio website',
-    keywords: ['resume', 'portfolio', 'developer', 'software engineer', 'web developer'],
+    defaultDescription: 'CV của Nguyễn Thị Thương – QA Engineer / Manual Tester với gần 4 năm kinh nghiệm kiểm thử hệ thống HRM, Access Control và nhận diện sinh trắc học tại VTI Technology.',
+    keywords: ['QA Engineer', 'Manual Tester', 'Software Tester', 'QA/QC', 'Test Case', 'Test Plan', 'Postman', 'Redmine', 'MySQL', 'Agile Scrum', 'HRM', 'Access Control', 'VTI Technology'],
     siteUrl: 'https://your-domain.com',
-    locale: 'en',
+    locale: 'vi',
   },
 
   // ---------------------------------------------------------------------------
@@ -154,7 +154,7 @@ export const siteConfig: SiteConfig = {
     // - Pink: "330 70% 50%"
     // - Teal: "180 70% 45%"
     // - Red: "0 80% 50%"
-    primaryColor: '220 92% 50%',
+    primaryColor: '180 70% 40%',
     darkModeEnabled: true,
     defaultColorMode: 'system',
     fontFamily: 'Inter',

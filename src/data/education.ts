@@ -155,40 +155,21 @@ export interface Award {
  */
 export const education: Education[] = [
   // ---------------------------------------------------------------------------
-  // MOST RECENT DEGREE
+  // DEGREE — Đại học Điện Lực
   // ---------------------------------------------------------------------------
   {
     id: 'edu-1',
     degree: 'Cử nhân Công nghệ Thông tin',
-    field: 'Phát triển phần mềm',
-    school: 'Trường Đại học Giao thông vận tải',
+    field: 'Công nghệ phần mềm',
+    school: 'Trường Đại học Điện Lực',
     location: 'Hà Nội, Việt Nam',
-    startYear: 2023,
-    endYear: 2025,
-    gpa: '2.7/4.0',
+    startYear: 2018,
+    endYear: 2023,
     relevantCourses: [
-      'Phát triển phần mềm',
-      'Kiến trúc hệ thống',
-      'Cơ sở dữ liệu',
-    ],
-  },
-
-  // ---------------------------------------------------------------------------
-  // EARLIER DEGREE
-  // ---------------------------------------------------------------------------
-  {
-    id: 'edu-2',
-    degree: 'Cử nhân Công nghệ Thông tin',
-    field: 'Ứng dụng phần mềm',
-    school: 'Cao đẳng FPT Polytechnic',
-    location: 'Hà Nội, Việt Nam',
-    startYear: 2020,
-    endYear: 2022,
-    gpa: '8.8/10.0',
-    relevantCourses: [
-      'Lập trình hướng đối tượng',
-      'Phát triển Web',
-      'Cơ sở dữ liệu quan hệ',
+      'Kiểm thử phần mềm (Software Testing)',
+      'Lập trình và cơ sở dữ liệu (SQL)',
+      'Quy trình phát triển phần mềm (SDLC)',
+      'Phân tích và thiết kế hệ thống',
     ],
   },
 ];
@@ -204,15 +185,9 @@ export const education: Education[] = [
 export const certifications: Certification[] = [
   {
     id: 'cert-1',
-    name: 'Top Notch 2 – Tiếng Anh',
-    issuer: 'Cao đẳng FPT Polytechnic',
-    date: '2022-06',
-  },
-  {
-    id: 'cert-2',
-    name: 'Chứng chỉ Tin học Văn phòng',
-    issuer: 'Cao đẳng FPT Polytechnic',
-    date: '2022-06',
+    name: 'Cử nhân Công nghệ Thông tin – Công nghệ phần mềm',
+    issuer: 'Trường Đại học Điện Lực',
+    date: '2023-07',
   },
 ];
 
@@ -227,17 +202,24 @@ export const certifications: Certification[] = [
 export const awards: Award[] = [
   {
     id: 'award-1',
-    title: 'Đồ án tốt nghiệp xuất sắc',
-    issuer: 'Trường Đại học Giao thông vận tải',
-    date: '2025',
-    description: 'Xây dựng Website Quản lý nhân sự sử dụng Spring Boot, ReactJS, OracleDB, Kafka, Redis, Docker, Microservices',
+    title: 'Kiểm thử Timesheet chính xác 100%',
+    issuer: 'Dự án TIA – VTI Technology',
+    date: '2024',
+    description: 'Phát hiện và giải quyết triệt để lỗi tính toán ca qua đêm (Overnight Shift), đảm bảo bảng chấm công chạy chính xác 100% tại Cảng Hàng không TSN.',
   },
   {
     id: 'award-2',
-    title: 'Đồ án tốt nghiệp xuất sắc',
-    issuer: 'Cao đẳng FPT Polytechnic',
-    date: '2022',
-    description: 'Xây dựng Website bán hàng sử dụng Spring Boot, ReactJS, MySQL',
+    title: 'Giảm thời gian check-in khách xuống dưới 10 giây',
+    issuer: 'Dự án VietJet Air – VTI Technology',
+    date: '2024',
+    description: 'Đảm bảo chất lượng tính năng Tablet Check-in tự động (QR/CCCD/Passport), giúp giảm thiểu thời gian chờ đợi tại sảnh xuống dưới 10 giây/lượt và ngăn chặn 100% xung đột đặt phòng (Overbooking).',
+  },
+  {
+    id: 'award-3',
+    title: 'Kiểm thử thành công Skip-level Approval cho 10+ loại yêu cầu',
+    issuer: 'Dự án HOYA – VTI Technology',
+    date: '2023',
+    description: 'Xây dựng kịch bản kiểm thử toàn diện cho workflow phê duyệt đa tầng phức tạp (AND/OR) và kiểm thử thành công tính năng phê duyệt vượt cấp cho hơn 10 loại yêu cầu khác nhau.',
   },
 ];
 

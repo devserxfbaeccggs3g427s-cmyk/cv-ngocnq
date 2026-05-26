@@ -49,12 +49,14 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Current Focus
 
-The resume has been fully customized for **Nguyễn Quang Ngọc** (Full-Stack Developer, Hà Nội):
-- Profile: quangngoc201197@gmail.com, 0346238899, Đa Phúc Hà Nội
-- 4 work experiences: Alphaway/SHB (current), Paraline/MBBank, Bảo Việt, GMO Runsystem
-- Skills in Java/Spring Boot, Spring Cloud, Microservices, Kafka, ReactJS, PostgreSQL, OracleDB, Redis, Keycloak, MinIO, ELK, Docker, Kubernetes
-- Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
-- 6 projects: SHB Debit Collection Portal, SHB SAHA Mobile Banking Cambodia, CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
+The resume has been fully customized for **Nguyễn Thị Thương** (QA Engineer / Manual Tester, Hà Nội):
+- Profile: thuongnguyen22022@gmail.com, 0974519863, Xuân Dương, Đa Phúc Hà Nội
+- 1 work experience: VTI Technology (2022–2026, QA Engineer / Manual Tester)
+- Skills in Manual Testing, Test Plan/Case Design, Regression Testing, Postman, MySQL, MongoDB, Redmine, Figma, HRM domain knowledge, Access Control, Multi-level Approval Workflow
+- Education: Đại học Điện Lực (2018–2023), Công nghệ phần mềm
+- 5 projects: FaceX Core, SMC (ParkingX), TIA (Sân bay TSN), HOYA, VietJet Air
+- Theme color: Teal (180 70% 40%)
+- Skills categories: Testing Process, API & Backend, Databases, Tools & Management, Domain Knowledge, Soft Skills
 
 ## Quick Customization Guide
 
@@ -112,3 +114,4 @@ Edit `src/config/site.config.ts` → `features`:
 | 2026-05-04 | Added Alphaway/SHB experience (Nov 2025–present), SHB Debit Collection Portal project, updated skills |
 | 2026-05-05 | Added SHB SAHA Mobile Banking Cambodia experience & project (Jan–Apr 2026), updated skills & profile |
 | 2026-05-05 | Added SHB Debit Collection Portal project entry (2025-11 – 2026-01) |
+| 2026-05-26 | Full CV rewrite for Nguyễn Thị Thương (QA Engineer / Manual Tester) – updated profile, experience, skills, education, projects and site config |
