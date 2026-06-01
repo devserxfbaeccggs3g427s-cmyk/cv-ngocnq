@@ -145,6 +145,51 @@ export const projectCategories: string[] = [
  */
 export const projects: Project[] = [
   // ---------------------------------------------------------------------------
+  // FEATURED PROJECT — C12 GOV Payment Service
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-8',
+    slug: 'c12-gov-payment-service',
+    title: 'C12 GOV Payment Service – Payment Gateway Dịch vụ công',
+    description:
+      'Backend payment gateway trung gian giữa Cổng Dịch vụ công Quốc gia và SHB, xử lý VietQR, thanh toán, hoàn tiền, chi hộ và đối soát giao dịch.',
+    longDescription: `C12 GOV Payment Service là backend service trung gian xử lý thanh toán giữa Hệ thống Quản lý Thanh toán Trực tuyến của Cổng Dịch vụ công Quốc gia và ngân hàng SHB. Hệ thống cung cấp 9 nhóm API chính: tạo giao dịch và sinh VietQR, kiểm tra trạng thái, lấy biên lai điện tử, vấn tin tài khoản, hoàn tiền, lấy thông tin tài khoản thanh toán, chi hộ, đối soát giao dịch và internal retry APIs. Backend tích hợp ESB/Core Banking, Napas, Ebank, Oracle Core Banking schema, Signature Service và Kafka retry topic. Kiến trúc được refactor theo facade + use-case services, Strategy/Template Method cho luồng transfer đa kênh, typed configuration properties, centralized error handling và observability qua AOP logging, MDC tracing, masking log và Actuator.`,
+    thumbnail: '/projects/c12-gov-payment-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Web MVC',
+      'Spring Data JPA',
+      'Hibernate',
+      'JdbcTemplate',
+      'Oracle DB',
+      'Spring Kafka',
+      'RestTemplate',
+      'JWT Authentication',
+      'Digital Signature',
+      'Napas EMVCo / VietQR',
+      'Spring AOP',
+      'SpringDoc OpenAPI',
+      'JUnit 5',
+      'Mockito',
+      'Maven',
+    ],
+    category: 'Tài chính – Ngân hàng',
+    role: 'Backend Developer',
+    duration: '2026-05 – Nay',
+    featured: true,
+    highlights: [
+      'Phát triển 9 API payment gateway: tạo QR, check status, receipt, bank inquiry, refund, disbursement, reconciliation và retry nội bộ',
+      'Sinh VietQR theo chuẩn Napas EMVCo với TLV encoding, CRC checksum, alias account Oracle sequence và idempotency',
+      'Tích hợp ESB/Core Banking, Napas, Ebank, Oracle Core Banking schema và Signature Service',
+      'Thiết kế luồng hoàn tiền/chi hộ đa kênh với Strategy + Template Method, hỗ trợ financial posting và reversal',
+      'Xây dựng đối soát Type 1/Type 2: file 22 cột pipe-delimited, Base64 parsing, checksum và lưu kết quả cần khớp',
+      'Bổ sung retry failed Kafka messages, AOP API logging, MDC tracing, masking log, Actuator và unit test JUnit/Mockito',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
   // FEATURED PROJECT 1 – CMV MBBank
   // ---------------------------------------------------------------------------
   {

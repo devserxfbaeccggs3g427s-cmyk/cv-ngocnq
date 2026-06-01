@@ -111,18 +111,18 @@ export const profile: Profile = {
   // PROFESSIONAL SUMMARY
   // Keep this concise: 2-4 sentences that capture who you are professionally
   // -------------------------------------------------------------------------
-  summary: `Kỹ sư phần mềm với hơn 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank, SHB) và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo kiến trúc Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway và xử lý bất đồng bộ với Kafka. Từng phát triển toàn bộ backend cho SHB Mobile Banking Cambodia với 3 microservices Java Spring Boot, tích hợp Core Banking Intellect qua Oracle Stored Procedures và TCP. Kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật đa lớp (JWT, RSA-4096, OTP), mở rộng linh hoạt và tích hợp AI/CMS để tự động hóa quy trình.`,
+  summary: `Kỹ sư phần mềm với hơn 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank, SHB), payment gateway và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo Java 17, Spring Boot 3, Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway/ESB/Core Banking và xử lý bất đồng bộ với Kafka. Từng phát triển backend cho SHB Mobile Banking Cambodia và GOV Payment Service cho Cổng Dịch vụ công Quốc gia, bao gồm VietQR/Napas EMVCo, hoàn tiền, chi hộ và đối soát giao dịch. Kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật đa lớp, observability và tích hợp liên hệ thống trong domain ngân hàng.`,
 
   // ---------------------------------------------------------------------------
   // KEY HIGHLIGHTS
   // 3-5 achievement statements with metrics when possible
   // ---------------------------------------------------------------------------
   highlights: [
+    'Phát triển GOV Payment Service cho Cổng Dịch vụ công Quốc gia: VietQR, refund, disbursement, reconciliation',
     'Phát triển toàn bộ backend 3 Microservices cho SHB Mobile Banking Campuchia (Identity, Account, Fund Transfer)',
     'Thiết kế Dynamic Filter Engine & Maker-Checker Workflow cho hệ thống xử lý nợ SHB',
     'Tích hợp AI giảm 60% khối lượng nhập tay trong hệ thống CMV MBBank',
-    'Triển khai bảo mật đa lớp: JWT + RSA-4096 + reCAPTCHA v3 + Rate Limiting + Device Fingerprinting',
-    'Hơn 4 năm kinh nghiệm hệ thống tài chính – ngân hàng, bảo hiểm và khách hàng Nhật Bản',
+    'Triển khai bảo mật đa lớp: JWT + RSA-4096 + Digital Signature + reCAPTCHA v3 + Rate Limiting',
   ],
 };
 

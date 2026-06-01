@@ -250,6 +250,42 @@ export const skills: Skill[] = [
     category: 'Backend',
     yearsOfExperience: 1,
   },
+  {
+    name: 'Spring Data JPA',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'JdbcTemplate',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'RestTemplate / External API Integration',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'VietQR / Napas EMVCo',
+    level: 75,
+    category: 'Backend',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'SpringDoc OpenAPI',
+    level: 75,
+    category: 'Backend',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'JUnit 5 / Mockito',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
 
   // ---------------------------------------------------------------------------
   // ARCHITECTURE
@@ -274,6 +310,24 @@ export const skills: Skill[] = [
   },
   {
     name: 'API Gateway (Apigee)',
+    level: 80,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Payment Gateway',
+    level: 80,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Idempotency / Retry Pattern',
+    level: 80,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Strategy / Template Method',
     level: 80,
     category: 'Architecture',
     yearsOfExperience: 2,
@@ -381,6 +435,12 @@ export const skills: Skill[] = [
     yearsOfExperience: 2,
   },
   {
+    name: 'Digital Signature / HMAC',
+    level: 75,
+    category: 'Security',
+    yearsOfExperience: 1,
+  },
+  {
     name: 'reCAPTCHA v3',
     level: 75,
     category: 'Security',
@@ -405,6 +465,24 @@ export const skills: Skill[] = [
   {
     name: 'Kibana',
     level: 70,
+    category: 'Monitoring',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Spring AOP Logging',
+    level: 80,
+    category: 'Monitoring',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'MDC Tracing',
+    level: 75,
+    category: 'Monitoring',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Spring Boot Actuator',
+    level: 75,
     category: 'Monitoring',
     yearsOfExperience: 2,
   },

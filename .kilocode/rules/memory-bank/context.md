@@ -8,6 +8,11 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added C12 GOV Payment Service project entry (featured), timeline 2026-05 – present
+- [x] Added current Alphaway/SHB C12 GOV Payment Service experience from May 2026
+- [x] Corrected SHB Debit Collection Portal experience to Nov 2025 – Jan 2026, no longer current
+- [x] Updated profile summary & highlights to emphasize payment gateway, VietQR/Napas EMVCo, refund, disbursement and reconciliation
+- [x] Added C12-related skills: Spring Data JPA, JdbcTemplate, RestTemplate integration, VietQR/Napas EMVCo, Payment Gateway, idempotency/retry, digital signature, AOP logging, MDC tracing, Actuator and JUnit/Mockito
 - [x] Added SHB Debit Collection Portal project entry (featured), timeline 2025-11 – 2026-01
 - [x] Added SHB SAHA Mobile Banking Cambodia experience: Backend Developer at Alphaway/SHB (Jan 2026 – Apr 2026)
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry (featured)
@@ -51,10 +56,10 @@ The template is fully implemented with all core sections working. It's ready for
 
 The resume has been fully customized for **Nguyễn Quang Ngọc** (Full-Stack Developer, Hà Nội):
 - Profile: quangngoc201197@gmail.com, 0346238899, Đa Phúc Hà Nội
-- 4 work experiences: Alphaway/SHB (current), Paraline/MBBank, Bảo Việt, GMO Runsystem
-- Skills in Java/Spring Boot, Spring Cloud, Microservices, Kafka, ReactJS, PostgreSQL, OracleDB, Redis, Keycloak, MinIO, ELK, Docker, Kubernetes
+- 6 work experience entries: Alphaway/SHB C12 GOV Payment Service (current), SHB SAHA Mobile Banking Cambodia, SHB Debit Collection Portal, Paraline/MBBank, Bảo Việt, GMO Runsystem
+- Skills in Java/Spring Boot, Spring Cloud, Microservices, Kafka, REST/ESB/Core Banking integration, VietQR/Napas EMVCo, OracleDB, PostgreSQL, Redis, Keycloak, MinIO, ELK, Docker, Kubernetes
 - Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
-- 6 projects: SHB Debit Collection Portal, SHB SAHA Mobile Banking Cambodia, CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
+- 8 projects: C12 GOV Payment Service, SHB Debit Collection Portal, SHB SAHA Mobile Banking Cambodia, CMV MBBank, MyBV Life, Veritas, Hywork, HR Management System
 
 ## Quick Customization Guide
 
@@ -112,3 +117,4 @@ Edit `src/config/site.config.ts` → `features`:
 | 2026-05-04 | Added Alphaway/SHB experience (Nov 2025–present), SHB Debit Collection Portal project, updated skills |
 | 2026-05-05 | Added SHB SAHA Mobile Banking Cambodia experience & project (Jan–Apr 2026), updated skills & profile |
 | 2026-05-05 | Added SHB Debit Collection Portal project entry (2025-11 – 2026-01) |
+| 2026-06-01 | Added C12 GOV Payment Service current experience & featured project (May 2026–present), updated profile and skills |

@@ -117,7 +117,7 @@ export interface Experience {
  */
 export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
-  // CURRENT POSITION — Alphaway / SHB (Debit Collection Portal)
+  // CURRENT POSITION — Alphaway / SHB (C12 GOV Payment Service)
   // ---------------------------------------------------------------------------
   {
     id: 'exp-0',
@@ -125,8 +125,51 @@ export const experience: Experience[] = [
     company: 'ALPHAWAY TECHNOLOGY (Outsourced cho Ngân hàng SHB)',
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
-    startDate: '2025-11',
+    startDate: '2026-05',
     current: true,
+    description:
+      'Backend Developer phát triển GOV Payment Service / Payment Gateway cho Cổng Dịch vụ công Quốc gia, hệ thống trung gian xử lý thanh toán giữa TTTT và SHB.',
+    achievements: [
+      'Thiết kế và phát triển 9 REST APIs theo đặc tả TTTT: tạo giao dịch/VietQR, truy vấn trạng thái, lấy biên lai, vấn tin tài khoản, hoàn tiền, chi hộ, đối soát và internal retry APIs',
+      'Tích hợp ESB/Core Banking, Napas, Ebank, Oracle Core Banking schema và Signature Service với JWT token management, service header signing và retry khi lỗi xác thực',
+      'Xây dựng luồng tạo tài khoản alias và sinh VietQR theo chuẩn Napas EMVCo với TLV encoding, CRC checksum, cấu hình bank/currency và idempotency theo x-request-id',
+      'Thiết kế luồng hoàn tiền/chi hộ đa kênh qua Strategy + Template Method, hỗ trợ SHB nội bộ, Napas, Citad/Kho bạc, financial posting và reversal khi giao dịch lỗi',
+      'Phát triển đối soát Type 1/Type 2: query Oracle/Core Banking, build file 22 cột pipe-delimited, Base64 parsing, checksum và lưu kết quả cần khớp',
+      'Refactor PaymentService monolithic thành facade + use-case services, bổ sung custom validation, centralized error handling, AOP API logging, MDC tracing, masking log và unit test JUnit/Mockito',
+    ],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Web MVC',
+      'Spring Data JPA',
+      'Hibernate',
+      'JdbcTemplate',
+      'Oracle DB',
+      'Spring Kafka',
+      'RestTemplate',
+      'JWT',
+      'Digital Signature',
+      'Napas EMVCo / VietQR',
+      'Spring AOP',
+      'SpringDoc OpenAPI',
+      'JUnit 5',
+      'Mockito',
+      'Maven',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Alphaway / SHB — Debit Collection Portal
+  // ---------------------------------------------------------------------------
+  {
+    id: 'exp-0a',
+    title: 'Backend Developer',
+    company: 'ALPHAWAY TECHNOLOGY (Outsourced cho Ngân hàng SHB)',
+    location: 'Hà Nội, Việt Nam',
+    type: 'full-time',
+    startDate: '2025-11',
+    endDate: '2026-01',
+    current: false,
     description:
       'Backend Developer phát triển Cổng Thông Tin Xử Lý Nợ Xấu SHB Debit Collection Portal, hệ thống quản lý & đấu giá tài sản xử lý nợ trên nền tảng Microservices.',
     achievements: [
