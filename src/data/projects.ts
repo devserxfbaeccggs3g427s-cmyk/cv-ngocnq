@@ -130,9 +130,9 @@ export interface Project {
 export const projectCategories: string[] = [
   'All',
   'Tài chính – Ngân hàng',
+  'Payment Gateway',
   'Bảo hiểm',
   'Nhật Bản',
-  'Đồ án',
 ];
 
 /**
@@ -145,15 +145,146 @@ export const projectCategories: string[] = [
  */
 export const projects: Project[] = [
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT 1 – CMV MBBank
+  // FEATURED PROJECT 1 – GOV Payment Service
   // ---------------------------------------------------------------------------
   {
     id: 'proj-1',
+    slug: 'gov-payment-service-c12',
+    title: 'GOV Payment Service – Cổng thanh toán Dịch vụ công',
+    description:
+      'Cổng thanh toán trung gian giữa Cổng Dịch vụ công Quốc gia và SHB, xử lý tạo giao dịch, QR, truy vấn, hoàn tiền, chi hộ và đối soát.',
+    longDescription: `GOV Payment Service là dịch vụ backend trung gian phục vụ thanh toán dịch vụ công giữa hệ thống TTTT/Cổng Dịch vụ công Quốc gia và ngân hàng SHB. Hệ thống tiếp nhận yêu cầu thanh toán, tạo giao dịch, sinh tài khoản alias, sinh VietQR/Napas QR, truy vấn trạng thái, tra cứu biên lai, vấn tin tài khoản, hoàn tiền, chi hộ, đối soát và xử lý lại các Kafka message lỗi. Kiến trúc được tái cấu trúc theo facade + use-case services, tách chiến lược chuyển tiền cho SHB nội bộ, Napas và Citad/Kho bạc, đồng thời áp dụng AOP logging, MDC request tracing, typed configuration và cơ chế tích hợp phòng thủ cho ESB/Core Banking.`,
+    thumbnail: '/projects/gov-payment-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Web MVC',
+      'Oracle DB',
+      'Spring Data JPA',
+      'JdbcTemplate',
+      'Kafka',
+      'RestTemplate',
+      'ESB Integration',
+      'Napas/VietQR',
+      'JWT',
+      'AOP Logging',
+      'Actuator',
+      'JUnit 5',
+      'Mockito',
+      'Maven',
+    ],
+    category: 'Payment Gateway',
+    role: 'Lập trình viên Backend',
+    duration: '2026-05 – Nay',
+    featured: true,
+    highlights: [
+      'Implement các API thanh toán theo spec TTTT: tạo giao dịch/QR, check status, receipt, bank inquiry, refund, disbursement và reconciliation',
+      'Thiết kế idempotency bằng request ID, duplicate bill prevention, alias account generation bằng Oracle sequence và unique constraint',
+      'Tích hợp ESB/Core Banking/Napas/Ebank/Signature Service, xử lý JWT token cache, service signature và request/response signing',
+      'Áp dụng Strategy + Template Method cho transfer channel: SHB nội bộ, Napas và Citad/Kho bạc; hỗ trợ reversal khi lỗi tích hợp',
+      'Xây dựng cơ chế xử lý lại Kafka message lỗi, AOP API logging, MDC correlation ID, masking dữ liệu nhạy cảm và Actuator health endpoints',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // FEATURED PROJECT 2 – SHB SAHA Mobile Banking Cambodia
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-2',
+    slug: 'shb-saha-mobile-banking-cambodia',
+    title: 'SHB SAHA Mobile Banking – Campuchia',
+    description:
+      'Nền tảng Mobile Banking cho thị trường Campuchia với 3 microservices Spring Boot: Identity, Account và Fund Transfer.',
+    longDescription: `SHB SAHA Mobile Banking Campuchia là hệ thống backend mobile banking phục vụ thị trường Campuchia. Hệ thống gồm Identity Service, Account Service và Fund Transfer Service, xử lý đăng nhập, quản lý thiết bị, OTP/SMS, session Redis, tài khoản CASA, người thụ hưởng, lịch sử giao dịch, tỷ giá và chuyển tiền. Backend tích hợp Oracle Core Banking/EBANK qua stored procedures, REF CURSOR mapping, TCP Core Banking và HTTP client liên service. Hệ thống hỗ trợ đa ngôn ngữ tiếng Anh/Khmer/Việt và nghiệp vụ tiền tệ USD/KHR.`,
+    thumbnail: '/projects/shb-saha-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Security',
+      'Oracle DB',
+      'PL/SQL',
+      'JdbcTemplate',
+      'Redis',
+      'JWT (Nimbus JOSE)',
+      'RSA',
+      'SMS OTP',
+      'Spring Integration TCP',
+      'MapStruct',
+      'Docker',
+      'Maven',
+      'OpenAPI',
+      'i18n EN/KM/VI',
+    ],
+    category: 'Tài chính – Ngân hàng',
+    role: 'Lập trình viên Backend',
+    duration: '2026-01 – 2026-06',
+    featured: true,
+    highlights: [
+      'Phát triển authentication/session/device flow với JWT, refresh token, Redis session, device binding, lockout và trusted-device OTP',
+      'Xây dựng OTP/SMS service cho xác thực thiết bị và xác nhận chuyển tiền, có expiry, retry attempt, resend rate limit và masked logging',
+      'Tích hợp Oracle Core Banking/EBANK bằng stored procedures, REF CURSOR, reusable executor và mapping response chuẩn banking',
+      'Thiết kế fund transfer processing bằng Strategy pattern cho self-transfer và intra-bank transfer, gồm validate account, FX, OTP và Core posting',
+      'Chuẩn hóa error contract, localized messages EN/KM/VI, DTO mapping bằng MapStruct và cache Redis cho dữ liệu ngân hàng',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // FEATURED PROJECT 3 – SHB Debit Collection Portal
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-3',
+    slug: 'shb-debit-collection-portal',
+    title: 'SHB Debit Collection Portal – Xử Lý Nợ & Thanh Lý Tài Sản',
+    description:
+      'Nền tảng microservices phục vụ nghiệp vụ xử lý nợ, thanh lý tài sản và quản trị nội dung website của SHB.',
+    longDescription: `SHB Debit Collection Portal là hệ thống microservices phục vụ nghiệp vụ xử lý nợ và thanh lý tài sản. Hệ thống cung cấp API public cho khách hàng tra cứu tài sản, đăng ký quan tâm, xem tin tức/thông báo/banner và tải file đính kèm; đồng thời cung cấp API quản trị cho nhân viên ngân hàng quản lý tài sản, danh mục, nội dung website, quy trình phê duyệt, upload file và xuất báo cáo. Kiến trúc gồm Gateway, Eureka, asset service, config/notification service và file/report service, triển khai với PostgreSQL, Redis, MinIO, Keycloak, Docker/Kubernetes và GitLab CI.`,
+    thumbnail: '/projects/shb-debit-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot',
+      'Spring Cloud Gateway',
+      'Eureka',
+      'OpenFeign',
+      'Keycloak OIDC',
+      'PostgreSQL',
+      'Redis',
+      'Bucket4j',
+      'Resilience4j',
+      'MinIO',
+      'Apache POI',
+      'Tika',
+      'iText',
+      'MapStruct',
+      'Microservices',
+      'Docker',
+      'Kubernetes',
+    ],
+    category: 'Tài chính – Ngân hàng',
+    role: 'Lập trình viên Backend',
+    duration: '2025-11 – 2026-01',
+    featured: true,
+    highlights: [
+      'Xây dựng Spring Cloud Gateway với Keycloak JWT validation, public/admin policy, Redis/Bucket4j rate limiting và Resilience4j',
+      'Implement asset APIs: public search/detail, admin CRUD, advanced filters, approval workflow, file attachment và view tracking',
+      'Thiết kế Maker-Checker workflow cho notice/content với audit trail và separation-of-duties validation',
+      'Tích hợp MinIO object storage, metadata persistence, multipart upload, batch delete và presigned URL generation',
+      'Xây dựng Excel import/export, report strategy, Redis cache/invalidation và Kubernetes/GitLab CI deployment assets',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // PROJECT 4 – CMV MBBank
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-4',
     slug: 'cmv-mbbank',
     title: 'Collateral Management & Valuation (CMV) – MBBank',
     description:
       'Hệ thống thẩm định và quản lý tài sản thế chấp ngân hàng MBBank theo kiến trúc Microservices, tích hợp AI và Kafka.',
-    longDescription: `Hệ thống CMV phục vụ nghiệp vụ thẩm định tài sản thế chấp tại MBBank. Được xây dựng theo kiến trúc Microservices và Event-Driven Architecture (EDA) với Apache Kafka, đảm bảo hiệu năng cao và khả năng mở rộng linh hoạt. Tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ tài liệu pháp lý và hình ảnh, phát hiện trùng lặp tài sản, giúp giảm 60% khối lượng nhập tay. API được quản lý qua Apigee Gateway với ECDH Encryption. ETL Pipeline dùng Pentaho PDI để đồng bộ dữ liệu sang CMV MBV (S600). Giám sát hệ thống với ELK Stack.`,
+    longDescription: `CMV phục vụ nghiệp vụ thẩm định tài sản thế chấp tại MBBank. Hệ thống được xây dựng theo kiến trúc Microservices và Event-Driven Architecture với Apache Kafka, tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ pháp lý/hình ảnh và phát hiện trùng lặp tài sản. API được quản lý qua Apigee Gateway với ECDH Encryption; ETL Pipeline dùng Pentaho PDI để đồng bộ dữ liệu sang CMV MBV (S600); hệ thống được giám sát bằng ELK Stack.`,
     thumbnail: '/projects/cmv-thumb.jpg',
     images: [],
     technologies: [
@@ -169,156 +300,71 @@ export const projects: Project[] = [
       'Docker',
     ],
     category: 'Tài chính – Ngân hàng',
-    role: 'Fullstack Developer',
-    duration: '2023-05 – Nay',
-    featured: true,
+    role: 'Lập trình viên Full Stack',
+    duration: '2023-05 – 2025-10',
+    featured: false,
     highlights: [
-      'Giảm 60% khối lượng nhập tay nhờ tích hợp AI trích xuất dữ liệu',
-      'Kiến trúc Microservices + EDA (Kafka) đảm bảo hiệu năng cao',
-      'Bảo mật API qua Apigee Gateway với ECDH Encryption',
-      'ETL Pipeline Pentaho PDI đồng bộ dữ liệu liên hệ thống',
-      'Giám sát real-time với ELK Stack',
+      'Giảm 60% khối lượng nhập tay nhờ tích hợp AI trích xuất dữ liệu và phát hiện trùng lặp hình ảnh',
+      'Triển khai Microservices + Event-Driven Architecture với Kafka cho tích hợp CMS/kho hàng',
+      'Bảo mật API qua Apigee Gateway với ECDH Encryption và quản lý dữ liệu ngân hàng nhạy cảm',
+      'Xây dựng ETL Pipeline Pentaho PDI đồng bộ CMV MBBank sang CMV MBV',
+      'Phát triển các module định giá tài sản, định giá lại, tư vấn giá, kho giá và tích hợp dữ liệu real-time',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT 2 – MyBV Life
+  // PROJECT 5 – MyBV Life
   // ---------------------------------------------------------------------------
   {
-    id: 'proj-2',
+    id: 'proj-5',
     slug: 'mybv-life',
     title: 'MyBV Life – Nền tảng bảo hiểm trực tuyến',
     description:
       'Nền tảng bảo hiểm trực tuyến của Bảo Việt Nhân Thọ với API thanh toán Napas, hợp đồng điện tử và tích hợp hệ thống lõi IMS.',
-    longDescription: `MyBV Life là nền tảng bảo hiểm trực tuyến của Bảo Việt Nhân Thọ. Xây dựng API nghiệp vụ tài chính – bảo hiểm bao gồm quy trình thanh toán qua Napas Gateway, quản lý hợp đồng điện tử (e-Contract), đồng bộ dữ liệu với hệ thống lõi IMS và đối tác DCS. Tối ưu hiệu năng truy vấn cơ sở dữ liệu và đảm bảo tính an toàn, toàn vẹn dữ liệu theo chuẩn ngành tài chính.`,
+    longDescription: `MyBV Life là nền tảng bảo hiểm trực tuyến của Bảo Việt Nhân Thọ. Backend xử lý API nghiệp vụ tài chính - bảo hiểm, bao gồm thanh toán qua Napas Gateway, hợp đồng điện tử, đồng bộ dữ liệu với hệ thống lõi IMS và đối tác DCS. Công việc tập trung vào thiết kế API, xử lý giao dịch, tối ưu truy vấn và đảm bảo an toàn/toàn vẹn dữ liệu.`,
     thumbnail: '/projects/mybv-thumb.jpg',
     images: [],
-    technologies: ['Spring Boot', 'AOP', 'Hibernate', 'Oracle'],
+    technologies: ['Spring Boot', 'AOP', 'Hibernate', 'Oracle', 'Napas Gateway'],
     category: 'Bảo hiểm',
-    role: 'Backend Developer',
+    role: 'Lập trình viên Backend',
     duration: '2022-11 – 2023-05',
-    featured: true,
+    featured: false,
     highlights: [
-      'API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
-      'Thiết kế API hợp đồng điện tử (e-Contract) + đồng bộ IMS',
-      'Tối ưu truy vấn DB, đảm bảo an toàn và bảo mật dữ liệu tài chính',
-      'Đồng bộ hóa dữ liệu hóa đơn với hệ thống đối tác DCS',
+      'Xây dựng API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
+      'Thiết kế API giao nhận hợp đồng điện tử và đồng bộ với hệ thống lõi IMS',
+      'Tối ưu truy vấn và đồng bộ hóa dữ liệu hóa đơn với hệ thống đối tác DCS',
+      'Đảm bảo tính toàn vẹn, bảo mật và an toàn dữ liệu trong domain tài chính - bảo hiểm',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT — SHB Debit Collection Portal (Xử Lý Nợ Xấu)
-  // ---------------------------------------------------------------------------
-  {
-    id: 'proj-7',
-    slug: 'shb-debit-collection-portal',
-    title: 'SHB Debit Collection Portal – Cổng Thông Tin Xử Lý Nợ Xấu',
-    description:
-      'Hệ thống quản lý và đấu giá tài sản xử lý nợ trên nền tảng Microservices, phục vụ quy trình xử lý nợ xấu tại Ngân hàng SHB.',
-    longDescription: `SHB Debit Collection Portal là hệ thống quản lý & đấu giá tài sản xử lý nợ xấu được xây dựng trên nền tảng Microservices với Spring Cloud. Hệ thống cung cấp Dynamic Filter Engine dựa trên JPA Specification Pattern hỗ trợ tìm kiếm đa tiêu chí với cấu hình filter động từ DB. Quy trình phê duyệt Maker-Checker (4 mắt) cho quản lý tài sản & thông báo đấu giá, đảm bảo Separation of Duties. Cơ chế bảo mật 3 lớp cho Lead Generation: Rate Limiting (Redis) + Google reCAPTCHA v3 + Duplicate Prevention. Hệ thống cũng có tính năng Dynamic Field Display dùng Java Reflection, hiển thị trường linh hoạt theo từng loại tài sản (BĐS, PTVT, MMTB).`,
-    thumbnail: '/projects/shb-debit-thumb.jpg',
-    images: [],
-    technologies: [
-      'Java 17',
-      'Spring Boot 3',
-      'Spring Cloud',
-      'Spring Cloud Gateway',
-      'PostgreSQL',
-      'Redis',
-      'Keycloak OIDC',
-      'OpenFeign',
-      'Eureka',
-      'MinIO',
-      'Apache POI',
-      'iText',
-      'MapStruct',
-      'Docker',
-      'Kubernetes',
-      'GitLab CI/CD',
-    ],
-    category: 'Tài chính – Ngân hàng',
-    role: 'Backend Developer',
-    duration: '2025-11 – 2026-01',
-    featured: true,
-    highlights: [
-      'Dynamic Filter Engine với JPA Specification Pattern, hỗ trợ tìm kiếm đa tiêu chí',
-      'Quy trình phê duyệt Maker-Checker (4 mắt) cho quản lý tài sản & thông báo đấu giá',
-      'Bảo mật 3 lớp: Rate Limiting (Redis) + Google reCAPTCHA v3 + Duplicate Prevention',
-      'Kiến trúc Microservices: Spring Cloud Gateway, Eureka, OpenFeign',
-      'Dynamic Field Display với Java Reflection, hiển thị linh hoạt theo loại tài sản',
-      'Redis Cache danh mục & banner; Atomic SQL UPDATE xử lý đồng thời lượt xem',
-    ],
-  },
-
-  // ---------------------------------------------------------------------------
-  // FEATURED PROJECT — SHB SAHA Mobile Banking Cambodia
+  // PROJECT 6 – Veritas
   // ---------------------------------------------------------------------------
   {
     id: 'proj-6',
-    slug: 'shb-saha-mobile-banking-cambodia',
-    title: 'SHB SAHA Mobile Banking – Campuchia',
-    description:
-      'Nền tảng ngân hàng di động phục vụ thị trường Campuchia với 3 microservices Spring Boot, hỗ trợ 3 ngôn ngữ và 2 loại tiền tệ, tích hợp Core Banking Intellect.',
-    longDescription: `SHB SAHA Mobile Banking Cambodia là nền tảng ngân hàng di động phục vụ thị trường Campuchia, hỗ trợ 3 ngôn ngữ (tiếng Anh, tiếng Việt, tiếng Khmer) và 2 loại tiền tệ (USD, KHR). Hệ thống được phân tách thành 3 microservices: Identity Service (xác thực JWT + RSA-4096, quản lý session Redis, Device Trust, OTP SMS), Account Service (quản lý tài khoản CASA/tiết kiệm/vay, người thụ hưởng, tích hợp Core Banking Intellect qua Oracle Stored Procedures), và Fund Transfer Service (chuyển khoản nội bộ SELF/INTRA với Two-Phase Commit, tích hợp Core Banking TCP cho bút toán tài chính). Hệ thống validation phân tầng 4 lớp, bảo mật đa lớp với JWT HS256, RSA-4096, rate limiting OTP, device fingerprinting và password policy.`,
-    thumbnail: '/projects/shb-saha-thumb.jpg',
-    images: [],
-    technologies: [
-      'Java 17',
-      'Spring Boot 3',
-      'Spring Security',
-      'Oracle DB',
-      'PL/SQL',
-      'Redis',
-      'JWT (Nimbus JOSE)',
-      'RSA-4096',
-      'SMS Gateway',
-      'Docker',
-      'Maven',
-      'GitLab CI/CD',
-      'i18n (EN/VI/KM)',
-    ],
-    category: 'Tài chính – Ngân hàng',
-    role: 'Backend Developer',
-    duration: '2026-01 – 2026-04',
-    featured: true,
-    highlights: [
-      '3 Microservices: Identity, Account, Fund Transfer với Spring Boot 3',
-      'Xác thực JWT + RSA-4096, session Redis sliding expiration, Device Trust fingerprinting',
-      'Tích hợp Core Banking Intellect qua Oracle Stored Procedures & TCP',
-      'Two-Phase Commit Pattern cho chuyển khoản nội bộ SELF/INTRA',
-      'Validation phân tầng 4 lớp + i18n đa ngôn ngữ động (EN/VI/KM)',
-      'Bảo mật đa lớp: JWT HS256, RSA-4096, rate limiting, password policy',
-    ],
-  },
-
-  // ---------------------------------------------------------------------------
-  // PROJECT 3 – Veritas
-  // ---------------------------------------------------------------------------
-  {
-    id: 'proj-3',
     slug: 'veritas-clinic',
     title: 'Veritas – Hệ thống quản lý phòng khám thẩm mỹ',
     description:
-      'Hệ thống quản lý phòng khám thẩm mỹ cho khách hàng Nhật Bản: đặt lịch khám, phân công bác sĩ, quản lý lịch hẹn.',
+      'Hệ thống quản lý phòng khám thẩm mỹ cho khách hàng Nhật Bản: đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn.',
     thumbnail: '/projects/veritas-thumb.jpg',
     images: [],
     technologies: ['Spring Boot', 'MyBatis', 'PostgreSQL', 'JSP', 'JavaScript', 'jQuery'],
     category: 'Nhật Bản',
-    role: 'Fullstack Developer',
+    role: 'Lập trình viên Full Stack',
     duration: '2022-03 – 2022-11',
     featured: false,
     highlights: [
-      'Module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn',
-      'Tối ưu SQL performance theo yêu cầu khách hàng Nhật Bản',
-      'Làm việc theo chuẩn Agile – kỷ luật và chính xác kiểu Nhật',
+      'Phát triển module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn',
+      'Tối ưu SQL performance và xử lý yêu cầu thay đổi dữ liệu từ khách hàng Nhật Bản',
+      'Làm việc theo Agile, chú trọng tính ổn định, kỷ luật và chất lượng bàn giao',
     ],
   },
 
   // ---------------------------------------------------------------------------
-  // PROJECT 4 – Hywork
+  // PROJECT 7 – Hywork
   // ---------------------------------------------------------------------------
   {
-    id: 'proj-4',
+    id: 'proj-7',
     slug: 'hywork',
     title: 'Hywork – Hệ thống đặt chỗ làm việc',
     description:
@@ -327,43 +373,12 @@ export const projects: Project[] = [
     images: [],
     technologies: ['Spring Boot', 'Hibernate', 'Thymeleaf', 'MySQL'],
     category: 'Nhật Bản',
-    role: 'Fullstack Developer',
+    role: 'Lập trình viên Full Stack',
     duration: '2021-11 – 2022-03',
     featured: false,
     highlights: [
-      'Tính năng quản lý chỗ ngồi và đồng bộ nhân sự từ AMIS',
-      'Báo cáo thống kê sử dụng (Export Excel) phục vụ quản lý',
-    ],
-  },
-
-  // ---------------------------------------------------------------------------
-  // PROJECT 5 – Đồ án tốt nghiệp
-  // ---------------------------------------------------------------------------
-  {
-    id: 'proj-5',
-    slug: 'hr-management-system',
-    title: 'Website Quản lý Nhân sự – Đồ án tốt nghiệp ĐH',
-    description:
-      'Hệ thống quản lý nhân sự xây dựng theo kiến trúc Microservices với Spring Boot, ReactJS, Kafka, Redis và Docker.',
-    thumbnail: '/projects/hrms-thumb.jpg',
-    images: [],
-    technologies: [
-      'Spring Boot',
-      'ReactJS',
-      'OracleDB',
-      'Apache Kafka',
-      'Redis',
-      'Docker',
-      'Microservices',
-    ],
-    category: 'Đồ án',
-    role: 'Tác giả',
-    duration: '2024 – 2025',
-    featured: true,
-    highlights: [
-      'Kiến trúc Microservices + Kafka + Redis',
-      'Containerized bằng Docker',
-      'Đồ án tốt nghiệp Đại học Giao thông vận tải',
+      'Phát triển tính năng quản lý chỗ ngồi và đồng bộ nhân sự từ AMIS',
+      'Xây dựng báo cáo thống kê sử dụng, export Excel phục vụ quản lý vận hành',
     ],
   },
 ];

@@ -7,20 +7,20 @@ import { SocialLinks } from './SocialLinks';
 export function ContactSection() {
   const contactInfo = [
     { icon: Mail, label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
-    { icon: Phone, label: 'Phone', value: profile.phone, href: `tel:${profile.phone}` },
-    { icon: MapPin, label: 'Location', value: profile.location },
-    { icon: Calendar, label: 'Availability', value: 'Open to opportunities' },
+    { icon: Phone, label: 'Số điện thoại', value: profile.phone, href: `tel:${profile.phone}` },
+    { icon: MapPin, label: 'Địa điểm', value: profile.location },
+    { icon: Calendar, label: 'Trạng thái', value: 'Sẵn sàng trao đổi cơ hội phù hợp' },
   ];
 
   return (
-    <Section id="contact" title="Get In Touch" subtitle="Let's discuss your next project">
+    <Section id="contact" title="Liên hệ" subtitle="Sẵn sàng trao đổi về cơ hội và dự án phù hợp">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Contact Info */}
         <div className="lg:col-span-1">
           <Card>
             <CardContent className="p-6 space-y-6">
               <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-                Contact Information
+                Thông tin liên hệ
               </h3>
 
               <div className="space-y-4">
@@ -48,7 +48,7 @@ export function ContactSection() {
 
               <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                  Connect with me
+                  Kết nối với tôi
                 </p>
                 <SocialLinks size="md" />
               </div>
@@ -61,7 +61,7 @@ export function ContactSection() {
           <Card>
             <CardContent className="p-6">
               <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-6">
-                Send a Message
+                Gửi lời nhắn
               </h3>
               <ContactForm />
             </CardContent>

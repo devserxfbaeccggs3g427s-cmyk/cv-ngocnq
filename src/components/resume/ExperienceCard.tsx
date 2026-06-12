@@ -6,8 +6,15 @@ interface ExperienceCardProps {
 }
 
 export function ExperienceCard({ experience }: ExperienceCardProps) {
+  const typeLabels: Record<Experience['type'], string> = {
+    'full-time': 'Toàn thời gian',
+    'part-time': 'Bán thời gian',
+    contract: 'Hợp đồng',
+    freelance: 'Tự do',
+  };
+
   const formatDate = (date: string) => {
-    return new Date(date + '-01').toLocaleDateString('en-US', {
+    return new Date(date + '-01').toLocaleDateString('vi-VN', {
       month: 'short',
       year: 'numeric',
     });
@@ -32,9 +39,9 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-500">
             {formatDate(experience.startDate)} –{' '}
-            {experience.current ? 'Present' : formatDate(experience.endDate!)}
+            {experience.current ? 'Hiện tại' : formatDate(experience.endDate!)}
             {' · '}{experience.location}
-            {' · '}<span className="capitalize">{experience.type}</span>
+            {' · '}<span>{typeLabels[experience.type]}</span>
           </p>
         </div>
       </div>

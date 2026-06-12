@@ -1,126 +1,191 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { profile } from '@/data/profile';
 import { experience } from '@/data/experience';
-import { skillCategories, getSkillsByCategory, languages } from '@/data/skills';
+import { projects } from '@/data/projects';
+import {
+  getLanguageLevelLabel,
+  getSkillCategoryLabel,
+  skillCategories,
+  getSkillsByCategory,
+  languages,
+} from '@/data/skills';
 import { education, certifications } from '@/data/education';
 import { PrintButton } from '@/components/ui/PrintButton';
 
 export const metadata: Metadata = {
-  title: `Resume | ${profile.name}`,
-  description: 'Print-friendly resume version',
+  title: `CV | ${profile.name}`,
+  description: 'Bản CV tối ưu để in hoặc lưu PDF',
 };
 
+function formatDate(date: string) {
+  return new Date(date + '-01').toLocaleDateString('vi-VN', {
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function SectionTitle({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="mb-3 border-b border-slate-900 pb-1 text-[13px] font-bold uppercase tracking-[0.14em] text-slate-900">
+      {children}
+    </h2>
+  );
+}
+
 export default function PrintPage() {
-  const formatDate = (date: string) => {
-    return new Date(date + '-01').toLocaleDateString('en-US', {
-      month: 'short',
-      year: 'numeric',
-    });
-  };
+  const printProjects = projects;
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white text-black print:p-0 print:pt-8">
-      {/* Header */}
-      <header className="print-header mb-8 border-b pb-6">
-        <h1 className="text-3xl font-bold mb-1">{profile.name}</h1>
-        <p className="text-xl text-gray-600 mb-4">{profile.title}</p>
-        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-          <span>{profile.email}</span>
-          <span>•</span>
-          <span>{profile.phone}</span>
-          <span>•</span>
-          <span>{profile.location}</span>
-          <span>•</span>
-          <span>{profile.website}</span>
+    <div className="print-resume mx-auto max-w-[210mm] bg-white px-8 py-7 text-slate-950 print:px-0 print:py-0">
+      <header className="print-header mb-5 border-b-2 border-slate-900 pb-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-[28px] font-bold leading-tight tracking-normal text-slate-950">
+              {profile.name}
+            </h1>
+            <p className="text-[15px] font-semibold text-slate-700">{profile.title}</p>
+          </div>
+          <div className="text-left text-[11px] leading-5 text-slate-700 sm:text-right">
+            <p>{profile.email}</p>
+            <p>{profile.phone}</p>
+            <p>{profile.location}</p>
+          </div>
         </div>
       </header>
 
-      {/* Summary */}
-      <section className="mb-6">
-        <h2 className="text-lg font-bold mb-2 uppercase tracking-wide">Summary</h2>
-        <p className="text-gray-700">{profile.summary}</p>
-      </section>
+      <main className="space-y-5">
+        <section>
+          <SectionTitle>Tóm tắt chuyên môn</SectionTitle>
+          <p className="text-[12px] leading-[1.58] text-slate-800">{profile.summary}</p>
+          <div className="mt-2 grid grid-cols-1 gap-x-5 gap-y-1 sm:grid-cols-2">
+            {profile.highlights.map((item) => (
+              <div key={item} className="flex gap-2 text-[11px] leading-[1.45] text-slate-800">
+                <span className="mt-[7px] h-1 w-1 flex-none rounded-full bg-slate-900" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      {/* Experience */}
-      <section className="mb-6">
-        <h2 className="text-lg font-bold mb-3 uppercase tracking-wide">Experience</h2>
-        <div className="space-y-4">
-          {experience.map((exp) => (
-            <div key={exp.id}>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold">{exp.title}</h3>
-                  <p className="text-gray-600">{exp.company} • {exp.location}</p>
+        <section>
+          <SectionTitle>Kỹ năng cốt lõi</SectionTitle>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+            {skillCategories.map((category) => {
+              const categorySkills = getSkillsByCategory(category);
+              if (categorySkills.length === 0) return null;
+
+              return (
+                <div key={category} className="break-inside-avoid">
+                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-slate-700">
+                    {getSkillCategoryLabel(category)}
+                  </h3>
+                  <p className="mt-0.5 text-[10.5px] leading-[1.42] text-slate-800">
+                    {categorySkills.map((skill) => skill.name).join(', ')}
+                  </p>
                 </div>
-                <span className="text-sm text-gray-500">
-                  {formatDate(exp.startDate)} – {exp.current ? 'Present' : formatDate(exp.endDate!)}
-                </span>
-              </div>
-              <ul className="list-disc list-inside mt-2 text-sm text-gray-700 space-y-1">
-                {exp.achievements.slice(0, 3).map((achievement, i) => (
-                  <li key={i}>{achievement}</li>
-                ))}
-              </ul>
+              );
+            })}
+          </div>
+        </section>
+
+        <section>
+          <SectionTitle>Kinh nghiệm làm việc</SectionTitle>
+          <div className="space-y-4">
+            {experience.map((exp) => (
+              <article key={exp.id} className="break-inside-avoid">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-[13px] font-bold text-slate-950">{exp.title}</h3>
+                    <p className="text-[11.5px] font-semibold text-slate-700">
+                      {exp.company} | {exp.location}
+                    </p>
+                  </div>
+                  <p className="whitespace-nowrap text-[11px] font-medium text-slate-700">
+                    {formatDate(exp.startDate)} - {exp.current ? 'Hiện tại' : formatDate(exp.endDate!)}
+                  </p>
+                </div>
+                <p className="mt-1 text-[11px] leading-[1.45] text-slate-700">{exp.description}</p>
+                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[10.8px] leading-[1.42] text-slate-800">
+                  {exp.achievements.slice(0, exp.id === 'exp-0' ? 6 : 4).map((achievement) => (
+                    <li key={achievement}>{achievement}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <SectionTitle>Kinh nghiệm dự án</SectionTitle>
+          <div className="space-y-4">
+            {printProjects.map((project, index) => (
+              <article key={project.id} className="break-inside-avoid">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-[13px] font-bold text-slate-950">{project.title}</h3>
+                    <p className="text-[11.5px] font-semibold text-slate-700">
+                      {project.role} | {project.category}
+                    </p>
+                  </div>
+                  <p className="whitespace-nowrap text-[11px] font-medium text-slate-700">
+                    {project.duration}
+                  </p>
+                </div>
+                <p className="mt-1 text-[11px] leading-[1.45] text-slate-700">
+                  {project.description}
+                </p>
+                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[10.8px] leading-[1.42] text-slate-800">
+                  {project.highlights.slice(0, index < 3 ? 5 : 3).map((highlight) => (
+                    <li key={highlight}>{highlight}</li>
+                  ))}
+                </ul>
+                <p className="mt-1 text-[10.5px] leading-[1.35] text-slate-700">
+                  <span className="font-semibold">Công nghệ:</span>{' '}
+                  {project.technologies.slice(0, 12).join(', ')}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-5 sm:grid-cols-[1.2fr_0.8fr]">
+          <div>
+            <SectionTitle>Học vấn</SectionTitle>
+            <div className="space-y-2">
+              {education.map((edu) => (
+                <div key={edu.id} className="break-inside-avoid">
+                  <div className="flex justify-between gap-4">
+                    <h3 className="text-[12px] font-bold text-slate-950">
+                      {edu.degree} - {edu.field}
+                    </h3>
+                    <span className="whitespace-nowrap text-[10.8px] text-slate-700">
+                      {edu.startYear} - {edu.endYear}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-700">{edu.school}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      {/* Skills */}
-      <section className="mb-6">
-        <h2 className="text-lg font-bold mb-3 uppercase tracking-wide">Skills</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {skillCategories.map((category) => {
-            const categorySkills = getSkillsByCategory(category);
-            if (categorySkills.length === 0) return null;
-            return (
-              <div key={category}>
-                <h3 className="font-medium text-sm text-gray-600 mb-1">{category}</h3>
-                <p className="text-sm">{categorySkills.map(s => s.name).join(', ')}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Education */}
-      <section className="mb-6">
-        <h2 className="text-lg font-bold mb-3 uppercase tracking-wide">Education</h2>
-        <div className="space-y-3">
-          {education.map((edu) => (
-            <div key={edu.id} className="flex justify-between">
-              <div>
-                <h3 className="font-semibold">{edu.degree} in {edu.field}</h3>
-                <p className="text-gray-600">{edu.school}</p>
-              </div>
-              <span className="text-sm text-gray-500">{edu.endYear}</span>
+          <div>
+            <SectionTitle>Chứng chỉ</SectionTitle>
+            <div className="space-y-1.5">
+              {certifications.map((cert) => (
+                <p key={cert.id} className="text-[10.8px] leading-[1.35] text-slate-800">
+                  <span className="font-semibold">{cert.name}</span> - {cert.issuer}
+                </p>
+              ))}
+              <p className="pt-1 text-[10.8px] text-slate-800">
+                <span className="font-semibold">Ngôn ngữ:</span>{' '}
+                {languages.map((lang) => `${lang.name} (${getLanguageLevelLabel(lang.level)})`).join(', ')}
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      </main>
 
-      {/* Certifications */}
-      <section className="mb-6">
-        <h2 className="text-lg font-bold mb-3 uppercase tracking-wide">Certifications</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {certifications.map((cert) => (
-            <div key={cert.id} className="text-sm">
-              <span className="font-medium">{cert.name}</span>
-              <span className="text-gray-500"> – {cert.issuer}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Languages */}
-      <section>
-        <h2 className="text-lg font-bold mb-2 uppercase tracking-wide">Languages</h2>
-        <p className="text-sm">
-          {languages.map((lang) => `${lang.name} (${lang.level})`).join(', ')}
-        </p>
-      </section>
-
-      {/* Print button - hidden when printing */}
       <div className="mt-8 text-center print:hidden">
         <PrintButton />
       </div>

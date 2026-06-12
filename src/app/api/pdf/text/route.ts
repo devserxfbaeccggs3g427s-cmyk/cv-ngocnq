@@ -4,7 +4,7 @@ import { profile } from '@/data/profile';
 
 export async function GET() {
   const textResume = generateTextResume();
-  const filename = `${profile.name.replace(/\s+/g, '_')}_Resume.txt`;
+  const filename = `${profile.name.replace(/\s+/g, '_')}_CV.txt`;
   
   return new NextResponse(textResume, {
     headers: {

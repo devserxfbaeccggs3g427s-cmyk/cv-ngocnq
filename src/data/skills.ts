@@ -191,6 +191,12 @@ export const skills: Skill[] = [
     yearsOfExperience: 4,
   },
   {
+    name: 'Spring Web MVC',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 4,
+  },
+  {
     name: 'Spring Cloud Gateway',
     level: 80,
     category: 'Backend',
@@ -239,6 +245,12 @@ export const skills: Skill[] = [
     yearsOfExperience: 3,
   },
   {
+    name: 'JdbcTemplate / Stored Procedures',
+    level: 82,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
     name: 'JWT / Nimbus JOSE',
     level: 80,
     category: 'Backend',
@@ -271,6 +283,24 @@ export const skills: Skill[] = [
     level: 80,
     category: 'Architecture',
     yearsOfExperience: 2,
+  },
+  {
+    name: 'Core Banking / ESB Integration',
+    level: 80,
+    category: 'Architecture',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Payment Gateway / Napas / VietQR',
+    level: 78,
+    category: 'Architecture',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'Resilience4j',
+    level: 72,
+    category: 'Architecture',
+    yearsOfExperience: 1,
   },
   {
     name: 'API Gateway (Apigee)',
@@ -397,6 +427,12 @@ export const skills: Skill[] = [
     yearsOfExperience: 2,
   },
   {
+    name: 'Actuator / Micrometer / Prometheus',
+    level: 72,
+    category: 'Monitoring',
+    yearsOfExperience: 1,
+  },
+  {
     name: 'Elasticsearch',
     level: 70,
     category: 'Monitoring',
@@ -419,8 +455,27 @@ export const skills: Skill[] = [
  */
 export const languages: Language[] = [
   { name: 'Tiếng Việt', level: 'Native' },
-  { name: 'English', level: 'Intermediate' },
+  { name: 'Tiếng Anh', level: 'Intermediate' },
 ];
+
+export const skillCategoryLabels: Record<string, string> = {
+  Languages: 'Ngôn ngữ & Framework',
+  Frontend: 'Frontend',
+  Backend: 'Backend',
+  Architecture: 'Kiến trúc hệ thống',
+  Databases: 'Cơ sở dữ liệu',
+  DevOps: 'DevOps',
+  Security: 'Bảo mật',
+  Monitoring: 'Giám sát & Logging',
+};
+
+export const languageLevelLabels: Record<Language['level'], string> = {
+  Native: 'Bản ngữ',
+  Fluent: 'Thành thạo',
+  Professional: 'Chuyên nghiệp',
+  Intermediate: 'Trung cấp',
+  Basic: 'Cơ bản',
+};
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -431,6 +486,14 @@ export const languages: Language[] = [
  */
 export function getSkillsByCategory(category: string): Skill[] {
   return skills.filter((skill) => skill.category === category);
+}
+
+export function getSkillCategoryLabel(category: string): string {
+  return skillCategoryLabels[category] || category;
+}
+
+export function getLanguageLevelLabel(level: Language['level']): string {
+  return languageLevelLabels[level] || level;
 }
 
 /**
@@ -478,9 +541,9 @@ export function getAverageSkillLevel(): number {
  * Get proficiency label for a skill level
  */
 export function getSkillProficiencyLabel(level: number): string {
-  if (level >= 90) return 'Expert';
-  if (level >= 70) return 'Advanced';
-  if (level >= 50) return 'Intermediate';
-  if (level >= 30) return 'Basic';
-  return 'Beginner';
+  if (level >= 90) return 'Chuyên sâu';
+  if (level >= 70) return 'Thành thạo';
+  if (level >= 50) return 'Khá';
+  if (level >= 30) return 'Cơ bản';
+  return 'Đang học';
 }

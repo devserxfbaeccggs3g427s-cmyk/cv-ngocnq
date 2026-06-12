@@ -10,10 +10,10 @@ const socialLinks = [
 ];
 
 const footerLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/portfolio', label: 'Portfolio' },
-  { href: '/#contact', label: 'Contact' },
-  { href: '/print', label: 'Print Version' },
+  { href: '/', label: 'Trang chủ' },
+  { href: '/portfolio', label: 'Dự án' },
+  { href: '/#contact', label: 'Liên hệ' },
+  { href: '/print', label: 'Bản in PDF' },
 ];
 
 export function Footer() {
@@ -39,7 +39,7 @@ export function Footer() {
           {/* Quick Links */}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-              Quick Links
+              Liên kết nhanh
             </h3>
             <ul className="space-y-2">
               {footerLinks.map((link) => (
@@ -58,7 +58,7 @@ export function Footer() {
           {/* Connect */}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-              Connect
+              Kết nối
             </h3>
             <div className="flex gap-4">
               {socialLinks.map(({ href, icon: Icon, label }) => (
@@ -81,10 +81,10 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-gray-500 dark:text-gray-500 text-sm">
-              © {currentYear} {profile.name}. All rights reserved.
+              © {currentYear} {profile.name}. Mọi quyền được bảo lưu.
             </p>
             <p className="text-gray-500 dark:text-gray-500 text-sm flex items-center gap-1">
-              Built with <Heart className="w-4 h-4 text-red-500" /> using Next.js
+              Xây dựng với <Heart className="w-4 h-4 text-red-500" /> Next.js
             </p>
           </div>
         </div>

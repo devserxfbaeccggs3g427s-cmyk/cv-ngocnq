@@ -53,7 +53,7 @@ export function ProjectGrid({ showFilters = true, limit, featuredOnly = false }:
       {displayProjects.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400">
-            No projects found in this category.
+            Không tìm thấy dự án trong nhóm này.
           </p>
         </div>
       )}

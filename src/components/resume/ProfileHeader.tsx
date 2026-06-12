@@ -55,7 +55,7 @@ export function ProfileHeader() {
             className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
             <Globe className="w-4 h-4" />
-            Portfolio
+            Dự án
           </a>
         </div>
 
@@ -64,7 +64,7 @@ export function ProfileHeader() {
           <SocialLinks />
           <Button href="/print">
             <Download className="w-4 h-4 mr-2" />
-            View Resume
+            Xem bản in PDF
           </Button>
         </div>
       </div>

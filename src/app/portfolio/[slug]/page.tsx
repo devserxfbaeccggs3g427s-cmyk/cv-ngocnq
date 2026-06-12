@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   }
 
   return {
-    title: `${project.title} | Portfolio`,
+    title: `${project.title} | Dự án`,
     description: project.description,
   };
 }

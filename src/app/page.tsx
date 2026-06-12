@@ -41,8 +41,8 @@ export default function HomePage() {
       {/* Featured Projects */}
       <Section 
         id="portfolio-preview" 
-        title="Featured Projects" 
-        subtitle="A selection of my recent work"
+        title="Dự án tiêu biểu"
+        subtitle="Một số dự án gần đây trong lĩnh vực ngân hàng, thanh toán và hệ thống backend"
       >
         <ProjectGrid featuredOnly limit={3} showFilters={false} />
         <div className="text-center mt-8">
@@ -50,7 +50,7 @@ export default function HomePage() {
             href="/portfolio"
             className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
           >
-            View All Projects
+            Xem tất cả dự án
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'Vui lòng nhập đầy đủ thông tin' },
         { status: 400 }
       );
     }
@@ -25,13 +25,13 @@ export async function POST(request: NextRequest) {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     return NextResponse.json(
-      { success: true, message: 'Message sent successfully' },
+      { success: true, message: 'Lời nhắn đã được gửi thành công' },
       { status: 200 }
     );
   } catch (error) {
     console.error('Contact form error:', error);
     return NextResponse.json(
-      { error: 'Failed to process request' },
+      { error: 'Không xử lý được yêu cầu' },
       { status: 500 }
     );
   }

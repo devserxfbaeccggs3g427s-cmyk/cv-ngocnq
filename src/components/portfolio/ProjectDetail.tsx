@@ -19,7 +19,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
         className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-8 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Portfolio
+        Quay lại danh sách dự án
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -66,7 +66,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
             className="mb-8"
           >
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Key Highlights
+              Điểm nổi bật
             </h2>
             <ul className="space-y-3">
               {project.highlights.map((highlight, index) => (
@@ -85,7 +85,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
             transition={{ delay: 0.4 }}
           >
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Technologies Used
+              Công nghệ sử dụng
             </h2>
             <div className="flex flex-wrap gap-2">
               {project.technologies.map((tech) => (
@@ -111,14 +111,14 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                 <div className="flex items-center gap-3">
                   <User className="w-5 h-5 text-gray-400" />
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Role</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Vai trò</p>
                     <p className="font-medium text-gray-900 dark:text-white">{project.role}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-gray-400" />
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Thời gian</p>
                     <p className="font-medium text-gray-900 dark:text-white">{project.duration}</p>
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
 
               {/* Category */}
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Category</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Nhóm dự án</p>
                 <Badge variant="secondary" size="md">{project.category}</Badge>
               </div>
 
@@ -135,13 +135,13 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                 {project.liveUrl && (
                   <Button href={project.liveUrl} className="w-full">
                     <ExternalLink className="w-4 h-4 mr-2" />
-                    View Live Site
+                    Xem website
                   </Button>
                 )}
                 {project.githubUrl && (
                   <Button href={project.githubUrl} variant="outline" className="w-full">
                     <Github className="w-4 h-4 mr-2" />
-                    View Source
+                    Xem mã nguồn
                   </Button>
                 )}
               </div>
