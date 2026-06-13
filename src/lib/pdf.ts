@@ -9,13 +9,11 @@ import {
   languages,
 } from '@/data/skills';
 import { education, certifications } from '@/data/education';
+import { formatMonthYear } from '@/lib/date';
 
 // Helper to format dates
 export function formatDate(date: string): string {
-  return new Date(date + '-01').toLocaleDateString('vi-VN', {
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatMonthYear(date);
 }
 
 // Generate plain text resume for simple downloads

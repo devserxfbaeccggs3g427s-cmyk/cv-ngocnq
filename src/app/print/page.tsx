@@ -12,22 +12,16 @@ import {
 } from '@/data/skills';
 import { education, certifications } from '@/data/education';
 import { PrintButton } from '@/components/ui/PrintButton';
+import { formatMonthYear } from '@/lib/date';
 
 export const metadata: Metadata = {
   title: `CV | ${profile.name}`,
   description: 'Bản CV tối ưu để in hoặc lưu PDF',
 };
 
-function formatDate(date: string) {
-  return new Date(date + '-01').toLocaleDateString('vi-VN', {
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mb-3 border-b border-slate-900 pb-1 text-[13px] font-bold uppercase tracking-[0.14em] text-slate-900">
+    <h2 className="mb-3 border-b border-slate-900 pb-1 text-[16px] font-bold uppercase tracking-[0.08em] text-slate-900">
       {children}
     </h2>
   );
@@ -41,12 +35,12 @@ export default function PrintPage() {
       <header className="print-header mb-5 border-b-2 border-slate-900 pb-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-[28px] font-bold leading-tight tracking-normal text-slate-950">
+            <h1 className="text-[24px] font-bold leading-tight tracking-normal text-slate-950">
               {profile.name}
             </h1>
-            <p className="text-[15px] font-semibold text-slate-700">{profile.title}</p>
+            <p className="text-[13px] font-bold text-slate-700">{profile.title}</p>
           </div>
-          <div className="text-left text-[11px] leading-5 text-slate-700 sm:text-right">
+          <div className="text-left text-[13px] font-semibold leading-5 text-slate-700 sm:text-right">
             <p>{profile.email}</p>
             <p>{profile.phone}</p>
             <p>{profile.location}</p>
@@ -57,10 +51,10 @@ export default function PrintPage() {
       <main className="space-y-5">
         <section>
           <SectionTitle>Tóm tắt chuyên môn</SectionTitle>
-          <p className="text-[12px] leading-[1.58] text-slate-800">{profile.summary}</p>
+          <p className="text-[13px] leading-[1.5] text-slate-800">{profile.summary}</p>
           <div className="mt-2 grid grid-cols-1 gap-x-5 gap-y-1 sm:grid-cols-2">
             {profile.highlights.map((item) => (
-              <div key={item} className="flex gap-2 text-[11px] leading-[1.45] text-slate-800">
+              <div key={item} className="flex gap-2 text-[13px] font-semibold leading-[1.45] text-slate-800">
                 <span className="mt-[7px] h-1 w-1 flex-none rounded-full bg-slate-900" />
                 <span>{item}</span>
               </div>
@@ -77,10 +71,10 @@ export default function PrintPage() {
 
               return (
                 <div key={category} className="break-inside-avoid">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-slate-700">
-                    {getSkillCategoryLabel(category)}
+                  <h3 className="text-[13px] font-extrabold uppercase tracking-wide text-slate-950">
+                    {getSkillCategoryLabel(category).toUpperCase()}
                   </h3>
-                  <p className="mt-0.5 text-[10.5px] leading-[1.42] text-slate-800">
+                  <p className="mt-0.5 text-[13px] leading-[1.42] text-slate-800">
                     {categorySkills.map((skill) => skill.name).join(', ')}
                   </p>
                 </div>
@@ -97,16 +91,16 @@ export default function PrintPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-[13px] font-bold text-slate-950">{exp.title}</h3>
-                    <p className="text-[11.5px] font-semibold text-slate-700">
+                    <p className="text-[13px] font-bold text-slate-700">
                       {exp.company} | {exp.location}
                     </p>
                   </div>
-                  <p className="whitespace-nowrap text-[11px] font-medium text-slate-700">
-                    {formatDate(exp.startDate)} - {exp.current ? 'Hiện tại' : formatDate(exp.endDate!)}
+                  <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
+                    {formatMonthYear(exp.startDate)} - {exp.current ? 'Hiện tại' : formatMonthYear(exp.endDate!)}
                   </p>
                 </div>
-                <p className="mt-1 text-[11px] leading-[1.45] text-slate-700">{exp.description}</p>
-                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[10.8px] leading-[1.42] text-slate-800">
+                <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">{exp.description}</p>
+                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
                   {exp.achievements.slice(0, exp.id === 'exp-0' ? 6 : 4).map((achievement) => (
                     <li key={achievement}>{achievement}</li>
                   ))}
@@ -124,23 +118,23 @@ export default function PrintPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-[13px] font-bold text-slate-950">{project.title}</h3>
-                    <p className="text-[11.5px] font-semibold text-slate-700">
+                    <p className="text-[13px] font-bold text-slate-700">
                       {project.role} | {project.category}
                     </p>
                   </div>
-                  <p className="whitespace-nowrap text-[11px] font-medium text-slate-700">
+                  <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
                     {project.duration}
                   </p>
                 </div>
-                <p className="mt-1 text-[11px] leading-[1.45] text-slate-700">
+                <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">
                   {project.description}
                 </p>
-                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[10.8px] leading-[1.42] text-slate-800">
+                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
                   {project.highlights.slice(0, index < 3 ? 5 : 3).map((highlight) => (
                     <li key={highlight}>{highlight}</li>
                   ))}
                 </ul>
-                <p className="mt-1 text-[10.5px] leading-[1.35] text-slate-700">
+                <p className="mt-1 text-[13px] leading-[1.35] text-slate-700">
                   <span className="font-semibold">Công nghệ:</span>{' '}
                   {project.technologies.slice(0, 12).join(', ')}
                 </p>
@@ -156,14 +150,14 @@ export default function PrintPage() {
               {education.map((edu) => (
                 <div key={edu.id} className="break-inside-avoid">
                   <div className="flex justify-between gap-4">
-                    <h3 className="text-[12px] font-bold text-slate-950">
+                    <h3 className="text-[13px] font-bold text-slate-950">
                       {edu.degree} - {edu.field}
                     </h3>
-                    <span className="whitespace-nowrap text-[10.8px] text-slate-700">
+                    <span className="whitespace-nowrap text-[13px] font-bold text-slate-700">
                       {edu.startYear} - {edu.endYear}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-700">{edu.school}</p>
+                  <p className="text-[13px] text-slate-700">{edu.school}</p>
                 </div>
               ))}
             </div>
@@ -173,11 +167,11 @@ export default function PrintPage() {
             <SectionTitle>Chứng chỉ</SectionTitle>
             <div className="space-y-1.5">
               {certifications.map((cert) => (
-                <p key={cert.id} className="text-[10.8px] leading-[1.35] text-slate-800">
+                <p key={cert.id} className="text-[13px] leading-[1.35] text-slate-800">
                   <span className="font-semibold">{cert.name}</span> - {cert.issuer}
                 </p>
               ))}
-              <p className="pt-1 text-[10.8px] text-slate-800">
+              <p className="pt-1 text-[13px] text-slate-800">
                 <span className="font-semibold">Ngôn ngữ:</span>{' '}
                 {languages.map((lang) => `${lang.name} (${getLanguageLevelLabel(lang.level)})`).join(', ')}
               </p>

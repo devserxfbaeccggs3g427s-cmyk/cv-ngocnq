@@ -176,7 +176,7 @@ export const projects: Project[] = [
     ],
     category: 'Payment Gateway',
     role: 'Lập trình viên Backend',
-    duration: '2026-05 – Nay',
+    duration: '05-2026 – Nay',
     featured: true,
     highlights: [
       'Implement các API thanh toán theo spec TTTT: tạo giao dịch/QR, check status, receipt, bank inquiry, refund, disbursement và reconciliation',
@@ -219,7 +219,7 @@ export const projects: Project[] = [
     ],
     category: 'Tài chính – Ngân hàng',
     role: 'Lập trình viên Backend',
-    duration: '2026-01 – 2026-06',
+    duration: '01-2026 – 06-2026',
     featured: true,
     highlights: [
       'Phát triển authentication/session/device flow với JWT, refresh token, Redis session, device binding, lockout và trusted-device OTP',
@@ -264,7 +264,7 @@ export const projects: Project[] = [
     ],
     category: 'Tài chính – Ngân hàng',
     role: 'Lập trình viên Backend',
-    duration: '2025-11 – 2026-01',
+    duration: '11-2025 – 01-2026',
     featured: true,
     highlights: [
       'Xây dựng Spring Cloud Gateway với Keycloak JWT validation, public/admin policy, Redis/Bucket4j rate limiting và Resilience4j',
@@ -301,7 +301,7 @@ export const projects: Project[] = [
     ],
     category: 'Tài chính – Ngân hàng',
     role: 'Lập trình viên Full Stack',
-    duration: '2023-05 – 2025-10',
+    duration: '05-2023 – 10-2025',
     featured: false,
     highlights: [
       'Giảm 60% khối lượng nhập tay nhờ tích hợp AI trích xuất dữ liệu và phát hiện trùng lặp hình ảnh',
@@ -327,7 +327,7 @@ export const projects: Project[] = [
     technologies: ['Spring Boot', 'AOP', 'Hibernate', 'Oracle', 'Napas Gateway'],
     category: 'Bảo hiểm',
     role: 'Lập trình viên Backend',
-    duration: '2022-11 – 2023-05',
+    duration: '11-2022 – 05-2023',
     featured: false,
     highlights: [
       'Xây dựng API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
@@ -351,7 +351,7 @@ export const projects: Project[] = [
     technologies: ['Spring Boot', 'MyBatis', 'PostgreSQL', 'JSP', 'JavaScript', 'jQuery'],
     category: 'Nhật Bản',
     role: 'Lập trình viên Full Stack',
-    duration: '2022-03 – 2022-11',
+    duration: '03-2022 – 11-2022',
     featured: false,
     highlights: [
       'Phát triển module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn',
@@ -374,7 +374,7 @@ export const projects: Project[] = [
     technologies: ['Spring Boot', 'Hibernate', 'Thymeleaf', 'MySQL'],
     category: 'Nhật Bản',
     role: 'Lập trình viên Full Stack',
-    duration: '2021-11 – 2022-03',
+    duration: '11-2021 – 03-2022',
     featured: false,
     highlights: [
       'Phát triển tính năng quản lý chỗ ngồi và đồng bộ nhân sự từ AMIS',

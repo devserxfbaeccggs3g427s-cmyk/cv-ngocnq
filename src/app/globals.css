@@ -355,20 +355,27 @@ a {
 .print-resume {
   background: white;
   color: black;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
   max-width: 210mm;
   margin: 0 auto;
   padding: 2rem;
 }
 
+.print-resume * {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+}
+
 .print-resume h1 {
-  font-size: 1.75rem;
+  font-size: 24px;
   font-weight: 700;
   margin-bottom: 0.25rem;
 }
 
 .print-resume h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 2px solid currentColor;
@@ -377,18 +384,22 @@ a {
 }
 
 .print-resume h3 {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .print-resume p {
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .print-resume ul {
-  font-size: 0.875rem;
+  font-size: 13px;
   margin-left: 1rem;
+}
+
+.print-resume li {
+  font-size: 13px;
 }
 
 .print-resume li {

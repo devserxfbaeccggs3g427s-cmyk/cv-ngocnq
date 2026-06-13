@@ -14,6 +14,8 @@ The template is fully implemented with all core sections working. It's ready for
 - [x] Added payment/core banking skills: Core Banking/ESB integration, Payment Gateway/Napas/VietQR, JdbcTemplate/Stored Procedures, Spring Web MVC, Resilience4j, Actuator/Micrometer/Prometheus
 - [x] Rebuilt `/print` route into a dense print-friendly CV layout with summary, highlights, core skills, experience, project experience, education, certifications, and languages
 - [x] Localized all visible resume/portfolio/print/PDF-export UI text to Vietnamese
+- [x] Updated print/PDF typography: Times New Roman, candidate name 24px, section titles 16px, other content 13px, stronger bold emphasis for highlighted information
+- [x] Updated displayed month/year dates to MM-YYYY format across print/PDF, experience cards, certifications, text export, and project durations
 - [x] Added SHB Debit Collection Portal project entry (featured), timeline 2025-11 – 2026-01
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry, timeline 2026-01 – 2026-06
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry (featured)
@@ -63,6 +65,8 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - 7 projects: GOV Payment Service / C12, SHB SAHA Mobile Banking Cambodia, SHB Debit Collection Portal, CMV MBBank, MyBV Life, Veritas, Hywork
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
+- Print/PDF typography uses Times New Roman with 24px candidate name, 16px section headings, and 13px body content
+- Displayed month/year ranges use MM-YYYY format, with current items ending in `Hiện tại` or `Nay`
 
 ## Quick Customization Guide
 
@@ -115,6 +119,8 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-13 | Changed displayed date format from month-name/year to MM-YYYY |
+| 2026-06-13 | Updated `/print` typography and emphasis for PDF export |
 | 2026-06-12 | Localized visible project UI and print/PDF CV labels to Vietnamese |
 | 2026-06-12 | Refreshed professional CV content, added GOV Payment Service/C12, corrected SAHA timeline to Jan-Jun 2026, rebuilt project portfolio and print/PDF view |
 | 2026-01-22 | Memory bank updated to match .kilocode standard structure |

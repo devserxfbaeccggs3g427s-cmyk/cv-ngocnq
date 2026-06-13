@@ -4,15 +4,9 @@ import { motion } from 'framer-motion';
 import { Award, ExternalLink, Calendar } from 'lucide-react';
 import { certifications } from '@/data/education';
 import { Section, Card, CardContent, Badge } from '@/components/ui';
+import { formatMonthYear } from '@/lib/date';
 
 export function CertificationsSection() {
-  const formatDate = (date: string) => {
-    return new Date(date + '-01').toLocaleDateString('vi-VN', {
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
   return (
     <Section title="Chứng chỉ" subtitle="Chứng chỉ và năng lực bổ trợ">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -42,9 +36,9 @@ export function CertificationsSection() {
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-500 mb-4">
                   <Calendar className="w-3.5 h-3.5" />
-                  <span>Cấp {formatDate(cert.date)}</span>
+                  <span>Cấp {formatMonthYear(cert.date)}</span>
                   {cert.expirationDate && (
-                    <span>· Hết hạn {formatDate(cert.expirationDate)}</span>
+                    <span>· Hết hạn {formatMonthYear(cert.expirationDate)}</span>
                   )}
                 </div>
 

@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui';
 import type { Experience } from '@/data/experience';
+import { formatMonthYear } from '@/lib/date';
 
 interface ExperienceCardProps {
   experience: Experience;
@@ -11,13 +12,6 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
     'part-time': 'Bán thời gian',
     contract: 'Hợp đồng',
     freelance: 'Tự do',
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date + '-01').toLocaleDateString('vi-VN', {
-      month: 'short',
-      year: 'numeric',
-    });
   };
 
   return (
@@ -38,8 +32,8 @@ export function ExperienceCard({ experience }: ExperienceCardProps) {
             {experience.company}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-500">
-            {formatDate(experience.startDate)} –{' '}
-            {experience.current ? 'Hiện tại' : formatDate(experience.endDate!)}
+            {formatMonthYear(experience.startDate)} –{' '}
+            {experience.current ? 'Hiện tại' : formatMonthYear(experience.endDate!)}
             {' · '}{experience.location}
             {' · '}<span>{typeLabels[experience.type]}</span>
           </p>

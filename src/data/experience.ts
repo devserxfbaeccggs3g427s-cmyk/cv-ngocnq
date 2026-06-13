@@ -1,3 +1,5 @@
+import { formatMonthYear } from '@/lib/date';
+
 /**
  * =============================================================================
  * EXPERIENCE DATA - Work History
@@ -311,8 +313,7 @@ export function getAllTechnologies(): string[] {
  * Format date string (YYYY-MM) to readable format
  */
 export function formatExperienceDate(dateString: string): string {
-  const date = new Date(dateString + '-01');
-  return date.toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' });
+  return formatMonthYear(dateString);
 }
 
 /**
