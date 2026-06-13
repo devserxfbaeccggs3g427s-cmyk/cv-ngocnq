@@ -28,7 +28,19 @@ function SectionTitle({ children }: { children: ReactNode }) {
 }
 
 export default function PrintPage() {
-  const printProjects = projects;
+  const printProjects = projects.slice(0, 4);
+  const conciseSummary =
+    'Lập trình viên Backend / Full-Stack với hơn 4 năm kinh nghiệm xây dựng hệ thống tài chính - ngân hàng, bảo hiểm và sản phẩm cho khách hàng Nhật Bản. Thế mạnh ở Java 17, Spring Boot 3, Microservices, Oracle/PostgreSQL, Redis, Kafka, Core Banking/ESB integration, bảo mật JWT/OAuth2/OTP và thiết kế API phục vụ nghiệp vụ có độ tin cậy cao.';
+  const skillLimits: Record<string, number> = {
+    Languages: 5,
+    Frontend: 4,
+    Backend: 8,
+    Architecture: 6,
+    Databases: 5,
+    DevOps: 5,
+    Security: 4,
+    Monitoring: 4,
+  };
 
   return (
     <div className="print-resume mx-auto max-w-[210mm] bg-white px-8 py-7 text-slate-950 print:px-0 print:py-0">
@@ -51,15 +63,7 @@ export default function PrintPage() {
       <main className="space-y-5">
         <section>
           <SectionTitle>Tóm tắt chuyên môn</SectionTitle>
-          <p className="text-[13px] leading-[1.5] text-slate-800">{profile.summary}</p>
-          <div className="mt-2 grid grid-cols-1 gap-x-5 gap-y-1 sm:grid-cols-2">
-            {profile.highlights.map((item) => (
-              <div key={item} className="flex gap-2 text-[13px] font-semibold leading-[1.45] text-slate-800">
-                <span className="mt-[7px] h-1 w-1 flex-none rounded-full bg-slate-900" />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
+          <p className="text-[13px] leading-[1.5] text-slate-800">{conciseSummary}</p>
         </section>
 
         <section>
@@ -75,7 +79,10 @@ export default function PrintPage() {
                     {getSkillCategoryLabel(category).toUpperCase()}
                   </h3>
                   <p className="mt-0.5 text-[13px] leading-[1.42] text-slate-800">
-                    {categorySkills.map((skill) => skill.name).join(', ')}
+                    {categorySkills
+                      .slice(0, skillLimits[category] || 6)
+                      .map((skill) => skill.name)
+                      .join(', ')}
                   </p>
                 </div>
               );
@@ -101,7 +108,7 @@ export default function PrintPage() {
                 </div>
                 <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">{exp.description}</p>
                 <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
-                  {exp.achievements.slice(0, exp.id === 'exp-0' ? 6 : 4).map((achievement) => (
+                  {exp.achievements.slice(0, exp.id === 'exp-0' ? 4 : 2).map((achievement) => (
                     <li key={achievement}>{achievement}</li>
                   ))}
                 </ul>
@@ -130,13 +137,13 @@ export default function PrintPage() {
                   {project.description}
                 </p>
                 <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
-                  {project.highlights.slice(0, index < 3 ? 5 : 3).map((highlight) => (
+                  {project.highlights.slice(0, index < 3 ? 3 : 2).map((highlight) => (
                     <li key={highlight}>{highlight}</li>
                   ))}
                 </ul>
                 <p className="mt-1 text-[13px] leading-[1.35] text-slate-700">
                   <span className="font-semibold">Công nghệ:</span>{' '}
-                  {project.technologies.slice(0, 12).join(', ')}
+                  {project.technologies.slice(0, 8).join(', ')}
                 </p>
               </article>
             ))}

@@ -16,6 +16,7 @@ The template is fully implemented with all core sections working. It's ready for
 - [x] Localized all visible resume/portfolio/print/PDF-export UI text to Vietnamese
 - [x] Updated print/PDF typography: Times New Roman, candidate name 24px, section titles 16px, other content 13px, stronger bold emphasis for highlighted information
 - [x] Updated displayed month/year dates to MM-YYYY format across print/PDF, experience cards, certifications, text export, and project durations
+- [x] Shortened print/PDF CV by removing repeated top highlights, limiting printed skills, reducing bullet counts, and keeping the 4 strongest projects in the PDF version
 - [x] Added SHB Debit Collection Portal project entry (featured), timeline 2025-11 – 2026-01
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry, timeline 2026-01 – 2026-06
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry (featured)
@@ -67,6 +68,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
 - Print/PDF typography uses Times New Roman with 24px candidate name, 16px section headings, and 13px body content
 - Displayed month/year ranges use MM-YYYY format, with current items ending in `Hiện tại` or `Nay`
+- Print/PDF CV is intentionally concise; full project portfolio remains available on `/portfolio`
 
 ## Quick Customization Guide
 
@@ -119,6 +121,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-13 | Shortened `/print` CV content to reduce PDF length while keeping strongest banking/payment projects |
 | 2026-06-13 | Changed displayed date format from month-name/year to MM-YYYY |
 | 2026-06-13 | Updated `/print` typography and emphasis for PDF export |
 | 2026-06-12 | Localized visible project UI and print/PDF CV labels to Vietnamese |
