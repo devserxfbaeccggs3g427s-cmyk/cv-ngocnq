@@ -41,6 +41,54 @@ export default function PrintPage() {
     Security: 4,
     Monitoring: 4,
   };
+  const renderExperience = (exp: (typeof experience)[number]) => (
+    <article key={exp.id} className="print-item break-inside-avoid">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-[13px] font-bold text-slate-950">{exp.title}</h3>
+          <p className="text-[13px] font-bold text-slate-700">
+            {exp.company} | {exp.location}
+          </p>
+        </div>
+        <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
+          {formatMonthYear(exp.startDate)} - {exp.current ? 'Hiện tại' : formatMonthYear(exp.endDate!)}
+        </p>
+      </div>
+      <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">{exp.description}</p>
+      <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
+        {exp.achievements.slice(0, exp.id === 'exp-0' ? 4 : 2).map((achievement) => (
+          <li key={achievement}>{achievement}</li>
+        ))}
+      </ul>
+    </article>
+  );
+  const renderProject = (project: (typeof projects)[number], index: number) => (
+    <article key={project.id} className="print-item break-inside-avoid">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-[13px] font-bold text-slate-950">{project.title}</h3>
+          <p className="text-[13px] font-bold text-slate-700">
+            {project.role} | {project.category}
+          </p>
+        </div>
+        <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
+          {project.duration}
+        </p>
+      </div>
+      <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">
+        {project.description}
+      </p>
+      <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
+        {project.highlights.slice(0, index < 3 ? 3 : 2).map((highlight) => (
+          <li key={highlight}>{highlight}</li>
+        ))}
+      </ul>
+      <p className="mt-1 text-[13px] leading-[1.35] text-slate-700">
+        <span className="font-semibold">Công nghệ:</span>{' '}
+        {project.technologies.slice(0, 8).join(', ')}
+      </p>
+    </article>
+  );
 
   return (
     <div className="print-resume mx-auto max-w-[210mm] bg-white px-8 py-7 text-slate-950 print:px-0 print:py-0">
@@ -61,12 +109,12 @@ export default function PrintPage() {
       </header>
 
       <main className="space-y-5">
-        <section>
+        <section className="print-section">
           <SectionTitle>Tóm tắt chuyên môn</SectionTitle>
           <p className="text-[13px] leading-[1.5] text-slate-800">{conciseSummary}</p>
         </section>
 
-        <section>
+        <section className="print-section">
           <SectionTitle>Kỹ năng cốt lõi</SectionTitle>
           <div className="grid grid-cols-2 gap-x-6 gap-y-2">
             {skillCategories.map((category) => {
@@ -90,67 +138,31 @@ export default function PrintPage() {
           </div>
         </section>
 
-        <section>
-          <SectionTitle>Kinh nghiệm làm việc</SectionTitle>
-          <div className="space-y-4">
-            {experience.map((exp) => (
-              <article key={exp.id} className="break-inside-avoid">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-[13px] font-bold text-slate-950">{exp.title}</h3>
-                    <p className="text-[13px] font-bold text-slate-700">
-                      {exp.company} | {exp.location}
-                    </p>
-                  </div>
-                  <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
-                    {formatMonthYear(exp.startDate)} - {exp.current ? 'Hiện tại' : formatMonthYear(exp.endDate!)}
-                  </p>
-                </div>
-                <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">{exp.description}</p>
-                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
-                  {exp.achievements.slice(0, exp.id === 'exp-0' ? 4 : 2).map((achievement) => (
-                    <li key={achievement}>{achievement}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
+        <section className="print-section">
+          <div className="print-keep-with-title">
+            <SectionTitle>Kinh nghiệm làm việc</SectionTitle>
+            <div className="space-y-4">
+              {experience.slice(0, 1).map(renderExperience)}
+            </div>
+          </div>
+          <div className="mt-4 space-y-4">
+            {experience.slice(1).map(renderExperience)}
           </div>
         </section>
 
-        <section>
-          <SectionTitle>Kinh nghiệm dự án</SectionTitle>
-          <div className="space-y-4">
-            {printProjects.map((project, index) => (
-              <article key={project.id} className="break-inside-avoid">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-[13px] font-bold text-slate-950">{project.title}</h3>
-                    <p className="text-[13px] font-bold text-slate-700">
-                      {project.role} | {project.category}
-                    </p>
-                  </div>
-                  <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
-                    {project.duration}
-                  </p>
-                </div>
-                <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">
-                  {project.description}
-                </p>
-                <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
-                  {project.highlights.slice(0, index < 3 ? 3 : 2).map((highlight) => (
-                    <li key={highlight}>{highlight}</li>
-                  ))}
-                </ul>
-                <p className="mt-1 text-[13px] leading-[1.35] text-slate-700">
-                  <span className="font-semibold">Công nghệ:</span>{' '}
-                  {project.technologies.slice(0, 8).join(', ')}
-                </p>
-              </article>
-            ))}
+        <section className="print-section">
+          <div className="print-keep-with-title">
+            <SectionTitle>Kinh nghiệm dự án</SectionTitle>
+            <div className="space-y-4">
+              {printProjects.slice(0, 1).map(renderProject)}
+            </div>
+          </div>
+          <div className="mt-4 space-y-4">
+            {printProjects.slice(1).map((project, index) => renderProject(project, index + 1))}
           </div>
         </section>
 
-        <section className="grid grid-cols-1 gap-5 sm:grid-cols-[1.2fr_0.8fr]">
+        <section className="print-section grid grid-cols-1 gap-5 sm:grid-cols-[1.2fr_0.8fr]">
           <div>
             <SectionTitle>Học vấn</SectionTitle>
             <div className="space-y-2">

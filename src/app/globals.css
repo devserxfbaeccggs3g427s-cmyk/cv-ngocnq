@@ -276,6 +276,7 @@ a {
   /* Page breaks */
   h1, h2, h3 {
     page-break-after: avoid;
+    break-after: avoid;
   }
 
   p, ul, ol {
@@ -330,6 +331,17 @@ a {
 
   .print-resume .grid {
     display: grid !important;
+  }
+
+  .print-resume .print-section h2 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .print-resume .print-keep-with-title,
+  .print-resume .print-item {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
   }
 
   /* Flex wrapping */
