@@ -144,15 +144,36 @@ export async function PUT(request: Request) {
     taskId?: string;
     completed?: boolean;
     note?: string;
+    items?: Record<string, unknown>;
   };
 
-  if (!body.taskId) {
+  if (!body.taskId && !body.items) {
     return NextResponse.json({ error: 'taskId is required' }, { status: 400 });
   }
 
   const now = new Date().toISOString();
   const progress = await readProgress();
-  const current = progress.items[body.taskId] ?? {
+
+  if (body.items) {
+    const normalized = normalizeProgress({ items: body.items });
+
+    if (!normalized) {
+      return NextResponse.json(
+        { error: 'items không đúng định dạng progress.' },
+        { status: 400 }
+      );
+    }
+
+    progress.items = normalized.items;
+    progress.updatedAt = now;
+
+    await writeProgress(progress);
+
+    return NextResponse.json(progress);
+  }
+
+  const taskId = body.taskId as string;
+  const current = progress.items[taskId] ?? {
     completed: false,
     note: '',
     completedAt: null,
@@ -161,7 +182,7 @@ export async function PUT(request: Request) {
 
   const completed = body.completed ?? current.completed;
 
-  progress.items[body.taskId] = {
+  progress.items[taskId] = {
     completed,
     note: body.note ?? current.note,
     completedAt: completed ? current.completedAt ?? now : null,

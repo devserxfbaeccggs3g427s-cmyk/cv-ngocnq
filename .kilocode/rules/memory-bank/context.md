@@ -9,6 +9,8 @@ The template is fully implemented with all core sections working. It's ready for
 ## Recently Completed
 
 - [x] Made `/skill-roadmap` progress Vercel-safe by persisting runtime completion state and notes in browser `localStorage` instead of writing to bundled JSON files in production
+- [x] Updated `/skill-roadmap` hierarchical todo progress so parent rows show an in-progress color when any descendant task is completed and are auto-marked complete when all descendant tasks are completed
+- [x] Extended local-dev roadmap progress sync to persist multi-task updates in one request, including auto-updated parent task states
 - [x] Updated `/skill-roadmap/notes/[taskId]` to read notes from browser progress storage so Markdown preview reflects Vercel/runtime edits
 - [x] Kept `src/data/skill-roadmap-progress.json` as seed/local-dev sync fallback and made production API write attempts return a clear unsupported-runtime error
 - [x] Hardened `/api/skill-roadmap/progress` import handling so roadmap progress backups return clearer JSON format errors and accept compatible backup shapes
@@ -93,6 +95,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - `/skill-roadmap` provides a professional 24-week hierarchical study todo list covering Java/JVM, Spring backend, microservices/event-driven architecture, banking/payment domain, database/cache/storage, security, DevOps/observability, frontend/full-stack delivery, and senior engineering/testing
 - Each roadmap node includes a concise generated AI learning prompt with two-line preview, show/hide control, and copy-to-clipboard action; prompts emphasize theory, internal mechanisms, why/how explanations, trade-offs, and deep interview questions
 - Roadmap task rows use subtle depth-based background colors and left borders; completed rows keep a stronger green completion signal
+- Roadmap parent task rows now show an amber in-progress state as soon as at least one descendant task is completed; once all descendants are completed, the corresponding parent chain is auto-marked completed and persisted
 - Roadmap nodes with child tasks can be expanded/collapsed individually; the filter toolbar also has "Mở tất cả" and "Thu gọn tất cả" controls
 - The roadmap now breaks broad topics into important interview-level fundamentals; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees
 - Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in browser `localStorage` under `skill-roadmap-progress:v1`, with `src/data/skill-roadmap-progress.json` kept as seed/local-dev JSON sync only
@@ -159,6 +162,7 @@ Edit `src/config/site.config.ts` → `features`:
 | Date | Activity |
 |------|----------|
 | 2026-06-14 | Made roadmap progress Vercel-safe with browser localStorage persistence, local-dev JSON sync fallback, and client-side note preview storage |
+| 2026-06-14 | Added derived parent task state for hierarchical roadmap todos: partial descendant progress color and auto-complete parent chain |
 | 2026-06-14 | Hardened roadmap progress JSON import validation and improved backup format error messages |
 | 2026-06-14 | Added per-task Markdown note preview opened from each completed roadmap task |
 | 2026-06-14 | Fixed nullable `filterTaskTree` return typing in `/skill-roadmap` build |

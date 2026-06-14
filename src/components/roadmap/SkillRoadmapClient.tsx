@@ -77,6 +77,11 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type TaskIndex = {
+  taskById: Map<string, RoadmapTask>;
+  ancestorIdsByTaskId: Map<string, string[]>;
+};
+
 const emptyProgress: ProgressFile = {
   updatedAt: null,
   items: {},
@@ -135,6 +140,11 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const levels = useMemo(
     () => Array.from(new Set(allTasks.map((task) => task.level))),
     [allTasks]
+  );
+
+  const taskIndex = useMemo(
+    () => buildTaskIndex(roadmap.tracks),
+    [roadmap.tracks]
   );
 
   const completedCount = allTasks.filter(
@@ -213,23 +223,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setSavingTaskId(taskId);
 
     const previous = progress;
-    const current = previous.items[taskId] ?? {
-      completed: false,
-      note: '',
-      completedAt: null,
-      updatedAt: new Date().toISOString(),
-    };
-    const optimistic: ProgressFile = {
-      updatedAt: new Date().toISOString(),
-      items: {
-        ...previous.items,
-        [taskId]: {
-          ...current,
-          ...nextItem,
-          updatedAt: new Date().toISOString(),
-        },
-      },
-    };
+    const optimistic = applyTaskProgressUpdate(previous, taskId, nextItem, taskIndex);
 
     setProgress(optimistic);
     storeProgress(optimistic);
@@ -240,9 +234,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            taskId,
-            completed: optimistic.items[taskId].completed,
-            note: optimistic.items[taskId].note,
+            items: optimistic.items,
           }),
         });
 
@@ -942,10 +934,15 @@ function TaskNode({
   const completed = Boolean(item?.completed);
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
-  const childCount = flattenTasks(childTasks).length;
-  const completedChildren = flattenTasks(childTasks).filter(
+  const descendants = flattenTasks(childTasks);
+  const childCount = descendants.length;
+  const completedChildren = descendants.filter(
     (child) => progress.items[child.id]?.completed
   ).length;
+  const hasStartedChildren = completedChildren > 0;
+  const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
+  const effectivelyCompleted = completed || allChildrenCompleted;
+  const childProgressing = !effectivelyCompleted && hasStartedChildren;
   const isChild = depth > 0;
   const hasChildren = childTasks.length > 0;
   const isExpanded = expandedTaskIds.has(task.id);
@@ -960,7 +957,8 @@ function TaskNode({
         className={cn(
           'grid gap-4 border-l-4 px-5 py-5 transition md:grid-cols-[auto_1fr] md:px-6',
           depthStyle,
-          completed && 'border-emerald-300 bg-emerald-50/70 dark:border-emerald-800 dark:bg-emerald-950/20'
+          childProgressing && 'border-amber-300 bg-amber-50/75 dark:border-amber-800 dark:bg-amber-950/20',
+          effectivelyCompleted && 'border-emerald-300 bg-emerald-50/70 dark:border-emerald-800 dark:bg-emerald-950/20'
         )}
         style={{ paddingLeft: `calc(1.25rem + ${depth * 1.5}rem)` }}
       >
@@ -971,11 +969,11 @@ function TaskNode({
             'mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:hover:border-blue-700',
             isChild && 'h-8 w-8'
           )}
-          aria-label={completed ? 'Bỏ đánh dấu hoàn thành' : 'Đánh dấu hoàn thành'}
+          aria-label={effectivelyCompleted ? 'Bỏ đánh dấu hoàn thành' : 'Đánh dấu hoàn thành'}
         >
           {saving ? (
             <Loader2 className="h-5 w-5 animate-spin" />
-          ) : completed ? (
+          ) : effectivelyCompleted ? (
             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
           ) : (
             <Circle className="h-5 w-5" />
@@ -1005,7 +1003,15 @@ function TaskNode({
               {task.estimateHours}h
             </span>
             {childCount > 0 && (
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span
+                className={cn(
+                  'rounded-full px-2 py-0.5 text-xs font-semibold',
+                  childProgressing
+                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
+                  effectivelyCompleted && 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200'
+                )}
+              >
                 {completedChildren}/{childCount} mục con
               </span>
             )}
@@ -1087,7 +1093,7 @@ function TaskNode({
             )}
           </div>
 
-          {completed && (
+          {effectivelyCompleted && (
             <div className="mt-4 rounded-lg border border-emerald-100 bg-white p-3 dark:border-emerald-900/50 dark:bg-gray-950">
               <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
@@ -1223,6 +1229,92 @@ function flattenTasks(tasks: RoadmapTask[]): RoadmapTask[] {
     task,
     ...flattenTasks(task.children ?? []),
   ]);
+}
+
+function buildTaskIndex(tracks: RoadmapTrack[]): TaskIndex {
+  const taskById = new Map<string, RoadmapTask>();
+  const ancestorIdsByTaskId = new Map<string, string[]>();
+
+  function walk(tasks: RoadmapTask[], ancestorIds: string[]) {
+    for (const task of tasks) {
+      taskById.set(task.id, task);
+      ancestorIdsByTaskId.set(task.id, ancestorIds);
+      walk(task.children ?? [], [...ancestorIds, task.id]);
+    }
+  }
+
+  for (const track of tracks) {
+    for (const module of track.modules) {
+      walk(module.tasks, []);
+    }
+  }
+
+  return {
+    taskById,
+    ancestorIdsByTaskId,
+  };
+}
+
+function applyTaskProgressUpdate(
+  progress: ProgressFile,
+  taskId: string,
+  nextItem: Partial<ProgressItem>,
+  taskIndex: TaskIndex
+): ProgressFile {
+  const now = new Date().toISOString();
+  const items = {
+    ...progress.items,
+    [taskId]: mergeProgressItem(progress.items[taskId], nextItem, now),
+  };
+
+  const ancestorIds = taskIndex.ancestorIdsByTaskId.get(taskId) ?? [];
+
+  for (const ancestorId of [...ancestorIds].reverse()) {
+    const ancestor = taskIndex.taskById.get(ancestorId);
+
+    if (!ancestor) {
+      continue;
+    }
+
+    const descendants = flattenTasks(ancestor.children ?? []);
+    const allDescendantsCompleted = descendants.length > 0
+      && descendants.every((descendant) => items[descendant.id]?.completed);
+    const current = items[ancestorId];
+
+    if (allDescendantsCompleted) {
+      items[ancestorId] = mergeProgressItem(current, {
+        completed: true,
+        completedAt: current?.completedAt ?? now,
+      }, now);
+      continue;
+    }
+
+    if (current?.completed) {
+      items[ancestorId] = mergeProgressItem(current, {
+        completed: false,
+        completedAt: null,
+      }, now);
+    }
+  }
+
+  return {
+    updatedAt: now,
+    items,
+  };
+}
+
+function mergeProgressItem(
+  current: ProgressItem | undefined,
+  nextItem: Partial<ProgressItem>,
+  now: string
+): ProgressItem {
+  return {
+    completed: current?.completed ?? false,
+    note: current?.note ?? '',
+    completedAt: current?.completedAt ?? null,
+    ...nextItem,
+    updatedAt: now,
+  };
 }
 
 function filterTaskTree(
