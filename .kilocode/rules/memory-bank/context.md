@@ -8,6 +8,9 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added direct edit mode on `/print` so users can adjust visible CV text before saving the browser PDF
+- [x] Added local draft persistence for edited print CV content with reset support
+- [x] Fixed `/print` hydration mismatch by deferring localStorage-derived draft state until after mount
 - [x] Refreshed CV content into a more senior/professional Backend / Full-Stack Developer profile
 - [x] Rebuilt selected projects around GOV Payment Service / C12 (2026-05 – present), SHB SAHA Mobile Banking Cambodia (2026-01 – 2026-06), and SHB Debit Collection Portal (2025-11 – 2026-01)
 - [x] Reworked Alphaway/SHB work experience as a current employer assignment covering payment gateway, mobile banking, and debit collection systems
@@ -52,6 +55,7 @@ The template is fully implemented with all core sections working. It's ready for
 | Education Section | `src/components/resume/EducationSection.tsx` | ✅ Complete |
 | Certifications | `src/components/resume/CertificationsSection.tsx` | ✅ Complete |
 | Languages | `src/components/resume/LanguagesSection.tsx` | ✅ Complete |
+| Editable Print Resume | `src/components/resume/PrintResumeEditor.tsx` | ✅ Complete |
 | Portfolio Grid | `src/components/portfolio/ProjectGrid.tsx` | ✅ Complete |
 | Contact Form | `src/components/contact/ContactForm.tsx` | ✅ Complete |
 | Header | `src/components/layout/Header.tsx` | ✅ Complete |
@@ -67,6 +71,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
 - 7 projects: GOV Payment Service / C12, SHB SAHA Mobile Banking Cambodia, SHB Debit Collection Portal, CMV MBBank, MyBV Life, Veritas, Hywork
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
+- `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
 - Print/PDF typography uses Times New Roman with 24px candidate name, 16px section headings, and 13px body content
 - Displayed month/year ranges use MM-YYYY format, with current items ending in `Hiện tại` or `Nay`
@@ -125,6 +130,8 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Fixed hydration mismatch in editable print CV reset button state |
+| 2026-06-14 | Added editable `/print` CV mode with local draft persistence and PDF export using the edited visible content |
 | 2026-06-14 | Wired contact form API to send email through Resend with env-based configuration |
 | 2026-06-13 | Restored full professional summary in print/PDF CV |
 | 2026-06-13 | Improved print page-break behavior for Experience and Project sections |

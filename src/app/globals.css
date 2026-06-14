@@ -344,6 +344,10 @@ a {
     page-break-inside: avoid;
   }
 
+  .print-resume-editing {
+    outline: none !important;
+  }
+
   /* Flex wrapping */
   .flex-wrap {
     flex-wrap: wrap;
@@ -416,6 +420,20 @@ a {
 
 .print-resume li {
   margin-bottom: 0.25rem;
+}
+
+.print-resume-editing {
+  outline: 2px dashed rgb(37 99 235 / 0.55);
+  outline-offset: 6px;
+  caret-color: rgb(37 99 235);
+}
+
+.print-resume-editing:focus {
+  outline: 2px dashed rgb(37 99 235 / 0.75);
+}
+
+.print-resume-editing *:focus {
+  outline: none;
 }
 
 /* ================================
