@@ -110,7 +110,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 - Profile image expects `/images/profile.jpg` → Add real photo
 - Project thumbnails expect `/projects/` images
-- Contact form needs backend integration for email
+- Contact form sends email through Resend when `RESEND_API_KEY` and `CONTACT_EMAIL_FROM` are configured
 - Avatar images use placeholders → Replace with real photos
 
 ## Pending Improvements (Optional)
@@ -125,6 +125,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Wired contact form API to send email through Resend with env-based configuration |
 | 2026-06-13 | Restored full professional summary in print/PDF CV |
 | 2026-06-13 | Improved print page-break behavior for Experience and Project sections |
 | 2026-06-13 | Shortened `/print` CV content to reduce PDF length while keeping strongest banking/payment projects |
