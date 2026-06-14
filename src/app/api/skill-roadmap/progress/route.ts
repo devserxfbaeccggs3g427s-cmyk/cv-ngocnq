@@ -37,35 +37,49 @@ async function writeProgress(progress: ProgressFile) {
   await fs.writeFile(progressFilePath, `${JSON.stringify(progress, null, 2)}\n`, 'utf8');
 }
 
-function normalizeProgress(input: unknown): ProgressFile | null {
-  if (!input || typeof input !== 'object') {
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeProgressItem(input: unknown): ProgressItem | null {
+  if (!isRecord(input)) {
     return null;
   }
 
-  const value = input as {
-    updatedAt?: unknown;
-    items?: unknown;
+  return {
+    completed: Boolean(input.completed),
+    note: typeof input.note === 'string' ? input.note : '',
+    completedAt: typeof input.completedAt === 'string' ? input.completedAt : null,
+    updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : new Date().toISOString(),
   };
+}
 
-  if (!value.items || typeof value.items !== 'object' || Array.isArray(value.items)) {
+function normalizeProgress(input: unknown): ProgressFile | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const value = isRecord(input.progress) ? input.progress : input;
+  const rawItems = isRecord(value.items) ? value.items : value;
+
+  if (!isRecord(rawItems)) {
     return null;
   }
 
   const items: Record<string, ProgressItem> = {};
 
-  for (const [taskId, item] of Object.entries(value.items)) {
-    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+  for (const [taskId, item] of Object.entries(rawItems)) {
+    if (taskId === 'updatedAt') {
+      continue;
+    }
+
+    const progressItem = normalizeProgressItem(item);
+
+    if (!progressItem) {
       return null;
     }
 
-    const raw = item as Partial<ProgressItem>;
-
-    items[taskId] = {
-      completed: Boolean(raw.completed),
-      note: typeof raw.note === 'string' ? raw.note : '',
-      completedAt: typeof raw.completedAt === 'string' ? raw.completedAt : null,
-      updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString(),
-    };
+    items[taskId] = progressItem;
   }
 
   return {
@@ -80,11 +94,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: 'File backup không phải JSON hợp lệ.' },
+      { status: 400 }
+    );
+  }
+
   const progress = normalizeProgress(body);
 
   if (!progress) {
-    return NextResponse.json({ error: 'Invalid progress backup format' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.' },
+      { status: 400 }
+    );
   }
 
   const importedProgress = {

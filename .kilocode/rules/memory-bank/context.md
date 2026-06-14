@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Hardened `/api/skill-roadmap/progress` import handling so roadmap progress backups return clearer JSON format errors and accept compatible backup shapes
 - [x] Added `/skill-roadmap` professional study roadmap page for Nguyễn Quang Ngọc's full Backend / Full-Stack skill set
 - [x] Added manual roadmap progress backup controls: Export JSON, Import JSON, and optional GitHub commit backup
 - [x] Added per-task Markdown note preview opened from each completed task note via `/skill-roadmap/notes/[taskId]`
@@ -154,6 +155,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Hardened roadmap progress JSON import validation and improved backup format error messages |
 | 2026-06-14 | Added per-task Markdown note preview opened from each completed roadmap task |
 | 2026-06-14 | Fixed nullable `filterTaskTree` return typing in `/skill-roadmap` build |
 | 2026-06-14 | Made per-task Markdown preview metadata sidebar sticky on desktop |
