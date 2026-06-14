@@ -8,6 +8,11 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Rebuilt `/skill-roadmap/notes/[taskId]` Markdown preview with a reusable professional renderer supporting headings, inline formatting, links, images, tables, ordered/unordered/task lists, blockquotes/callouts, horizontal rules, and language-labeled fenced code blocks including SQL/database formats
+- [x] Added light/dark Markdown preview styling in `src/app/globals.css` for readable typography, responsive tables, IDE-like syntax-highlighted code blocks with line numbers, language auto-detection, database code emphasis, checklist controls, and callout variants
+- [x] Split Markdown preview colors into dedicated light/dark CSS variables so headings, body text, links, inline code, lists, tables, callouts, images, code text, line numbers, and token colors keep readable contrast in both themes
+- [x] Added `prefers-color-scheme: dark` support for global and Markdown CSS variables so Markdown content and code blocks follow both class-based and system/browser dark mode
+- [x] Added rendered-theme detection in `MarkdownPreview` so Markdown/code palettes follow the actual visible page background, including class-based, data-theme, system dark mode, and computed body background cases
 - [x] Added env-driven defaults for `/skill-roadmap` GitHub backup form, including server-side token fallback via `GITHUB_BACKUP_TOKEN` without exposing the token to browser JavaScript
 - [x] Fixed TypeScript build error in `/api/skill-roadmap/backup/github` by normalizing unknown GitHub error responses before building contextual error messages
 - [x] Hardened `/api/skill-roadmap/backup/github` with GitHub repo/branch preflight checks, more tolerant repo URL parsing, normalized backup paths, and contextual Vietnamese errors for token permission, branch, repo access, conflict, and validation failures
@@ -83,6 +88,7 @@ The template is fully implemented with all core sections working. It's ready for
 | Portfolio Grid | `src/components/portfolio/ProjectGrid.tsx` | ✅ Complete |
 | Contact Form | `src/components/contact/ContactForm.tsx` | ✅ Complete |
 | Skill Roadmap | `src/components/roadmap/SkillRoadmapClient.tsx` | ✅ Complete |
+| Markdown Preview | `src/components/markdown/MarkdownPreview.tsx` | ✅ Complete |
 | Header | `src/components/layout/Header.tsx` | ✅ Complete |
 | Footer | `src/components/layout/Footer.tsx` | ✅ Complete |
 | Side Nav | `src/components/layout/SideNav.tsx` | ✅ Complete |
@@ -106,6 +112,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - GitHub backup form defaults can be configured with `GITHUB_BACKUP_REPO_URL`, `GITHUB_BACKUP_BRANCH`, `GITHUB_BACKUP_PATH`, `GITHUB_BACKUP_COMMIT_MESSAGE`, and `GITHUB_BACKUP_TOKEN`; the token is consumed server-side and never returned by the config API.
 - GitHub backup now checks repository and branch access before writing the backup file, accepts common repo URL forms (`https://github.com/owner/repo`, copied GitHub URLs, SSH URL, and `owner/repo`), and returns actionable/contextual Vietnamese errors for common GitHub API failures.
 - `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab by reading the same browser progress storage, with sticky task metadata and completion status on desktop
+- Markdown note preview now uses reusable `src/components/markdown/MarkdownPreview.tsx` and supports richer professional Markdown formatting for headings, body text, tables, syntax-highlighted source code with auto-detected languages, SQL/database snippets, checklists, links, images, callouts, and dedicated light/dark readability palettes that follow the actual rendered page theme
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
@@ -166,6 +173,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Upgraded per-task Markdown note preview with a reusable professional renderer, language auto-detection, IDE-like syntax-highlighted code, and light/dark styles for tables, database snippets, lists, links, images, and callouts |
 | 2026-06-14 | Fixed GitHub roadmap backup API typecheck failure by normalizing unknown GitHub error bodies before passing them to `buildGithubError` |
 | 2026-06-14 | Added env-driven default GitHub backup settings and server-side token fallback |
 | 2026-06-14 | Hardened GitHub roadmap backup diagnostics and repo URL/path normalization |
