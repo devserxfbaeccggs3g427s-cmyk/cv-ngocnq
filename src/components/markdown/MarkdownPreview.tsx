@@ -925,7 +925,7 @@ function tokenizeShellLine(line: string): SyntaxToken[] {
 
   while (cursor < line.length) {
     const rest = line.slice(cursor);
-    const matched =
+    const matched: SyntaxToken | null =
       readMatch(rest, /^\s+/) ??
       readMatch(rest, /^#.*/, 'comment') ??
       readMatch(rest, /^("(?:\\.|[^"])*"?|'(?:\\.|[^'])*'?)/, 'string') ??
