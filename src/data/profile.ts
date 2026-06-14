@@ -97,7 +97,7 @@ export const profile: Profile = {
   // BASIC INFO (Required)
   // -------------------------------------------------------------------------
   name: 'Nguyễn Quang Ngọc',
-  title: 'Full-Stack Developer',
+  title: 'Lập trình viên Backend / Full-Stack',
   photo: '/images/profile.jpg', // Set to '' to hide photo
   email: 'quangngoc201197@gmail.com',
   location: 'Đa Phúc, Hà Nội, Việt Nam',
@@ -111,18 +111,18 @@ export const profile: Profile = {
   // PROFESSIONAL SUMMARY
   // Keep this concise: 2-4 sentences that capture who you are professionally
   // -------------------------------------------------------------------------
-  summary: `Kỹ sư phần mềm với hơn 4 năm kinh nghiệm trong phát triển, thiết kế và bảo trì hệ thống tài chính - ngân hàng (MBBank, SHB) và khách hàng Nhật Bản với yêu cầu khắt khe về bảo mật, hiệu năng và quy trình chuẩn hoá. Thành thạo kiến trúc Microservices, Event-Driven Architecture (EDA), tích hợp hệ thống qua API Gateway và xử lý bất đồng bộ với Kafka. Từng phát triển toàn bộ backend cho SHB Mobile Banking Cambodia với 3 microservices Java Spring Boot, tích hợp Core Banking Intellect qua Oracle Stored Procedures và TCP. Kinh nghiệm thực tế trong xây dựng hệ thống hiệu năng cao, bảo mật đa lớp (JWT, RSA-4096, OTP), mở rộng linh hoạt và tích hợp AI/CMS để tự động hóa quy trình.`,
+  summary: `Lập trình viên Backend / Full-Stack với hơn 4 năm kinh nghiệm xây dựng hệ thống tài chính - ngân hàng, bảo hiểm và sản phẩm cho khách hàng Nhật Bản. Thế mạnh ở Java 17, Spring Boot 3, kiến trúc Microservices, Oracle/PostgreSQL, Redis, Kafka, tích hợp Core Banking/ESB, bảo mật JWT/OAuth2/OTP và thiết kế API phục vụ nghiệp vụ có độ tin cậy cao. Đã tham gia các nền tảng thực tế cho SHB, MBBank và Bảo Việt, bao gồm cổng thanh toán dịch vụ công, Mobile Banking Campuchia, cổng xử lý nợ, hệ thống định giá tài sản thế chấp và bảo hiểm trực tuyến.`,
 
   // ---------------------------------------------------------------------------
   // KEY HIGHLIGHTS
   // 3-5 achievement statements with metrics when possible
   // ---------------------------------------------------------------------------
   highlights: [
-    'Phát triển toàn bộ backend 3 Microservices cho SHB Mobile Banking Campuchia (Identity, Account, Fund Transfer)',
-    'Thiết kế Dynamic Filter Engine & Maker-Checker Workflow cho hệ thống xử lý nợ SHB',
+    'Xây dựng backend cổng thanh toán dịch vụ công với luồng tạo QR, truy vấn, hoàn tiền, chi hộ và đối soát',
+    'Phát triển 3 Microservices cho SHB Mobile Banking Campuchia: Identity, Account, Fund Transfer',
+    'Thiết kế Gateway, Maker-Checker Workflow, MinIO file service và report module cho SHB Debit Collection Portal',
     'Tích hợp AI giảm 60% khối lượng nhập tay trong hệ thống CMV MBBank',
-    'Triển khai bảo mật đa lớp: JWT + RSA-4096 + reCAPTCHA v3 + Rate Limiting + Device Fingerprinting',
-    'Hơn 4 năm kinh nghiệm hệ thống tài chính – ngân hàng, bảo hiểm và khách hàng Nhật Bản',
+    'Kinh nghiệm tích hợp Core Banking, ESB, Napas, Oracle Stored Procedures, Kafka và Signature Service',
   ],
 };
 

@@ -135,10 +135,10 @@ export const siteConfig: SiteConfig = {
   // ---------------------------------------------------------------------------
   meta: {
     titleTemplate: '{{name}} | {{title}}',
-    defaultDescription: 'Professional resume and portfolio website',
+    defaultDescription: 'CV chuyên nghiệp và portfolio dự án',
     keywords: ['resume', 'portfolio', 'developer', 'software engineer', 'web developer'],
     siteUrl: 'https://your-domain.com',
-    locale: 'en',
+    locale: 'vi',
   },
 
   // ---------------------------------------------------------------------------
@@ -184,12 +184,13 @@ export const siteConfig: SiteConfig = {
   // ---------------------------------------------------------------------------
   navigation: {
     items: [
-      { label: 'About', href: '#about', icon: 'User', enabled: true },
-      { label: 'Experience', href: '#experience', icon: 'Briefcase', enabled: true },
-      { label: 'Skills', href: '#skills', icon: 'Code', enabled: true },
-      { label: 'Education', href: '#education', icon: 'GraduationCap', enabled: true },
-      { label: 'Portfolio', href: '/portfolio', icon: 'Folder', enabled: true },
-      { label: 'Contact', href: '#contact', icon: 'Mail', enabled: true },
+      { label: 'Giới thiệu', href: '#about', icon: 'User', enabled: true },
+      { label: 'Kinh nghiệm', href: '#experience', icon: 'Briefcase', enabled: true },
+      { label: 'Kỹ năng', href: '#skills', icon: 'Code', enabled: true },
+      { label: 'Ôn tập', href: '/skill-roadmap', icon: 'ListChecks', enabled: true },
+      { label: 'Học vấn', href: '#education', icon: 'GraduationCap', enabled: true },
+      { label: 'Dự án', href: '/portfolio', icon: 'Folder', enabled: true },
+      { label: 'Liên hệ', href: '#contact', icon: 'Mail', enabled: true },
     ],
   },
 
@@ -262,8 +263,8 @@ export const siteConfig: SiteConfig = {
   // ---------------------------------------------------------------------------
   contactForm: {
     endpoint: '/api/contact',
-    successMessage: 'Thank you! Your message has been sent successfully.',
-    errorMessage: 'Oops! Something went wrong. Please try again later.',
+    successMessage: 'Cảm ơn bạn! Lời nhắn đã được gửi thành công.',
+    errorMessage: 'Có lỗi xảy ra. Vui lòng thử lại sau.',
   },
 };
 

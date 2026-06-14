@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { skillCategories, getSkillsByCategory } from '@/data/skills';
+import { skillCategories, getSkillCategoryLabel, getSkillsByCategory } from '@/data/skills';
 import { Section } from '@/components/ui';
 import type { Skill } from '@/data/skills';
 
@@ -77,7 +77,7 @@ function SkillChip({ skill }: { skill: Skill }) {
       </span>
       {skill.yearsOfExperience && (
         <span className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
-          {skill.yearsOfExperience}y
+          {skill.yearsOfExperience} năm
         </span>
       )}
     </motion.div>
@@ -104,7 +104,7 @@ function SkillCategory({ category, index }: { category: string; index: number })
           {categoryIcons[category]}
         </span>
         <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wide">
-          {category}
+          {getSkillCategoryLabel(category)}
         </h3>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -118,22 +118,22 @@ function SkillCategory({ category, index }: { category: string; index: number })
 
 export function SkillsSection() {
   return (
-    <Section id="skills" title="Skills & Expertise" subtitle="Technologies and tools I work with">
+    <Section id="skills" title="Kỹ năng chuyên môn" subtitle="Công nghệ, công cụ và năng lực kỹ thuật đã sử dụng trong dự án thực tế">
       {/* Legend */}
       <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-800">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-          <span className="text-gray-500 dark:text-gray-400 font-medium">Proficiency:</span>
+          <span className="text-gray-500 dark:text-gray-400 font-medium">Mức độ:</span>
           <span className="inline-flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span className="text-gray-600 dark:text-gray-400">Expert (90%+)</span>
+            <span className="text-gray-600 dark:text-gray-400">Chuyên sâu (90%+)</span>
           </span>
           <span className="inline-flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <span className="text-gray-600 dark:text-gray-400">Advanced (75%+)</span>
+            <span className="text-gray-600 dark:text-gray-400">Thành thạo (75%+)</span>
           </span>
           <span className="inline-flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span className="text-gray-600 dark:text-gray-400">Intermediate (60%+)</span>
+            <span className="text-gray-600 dark:text-gray-400">Khá (60%+)</span>
           </span>
         </div>
       </div>

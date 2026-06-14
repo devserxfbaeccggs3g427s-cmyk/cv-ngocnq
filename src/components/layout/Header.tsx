@@ -8,12 +8,13 @@ import { profile } from '@/data/profile';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/#about', label: 'About' },
-  { href: '/#experience', label: 'Experience' },
-  { href: '/#skills', label: 'Skills' },
-  { href: '/#education', label: 'Education' },
-  { href: '/portfolio', label: 'Portfolio' },
-  { href: '/#contact', label: 'Contact' },
+  { href: '/#about', label: 'Giới thiệu' },
+  { href: '/#experience', label: 'Kinh nghiệm' },
+  { href: '/#skills', label: 'Kỹ năng' },
+  { href: '/#education', label: 'Học vấn' },
+  { href: '/#contact', label: 'Liên hệ' },
+  { href: '/portfolio', label: 'Dự án' },
+  { href: '/skill-roadmap', label: 'Ôn tập' },
 ];
 
 export function Header() {
@@ -41,7 +42,7 @@ export function Header() {
             ))}
             <Button href="/print" size="sm">
               <Download className="w-4 h-4 mr-2" />
-              Resume
+              CV
             </Button>
           </nav>
 
@@ -76,7 +77,7 @@ export function Header() {
             <div className="px-4 pt-2">
               <Button href="/print" size="sm" className="w-full">
                 <Download className="w-4 h-4 mr-2" />
-                Download Resume
+                Xem bản in PDF
               </Button>
             </div>
           </nav>

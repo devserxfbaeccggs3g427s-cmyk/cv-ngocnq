@@ -1,3 +1,5 @@
+import { formatMonthYear } from '@/lib/date';
+
 /**
  * =============================================================================
  * EXPERIENCE DATA - Work History
@@ -117,83 +119,49 @@ export interface Experience {
  */
 export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
-  // CURRENT POSITION — Alphaway / SHB (Debit Collection Portal)
+  // CURRENT POSITION — Alphaway / SHB
   // ---------------------------------------------------------------------------
   {
     id: 'exp-0',
-    title: 'Backend Developer',
+    title: 'Lập trình viên Backend',
     company: 'ALPHAWAY TECHNOLOGY (Outsourced cho Ngân hàng SHB)',
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
     startDate: '2025-11',
     current: true,
     description:
-      'Backend Developer phát triển Cổng Thông Tin Xử Lý Nợ Xấu SHB Debit Collection Portal, hệ thống quản lý & đấu giá tài sản xử lý nợ trên nền tảng Microservices.',
+      'Lập trình viên Backend tham gia các nền tảng trọng điểm của SHB gồm cổng xử lý nợ, Mobile Banking Campuchia và cổng thanh toán dịch vụ công, tập trung vào Java/Spring Boot microservices, tích hợp Core Banking/ESB, bảo mật và vận hành backend.',
     achievements: [
-      'Xây dựng Dynamic Filter Engine dựa trên JPA Specification Pattern, hỗ trợ tìm kiếm đa tiêu chí với cấu hình filter động từ DB',
-      'Triển khai quy trình phê duyệt Maker-Checker (4 mắt) cho quản lý tài sản & thông báo đấu giá, đảm bảo Separation of Duties',
-      'Thiết kế cơ chế bảo mật 3 lớp cho Lead Generation: Rate Limiting (Redis) + Google reCAPTCHA v3 + Duplicate Prevention',
-      'Xây dựng kiến trúc Microservices với Spring Cloud Gateway, Eureka Service Discovery, OpenFeign giao tiếp liên service',
-      'Phát triển tính năng Dynamic Field Display dùng Java Reflection, hiển thị trường linh hoạt theo từng loại tài sản (BĐS, PTVT, MMTB)',
-      'Tích hợp Redis Cache cho danh mục & banner, tối ưu thời gian phản hồi; Atomic SQL UPDATE xử lý đồng thời lượt xem tài sản',
+      'Phát triển GOV Payment Service cho luồng tạo giao dịch, sinh VietQR/Napas QR, truy vấn trạng thái, biên lai, vấn tin tài khoản, hoàn tiền, chi hộ và đối soát',
+      'Thiết kế service/use-case layer, transfer strategy và retry failed Kafka messages; tích hợp ESB, Core Banking Oracle, Napas, Ebank và Signature Service',
+      'Phát triển SHB SAHA Mobile Banking Campuchia với 3 microservices: Identity, Account, Fund Transfer; xử lý JWT, Redis session, OTP/SMS, beneficiary và fund transfer',
+      'Tích hợp Oracle Stored Procedures/REF CURSOR, TCP Core Banking và xử lý nghiệp vụ USD/KHR, i18n EN/VI/KM cho thị trường Cambodia',
+      'Xây dựng SHB Debit Collection Portal với Gateway, Keycloak, Maker-Checker workflow, asset/search APIs, MinIO file service, Excel import/export và report module',
+      'Triển khai Redis cache/rate limit, Resilience4j, Actuator/Prometheus metrics, Docker/Kubernetes/GitLab CI và logging theo request ID',
     ],
     technologies: [
       'Java 17',
       'Spring Boot 3',
       'Spring Cloud',
       'Spring Cloud Gateway',
+      'Spring Security',
+      'Oracle DB',
       'PostgreSQL',
       'Redis',
-      'Keycloak OIDC',
+      'Kafka',
+      'Keycloak',
+      'JWT/OAuth2',
       'OpenFeign',
       'Eureka',
       'MinIO',
       'Apache POI',
-      'iText',
+      'JdbcTemplate',
+      'Oracle Stored Procedures',
       'MapStruct',
       'Docker',
       'Kubernetes',
       'GitLab CI/CD',
-    ],
-  },
-
-  // ---------------------------------------------------------------------------
-  // Alphaway / SHB — SHB SAHA Mobile Banking Cambodia
-  // ---------------------------------------------------------------------------
-  {
-    id: 'exp-0b',
-    title: 'Backend Developer',
-    company: 'ALPHAWAY TECHNOLOGY (Outsourced cho Ngân hàng SHB)',
-    location: 'Hà Nội, Việt Nam',
-    type: 'full-time',
-    startDate: '2026-01',
-    endDate: '2026-04',
-    current: false,
-    description:
-      'Backend Developer phát triển SHB SAHA Mobile Banking Cambodia – nền tảng ngân hàng di động phục vụ thị trường Campuchia, hỗ trợ 3 ngôn ngữ (EN/VI/KM) và 2 loại tiền tệ (USD/KHR) trên kiến trúc 3 Microservices Java Spring Boot.',
-    achievements: [
-      'Phát triển Identity Service: Xác thực JWT + RSA-4096, quản lý session Redis với sliding expiration (15 phút) & absolute timeout (8 giờ), Device Trust với device fingerprinting, OTP SMS Gateway tích hợp',
-      'Phát triển Account Service: Quản lý danh sách tài khoản CASA/tiết kiệm/vay, tích hợp Core Banking Intellect qua Oracle Stored Procedures (PKG_MBBANKING), quản lý người thụ hưởng, hỗ trợ i18n đa ngôn ngữ động',
-      'Phát triển Fund Transfer Service: Chuyển khoản nội bộ SELF/INTRA với Two-Phase Commit Pattern, tích hợp Core Banking TCP cho bút toán tài chính (Finance Posting), xử lý mapping phức tạp với FinancePostingMapper',
-      'Thiết kế hệ thống validation phân tầng 4 lớp: Bean Validation → Custom Validators → Business Validators → Database Constraints, tất cả mã lỗi được mapping đa ngôn ngữ qua TBL_ERROR_MESSAGES',
-      'Xây dựng JdbcCallStoreExecutor (Template Method Pattern) gọi Stored Procedures động với tham số linh hoạt, hỗ trợ REF CURSOR và OUT parameters',
-      'Triển khai bảo mật đa lớp: JWT HS256 authentication, RSA-4096 mã hóa mật khẩu, session Redis, rate limiting OTP, device fingerprinting, password policy (8-20 ký tự, chữ hoa/thường/số/ký tự đặc biệt)',
-    ],
-    technologies: [
-      'Java 17',
-      'Spring Boot 3',
-      'Spring Security',
-      'Oracle DB',
-      'PL/SQL',
-      'Redis',
-      'JWT (Nimbus JOSE)',
-      'RSA-4096',
-      'SMS Gateway',
-      'Docker',
       'Maven',
-      'GitLab CI/CD',
-      'REST API (OpenAPI 3.0)',
-      'i18n (EN/VI/KM)',
     ],
   },
 
@@ -202,7 +170,7 @@ export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
   {
     id: 'exp-1',
-    title: 'Full Stack Developer',
+    title: 'Lập trình viên Full Stack',
     company: 'Paraline Software (Outsourced cho MBBank)',
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
@@ -210,7 +178,7 @@ export const experience: Experience[] = [
     endDate: '2025-10',
     current: false,
     description:
-      'Fullstack Developer phụ trách hệ thống Collateral Management & Valuation (CMV) phục vụ nghiệp vụ thẩm định tài sản ngân hàng MBBank.',
+      'Lập trình viên Full Stack phụ trách hệ thống Collateral Management & Valuation (CMV) phục vụ nghiệp vụ thẩm định tài sản ngân hàng MBBank.',
     achievements: [
       'Thiết kế & triển khai kiến trúc Microservices và EDA (Apache Kafka), đảm bảo hiệu năng và khả năng mở rộng cao',
       'Tích hợp AI để tự động trích xuất dữ liệu, kiểm tra trùng lặp hình ảnh tài sản, giảm 60% khối lượng nhập tay',
@@ -239,7 +207,7 @@ export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
   {
     id: 'exp-2',
-    title: 'Backend Developer',
+    title: 'Lập trình viên Backend',
     company: 'Bảo Hiểm Bảo Việt',
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
@@ -247,7 +215,7 @@ export const experience: Experience[] = [
     endDate: '2023-05',
     current: false,
     description:
-      'Backend Developer trong dự án MyBV Life – Nền tảng bảo hiểm trực tuyến, phát triển API nghiệp vụ tài chính – bảo hiểm.',
+      'Lập trình viên Backend trong dự án MyBV Life – Nền tảng bảo hiểm trực tuyến, phát triển API nghiệp vụ tài chính – bảo hiểm.',
     achievements: [
       'Xây dựng API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
       'Thiết kế API giao nhận hợp đồng điện tử (e-Contract) và đồng bộ với hệ thống lõi IMS',
@@ -262,7 +230,7 @@ export const experience: Experience[] = [
   // ---------------------------------------------------------------------------
   {
     id: 'exp-3',
-    title: 'Full Stack Developer',
+    title: 'Lập trình viên Full Stack',
     company: 'GMO-Z.com RUNSYSTEM',
     location: 'Hà Nội, Việt Nam',
     type: 'full-time',
@@ -270,7 +238,7 @@ export const experience: Experience[] = [
     endDate: '2022-11',
     current: false,
     description:
-      'Fullstack Developer tham gia phát triển các sản phẩm cho khách hàng Nhật Bản, tiêu biểu là Veritas (quản lý phòng khám thẩm mỹ) và Hywork (đặt chỗ làm việc).',
+      'Lập trình viên Full Stack tham gia phát triển các sản phẩm cho khách hàng Nhật Bản, tiêu biểu là Veritas (quản lý phòng khám thẩm mỹ) và Hywork (đặt chỗ làm việc).',
     achievements: [
       'Phát triển module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn cho hệ thống Veritas',
       'Phát triển tính năng quản lý chỗ ngồi, đồng bộ nhân sự từ AMIS trong hệ thống Hywork',
@@ -345,8 +313,7 @@ export function getAllTechnologies(): string[] {
  * Format date string (YYYY-MM) to readable format
  */
 export function formatExperienceDate(dateString: string): string {
-  const date = new Date(dateString + '-01');
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  return formatMonthYear(dateString);
 }
 
 /**

@@ -9,10 +9,10 @@ import { Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
 const contactSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email'),
-  subject: z.string().min(5, 'Subject must be at least 5 characters'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
+  name: z.string().min(2, 'Tên cần có ít nhất 2 ký tự'),
+  email: z.string().email('Vui lòng nhập email hợp lệ'),
+  subject: z.string().min(5, 'Tiêu đề cần có ít nhất 5 ký tự'),
+  message: z.string().min(10, 'Nội dung cần có ít nhất 10 ký tự'),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -42,14 +42,14 @@ export function ContactForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        throw new Error('Không gửi được lời nhắn');
       }
 
       setStatus('success');
       reset();
     } catch {
       setStatus('error');
-      setErrorMessage('Failed to send message. Please try again later.');
+      setErrorMessage('Không gửi được lời nhắn. Vui lòng thử lại sau.');
     }
   };
 
@@ -60,13 +60,13 @@ export function ContactForm() {
           <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
         </div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-          Message Sent!
+          Đã gửi lời nhắn!
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Thank you for reaching out. I&apos;ll get back to you soon.
+          Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi trong thời gian sớm nhất.
         </p>
         <Button onClick={() => setStatus('idle')} variant="outline">
-          Send Another Message
+          Gửi lời nhắn khác
         </Button>
       </div>
     );
@@ -85,7 +85,7 @@ export function ContactForm() {
         {/* Name */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Name
+            Họ và tên
           </label>
           <input
             id="name"
@@ -97,7 +97,7 @@ export function ContactForm() {
                 ? 'border-red-300 dark:border-red-700'
                 : 'border-gray-300 dark:border-gray-700'
             )}
-            placeholder="Your name"
+            placeholder="Nhập họ và tên"
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
@@ -130,7 +130,7 @@ export function ContactForm() {
       {/* Subject */}
       <div>
         <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Subject
+            Tiêu đề
         </label>
         <input
           id="subject"
@@ -142,7 +142,7 @@ export function ContactForm() {
               ? 'border-red-300 dark:border-red-700'
               : 'border-gray-300 dark:border-gray-700'
           )}
-          placeholder="What is this about?"
+          placeholder="Nội dung trao đổi chính"
         />
         {errors.subject && (
           <p className="mt-1 text-sm text-red-500">{errors.subject.message}</p>
@@ -152,7 +152,7 @@ export function ContactForm() {
       {/* Message */}
       <div>
         <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Message
+          Nội dung
         </label>
         <textarea
           id="message"
@@ -164,7 +164,7 @@ export function ContactForm() {
               ? 'border-red-300 dark:border-red-700'
               : 'border-gray-300 dark:border-gray-700'
           )}
-          placeholder="Your message..."
+          placeholder="Nhập nội dung lời nhắn..."
         />
         {errors.message && (
           <p className="mt-1 text-sm text-red-500">{errors.message.message}</p>
@@ -176,12 +176,12 @@ export function ContactForm() {
         {status === 'loading' ? (
           <>
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            Sending...
+            Đang gửi...
           </>
         ) : (
           <>
             <Send className="w-4 h-4 mr-2" />
-            Send Message
+            Gửi lời nhắn
           </>
         )}
       </Button>

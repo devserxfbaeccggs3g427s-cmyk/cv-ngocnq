@@ -7,7 +7,7 @@ import { Section } from '@/components/ui';
 
 export function ExperienceTimeline() {
   return (
-    <Section id="experience" title="Work Experience" subtitle="My professional journey">
+    <Section id="experience" title="Kinh nghiệm làm việc" subtitle="Quá trình làm việc chuyên môn">
       <div className="relative">
         {/* Timeline line */}
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700 hidden md:block" />

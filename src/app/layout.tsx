@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: `${profile.name} | ${profile.title}`,
   description: profile.summary,
-  keywords: ['resume', 'portfolio', 'developer', 'software engineer'],
+  keywords: ['CV', 'portfolio', 'developer', 'software engineer', 'lap trinh vien'],
   authors: [{ name: profile.name }],
   openGraph: {
     title: `${profile.name} | ${profile.title}`,
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="vi" className="scroll-smooth">
       <body className={`${inter.className} bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased`}>
         <Header />
         <SideNav />

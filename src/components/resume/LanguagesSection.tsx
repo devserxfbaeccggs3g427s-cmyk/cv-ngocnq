@@ -1,5 +1,5 @@
 import { Globe } from 'lucide-react';
-import { languages } from '@/data/skills';
+import { getLanguageLevelLabel, languages } from '@/data/skills';
 import { Badge } from '@/components/ui';
 
 export function LanguagesSection() {
@@ -13,7 +13,7 @@ export function LanguagesSection() {
     <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
       <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-4 flex items-center gap-2">
         <Globe className="w-5 h-5 text-gray-400" />
-        Languages
+        Ngôn ngữ
       </h3>
       <div className="flex flex-wrap gap-3">
         {languages.map((lang) => (
@@ -25,7 +25,7 @@ export function LanguagesSection() {
               {lang.name}
             </span>
             <Badge variant={levelColors[lang.level] || 'secondary'} size="sm">
-              {lang.level}
+              {getLanguageLevelLabel(lang.level)}
             </Badge>
           </div>
         ))}

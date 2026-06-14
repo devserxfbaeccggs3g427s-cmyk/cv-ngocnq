@@ -1,16 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { User, Briefcase, Code, GraduationCap, Folder, Mail } from 'lucide-react';
+import { User, Briefcase, Code, GraduationCap, Folder, Mail, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/#about', label: 'About', icon: User },
-  { href: '/#experience', label: 'Experience', icon: Briefcase },
-  { href: '/#skills', label: 'Skills', icon: Code },
-  { href: '/#education', label: 'Education', icon: GraduationCap },
-  { href: '/portfolio', label: 'Portfolio', icon: Folder },
-  { href: '/#contact', label: 'Contact', icon: Mail },
+  { href: '/#about', label: 'Giới thiệu', icon: User },
+  { href: '/#experience', label: 'Kinh nghiệm', icon: Briefcase },
+  { href: '/#skills', label: 'Kỹ năng', icon: Code },
+  { href: '/#education', label: 'Học vấn', icon: GraduationCap },
+  { href: '/#contact', label: 'Liên hệ', icon: Mail },
+  { href: '/portfolio', label: 'Dự án', icon: Folder },
+  { href: '/skill-roadmap', label: 'Ôn tập', icon: ListChecks },
 ];
 
 interface SideNavProps {

@@ -45,7 +45,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 bg-white rounded-full text-gray-900 hover:bg-blue-500 hover:text-white transition-colors"
-              aria-label="View live site"
+              aria-label="Xem website"
             >
               <ExternalLink className="w-5 h-5" />
             </a>
@@ -56,7 +56,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="p-3 bg-white rounded-full text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
-              aria-label="View source code"
+              aria-label="Xem mã nguồn"
             >
               <Github className="w-5 h-5" />
             </a>
@@ -66,7 +66,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {/* Featured badge */}
         {project.featured && (
           <div className="absolute top-3 left-3">
-            <Badge variant="warning" size="sm">Featured</Badge>
+            <Badge variant="warning" size="sm">Tiêu biểu</Badge>
           </div>
         )}
       </div>
@@ -103,7 +103,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           href={`/portfolio/${project.slug}`}
           className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
         >
-          View Details
+          Xem chi tiết
           <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>

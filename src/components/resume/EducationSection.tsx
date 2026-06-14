@@ -7,7 +7,7 @@ import { Section, Badge, Card, CardContent } from '@/components/ui';
 
 export function EducationSection() {
   return (
-    <Section id="education" title="Education" subtitle="Academic background and qualifications">
+    <Section id="education" title="Học vấn" subtitle="Nền tảng đào tạo và chuyên ngành">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
         {education.map((edu, index) => (
           <motion.div
@@ -25,7 +25,7 @@ export function EducationSection() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {edu.degree} in {edu.field}
+                      {edu.degree} - {edu.field}
                     </h3>
                     <p className="text-blue-600 dark:text-blue-400 font-medium">
                       {edu.school}
@@ -36,7 +36,7 @@ export function EducationSection() {
                     </div>
                     {edu.gpa && (
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                        GPA: {edu.gpa}
+                        Điểm: {edu.gpa}
                       </p>
                     )}
                     {edu.honors && edu.honors.length > 0 && (
