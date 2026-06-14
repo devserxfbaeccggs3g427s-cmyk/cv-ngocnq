@@ -23,6 +23,7 @@ const progressFilePath = path.join(
   'data',
   'skill-roadmap-progress.json'
 );
+const canWriteProgressFile = process.env.NODE_ENV !== 'production' && !process.env.VERCEL;
 
 async function readProgress(): Promise<ProgressFile> {
   try {
@@ -94,6 +95,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!canWriteProgressFile) {
+    return NextResponse.json(
+      { error: 'Runtime production không hỗ trợ ghi vào file JSON. Hãy dùng localStorage/export/import hoặc database thật.' },
+      { status: 501 }
+    );
+  }
+
   let body: unknown;
 
   try {
@@ -125,6 +133,13 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  if (!canWriteProgressFile) {
+    return NextResponse.json(
+      { error: 'Runtime production không hỗ trợ ghi vào file JSON. Hãy dùng localStorage/export/import hoặc database thật.' },
+      { status: 501 }
+    );
+  }
+
   const body = (await request.json()) as {
     taskId?: string;
     completed?: boolean;

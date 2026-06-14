@@ -11,13 +11,13 @@ src/
 │   ├── portfolio/
 │   │   ├── page.tsx        # Portfolio grid page
 │   │   └── [slug]/page.tsx # Project detail page
-│   ├── skill-roadmap/page.tsx # JSON-backed skill study roadmap
+│   ├── skill-roadmap/page.tsx # JSON-backed curriculum with browser-persisted progress
 │   ├── skill-roadmap/notes/[taskId]/page.tsx # Per-task Markdown note preview
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
-│       ├── skill-roadmap/progress/route.ts # JSON progress read/write for roadmap
-│       ├── skill-roadmap/backup/github/route.ts # Optional GitHub progress backup
+│       ├── skill-roadmap/progress/route.ts # Roadmap progress seed + local-dev JSON sync
+│       ├── skill-roadmap/backup/github/route.ts # Optional browser progress GitHub backup
 │       └── pdf/
 │           ├── route.ts       # PDF info endpoint
 │           ├── text/route.ts  # Plain text export
@@ -42,7 +42,8 @@ src/
 │   │   ├── ProjectFilters.tsx
 │   │   └── ProjectDetail.tsx
 │   ├── roadmap/            # Hierarchical study roadmap checklist components
-│   │   └── SkillRoadmapClient.tsx
+│   │   ├── SkillRoadmapClient.tsx
+│   │   └── SkillRoadmapNotePreview.tsx
 │   ├── contact/            # Contact components
 │   │   ├── ContactForm.tsx
 │   │   ├── ContactSection.tsx
@@ -65,7 +66,7 @@ src/
 │   ├── education.ts        # Education, certifications, awards
 │   ├── projects.ts         # Portfolio projects
 │   ├── skill-roadmap.json  # Hierarchical study roadmap curriculum
-│   └── skill-roadmap-progress.json # Roadmap completion and notes by node id
+│   └── skill-roadmap-progress.json # Seed/local-dev roadmap progress by node id
 └── lib/
     ├── utils.ts            # Utility functions
     └── pdf.ts              # PDF generation helpers

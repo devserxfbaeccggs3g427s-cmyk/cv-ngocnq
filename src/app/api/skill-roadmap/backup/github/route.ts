@@ -18,6 +18,7 @@ type GithubBackupRequest = {
   branch?: string;
   backupPath?: string;
   commitMessage?: string;
+  progress?: unknown;
 };
 
 function parseGithubRepo(repoUrl: string): { owner: string; repo: string } | null {
@@ -115,7 +116,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const progress = await readProgress();
+  const progress = body.progress ?? await readProgress();
   const content = `${JSON.stringify(progress, null, 2)}\n`;
   const encodedContent = Buffer.from(content, 'utf8').toString('base64');
 

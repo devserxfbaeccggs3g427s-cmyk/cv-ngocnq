@@ -82,6 +82,9 @@ const emptyProgress: ProgressFile = {
   items: {},
 };
 
+const progressStorageKey = 'skill-roadmap-progress:v1';
+const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
+
 const levelStyles: Record<string, string> = {
   'Cơ bản': 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
   'Trung cấp': 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
@@ -171,6 +174,13 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     let ignore = false;
 
     async function loadProgress() {
+      const storedProgress = readStoredProgress();
+
+      if (storedProgress) {
+        setProgress(storedProgress);
+        return;
+      }
+
       try {
         const response = await fetch('/api/skill-roadmap/progress', {
           cache: 'no-store',
@@ -183,10 +193,11 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         const data = (await response.json()) as ProgressFile;
         if (!ignore) {
           setProgress(data);
+          storeProgress(data);
         }
       } catch {
         if (!ignore) {
-          setLoadError('Không tải được tiến độ từ file JSON. Các thay đổi có thể không được lưu.');
+          setLoadError('Không tải được tiến độ seed từ file JSON. Tiến độ mới vẫn được lưu trong trình duyệt này.');
         }
       }
     }
@@ -221,28 +232,32 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     };
 
     setProgress(optimistic);
+    storeProgress(optimistic);
 
     try {
-      const response = await fetch('/api/skill-roadmap/progress', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId,
-          completed: optimistic.items[taskId].completed,
-          note: optimistic.items[taskId].note,
-        }),
-      });
+      if (shouldSyncProgressFile) {
+        const response = await fetch('/api/skill-roadmap/progress', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            taskId,
+            completed: optimistic.items[taskId].completed,
+            note: optimistic.items[taskId].note,
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error('Save failed');
+        if (!response.ok) {
+          throw new Error('Save failed');
+        }
+
+        const saved = (await response.json()) as ProgressFile;
+        setProgress(saved);
+        storeProgress(saved);
       }
 
-      const saved = (await response.json()) as ProgressFile;
-      setProgress(saved);
       setLoadError(null);
     } catch {
-      setProgress(previous);
-      setLoadError('Không lưu được thay đổi vào file JSON. Vui lòng thử lại.');
+      setLoadError('Đã lưu vào trình duyệt, nhưng không sync được vào file JSON local.');
     } finally {
       setSavingTaskId(null);
     }
@@ -258,18 +273,24 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   }
 
   function updateNote(taskId: string, note: string) {
-    setProgress((current) => ({
-      ...current,
-      items: {
-        ...current.items,
-        [taskId]: {
-          completed: current.items[taskId]?.completed ?? true,
-          completedAt: current.items[taskId]?.completedAt ?? new Date().toISOString(),
-          updatedAt: current.items[taskId]?.updatedAt ?? new Date().toISOString(),
-          note,
+    setProgress((current) => {
+      const next: ProgressFile = {
+        ...current,
+        updatedAt: new Date().toISOString(),
+        items: {
+          ...current.items,
+          [taskId]: {
+            completed: current.items[taskId]?.completed ?? true,
+            completedAt: current.items[taskId]?.completedAt ?? new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            note,
+          },
         },
-      },
-    }));
+      };
+
+      storeProgress(next);
+      return next;
+    });
   }
 
   function toggleExpandedTask(taskId: string) {
@@ -326,16 +347,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setBackupMessage(null);
 
     try {
-      const response = await fetch('/api/skill-roadmap/progress', {
-        cache: 'no-store',
-      });
-
-      if (!response.ok) {
-        throw new Error('Không export được backup.');
-      }
-
-      const data = (await response.json()) as ProgressFile;
-      const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], {
+      const blob = new Blob([`${JSON.stringify(progress, null, 2)}\n`], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
@@ -367,25 +379,29 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text) as ProgressFile;
-      const response = await fetch('/api/skill-roadmap/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      const data = normalizeProgress(JSON.parse(text));
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(
-          typeof body?.error === 'string'
-            ? body.error
-            : 'File backup không đúng định dạng.'
-        );
+      if (!data) {
+        throw new Error('File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.');
       }
 
-      const imported = (await response.json()) as ProgressFile;
+      const imported = {
+        ...data,
+        updatedAt: new Date().toISOString(),
+      };
+
       setProgress(imported);
-      setBackupMessage('Đã import backup JSON vào tiến độ hiện tại.');
+      storeProgress(imported);
+
+      if (shouldSyncProgressFile) {
+        await fetch('/api/skill-roadmap/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(imported),
+        });
+      }
+
+      setBackupMessage('Đã import backup JSON vào tiến độ trong trình duyệt.');
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không import được file backup.'
@@ -412,6 +428,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           branch: githubBranch,
           backupPath: githubBackupPath,
           commitMessage: githubCommitMessage,
+          progress,
         }),
       });
 
@@ -814,6 +831,82 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       </div>
     </div>
   );
+}
+
+function readStoredProgress(): ProgressFile | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(progressStorageKey);
+    return raw ? normalizeProgress(JSON.parse(raw)) : null;
+  } catch {
+    return null;
+  }
+}
+
+function storeProgress(progress: ProgressFile) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(progressStorageKey, JSON.stringify(progress));
+  } catch {
+    // localStorage can fail in private browsing or full quota. The in-memory UI still works.
+  }
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeProgressItem(input: unknown): ProgressItem | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  return {
+    completed: Boolean(input.completed),
+    note: typeof input.note === 'string' ? input.note : '',
+    completedAt: typeof input.completedAt === 'string' ? input.completedAt : null,
+    updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : new Date().toISOString(),
+  };
+}
+
+function normalizeProgress(input: unknown): ProgressFile | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const value = isRecord(input.progress) ? input.progress : input;
+  const rawItems = isRecord(value.items) ? value.items : value;
+
+  if (!isRecord(rawItems)) {
+    return null;
+  }
+
+  const items: Record<string, ProgressItem> = {};
+
+  for (const [taskId, item] of Object.entries(rawItems)) {
+    if (taskId === 'updatedAt') {
+      continue;
+    }
+
+    const progressItem = normalizeProgressItem(item);
+
+    if (!progressItem) {
+      return null;
+    }
+
+    items[taskId] = progressItem;
+  }
+
+  return {
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
+    items,
+  };
 }
 
 function TaskNode({
