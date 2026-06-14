@@ -32,6 +32,22 @@ type GithubErrorBody = {
   documentation_url?: string;
 };
 
+function normalizeGithubErrorBody(body: unknown): GithubErrorBody {
+  if (!body || typeof body !== 'object') {
+    return {};
+  }
+
+  const errorBody = body as Record<string, unknown>;
+
+  return {
+    message: typeof errorBody.message === 'string' ? errorBody.message : undefined,
+    documentation_url:
+      typeof errorBody.documentation_url === 'string'
+        ? errorBody.documentation_url
+        : undefined,
+  };
+}
+
 function parseGithubRepo(repoUrl: string): { owner: string; repo: string } | null {
   const trimmed = repoUrl.trim();
   const sshMatch = trimmed.match(/^git@github\.com:([^/]+)\/([^/]+?)(?:\.git)?$/);
@@ -162,13 +178,20 @@ async function fetchGithubJson<T>(
       'X-GitHub-Api-Version': '2022-11-28',
     },
   });
-  const body = (await response.json().catch(() => ({}))) as T | GithubErrorBody;
+  const body = (await response.json().catch(() => ({}))) as unknown;
 
   if (!response.ok) {
-    throw new Error(buildGithubError(response, body, fallbackError, fallbackError));
+    throw new Error(
+      buildGithubError(
+        response,
+        normalizeGithubErrorBody(body),
+        fallbackError,
+        fallbackError
+      )
+    );
   }
 
-  return { response, body };
+  return { response, body: body as T };
 }
 
 async function assertRepositoryAndBranchAccess({
@@ -225,8 +248,15 @@ async function getExistingFileSha({
   }
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as GithubErrorBody;
-    throw new Error(buildGithubError(response, body, 'Không đọc được file backup hiện có trên GitHub', 'Không đọc được file backup hiện có trên GitHub'));
+    const body = await response.json().catch(() => ({}));
+    throw new Error(
+      buildGithubError(
+        response,
+        normalizeGithubErrorBody(body),
+        'Không đọc được file backup hiện có trên GitHub',
+        'Không đọc được file backup hiện có trên GitHub'
+      )
+    );
   }
 
   const data = (await response.json()) as { sha?: string };
@@ -308,7 +338,9 @@ export async function POST(request: Request) {
     );
 
     if (!response.ok) {
-      const errorBody = (await response.json().catch(() => ({}))) as GithubErrorBody;
+      const errorBody = normalizeGithubErrorBody(
+        await response.json().catch(() => ({}))
+      );
 
       return NextResponse.json(
         {

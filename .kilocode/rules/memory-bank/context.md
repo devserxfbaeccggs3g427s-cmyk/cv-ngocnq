@@ -9,6 +9,7 @@ The template is fully implemented with all core sections working. It's ready for
 ## Recently Completed
 
 - [x] Added env-driven defaults for `/skill-roadmap` GitHub backup form, including server-side token fallback via `GITHUB_BACKUP_TOKEN` without exposing the token to browser JavaScript
+- [x] Fixed TypeScript build error in `/api/skill-roadmap/backup/github` by normalizing unknown GitHub error responses before building contextual error messages
 - [x] Hardened `/api/skill-roadmap/backup/github` with GitHub repo/branch preflight checks, more tolerant repo URL parsing, normalized backup paths, and contextual Vietnamese errors for token permission, branch, repo access, conflict, and validation failures
 - [x] Made `/skill-roadmap` progress Vercel-safe by persisting runtime completion state and notes in browser `localStorage` instead of writing to bundled JSON files in production
 - [x] Updated `/skill-roadmap` hierarchical todo progress so parent rows show an in-progress color when any descendant task is completed and are auto-marked complete when all descendant tasks are completed
@@ -165,6 +166,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Fixed GitHub roadmap backup API typecheck failure by normalizing unknown GitHub error bodies before passing them to `buildGithubError` |
 | 2026-06-14 | Added env-driven default GitHub backup settings and server-side token fallback |
 | 2026-06-14 | Hardened GitHub roadmap backup diagnostics and repo URL/path normalization |
 | 2026-06-14 | Made roadmap progress Vercel-safe with browser localStorage persistence, local-dev JSON sync fallback, and client-side note preview storage |
