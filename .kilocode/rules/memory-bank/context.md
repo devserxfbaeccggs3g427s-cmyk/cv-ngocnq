@@ -14,6 +14,7 @@ The template is fully implemented with all core sections working. It's ready for
 - [x] Made the task info sidebar sticky on desktop in per-task Markdown note preview
 - [x] Added `/api/skill-roadmap/backup/github` route to commit `skill-roadmap-progress.json` to a configured GitHub repository using a one-time token
 - [x] Added per-node AI learning prompts to `/skill-roadmap`, with preview, show/hide, and copy-to-clipboard controls
+- [x] Fixed TypeScript build error in `/skill-roadmap` task tree filtering by removing nullable map results
 - [x] Adjusted roadmap AI prompts to emphasize theory, internal mechanisms, why/how explanations, trade-offs, and deep interview questions
 - [x] Added subtle depth-based backgrounds and left borders to roadmap todo nodes for clearer parent/child separation
 - [x] Added expand/collapse controls for roadmap todo nodes with child tasks, including open-all and collapse-all actions
@@ -154,6 +155,7 @@ Edit `src/config/site.config.ts` → `features`:
 | Date | Activity |
 |------|----------|
 | 2026-06-14 | Added per-task Markdown note preview opened from each completed roadmap task |
+| 2026-06-14 | Fixed nullable `filterTaskTree` return typing in `/skill-roadmap` build |
 | 2026-06-14 | Made per-task Markdown preview metadata sidebar sticky on desktop |
 | 2026-06-14 | Added manual JSON export/import and optional GitHub commit backup for `/skill-roadmap` progress |
 | 2026-06-14 | Added per-node AI learning prompt preview/view/copy controls to `/skill-roadmap` |

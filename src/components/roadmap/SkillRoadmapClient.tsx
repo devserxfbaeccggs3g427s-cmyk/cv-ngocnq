@@ -1136,20 +1136,18 @@ function filterTaskTree(
   tasks: RoadmapTask[],
   predicate: (task: RoadmapTask) => boolean
 ): RoadmapTask[] {
-  return tasks
-    .map((task) => {
-      const children = filterTaskTree(task.children ?? [], predicate);
+  return tasks.flatMap((task) => {
+    const children = filterTaskTree(task.children ?? [], predicate);
 
-      if (predicate(task) || children.length > 0) {
-        return {
-          ...task,
-          children,
-        };
-      }
+    if (predicate(task) || children.length > 0) {
+      return [{
+        ...task,
+        children,
+      }];
+    }
 
-      return null;
-    })
-    .filter((task): task is RoadmapTask => Boolean(task));
+    return [];
+  });
 }
 
 function collectTaskSearchText(
