@@ -29,8 +29,6 @@ function SectionTitle({ children }: { children: ReactNode }) {
 
 export default function PrintPage() {
   const printProjects = projects.slice(0, 4);
-  const conciseSummary =
-    'Lập trình viên Backend / Full-Stack với hơn 4 năm kinh nghiệm xây dựng hệ thống tài chính - ngân hàng, bảo hiểm và sản phẩm cho khách hàng Nhật Bản. Thế mạnh ở Java 17, Spring Boot 3, Microservices, Oracle/PostgreSQL, Redis, Kafka, Core Banking/ESB integration, bảo mật JWT/OAuth2/OTP và thiết kế API phục vụ nghiệp vụ có độ tin cậy cao.';
   const skillLimits: Record<string, number> = {
     Languages: 5,
     Frontend: 4,
@@ -43,14 +41,14 @@ export default function PrintPage() {
   };
   const renderExperience = (exp: (typeof experience)[number]) => (
     <article key={exp.id} className="print-item break-inside-avoid">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-baseline justify-between gap-4">
         <div>
-          <h3 className="text-[13px] font-bold text-slate-950">{exp.title}</h3>
-          <p className="text-[13px] font-bold text-slate-700">
+          <h3 className="text-[13px] font-bold leading-tight text-slate-950">{exp.title}</h3>
+          <p className="text-[13px] font-bold leading-tight text-slate-700">
             {exp.company} | {exp.location}
           </p>
         </div>
-        <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
+        <p className="whitespace-nowrap text-[13px] font-bold leading-tight text-slate-700">
           {formatMonthYear(exp.startDate)} - {exp.current ? 'Hiện tại' : formatMonthYear(exp.endDate!)}
         </p>
       </div>
@@ -64,14 +62,14 @@ export default function PrintPage() {
   );
   const renderProject = (project: (typeof projects)[number], index: number) => (
     <article key={project.id} className="print-item break-inside-avoid">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-baseline justify-between gap-4">
         <div>
-          <h3 className="text-[13px] font-bold text-slate-950">{project.title}</h3>
-          <p className="text-[13px] font-bold text-slate-700">
+          <h3 className="text-[13px] font-bold leading-tight text-slate-950">{project.title}</h3>
+          <p className="text-[13px] font-bold leading-tight text-slate-700">
             {project.role} | {project.category}
           </p>
         </div>
-        <p className="whitespace-nowrap text-[13px] font-bold text-slate-700">
+        <p className="whitespace-nowrap text-[13px] font-bold leading-tight text-slate-700">
           {project.duration}
         </p>
       </div>
@@ -111,7 +109,7 @@ export default function PrintPage() {
       <main className="space-y-5">
         <section className="print-section">
           <SectionTitle>Tóm tắt chuyên môn</SectionTitle>
-          <p className="text-[13px] leading-[1.5] text-slate-800">{conciseSummary}</p>
+          <p className="text-[13px] leading-[1.5] text-slate-800">{profile.summary}</p>
         </section>
 
         <section className="print-section">
@@ -168,11 +166,11 @@ export default function PrintPage() {
             <div className="space-y-2">
               {education.map((edu) => (
                 <div key={edu.id} className="break-inside-avoid">
-                  <div className="flex justify-between gap-4">
-                    <h3 className="text-[13px] font-bold text-slate-950">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="text-[13px] font-bold leading-tight text-slate-950">
                       {edu.degree} - {edu.field}
                     </h3>
-                    <span className="whitespace-nowrap text-[13px] font-bold text-slate-700">
+                    <span className="whitespace-nowrap text-[13px] font-bold leading-tight text-slate-700">
                       {edu.startYear} - {edu.endYear}
                     </span>
                   </div>

@@ -18,6 +18,7 @@ The template is fully implemented with all core sections working. It's ready for
 - [x] Updated displayed month/year dates to MM-YYYY format across print/PDF, experience cards, certifications, text export, and project durations
 - [x] Shortened print/PDF CV by removing repeated top highlights, limiting printed skills, reducing bullet counts, and keeping the 4 strongest projects in the PDF version
 - [x] Improved print pagination so long section headings stay with their first content item instead of being orphaned at page bottom
+- [x] Restored full professional summary in `/print` while keeping duplicated top highlight bullets removed
 - [x] Added SHB Debit Collection Portal project entry (featured), timeline 2025-11 – 2026-01
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry, timeline 2026-01 – 2026-06
 - [x] Added SHB SAHA Mobile Banking Cambodia project entry (featured)
@@ -71,6 +72,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Displayed month/year ranges use MM-YYYY format, with current items ending in `Hiện tại` or `Nay`
 - Print/PDF CV is intentionally concise; full project portfolio remains available on `/portfolio`
 - Print CSS now uses `break-after: avoid-page` and `break-inside: avoid-page` for section headings and first content blocks
+- `/print` uses the full profile summary, but keeps the top highlight bullet block removed to avoid duplicated project content
 
 ## Quick Customization Guide
 
@@ -123,6 +125,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-13 | Restored full professional summary in print/PDF CV |
 | 2026-06-13 | Improved print page-break behavior for Experience and Project sections |
 | 2026-06-13 | Shortened `/print` CV content to reduce PDF length while keeping strongest banking/payment projects |
 | 2026-06-13 | Changed displayed date format from month-name/year to MM-YYYY |
