@@ -77,6 +77,14 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type GithubBackupConfig = {
+  repoUrl: string;
+  branch: string;
+  backupPath: string;
+  commitMessage: string;
+  hasServerToken: boolean;
+};
+
 type TaskIndex = {
   taskById: Map<string, RoadmapTask>;
   ancestorIdsByTaskId: Map<string, string[]>;
@@ -116,6 +124,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isBackingUpGithub, setIsBackingUpGithub] = useState(false);
+  const [hasServerGithubToken, setHasServerGithubToken] = useState(false);
   const [githubToken, setGithubToken] = useState('');
   const [githubRepoUrl, setGithubRepoUrl] = useState('');
   const [githubBranch, setGithubBranch] = useState('main');
@@ -213,6 +222,54 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     }
 
     loadProgress();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadGithubBackupConfig() {
+      try {
+        const response = await fetch('/api/skill-roadmap/backup/github', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const config = (await response.json()) as Partial<GithubBackupConfig>;
+
+        if (ignore) {
+          return;
+        }
+
+        if (typeof config.repoUrl === 'string' && config.repoUrl) {
+          setGithubRepoUrl(config.repoUrl);
+        }
+
+        if (typeof config.branch === 'string' && config.branch) {
+          setGithubBranch(config.branch);
+        }
+
+        if (typeof config.backupPath === 'string' && config.backupPath) {
+          setGithubBackupPath(config.backupPath);
+        }
+
+        if (typeof config.commitMessage === 'string' && config.commitMessage) {
+          setGithubCommitMessage(config.commitMessage);
+        }
+
+        setHasServerGithubToken(Boolean(config.hasServerToken));
+      } catch {
+        setHasServerGithubToken(false);
+      }
+    }
+
+    loadGithubBackupConfig();
 
     return () => {
       ignore = true;
@@ -567,7 +624,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                   type="password"
                   value={githubToken}
                   onChange={(event) => setGithubToken(event.target.value)}
-                  placeholder="Fine-grained token"
+                  placeholder={hasServerGithubToken ? 'Đang dùng token từ env nếu để trống' : 'Fine-grained token'}
                   className="mt-1 h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 />
               </label>
@@ -621,7 +678,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                 <button
                   type="button"
                   onClick={backupProgressToGithub}
-                  disabled={isBackingUpGithub || !githubToken || !githubRepoUrl || !githubBranch || !githubBackupPath}
+                  disabled={isBackingUpGithub || (!githubToken && !hasServerGithubToken) || !githubRepoUrl || !githubBranch || !githubBackupPath}
                   className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-60 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
                 >
                   {isBackingUpGithub ? (

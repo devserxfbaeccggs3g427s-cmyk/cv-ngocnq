@@ -11,6 +11,12 @@ const progressFilePath = path.join(
   'data',
   'skill-roadmap-progress.json'
 );
+const defaultGithubRepoUrl = process.env.GITHUB_BACKUP_REPO_URL ?? '';
+const defaultGithubBranch = process.env.GITHUB_BACKUP_BRANCH ?? 'main';
+const defaultGithubBackupPath =
+  process.env.GITHUB_BACKUP_PATH ?? 'backups/skill-roadmap-progress.json';
+const defaultGithubCommitMessage =
+  process.env.GITHUB_BACKUP_COMMIT_MESSAGE ?? 'Backup skill roadmap progress';
 
 type GithubBackupRequest = {
   token?: string;
@@ -95,6 +101,16 @@ async function readProgress() {
   } catch {
     return { updatedAt: null, items: {} };
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    repoUrl: defaultGithubRepoUrl,
+    branch: defaultGithubBranch,
+    backupPath: normalizeGithubPath(defaultGithubBackupPath),
+    commitMessage: defaultGithubCommitMessage,
+    hasServerToken: Boolean(process.env.GITHUB_BACKUP_TOKEN?.trim()),
+  });
 }
 
 function buildGithubError(
@@ -226,12 +242,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Request body không phải JSON hợp lệ' }, { status: 400 });
   }
 
-  const repo = body.repoUrl ? parseGithubRepo(body.repoUrl) : null;
-  const token = body.token?.trim();
-  const branch = body.branch?.trim() || 'main';
-  const backupPath = normalizeGithubPath(body.backupPath || 'backups/skill-roadmap-progress.json');
+  const repoUrl = body.repoUrl?.trim() || defaultGithubRepoUrl;
+  const repo = repoUrl ? parseGithubRepo(repoUrl) : null;
+  const token = body.token?.trim() || process.env.GITHUB_BACKUP_TOKEN?.trim();
+  const branch = body.branch?.trim() || defaultGithubBranch;
+  const backupPath = normalizeGithubPath(body.backupPath || defaultGithubBackupPath);
   const commitMessage =
-    body.commitMessage?.trim() || 'Backup skill roadmap progress';
+    body.commitMessage?.trim() || defaultGithubCommitMessage;
 
   if (!token) {
     return NextResponse.json({ error: 'GitHub token is required' }, { status: 400 });
