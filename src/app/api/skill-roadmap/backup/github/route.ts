@@ -18,19 +18,6 @@ type GithubBackupRequest = {
   branch?: string;
   backupPath?: string;
   commitMessage?: string;
-  progress?: unknown;
-};
-
-type ProgressItem = {
-  completed: boolean;
-  note: string;
-  completedAt: string | null;
-  updatedAt: string;
-};
-
-type ProgressFile = {
-  updatedAt: string | null;
-  items: Record<string, ProgressItem>;
 };
 
 function parseGithubRepo(repoUrl: string): { owner: string; repo: string } | null {
@@ -56,57 +43,6 @@ function encodeGithubPath(filePath: string): string {
     .filter(Boolean)
     .map((segment) => encodeURIComponent(segment))
     .join('/');
-}
-
-function isRecord(input: unknown): input is Record<string, unknown> {
-  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
-}
-
-function normalizeProgressItem(input: unknown): ProgressItem | null {
-  if (!isRecord(input)) {
-    return null;
-  }
-
-  return {
-    completed: Boolean(input.completed),
-    note: typeof input.note === 'string' ? input.note : '',
-    completedAt: typeof input.completedAt === 'string' ? input.completedAt : null,
-    updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : new Date().toISOString(),
-  };
-}
-
-function normalizeProgress(input: unknown): ProgressFile | null {
-  if (!isRecord(input)) {
-    return null;
-  }
-
-  const value = isRecord(input.progress) ? input.progress : input;
-  const rawItems = isRecord(value.items) ? value.items : value;
-
-  if (!isRecord(rawItems)) {
-    return null;
-  }
-
-  const items: Record<string, ProgressItem> = {};
-
-  for (const [taskId, item] of Object.entries(rawItems)) {
-    if (taskId === 'updatedAt') {
-      continue;
-    }
-
-    const progressItem = normalizeProgressItem(item);
-
-    if (!progressItem) {
-      return null;
-    }
-
-    items[taskId] = progressItem;
-  }
-
-  return {
-    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
-    items,
-  };
 }
 
 async function readProgress() {
@@ -179,12 +115,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const progress = body.progress ? normalizeProgress(body.progress) : await readProgress();
-
-  if (!progress) {
-    return NextResponse.json({ error: 'Invalid progress backup format' }, { status: 400 });
-  }
-
+  const progress = await readProgress();
   const content = `${JSON.stringify(progress, null, 2)}\n`;
   const encodedContent = Buffer.from(content, 'utf8').toString('base64');
 

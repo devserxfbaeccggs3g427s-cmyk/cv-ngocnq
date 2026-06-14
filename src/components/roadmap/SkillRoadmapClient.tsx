@@ -82,76 +82,6 @@ const emptyProgress: ProgressFile = {
   items: {},
 };
 
-const localProgressKey = 'skill-roadmap-progress';
-
-function isRecord(input: unknown): input is Record<string, unknown> {
-  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
-}
-
-function normalizeProgressItem(input: unknown): ProgressItem | null {
-  if (!isRecord(input)) {
-    return null;
-  }
-
-  return {
-    completed: Boolean(input.completed),
-    note: typeof input.note === 'string' ? input.note : '',
-    completedAt: typeof input.completedAt === 'string' ? input.completedAt : null,
-    updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : new Date().toISOString(),
-  };
-}
-
-function normalizeProgress(input: unknown): ProgressFile | null {
-  if (!isRecord(input)) {
-    return null;
-  }
-
-  const value = isRecord(input.progress) ? input.progress : input;
-  const rawItems = isRecord(value.items) ? value.items : value;
-
-  if (!isRecord(rawItems)) {
-    return null;
-  }
-
-  const items: Record<string, ProgressItem> = {};
-
-  for (const [taskId, item] of Object.entries(rawItems)) {
-    if (taskId === 'updatedAt') {
-      continue;
-    }
-
-    const progressItem = normalizeProgressItem(item);
-
-    if (!progressItem) {
-      return null;
-    }
-
-    items[taskId] = progressItem;
-  }
-
-  return {
-    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
-    items,
-  };
-}
-
-function readLocalProgress(): ProgressFile | null {
-  try {
-    const raw = window.localStorage.getItem(localProgressKey);
-    return raw ? normalizeProgress(JSON.parse(raw)) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeLocalProgress(progress: ProgressFile) {
-  try {
-    window.localStorage.setItem(localProgressKey, JSON.stringify(progress));
-  } catch {
-    // localStorage can be unavailable in private mode; server save may still work.
-  }
-}
-
 const levelStyles: Record<string, string> = {
   'Cơ bản': 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
   'Trung cấp': 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
@@ -241,12 +171,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     let ignore = false;
 
     async function loadProgress() {
-      const localProgress = readLocalProgress();
-
-      if (localProgress && !ignore) {
-        setProgress(localProgress);
-      }
-
       try {
         const response = await fetch('/api/skill-roadmap/progress', {
           cache: 'no-store',
@@ -257,16 +181,12 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         }
 
         const data = (await response.json()) as ProgressFile;
-        if (!ignore && !localProgress) {
+        if (!ignore) {
           setProgress(data);
         }
       } catch {
         if (!ignore) {
-          setLoadError(
-            localProgress
-              ? 'Không đọc được file tiến độ trên server. Đang dùng tiến độ đã lưu trong trình duyệt.'
-              : 'Không tải được tiến độ từ file JSON. Các thay đổi sẽ được lưu trong trình duyệt nếu có thể.'
-          );
+          setLoadError('Không tải được tiến độ từ file JSON. Các thay đổi có thể không được lưu.');
         }
       }
     }
@@ -301,7 +221,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     };
 
     setProgress(optimistic);
-    writeLocalProgress(optimistic);
 
     try {
       const response = await fetch('/api/skill-roadmap/progress', {
@@ -320,10 +239,10 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       const saved = (await response.json()) as ProgressFile;
       setProgress(saved);
-      writeLocalProgress(saved);
       setLoadError(null);
     } catch {
-      setLoadError('Không ghi được file tiến độ trên server deploy. Thay đổi đã được lưu trong trình duyệt này.');
+      setProgress(previous);
+      setLoadError('Không lưu được thay đổi vào file JSON. Vui lòng thử lại.');
     } finally {
       setSavingTaskId(null);
     }
@@ -407,10 +326,15 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setBackupMessage(null);
 
     try {
-      const data = {
-        ...progress,
-        updatedAt: progress.updatedAt ?? new Date().toISOString(),
-      };
+      const response = await fetch('/api/skill-roadmap/progress', {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Không export được backup.');
+      }
+
+      const data = (await response.json()) as ProgressFile;
       const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], {
         type: 'application/json',
       });
@@ -443,12 +367,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
     try {
       const text = await file.text();
-      const data = normalizeProgress(JSON.parse(text));
-
-      if (!data) {
-        throw new Error('File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.');
-      }
-
+      const data = JSON.parse(text) as ProgressFile;
       const response = await fetch('/api/skill-roadmap/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -466,30 +385,11 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       const imported = (await response.json()) as ProgressFile;
       setProgress(imported);
-      writeLocalProgress(imported);
       setBackupMessage('Đã import backup JSON vào tiến độ hiện tại.');
     } catch (error) {
-      try {
-        const text = await file.text();
-        const data = normalizeProgress(JSON.parse(text));
-
-        if (!data) {
-          throw new Error('File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.');
-        }
-
-        const imported = {
-          ...data,
-          updatedAt: new Date().toISOString(),
-        };
-
-        setProgress(imported);
-        writeLocalProgress(imported);
-        setBackupMessage('Server deploy không cho ghi file. Đã import backup vào trình duyệt này.');
-      } catch {
-        setBackupError(
-          error instanceof Error ? error.message : 'Không import được file backup.'
-        );
-      }
+      setBackupError(
+        error instanceof Error ? error.message : 'Không import được file backup.'
+      );
     } finally {
       event.target.value = '';
       setIsImporting(false);
@@ -512,7 +412,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           branch: githubBranch,
           backupPath: githubBackupPath,
           commitMessage: githubCommitMessage,
-          progress,
         }),
       });
 
