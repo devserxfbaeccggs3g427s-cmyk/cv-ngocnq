@@ -12,8 +12,9 @@ const navItems = [
   { href: '/#experience', label: 'Kinh nghiệm' },
   { href: '/#skills', label: 'Kỹ năng' },
   { href: '/#education', label: 'Học vấn' },
-  { href: '/portfolio', label: 'Dự án' },
   { href: '/#contact', label: 'Liên hệ' },
+  { href: '/portfolio', label: 'Dự án' },
+  { href: '/skill-roadmap', label: 'Ôn tập' },
 ];
 
 export function Header() {

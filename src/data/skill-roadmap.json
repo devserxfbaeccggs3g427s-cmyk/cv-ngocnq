@@ -1,0 +1,2488 @@
+{
+  "meta": {
+    "owner": "Nguyễn Quang Ngọc",
+    "title": "Lộ trình ôn tập toàn bộ kỹ năng Backend / Full-Stack",
+    "targetRole": "Senior Backend / Full-Stack Developer trong domain ngân hàng, thanh toán và hệ thống tích hợp",
+    "durationWeeks": 24,
+    "weeklyCommitment": "10-12 giờ/tuần",
+    "reviewCadence": "Mỗi Chủ nhật: tổng kết task đã hoàn thành, bổ sung note, chọn 3 ưu tiên tuần tiếp theo"
+  },
+  "tracks": [
+    {
+      "id": "java-core",
+      "title": "Java Core & JVM",
+      "level": "Cơ bản đến nâng cao",
+      "duration": "3 tuần",
+      "goal": "Nắm chắc ngôn ngữ, collection, concurrency, memory model và tuning JVM để xử lý backend tải cao.",
+      "skills": [
+        "Java Core",
+        "OOP",
+        "Collections",
+        "Concurrency",
+        "JVM",
+        "Clean Code"
+      ],
+      "modules": [
+        {
+          "id": "java-foundation",
+          "title": "Nền tảng Java",
+          "tasks": [
+            {
+              "id": "java-001",
+              "title": "Ôn lại OOP, SOLID, immutable object, equals/hashCode và defensive copying",
+              "level": "Cơ bản",
+              "estimateHours": 3,
+              "deliverable": "Viết note so sánh entity, value object, DTO và lỗi thường gặp khi override equals/hashCode",
+              "children": [
+                {
+                  "id": "java-001.oop",
+                  "title": "OOP căn bản: encapsulation, inheritance, polymorphism, abstraction",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Tự giải thích từng tính chất bằng ví dụ Java, nêu khi nào kế thừa gây coupling xấu và khi nào nên dùng composition.",
+                  "children": [
+                    {
+                      "id": "java-001.oop.encapsulation",
+                      "title": "Encapsulation: private field, invariant, getter/setter có kiểm soát",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Viết ví dụ class giữ invariant hợp lệ và ví dụ setter làm hỏng invariant."
+                    },
+                    {
+                      "id": "java-001.oop.polymorphism",
+                      "title": "Polymorphism: interface, abstract class, dynamic dispatch",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "So sánh interface vs abstract class và giải thích method dispatch khi runtime type khác declared type."
+                    },
+                    {
+                      "id": "java-001.oop.composition",
+                      "title": "Composition over inheritance",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Ghi 3 dấu hiệu nên dùng composition thay vì extends trong service/backend code."
+                    }
+                  ]
+                },
+                {
+                  "id": "java-001.solid",
+                  "title": "SOLID: hiểu từng nguyên lý và dấu hiệu vi phạm trong code backend",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Tạo checklist SRP/OCP/LSP/ISP/DIP; mỗi nguyên lý có ví dụ vi phạm và cách refactor.",
+                  "children": [
+                    {
+                      "id": "java-001.solid.srp",
+                      "title": "SRP: một class chỉ có một lý do để thay đổi",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Tách ví dụ service vừa validate, vừa persist, vừa gửi notification thành các collaborator rõ ràng."
+                    },
+                    {
+                      "id": "java-001.solid.ocp-dip",
+                      "title": "OCP/DIP: mở rộng bằng abstraction, không sửa code lõi",
+                      "level": "Trung cấp",
+                      "estimateHours": 1,
+                      "deliverable": "Refactor if/else theo loại transfer channel thành Strategy interface."
+                    },
+                    {
+                      "id": "java-001.solid.lsp-isp",
+                      "title": "LSP/ISP: subtype đúng hợp đồng và interface nhỏ",
+                      "level": "Trung cấp",
+                      "estimateHours": 1,
+                      "deliverable": "Ghi ví dụ subtype ném UnsupportedOperationException làm sai LSP và cách tách interface."
+                    }
+                  ]
+                },
+                {
+                  "id": "java-001.immutable",
+                  "title": "Immutable object: final field, defensive copy, thread-safety và value object",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Viết một value object immutable có validation, không expose mutable collection/date ra ngoài.",
+                  "children": [
+                    {
+                      "id": "java-001.immutable.final",
+                      "title": "final field và constructor validation",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Giải thích final giúp gì cho immutable object và giới hạn của final với object mutable."
+                    },
+                    {
+                      "id": "java-001.immutable.collection",
+                      "title": "Immutable collection và unmodifiable view",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "So sánh List.copyOf, Collections.unmodifiableList và lỗi vẫn mutate được object bên trong."
+                    },
+                    {
+                      "id": "java-001.immutable.thread",
+                      "title": "Immutable object trong concurrent code",
+                      "level": "Trung cấp",
+                      "estimateHours": 1,
+                      "deliverable": "Nêu vì sao immutable object giảm nhu cầu lock và rủi ro visibility."
+                    }
+                  ]
+                },
+                {
+                  "id": "java-001.equals-hashcode",
+                  "title": "equals/hashCode: contract, HashMap/HashSet và entity id",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Viết note 5 điều kiện equals, quan hệ hashCode, lỗi mutate key sau khi put vào HashMap.",
+                  "children": [
+                    {
+                      "id": "java-001.equals-hashcode.contract",
+                      "title": "Contract của equals và hashCode",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Tự trả lời reflexive, symmetric, transitive, consistent, null comparison bằng ví dụ."
+                    },
+                    {
+                      "id": "java-001.equals-hashcode.collections",
+                      "title": "Ảnh hưởng tới HashMap/HashSet",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Demo object đổi field dùng trong hashCode sau khi add vào HashSet và giải thích vì sao tìm không ra."
+                    },
+                    {
+                      "id": "java-001.equals-hashcode.entity",
+                      "title": "equals/hashCode cho JPA entity",
+                      "level": "Trung cấp",
+                      "estimateHours": 1,
+                      "deliverable": "Ghi trade-off dùng business key vs generated id, proxy Hibernate và lifecycle transient/persisted."
+                    }
+                  ]
+                },
+                {
+                  "id": "java-001.defensive-copy",
+                  "title": "Defensive copying: chống leak mutable state qua constructor/getter",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Viết ví dụ lỗi expose List/Date và sửa bằng copy khi nhận vào/trả ra.",
+                  "children": [
+                    {
+                      "id": "java-001.defensive-copy.input",
+                      "title": "Copy dữ liệu mutable ở constructor/setter",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Tạo ví dụ caller giữ reference List rồi mutate làm hỏng state object."
+                    },
+                    {
+                      "id": "java-001.defensive-copy.output",
+                      "title": "Copy dữ liệu mutable ở getter",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "So sánh trả trực tiếp collection, unmodifiable view và immutable copy."
+                    }
+                  ]
+                },
+                {
+                  "id": "java-001.entity-value-dto",
+                  "title": "Phân biệt entity, value object, DTO và domain model",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Lập bảng so sánh lifecycle, identity, validation, persistence annotation, serialization và mapping.",
+                  "children": [
+                    {
+                      "id": "java-001.entity-value-dto.entity",
+                      "title": "Entity: identity, lifecycle và persistence boundary",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Nêu vì sao entity không nên expose trực tiếp ra API response trong hệ thống lớn."
+                    },
+                    {
+                      "id": "java-001.entity-value-dto.value",
+                      "title": "Value object: so sánh bằng giá trị và bất biến",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Thiết kế Money hoặc AccountNumber value object có validation."
+                    },
+                    {
+                      "id": "java-001.entity-value-dto.dto",
+                      "title": "DTO: contract API và mapping boundary",
+                      "level": "Cơ bản",
+                      "estimateHours": 1,
+                      "deliverable": "Ghi rule request DTO, response DTO, internal command và nơi đặt validation."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "java-002",
+              "title": "Đào sâu Collections: ArrayList, LinkedList, HashMap, ConcurrentHashMap, TreeMap",
+              "level": "Cơ bản",
+              "estimateHours": 4,
+              "deliverable": "Bảng so sánh complexity, use case và trade-off bộ nhớ",
+              "children": [
+                {
+                  "id": "java-002.arraylist-linkedlist",
+                  "title": "ArrayList vs LinkedList: memory layout, random access, insert/delete",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "So sánh complexity thực tế, locality CPU và vì sao LinkedList ít khi tốt hơn trong backend."
+                },
+                {
+                  "id": "java-002.hashmap",
+                  "title": "HashMap internals: bucket, hash, collision, resize, treeify",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Vẽ luồng put/get, giải thích load factor, equals/hashCode và collision attack ở mức cơ bản."
+                },
+                {
+                  "id": "java-002.concurrenthashmap",
+                  "title": "ConcurrentHashMap: thread-safe map và giới hạn atomic operation",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "So sánh get/putIfAbsent/computeIfAbsent; nêu lỗi check-then-act khi dùng map thường."
+                },
+                {
+                  "id": "java-002.treemap",
+                  "title": "TreeMap/Comparator: ordering, null, compareTo consistency",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lỗi comparator không consistent với equals và ảnh hưởng tới key uniqueness."
+                },
+                {
+                  "id": "java-002.interview",
+                  "title": "Câu hỏi phỏng vấn Collections nền tảng",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Trả lời: HashMap vs Hashtable vs ConcurrentHashMap, ArrayList vs Vector, fail-fast iterator, initial capacity."
+                }
+              ]
+            },
+            {
+              "id": "java-003",
+              "title": "Ôn Stream API, Optional, functional interface và lambda trong code backend",
+              "level": "Trung cấp",
+              "estimateHours": 3,
+              "deliverable": "Refactor một đoạn mapping/filtering phức tạp thành code dễ đọc",
+              "children": [
+                {
+                  "id": "java-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Stream API, Optional, functional interface và lambda trong code backend",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "java-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Stream API, Optional, functional interface và lambda trong code backend",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "java-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Stream API, Optional, functional interface và lambda trong code backend",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "java-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Stream API, Optional, functional interface và lambda trong code backend",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "java-advanced",
+          "title": "JVM & concurrent programming",
+          "tasks": [
+            {
+              "id": "java-004",
+              "title": "Học Java Memory Model, volatile, synchronized, lock, happens-before",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Viết note giải thích race condition, visibility và atomicity bằng ví dụ thực tế",
+              "children": [
+                {
+                  "id": "java-004.visibility",
+                  "title": "Visibility: cache CPU, main memory, stale read",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Giải thích vì sao một thread có thể không thấy thay đổi của thread khác nếu không có happens-before."
+                },
+                {
+                  "id": "java-004.atomicity",
+                  "title": "Atomicity: ++ không atomic, compound action và race condition",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Demo counter sai khi nhiều thread increment và sửa bằng AtomicInteger hoặc lock."
+                },
+                {
+                  "id": "java-004.volatile",
+                  "title": "volatile: visibility, ordering và giới hạn không thay thế lock",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Nêu trường hợp volatile đủ dùng và trường hợp vẫn race vì cần atomic compound action."
+                },
+                {
+                  "id": "java-004.synchronized-lock",
+                  "title": "synchronized/ReentrantLock: mutual exclusion, monitor, fairness, deadlock",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Viết checklist tránh deadlock và khi nào cần lock explicit."
+                },
+                {
+                  "id": "java-004.happens-before",
+                  "title": "Happens-before rules thường gặp",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi các rule: volatile write/read, monitor unlock/lock, thread start/join, final field publication."
+                }
+              ]
+            },
+            {
+              "id": "java-005",
+              "title": "Thực hành ExecutorService, CompletableFuture, thread pool sizing và timeout",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Mini service gọi song song 3 API giả lập, có timeout và fallback",
+              "children": [
+                {
+                  "id": "java-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành ExecutorService, CompletableFuture, thread pool sizing và timeout",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "java-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành ExecutorService, CompletableFuture, thread pool sizing và timeout",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "java-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành ExecutorService, CompletableFuture, thread pool sizing và timeout",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "java-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành ExecutorService, CompletableFuture, thread pool sizing và timeout",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "java-006",
+              "title": "Ôn GC, heap, stack, metaspace, memory leak và cách đọc thread dump/heap dump",
+              "level": "Nâng cao",
+              "estimateHours": 4,
+              "deliverable": "Checklist điều tra CPU cao, memory leak và request treo",
+              "children": [
+                {
+                  "id": "java-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn GC, heap, stack, metaspace, memory leak và cách đọc thread dump/heap dump",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "java-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn GC, heap, stack, metaspace, memory leak và cách đọc thread dump/heap dump",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "java-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn GC, heap, stack, metaspace, memory leak và cách đọc thread dump/heap dump",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "java-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn GC, heap, stack, metaspace, memory leak và cách đọc thread dump/heap dump",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spring-backend",
+      "title": "Spring Boot, Spring MVC & Spring Data",
+      "level": "Cơ bản đến nâng cao",
+      "duration": "4 tuần",
+      "goal": "Củng cố nền tảng Spring, xây API chuẩn production, transaction đúng và xử lý lỗi nhất quán.",
+      "skills": [
+        "Spring Boot",
+        "Spring Framework",
+        "Spring Web MVC",
+        "Spring Data JPA",
+        "Hibernate",
+        "MyBatis",
+        "JdbcTemplate",
+        "MapStruct"
+      ],
+      "modules": [
+        {
+          "id": "spring-foundation",
+          "title": "Spring foundation",
+          "tasks": [
+            {
+              "id": "spring-001",
+              "title": "Ôn IoC/DI, bean lifecycle, profile, configuration properties và auto-configuration",
+              "level": "Cơ bản",
+              "estimateHours": 4,
+              "deliverable": "Sơ đồ luồng khởi tạo application context và 5 lỗi cấu hình hay gặp",
+              "children": [
+                {
+                  "id": "spring-001.ioc-di",
+                  "title": "IoC/DI: BeanFactory, ApplicationContext, constructor injection",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Giải thích vì sao constructor injection tốt hơn field injection cho testability và immutability."
+                },
+                {
+                  "id": "spring-001.bean-lifecycle",
+                  "title": "Bean lifecycle: instantiate, populate, aware, post processor, init, destroy",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Vẽ thứ tự lifecycle và nêu nơi phù hợp để validate config hoặc mở resource."
+                },
+                {
+                  "id": "spring-001.scope",
+                  "title": "Bean scope: singleton, prototype, request và lỗi stateful singleton",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi ví dụ singleton service chứa mutable field gây bug concurrent request."
+                },
+                {
+                  "id": "spring-001.autoconfig",
+                  "title": "Auto-configuration và conditional annotation",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Giải thích @ConditionalOnClass/@ConditionalOnProperty và cách debug bean không được tạo."
+                },
+                {
+                  "id": "spring-001.config-properties",
+                  "title": "Configuration properties: bind, validate, profile, secret",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Tạo checklist đặt config theo environment và validate timeout/url/feature flag khi startup."
+                }
+              ]
+            },
+            {
+              "id": "spring-002",
+              "title": "Thiết kế REST API: resource naming, pagination, sorting, validation và error response",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Một API CRUD chuẩn có Bean Validation và global exception handler",
+              "children": [
+                {
+                  "id": "spring-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thiết kế REST API: resource naming, pagination, sorting, validation và error response",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "spring-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thiết kế REST API: resource naming, pagination, sorting, validation và error response",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "spring-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thiết kế REST API: resource naming, pagination, sorting, validation và error response",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "spring-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thiết kế REST API: resource naming, pagination, sorting, validation và error response",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "spring-003",
+              "title": "Ôn Spring AOP cho logging, audit, masking dữ liệu nhạy cảm và correlation ID",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Aspect log request/response có MDC traceId và masking field nhạy cảm",
+              "children": [
+                {
+                  "id": "spring-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Spring AOP cho logging, audit, masking dữ liệu nhạy cảm và correlation ID",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "spring-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Spring AOP cho logging, audit, masking dữ liệu nhạy cảm và correlation ID",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "spring-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Spring AOP cho logging, audit, masking dữ liệu nhạy cảm và correlation ID",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "spring-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Spring AOP cho logging, audit, masking dữ liệu nhạy cảm và correlation ID",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "persistence",
+          "title": "Persistence layer",
+          "tasks": [
+            {
+              "id": "spring-004",
+              "title": "Đào sâu transaction: propagation, isolation, rollback rule, read-only và self-invocation",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Bảng tình huống transaction lỗi và cách sửa",
+              "children": [
+                {
+                  "id": "spring-004.propagation",
+                  "title": "Propagation: REQUIRED, REQUIRES_NEW, SUPPORTS, MANDATORY",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Tạo bảng tình huống service A gọi service B và transaction nào được dùng."
+                },
+                {
+                  "id": "spring-004.isolation",
+                  "title": "Isolation level: dirty read, non-repeatable read, phantom read",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Giải thích READ_COMMITTED, REPEATABLE_READ, SERIALIZABLE bằng ví dụ banking balance/order."
+                },
+                {
+                  "id": "spring-004.rollback",
+                  "title": "Rollback rule: checked exception, runtime exception, rollbackFor",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Demo checked exception không rollback mặc định và cách cấu hình rollbackFor."
+                },
+                {
+                  "id": "spring-004.self-invocation",
+                  "title": "Self-invocation và proxy limitation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Giải thích vì sao gọi method @Transactional trong cùng class có thể không mở transaction."
+                },
+                {
+                  "id": "spring-004.locking",
+                  "title": "Transaction lock, deadlock và timeout",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Viết checklist debug DB lock/deadlock từ log application tới query monitoring."
+                }
+              ]
+            },
+            {
+              "id": "spring-005",
+              "title": "Ôn Hibernate/JPA: entity state, lazy/eager loading, N+1, optimistic locking",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Demo N+1 và cách xử lý bằng fetch join/entity graph",
+              "children": [
+                {
+                  "id": "spring-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Hibernate/JPA: entity state, lazy/eager loading, N+1, optimistic locking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "spring-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Hibernate/JPA: entity state, lazy/eager loading, N+1, optimistic locking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "spring-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Hibernate/JPA: entity state, lazy/eager loading, N+1, optimistic locking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "spring-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Hibernate/JPA: entity state, lazy/eager loading, N+1, optimistic locking",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "spring-006",
+              "title": "Thực hành JdbcTemplate, stored procedure, REF CURSOR và mapper chuẩn banking",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Reusable executor cho stored procedure có timeout, logging và mapping lỗi",
+              "children": [
+                {
+                  "id": "spring-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành JdbcTemplate, stored procedure, REF CURSOR và mapper chuẩn banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "spring-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành JdbcTemplate, stored procedure, REF CURSOR và mapper chuẩn banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "spring-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành JdbcTemplate, stored procedure, REF CURSOR và mapper chuẩn banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "spring-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành JdbcTemplate, stored procedure, REF CURSOR và mapper chuẩn banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "spring-007",
+              "title": "Chuẩn hóa DTO mapping bằng MapStruct và quy ước request/response contract",
+              "level": "Trung cấp",
+              "estimateHours": 3,
+              "deliverable": "Mapper cho create/update/detail response, có unit test mapping edge case",
+              "children": [
+                {
+                  "id": "spring-007.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Chuẩn hóa DTO mapping bằng MapStruct và quy ước request/response contract",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "spring-007.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Chuẩn hóa DTO mapping bằng MapStruct và quy ước request/response contract",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "spring-007.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Chuẩn hóa DTO mapping bằng MapStruct và quy ước request/response contract",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "spring-007.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Chuẩn hóa DTO mapping bằng MapStruct và quy ước request/response contract",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "microservices-architecture",
+      "title": "Microservices, Spring Cloud & Event-Driven",
+      "level": "Trung cấp đến chuyên sâu",
+      "duration": "4 tuần",
+      "goal": "Thiết kế service có ranh giới rõ, giao tiếp ổn định, chịu lỗi tốt và phù hợp hệ thống ngân hàng.",
+      "skills": [
+        "Microservices",
+        "Spring Cloud",
+        "Spring Cloud Gateway",
+        "Eureka",
+        "OpenFeign",
+        "Apache Kafka",
+        "Resilience4j",
+        "API Gateway"
+      ],
+      "modules": [
+        {
+          "id": "service-design",
+          "title": "Thiết kế service",
+          "tasks": [
+            {
+              "id": "ms-001",
+              "title": "Ôn bounded context, database per service, shared library, contract-first API",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Sơ đồ service boundary cho payment, account, identity và notification",
+              "children": [
+                {
+                  "id": "ms-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn bounded context, database per service, shared library, contract-first API",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "ms-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn bounded context, database per service, shared library, contract-first API",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "ms-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn bounded context, database per service, shared library, contract-first API",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "ms-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn bounded context, database per service, shared library, contract-first API",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "ms-002",
+              "title": "Thực hành Spring Cloud Gateway: routing, filter, auth policy, rate limit",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Gateway mẫu có public/admin route, JWT validation và Redis rate limit",
+              "children": [
+                {
+                  "id": "ms-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành Spring Cloud Gateway: routing, filter, auth policy, rate limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "ms-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành Spring Cloud Gateway: routing, filter, auth policy, rate limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "ms-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành Spring Cloud Gateway: routing, filter, auth policy, rate limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "ms-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành Spring Cloud Gateway: routing, filter, auth policy, rate limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "ms-003",
+              "title": "Ôn Eureka/OpenFeign: discovery, timeout, retry, fallback và error decoder",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Feign client chuẩn có timeout riêng, logging và mapping lỗi nghiệp vụ",
+              "children": [
+                {
+                  "id": "ms-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Eureka/OpenFeign: discovery, timeout, retry, fallback và error decoder",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "ms-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Eureka/OpenFeign: discovery, timeout, retry, fallback và error decoder",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "ms-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Eureka/OpenFeign: discovery, timeout, retry, fallback và error decoder",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "ms-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Eureka/OpenFeign: discovery, timeout, retry, fallback và error decoder",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "event-driven",
+          "title": "Event-driven & resilience",
+          "tasks": [
+            {
+              "id": "ms-004",
+              "title": "Đào sâu Kafka: topic, partition, consumer group, offset, retry topic, DLQ",
+              "level": "Nâng cao",
+              "estimateHours": 6,
+              "deliverable": "Flow xử lý message lỗi, retry lại và ghi audit",
+              "children": [
+                {
+                  "id": "ms-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Đào sâu Kafka: topic, partition, consumer group, offset, retry topic, DLQ",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "ms-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Đào sâu Kafka: topic, partition, consumer group, offset, retry topic, DLQ",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "ms-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Đào sâu Kafka: topic, partition, consumer group, offset, retry topic, DLQ",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "ms-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Đào sâu Kafka: topic, partition, consumer group, offset, retry topic, DLQ",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "ms-005",
+              "title": "Học idempotency, duplicate prevention, outbox pattern và saga compensation",
+              "level": "Nâng cao",
+              "estimateHours": 6,
+              "deliverable": "Thiết kế idempotency cho API tạo giao dịch thanh toán",
+              "children": [
+                {
+                  "id": "ms-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Học idempotency, duplicate prevention, outbox pattern và saga compensation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "ms-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Học idempotency, duplicate prevention, outbox pattern và saga compensation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "ms-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Học idempotency, duplicate prevention, outbox pattern và saga compensation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "ms-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Học idempotency, duplicate prevention, outbox pattern và saga compensation",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "ms-006",
+              "title": "Thực hành Resilience4j: timeout, retry, circuit breaker, bulkhead, rate limiter",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Policy resilience cho ESB/Core Banking client kèm metric quan sát",
+              "children": [
+                {
+                  "id": "ms-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành Resilience4j: timeout, retry, circuit breaker, bulkhead, rate limiter",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "ms-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành Resilience4j: timeout, retry, circuit breaker, bulkhead, rate limiter",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "ms-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành Resilience4j: timeout, retry, circuit breaker, bulkhead, rate limiter",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "ms-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành Resilience4j: timeout, retry, circuit breaker, bulkhead, rate limiter",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "banking-payment",
+      "title": "Banking, Payment Gateway & Core Integration",
+      "level": "Chuyên sâu domain",
+      "duration": "3 tuần",
+      "goal": "Hệ thống hóa kiến thức thanh toán, core banking, Napas/VietQR, OTP và đối soát để nâng cấp năng lực domain.",
+      "skills": [
+        "Core Banking / ESB Integration",
+        "Payment Gateway / Napas / VietQR",
+        "JWT / Nimbus JOSE",
+        "SMS Gateway",
+        "Oracle PL/SQL"
+      ],
+      "modules": [
+        {
+          "id": "payment-flow",
+          "title": "Luồng thanh toán",
+          "tasks": [
+            {
+              "id": "bank-001",
+              "title": "Vẽ end-to-end flow tạo giao dịch, sinh QR, vấn tin, hạch toán, hoàn tiền và đối soát",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Sequence diagram cho payment gateway dịch vụ công",
+              "children": [
+                {
+                  "id": "bank-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Vẽ end-to-end flow tạo giao dịch, sinh QR, vấn tin, hạch toán, hoàn tiền và đối soát",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "bank-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Vẽ end-to-end flow tạo giao dịch, sinh QR, vấn tin, hạch toán, hoàn tiền và đối soát",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "bank-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Vẽ end-to-end flow tạo giao dịch, sinh QR, vấn tin, hạch toán, hoàn tiền và đối soát",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "bank-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Vẽ end-to-end flow tạo giao dịch, sinh QR, vấn tin, hạch toán, hoàn tiền và đối soát",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "bank-002",
+              "title": "Ôn Napas/VietQR: cấu trúc request, trạng thái giao dịch, reversal và reconciliation",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Bảng trạng thái giao dịch và rule chuyển trạng thái hợp lệ",
+              "children": [
+                {
+                  "id": "bank-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Napas/VietQR: cấu trúc request, trạng thái giao dịch, reversal và reconciliation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "bank-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Napas/VietQR: cấu trúc request, trạng thái giao dịch, reversal và reconciliation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "bank-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Napas/VietQR: cấu trúc request, trạng thái giao dịch, reversal và reconciliation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "bank-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Napas/VietQR: cấu trúc request, trạng thái giao dịch, reversal và reconciliation",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "bank-003",
+              "title": "Thiết kế duplicate bill prevention, alias account generation và idempotency key",
+              "level": "Nâng cao",
+              "estimateHours": 4,
+              "deliverable": "Data model và unique constraint cho chống thanh toán trùng",
+              "children": [
+                {
+                  "id": "bank-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thiết kế duplicate bill prevention, alias account generation và idempotency key",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "bank-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thiết kế duplicate bill prevention, alias account generation và idempotency key",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "bank-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thiết kế duplicate bill prevention, alias account generation và idempotency key",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "bank-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thiết kế duplicate bill prevention, alias account generation và idempotency key",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "core-integration",
+          "title": "Tích hợp core banking",
+          "tasks": [
+            {
+              "id": "bank-004",
+              "title": "Chuẩn hóa ESB/Core Banking adapter: timeout, signing, token cache, retry và fallback",
+              "level": "Nâng cao",
+              "estimateHours": 6,
+              "deliverable": "Adapter interface và implementation mẫu cho 2 kênh chuyển tiền",
+              "children": [
+                {
+                  "id": "bank-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Chuẩn hóa ESB/Core Banking adapter: timeout, signing, token cache, retry và fallback",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "bank-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Chuẩn hóa ESB/Core Banking adapter: timeout, signing, token cache, retry và fallback",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "bank-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Chuẩn hóa ESB/Core Banking adapter: timeout, signing, token cache, retry và fallback",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "bank-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Chuẩn hóa ESB/Core Banking adapter: timeout, signing, token cache, retry và fallback",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "bank-005",
+              "title": "Ôn OTP/SMS flow: expiry, resend, attempt limit, trusted device và masked logging",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "State machine OTP và checklist bảo mật",
+              "children": [
+                {
+                  "id": "bank-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn OTP/SMS flow: expiry, resend, attempt limit, trusted device và masked logging",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "bank-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn OTP/SMS flow: expiry, resend, attempt limit, trusted device và masked logging",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "bank-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn OTP/SMS flow: expiry, resend, attempt limit, trusted device và masked logging",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "bank-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn OTP/SMS flow: expiry, resend, attempt limit, trusted device và masked logging",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "bank-006",
+              "title": "Tổng hợp rủi ro domain: double posting, timeout không rõ kết quả, partial failure, stale balance",
+              "level": "Chuyên sâu",
+              "estimateHours": 5,
+              "deliverable": "Runbook xử lý sự cố thanh toán không rõ trạng thái",
+              "children": [
+                {
+                  "id": "bank-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Tổng hợp rủi ro domain: double posting, timeout không rõ kết quả, partial failure, stale balance",
+                  "level": "Chuyên sâu",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "bank-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Tổng hợp rủi ro domain: double posting, timeout không rõ kết quả, partial failure, stale balance",
+                  "level": "Chuyên sâu",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "bank-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Tổng hợp rủi ro domain: double posting, timeout không rõ kết quả, partial failure, stale balance",
+                  "level": "Chuyên sâu",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "bank-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Tổng hợp rủi ro domain: double posting, timeout không rõ kết quả, partial failure, stale balance",
+                  "level": "Chuyên sâu",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "database-cache-storage",
+      "title": "Database, SQL Performance, Cache & Object Storage",
+      "level": "Cơ bản đến nâng cao",
+      "duration": "3 tuần",
+      "goal": "Tối ưu truy vấn, model dữ liệu giao dịch, cache nhất quán và storage file an toàn.",
+      "skills": [
+        "OracleDB",
+        "PostgreSQL",
+        "MySQL",
+        "SQL Server",
+        "Redis",
+        "MinIO",
+        "Pentaho PDI"
+      ],
+      "modules": [
+        {
+          "id": "sql-performance",
+          "title": "SQL & database design",
+          "tasks": [
+            {
+              "id": "db-001",
+              "title": "Ôn index, execution plan, join strategy, pagination và transaction lock",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Checklist tối ưu query chậm trong Oracle/PostgreSQL",
+              "children": [
+                {
+                  "id": "db-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn index, execution plan, join strategy, pagination và transaction lock",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "db-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn index, execution plan, join strategy, pagination và transaction lock",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "db-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn index, execution plan, join strategy, pagination và transaction lock",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "db-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn index, execution plan, join strategy, pagination và transaction lock",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "db-002",
+              "title": "Thiết kế schema cho giao dịch tài chính: audit, status history, immutable ledger",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "ERD giao dịch thanh toán có audit trail",
+              "children": [
+                {
+                  "id": "db-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thiết kế schema cho giao dịch tài chính: audit, status history, immutable ledger",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "db-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thiết kế schema cho giao dịch tài chính: audit, status history, immutable ledger",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "db-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thiết kế schema cho giao dịch tài chính: audit, status history, immutable ledger",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "db-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thiết kế schema cho giao dịch tài chính: audit, status history, immutable ledger",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "db-003",
+              "title": "Ôn PL/SQL/stored procedure: package, cursor, exception, bulk operation",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Stored procedure mẫu trả REF CURSOR và mã lỗi chuẩn",
+              "children": [
+                {
+                  "id": "db-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn PL/SQL/stored procedure: package, cursor, exception, bulk operation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "db-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn PL/SQL/stored procedure: package, cursor, exception, bulk operation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "db-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn PL/SQL/stored procedure: package, cursor, exception, bulk operation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "db-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn PL/SQL/stored procedure: package, cursor, exception, bulk operation",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cache-storage",
+          "title": "Cache, storage & ETL",
+          "tasks": [
+            {
+              "id": "db-004",
+              "title": "Thực hành Redis: cache aside, TTL, invalidation, distributed lock, session store",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Cache policy cho danh mục ngân hàng và session người dùng",
+              "children": [
+                {
+                  "id": "db-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành Redis: cache aside, TTL, invalidation, distributed lock, session store",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "db-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành Redis: cache aside, TTL, invalidation, distributed lock, session store",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "db-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành Redis: cache aside, TTL, invalidation, distributed lock, session store",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "db-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành Redis: cache aside, TTL, invalidation, distributed lock, session store",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "db-005",
+              "title": "Ôn MinIO: bucket policy, presigned URL, multipart upload, metadata và antivirus hook",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "File service mẫu có upload, download, delete và metadata persistence",
+              "children": [
+                {
+                  "id": "db-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn MinIO: bucket policy, presigned URL, multipart upload, metadata và antivirus hook",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "db-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn MinIO: bucket policy, presigned URL, multipart upload, metadata và antivirus hook",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "db-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn MinIO: bucket policy, presigned URL, multipart upload, metadata và antivirus hook",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "db-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn MinIO: bucket policy, presigned URL, multipart upload, metadata và antivirus hook",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "db-006",
+              "title": "Hệ thống hóa ETL với Pentaho PDI: extract, transform, load, schedule, retry",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Thiết kế job đồng bộ dữ liệu có checkpoint và log lỗi",
+              "children": [
+                {
+                  "id": "db-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Hệ thống hóa ETL với Pentaho PDI: extract, transform, load, schedule, retry",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "db-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Hệ thống hóa ETL với Pentaho PDI: extract, transform, load, schedule, retry",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "db-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Hệ thống hóa ETL với Pentaho PDI: extract, transform, load, schedule, retry",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "db-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Hệ thống hóa ETL với Pentaho PDI: extract, transform, load, schedule, retry",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "title": "Security, Identity & API Protection",
+      "level": "Trung cấp đến nâng cao",
+      "duration": "2 tuần",
+      "goal": "Nâng cấp năng lực bảo mật API, identity, token, encryption và bảo vệ dữ liệu nhạy cảm.",
+      "skills": [
+        "Spring Security",
+        "Keycloak OIDC",
+        "JWT / Nimbus JOSE",
+        "RSA",
+        "ECDH Encryption",
+        "reCAPTCHA v3",
+        "Bucket4j"
+      ],
+      "modules": [
+        {
+          "id": "identity-access",
+          "title": "Identity & access control",
+          "tasks": [
+            {
+              "id": "sec-001",
+              "title": "Ôn Spring Security filter chain, authentication provider, authorization manager",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Sơ đồ request đi qua filter chain và rule public/admin/user",
+              "children": [
+                {
+                  "id": "sec-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Spring Security filter chain, authentication provider, authorization manager",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "sec-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Spring Security filter chain, authentication provider, authorization manager",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "sec-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Spring Security filter chain, authentication provider, authorization manager",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "sec-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Spring Security filter chain, authentication provider, authorization manager",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "sec-002",
+              "title": "Thực hành Keycloak OIDC: realm, client, role, token claim, JWKS validation",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "API bảo vệ bằng Keycloak role và custom claim mapping",
+              "children": [
+                {
+                  "id": "sec-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành Keycloak OIDC: realm, client, role, token claim, JWKS validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "sec-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành Keycloak OIDC: realm, client, role, token claim, JWKS validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "sec-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành Keycloak OIDC: realm, client, role, token claim, JWKS validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "sec-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành Keycloak OIDC: realm, client, role, token claim, JWKS validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "sec-003",
+              "title": "Đào sâu JWT/Nimbus JOSE: signing, encryption, refresh token, rotation và revocation",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Checklist thiết kế token cho mobile banking",
+              "children": [
+                {
+                  "id": "sec-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Đào sâu JWT/Nimbus JOSE: signing, encryption, refresh token, rotation và revocation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "sec-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Đào sâu JWT/Nimbus JOSE: signing, encryption, refresh token, rotation và revocation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "sec-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Đào sâu JWT/Nimbus JOSE: signing, encryption, refresh token, rotation và revocation",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "sec-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Đào sâu JWT/Nimbus JOSE: signing, encryption, refresh token, rotation và revocation",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "api-hardening",
+          "title": "API hardening",
+          "tasks": [
+            {
+              "id": "sec-004",
+              "title": "Ôn OWASP API Top 10 và mapping vào hệ thống ngân hàng",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Danh sách rủi ro, ví dụ exploit và cách phòng thủ",
+              "children": [
+                {
+                  "id": "sec-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn OWASP API Top 10 và mapping vào hệ thống ngân hàng",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "sec-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn OWASP API Top 10 và mapping vào hệ thống ngân hàng",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "sec-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn OWASP API Top 10 và mapping vào hệ thống ngân hàng",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "sec-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn OWASP API Top 10 và mapping vào hệ thống ngân hàng",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "sec-005",
+              "title": "Thực hành rate limit, reCAPTCHA, input validation, masking, audit log",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Middleware/policy bảo vệ public API có audit và rate limit",
+              "children": [
+                {
+                  "id": "sec-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành rate limit, reCAPTCHA, input validation, masking, audit log",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "sec-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành rate limit, reCAPTCHA, input validation, masking, audit log",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "sec-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành rate limit, reCAPTCHA, input validation, masking, audit log",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "sec-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành rate limit, reCAPTCHA, input validation, masking, audit log",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "sec-006",
+              "title": "Ôn RSA/ECDH, request signing, timestamp, nonce và replay attack prevention",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Protocol mẫu ký request giữa partner và gateway",
+              "children": [
+                {
+                  "id": "sec-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn RSA/ECDH, request signing, timestamp, nonce và replay attack prevention",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "sec-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn RSA/ECDH, request signing, timestamp, nonce và replay attack prevention",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "sec-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn RSA/ECDH, request signing, timestamp, nonce và replay attack prevention",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "sec-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn RSA/ECDH, request signing, timestamp, nonce và replay attack prevention",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "devops-observability",
+      "title": "DevOps, Kubernetes & Observability",
+      "level": "Cơ bản đến nâng cao",
+      "duration": "3 tuần",
+      "goal": "Tự tin đóng gói, triển khai, quan sát và vận hành service production.",
+      "skills": [
+        "Docker",
+        "Kubernetes",
+        "GitLab CI/CD",
+        "ELK Stack",
+        "Actuator",
+        "Micrometer",
+        "Prometheus",
+        "Maven"
+      ],
+      "modules": [
+        {
+          "id": "delivery",
+          "title": "Build & deployment",
+          "tasks": [
+            {
+              "id": "devops-001",
+              "title": "Ôn Maven lifecycle, dependency management, multi-module và build profile",
+              "level": "Cơ bản",
+              "estimateHours": 3,
+              "deliverable": "Template pom chuẩn cho Spring Boot service",
+              "children": [
+                {
+                  "id": "devops-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Maven lifecycle, dependency management, multi-module và build profile",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Maven lifecycle, dependency management, multi-module và build profile",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Maven lifecycle, dependency management, multi-module và build profile",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Maven lifecycle, dependency management, multi-module và build profile",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "devops-002",
+              "title": "Thực hành Dockerfile tối ưu: layer caching, non-root user, healthcheck, env config",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Dockerfile production cho service Java 17",
+              "children": [
+                {
+                  "id": "devops-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành Dockerfile tối ưu: layer caching, non-root user, healthcheck, env config",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành Dockerfile tối ưu: layer caching, non-root user, healthcheck, env config",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành Dockerfile tối ưu: layer caching, non-root user, healthcheck, env config",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành Dockerfile tối ưu: layer caching, non-root user, healthcheck, env config",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "devops-003",
+              "title": "Ôn Kubernetes: deployment, service, configmap, secret, ingress, probes, resource limit",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Manifest triển khai service có readiness/liveness và resource request/limit",
+              "children": [
+                {
+                  "id": "devops-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Kubernetes: deployment, service, configmap, secret, ingress, probes, resource limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Kubernetes: deployment, service, configmap, secret, ingress, probes, resource limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Kubernetes: deployment, service, configmap, secret, ingress, probes, resource limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Kubernetes: deployment, service, configmap, secret, ingress, probes, resource limit",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "devops-004",
+              "title": "Thiết kế GitLab CI/CD: build, test, scan, docker push, deploy theo environment",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Pipeline mẫu có cache, artifact và manual production deploy",
+              "children": [
+                {
+                  "id": "devops-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thiết kế GitLab CI/CD: build, test, scan, docker push, deploy theo environment",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thiết kế GitLab CI/CD: build, test, scan, docker push, deploy theo environment",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thiết kế GitLab CI/CD: build, test, scan, docker push, deploy theo environment",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thiết kế GitLab CI/CD: build, test, scan, docker push, deploy theo environment",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "observability",
+          "title": "Logging, metrics & runbook",
+          "tasks": [
+            {
+              "id": "devops-005",
+              "title": "Thực hành Actuator/Micrometer/Prometheus: custom metric, health indicator, alert signal",
+              "level": "Trung cấp",
+              "estimateHours": 5,
+              "deliverable": "Metric latency/error cho ESB client và health check phụ thuộc ngoài",
+              "children": [
+                {
+                  "id": "devops-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thực hành Actuator/Micrometer/Prometheus: custom metric, health indicator, alert signal",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thực hành Actuator/Micrometer/Prometheus: custom metric, health indicator, alert signal",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thực hành Actuator/Micrometer/Prometheus: custom metric, health indicator, alert signal",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thực hành Actuator/Micrometer/Prometheus: custom metric, health indicator, alert signal",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "devops-006",
+              "title": "Ôn ELK logging: structured log, correlation ID, masking, search query",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Log format chuẩn và dashboard truy vết một giao dịch",
+              "children": [
+                {
+                  "id": "devops-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn ELK logging: structured log, correlation ID, masking, search query",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn ELK logging: structured log, correlation ID, masking, search query",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn ELK logging: structured log, correlation ID, masking, search query",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn ELK logging: structured log, correlation ID, masking, search query",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "devops-007",
+              "title": "Viết runbook vận hành: service down, Kafka lag, DB lock, timeout core banking",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Runbook incident response cho 4 loại sự cố production",
+              "children": [
+                {
+                  "id": "devops-007.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Viết runbook vận hành: service down, Kafka lag, DB lock, timeout core banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "devops-007.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Viết runbook vận hành: service down, Kafka lag, DB lock, timeout core banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "devops-007.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Viết runbook vận hành: service down, Kafka lag, DB lock, timeout core banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "devops-007.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Viết runbook vận hành: service down, Kafka lag, DB lock, timeout core banking",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frontend-fullstack",
+      "title": "Frontend & Full-Stack Delivery",
+      "level": "Cơ bản đến trung cấp",
+      "duration": "2 tuần",
+      "goal": "Giữ năng lực full-stack đủ tốt để làm admin portal, dashboard và phối hợp frontend hiệu quả.",
+      "skills": [
+        "ReactJS",
+        "JavaScript",
+        "HTML / CSS",
+        "Thymeleaf",
+        "JSP / Servlet",
+        "jQuery"
+      ],
+      "modules": [
+        {
+          "id": "react-ui",
+          "title": "React & admin UI",
+          "tasks": [
+            {
+              "id": "fe-001",
+              "title": "Ôn React component, state, effect, form handling và controlled input",
+              "level": "Cơ bản",
+              "estimateHours": 4,
+              "deliverable": "CRUD table có filter, pagination, loading và error state",
+              "children": [
+                {
+                  "id": "fe-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn React component, state, effect, form handling và controlled input",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "fe-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn React component, state, effect, form handling và controlled input",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "fe-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn React component, state, effect, form handling và controlled input",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "fe-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn React component, state, effect, form handling và controlled input",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "fe-002",
+              "title": "Thiết kế admin portal: layout, table density, modal, confirm action, empty state",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Wireframe hoặc component mẫu cho màn hình duyệt tài sản",
+              "children": [
+                {
+                  "id": "fe-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thiết kế admin portal: layout, table density, modal, confirm action, empty state",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "fe-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thiết kế admin portal: layout, table density, modal, confirm action, empty state",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "fe-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thiết kế admin portal: layout, table density, modal, confirm action, empty state",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "fe-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thiết kế admin portal: layout, table density, modal, confirm action, empty state",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "fe-003",
+              "title": "Ôn JavaScript async, fetch, error handling, debounce và client-side validation",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Form gọi API có debounce validate, retry nhẹ và message rõ",
+              "children": [
+                {
+                  "id": "fe-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn JavaScript async, fetch, error handling, debounce và client-side validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "fe-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn JavaScript async, fetch, error handling, debounce và client-side validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "fe-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn JavaScript async, fetch, error handling, debounce và client-side validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "fe-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn JavaScript async, fetch, error handling, debounce và client-side validation",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "legacy-ui",
+          "title": "Legacy UI stack",
+          "tasks": [
+            {
+              "id": "fe-004",
+              "title": "Ôn Thymeleaf/JSP: server-side rendering, form binding, layout fragment",
+              "level": "Cơ bản",
+              "estimateHours": 3,
+              "deliverable": "Trang danh sách + form tạo mới bằng template server-side",
+              "children": [
+                {
+                  "id": "fe-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn Thymeleaf/JSP: server-side rendering, form binding, layout fragment",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "fe-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn Thymeleaf/JSP: server-side rendering, form binding, layout fragment",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "fe-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn Thymeleaf/JSP: server-side rendering, form binding, layout fragment",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "fe-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn Thymeleaf/JSP: server-side rendering, form binding, layout fragment",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "fe-005",
+              "title": "Ôn jQuery trong hệ thống legacy: event delegation, AJAX, plugin lifecycle",
+              "level": "Cơ bản",
+              "estimateHours": 3,
+              "deliverable": "Checklist tránh memory leak và event binding trùng trong màn hình legacy",
+              "children": [
+                {
+                  "id": "fe-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn jQuery trong hệ thống legacy: event delegation, AJAX, plugin lifecycle",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "fe-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn jQuery trong hệ thống legacy: event delegation, AJAX, plugin lifecycle",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "fe-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn jQuery trong hệ thống legacy: event delegation, AJAX, plugin lifecycle",
+                  "level": "Cơ bản",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "fe-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn jQuery trong hệ thống legacy: event delegation, AJAX, plugin lifecycle",
+                  "level": "Cơ bản",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testing-leadership",
+      "title": "Testing, Design Review & Senior Engineering",
+      "level": "Trung cấp đến nâng cao",
+      "duration": "3 tuần",
+      "goal": "Nâng chất lượng engineering: test đủ sâu, review thiết kế, tài liệu hóa quyết định và mentor team.",
+      "skills": [
+        "JUnit 5",
+        "Mockito",
+        "API Contract",
+        "System Design",
+        "Code Review",
+        "Technical Documentation"
+      ],
+      "modules": [
+        {
+          "id": "testing",
+          "title": "Testing strategy",
+          "tasks": [
+            {
+              "id": "senior-001",
+              "title": "Ôn unit test với JUnit 5/Mockito: boundary, exception, interaction và parameterized test",
+              "level": "Trung cấp",
+              "estimateHours": 4,
+              "deliverable": "Test suite cho service chuyển tiền với success, timeout, duplicate, invalid OTP",
+              "children": [
+                {
+                  "id": "senior-001.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn unit test với JUnit 5/Mockito: boundary, exception, interaction và parameterized test",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "senior-001.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn unit test với JUnit 5/Mockito: boundary, exception, interaction và parameterized test",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "senior-001.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn unit test với JUnit 5/Mockito: boundary, exception, interaction và parameterized test",
+                  "level": "Trung cấp",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "senior-001.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn unit test với JUnit 5/Mockito: boundary, exception, interaction và parameterized test",
+                  "level": "Trung cấp",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "senior-002",
+              "title": "Thiết kế integration test: database, API contract, external stub và test data",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Kế hoạch test cho payment API có mock ESB/Napas",
+              "children": [
+                {
+                  "id": "senior-002.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Thiết kế integration test: database, API contract, external stub và test data",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "senior-002.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Thiết kế integration test: database, API contract, external stub và test data",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "senior-002.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Thiết kế integration test: database, API contract, external stub và test data",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "senior-002.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Thiết kế integration test: database, API contract, external stub và test data",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "senior-003",
+              "title": "Ôn performance test cơ bản: throughput, latency percentile, bottleneck và capacity note",
+              "level": "Nâng cao",
+              "estimateHours": 5,
+              "deliverable": "Báo cáo hiệu năng ngắn cho một API nghiệp vụ",
+              "children": [
+                {
+                  "id": "senior-003.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Ôn performance test cơ bản: throughput, latency percentile, bottleneck và capacity note",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "senior-003.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Ôn performance test cơ bản: throughput, latency percentile, bottleneck và capacity note",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "senior-003.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Ôn performance test cơ bản: throughput, latency percentile, bottleneck và capacity note",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "senior-003.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Ôn performance test cơ bản: throughput, latency percentile, bottleneck và capacity note",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "senior-practice",
+          "title": "Senior practice",
+          "tasks": [
+            {
+              "id": "senior-004",
+              "title": "Viết ADR cho lựa chọn kiến trúc: sync vs async, JPA vs JdbcTemplate, cache vs no cache",
+              "level": "Nâng cao",
+              "estimateHours": 4,
+              "deliverable": "3 ADR ngắn dựa trên dự án thực tế",
+              "children": [
+                {
+                  "id": "senior-004.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Viết ADR cho lựa chọn kiến trúc: sync vs async, JPA vs JdbcTemplate, cache vs no cache",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "senior-004.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Viết ADR cho lựa chọn kiến trúc: sync vs async, JPA vs JdbcTemplate, cache vs no cache",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "senior-004.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Viết ADR cho lựa chọn kiến trúc: sync vs async, JPA vs JdbcTemplate, cache vs no cache",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "senior-004.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Viết ADR cho lựa chọn kiến trúc: sync vs async, JPA vs JdbcTemplate, cache vs no cache",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "senior-005",
+              "title": "Luyện system design interview cho payment gateway, mobile banking và asset portal",
+              "level": "Nâng cao",
+              "estimateHours": 6,
+              "deliverable": "3 bản thiết kế có diagram, trade-off và failure mode",
+              "children": [
+                {
+                  "id": "senior-005.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Luyện system design interview cho payment gateway, mobile banking và asset portal",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "senior-005.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Luyện system design interview cho payment gateway, mobile banking và asset portal",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "senior-005.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Luyện system design interview cho payment gateway, mobile banking và asset portal",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "senior-005.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Luyện system design interview cho payment gateway, mobile banking và asset portal",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            },
+            {
+              "id": "senior-006",
+              "title": "Chuẩn hóa checklist code review: transaction, security, logging, error handling, test coverage",
+              "level": "Nâng cao",
+              "estimateHours": 3,
+              "deliverable": "Checklist review dùng được cho team backend",
+              "children": [
+                {
+                  "id": "senior-006.concept",
+                  "title": "Tách và nắm khái niệm cốt lõi trong chủ đề: Chuẩn hóa checklist code review: transaction, security, logging, error handling, test coverage",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Ghi lại định nghĩa ngắn gọn, mục đích sử dụng, ví dụ đúng và ví dụ sai; ưu tiên các khái niệm phỏng vấn hay hỏi."
+                },
+                {
+                  "id": "senior-006.interview",
+                  "title": "Chuẩn bị câu hỏi phỏng vấn thường gặp cho: Chuẩn hóa checklist code review: transaction, security, logging, error handling, test coverage",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Tự trả lời tối thiểu 5 câu hỏi: what, why, when to use, trade-off, lỗi production hoặc lỗi thiết kế liên quan."
+                },
+                {
+                  "id": "senior-006.edge-cases",
+                  "title": "Liệt kê edge case và lỗi dễ gặp khi áp dụng: Chuẩn hóa checklist code review: transaction, security, logging, error handling, test coverage",
+                  "level": "Nâng cao",
+                  "estimateHours": 1,
+                  "deliverable": "Danh sách lỗi, triệu chứng, nguyên nhân gốc, cách debug và cách phòng tránh trong code review."
+                },
+                {
+                  "id": "senior-006.practice",
+                  "title": "Thực hành nhỏ và viết note tổng kết cho: Chuẩn hóa checklist code review: transaction, security, logging, error handling, test coverage",
+                  "level": "Nâng cao",
+                  "estimateHours": 2,
+                  "deliverable": "Hoàn thành ví dụ code/diagram/checklist nhỏ, ghi lại điều đã hiểu chắc, điều còn mơ hồ và câu hỏi cần ôn lại."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
