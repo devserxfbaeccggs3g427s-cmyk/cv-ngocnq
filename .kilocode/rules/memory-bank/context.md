@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Hardened `/api/skill-roadmap/backup/github` with GitHub repo/branch preflight checks, more tolerant repo URL parsing, normalized backup paths, and contextual Vietnamese errors for token permission, branch, repo access, conflict, and validation failures
 - [x] Made `/skill-roadmap` progress Vercel-safe by persisting runtime completion state and notes in browser `localStorage` instead of writing to bundled JSON files in production
 - [x] Updated `/skill-roadmap` hierarchical todo progress so parent rows show an in-progress color when any descendant task is completed and are auto-marked complete when all descendant tasks are completed
 - [x] Extended local-dev roadmap progress sync to persist multi-task updates in one request, including auto-updated parent task states
@@ -100,6 +101,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - The roadmap now breaks broad topics into important interview-level fundamentals; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees
 - Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in browser `localStorage` under `skill-roadmap-progress:v1`, with `src/data/skill-roadmap-progress.json` kept as seed/local-dev JSON sync only
 - `/skill-roadmap` includes backup tools for roadmap progress: browser JSON export/import plus optional GitHub commit backup using the current browser progress payload. GitHub tokens are submitted per request and not persisted by the app.
+- GitHub backup now checks repository and branch access before writing the backup file, accepts common repo URL forms (`https://github.com/owner/repo`, copied GitHub URLs, SSH URL, and `owner/repo`), and returns actionable/contextual Vietnamese errors for common GitHub API failures.
 - `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab by reading the same browser progress storage, with sticky task metadata and completion status on desktop
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
@@ -161,6 +163,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Hardened GitHub roadmap backup diagnostics and repo URL/path normalization |
 | 2026-06-14 | Made roadmap progress Vercel-safe with browser localStorage persistence, local-dev JSON sync fallback, and client-side note preview storage |
 | 2026-06-14 | Added derived parent task state for hierarchical roadmap todos: partial descendant progress color and auto-complete parent chain |
 | 2026-06-14 | Hardened roadmap progress JSON import validation and improved backup format error messages |

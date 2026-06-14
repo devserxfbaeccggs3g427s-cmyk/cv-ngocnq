@@ -21,12 +21,47 @@ type GithubBackupRequest = {
   progress?: unknown;
 };
 
+type GithubErrorBody = {
+  message?: string;
+  documentation_url?: string;
+};
+
 function parseGithubRepo(repoUrl: string): { owner: string; repo: string } | null {
   const trimmed = repoUrl.trim();
-  const httpsMatch = trimmed.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
   const sshMatch = trimmed.match(/^git@github\.com:([^/]+)\/([^/]+?)(?:\.git)?$/);
+  const shorthandMatch = trimmed.match(/^([^/\s]+)\/([^/\s]+?)(?:\.git)?$/);
 
-  const match = httpsMatch ?? sshMatch;
+  if (sshMatch) {
+    return {
+      owner: sshMatch[1],
+      repo: sshMatch[2],
+    };
+  }
+
+  const urlValue = trimmed.startsWith('github.com/')
+    ? `https://${trimmed}`
+    : trimmed;
+
+  try {
+    const url = new URL(urlValue);
+
+    if (url.hostname === 'github.com') {
+      const [owner, repo] = url.pathname
+        .split('/')
+        .filter(Boolean);
+
+      if (owner && repo) {
+        return {
+          owner,
+          repo: repo.replace(/\.git$/, ''),
+        };
+      }
+    }
+  } catch {
+    // Fall through to owner/repo shorthand parsing.
+  }
+
+  const match = shorthandMatch;
 
   if (!match) {
     return null;
@@ -36,6 +71,13 @@ function parseGithubRepo(repoUrl: string): { owner: string; repo: string } | nul
     owner: match[1],
     repo: match[2],
   };
+}
+
+function normalizeGithubPath(filePath: string): string {
+  return filePath
+    .trim()
+    .replace(/^\/+/, '')
+    .replace(/\/{2,}/g, '/');
 }
 
 function encodeGithubPath(filePath: string): string {
@@ -53,6 +95,89 @@ async function readProgress() {
   } catch {
     return { updatedAt: null, items: {} };
   }
+}
+
+function buildGithubError(
+  response: Response,
+  body: GithubErrorBody,
+  fallback: string,
+  context?: string
+): string {
+  const githubMessage = body.message ? ` GitHub: ${body.message}.` : '';
+  const prefix = context ? `${context}: ` : '';
+
+  if (response.status === 401) {
+    return `${prefix}GitHub token không hợp lệ hoặc đã hết hạn.${githubMessage}`;
+  }
+
+  if (response.status === 403) {
+    return `${prefix}GitHub token không có đủ quyền hoặc bị chặn bởi policy/rate limit. Hãy dùng fine-grained token có quyền Contents: Read and Write cho đúng repository.${githubMessage}`;
+  }
+
+  if (response.status === 404) {
+    return `${prefix}GitHub trả về Not Found. Kiểm tra repo URL, branch và token có quyền vào private repo nếu repo private.${githubMessage}`;
+  }
+
+  if (response.status === 409) {
+    return `${prefix}GitHub báo conflict khi ghi file. Hãy thử lại sau khi refresh tiến độ hoặc đổi đường dẫn backup.${githubMessage}`;
+  }
+
+  if (response.status === 422) {
+    return `${prefix}GitHub từ chối dữ liệu commit. Kiểm tra branch tồn tại, file path hợp lệ và commit message không rỗng.${githubMessage}`;
+  }
+
+  return `${prefix}${fallback}.${githubMessage}`.trim();
+}
+
+async function fetchGithubJson<T>(
+  url: string,
+  {
+    token,
+    fallbackError,
+  }: {
+    token: string;
+    fallbackError: string;
+  }
+): Promise<{ response: Response; body: T | GithubErrorBody }> {
+  const response = await fetch(url, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  const body = (await response.json().catch(() => ({}))) as T | GithubErrorBody;
+
+  if (!response.ok) {
+    throw new Error(buildGithubError(response, body, fallbackError, fallbackError));
+  }
+
+  return { response, body };
+}
+
+async function assertRepositoryAndBranchAccess({
+  owner,
+  repo,
+  branch,
+  token,
+}: {
+  owner: string;
+  repo: string;
+  branch: string;
+  token: string;
+}) {
+  await fetchGithubJson(`https://api.github.com/repos/${owner}/${repo}`, {
+    token,
+    fallbackError: 'Không kiểm tra được repository GitHub',
+  });
+
+  await fetchGithubJson(
+    `https://api.github.com/repos/${owner}/${repo}/branches/${encodeURIComponent(branch)}`,
+    {
+      token,
+      fallbackError: 'Không kiểm tra được branch GitHub',
+    }
+  );
 }
 
 async function getExistingFileSha({
@@ -84,12 +209,8 @@ async function getExistingFileSha({
   }
 
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw new Error(
-      typeof body?.message === 'string'
-        ? body.message
-        : 'Cannot read existing GitHub file'
-    );
+    const body = (await response.json().catch(() => ({}))) as GithubErrorBody;
+    throw new Error(buildGithubError(response, body, 'Không đọc được file backup hiện có trên GitHub', 'Không đọc được file backup hiện có trên GitHub'));
   }
 
   const data = (await response.json()) as { sha?: string };
@@ -97,11 +218,18 @@ async function getExistingFileSha({
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as GithubBackupRequest;
+  let body: GithubBackupRequest;
+
+  try {
+    body = (await request.json()) as GithubBackupRequest;
+  } catch {
+    return NextResponse.json({ error: 'Request body không phải JSON hợp lệ' }, { status: 400 });
+  }
+
   const repo = body.repoUrl ? parseGithubRepo(body.repoUrl) : null;
   const token = body.token?.trim();
   const branch = body.branch?.trim() || 'main';
-  const backupPath = body.backupPath?.trim() || 'backups/skill-roadmap-progress.json';
+  const backupPath = normalizeGithubPath(body.backupPath || 'backups/skill-roadmap-progress.json');
   const commitMessage =
     body.commitMessage?.trim() || 'Backup skill roadmap progress';
 
@@ -111,7 +239,14 @@ export async function POST(request: Request) {
 
   if (!repo) {
     return NextResponse.json(
-      { error: 'GitHub repo URL must be https://github.com/owner/repo or git@github.com:owner/repo.git' },
+      { error: 'GitHub repo URL phải có dạng https://github.com/owner/repo, git@github.com:owner/repo.git hoặc owner/repo' },
+      { status: 400 }
+    );
+  }
+
+  if (!backupPath || backupPath.endsWith('/')) {
+    return NextResponse.json(
+      { error: 'File path phải là đường dẫn tới file, ví dụ backups/skill-roadmap-progress.json' },
       { status: 400 }
     );
   }
@@ -121,6 +256,13 @@ export async function POST(request: Request) {
   const encodedContent = Buffer.from(content, 'utf8').toString('base64');
 
   try {
+    await assertRepositoryAndBranchAccess({
+      owner: repo.owner,
+      repo: repo.repo,
+      branch,
+      token,
+    });
+
     const sha = await getExistingFileSha({
       owner: repo.owner,
       repo: repo.repo,
@@ -149,14 +291,11 @@ export async function POST(request: Request) {
     );
 
     if (!response.ok) {
-      const errorBody = await response.json().catch(() => ({}));
+      const errorBody = (await response.json().catch(() => ({}))) as GithubErrorBody;
 
       return NextResponse.json(
         {
-          error:
-            typeof errorBody?.message === 'string'
-              ? errorBody.message
-              : 'GitHub backup failed',
+          error: buildGithubError(response, errorBody, 'GitHub backup failed'),
         },
         { status: response.status }
       );
