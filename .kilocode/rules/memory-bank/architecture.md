@@ -11,13 +11,13 @@ src/
 │   ├── portfolio/
 │   │   ├── page.tsx        # Portfolio grid page
 │   │   └── [slug]/page.tsx # Project detail page
-│   ├── skill-roadmap/page.tsx # JSON-backed skill study roadmap
+│   ├── skill-roadmap/page.tsx # JSON-backed curriculum with browser-persisted progress
 │   ├── skill-roadmap/notes/[taskId]/page.tsx # Per-task Markdown note preview
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
-│       ├── skill-roadmap/progress/route.ts # JSON progress read/write for roadmap
-│       ├── skill-roadmap/backup/github/route.ts # Optional GitHub progress backup
+│       ├── skill-roadmap/progress/route.ts # Roadmap progress seed + local-dev JSON sync
+│       ├── skill-roadmap/backup/github/route.ts # Optional browser progress GitHub backup
 │       └── pdf/
 │           ├── route.ts       # PDF info endpoint
 │           ├── text/route.ts  # Plain text export
@@ -42,7 +42,10 @@ src/
 │   │   ├── ProjectFilters.tsx
 │   │   └── ProjectDetail.tsx
 │   ├── roadmap/            # Hierarchical study roadmap checklist components
-│   │   └── SkillRoadmapClient.tsx
+│   │   ├── SkillRoadmapClient.tsx
+│   │   └── SkillRoadmapNotePreview.tsx
+│   ├── markdown/           # Reusable Markdown rendering components
+│   │   └── MarkdownPreview.tsx
 │   ├── contact/            # Contact components
 │   │   ├── ContactForm.tsx
 │   │   ├── ContactSection.tsx
@@ -65,7 +68,7 @@ src/
 │   ├── education.ts        # Education, certifications, awards
 │   ├── projects.ts         # Portfolio projects
 │   ├── skill-roadmap.json  # Hierarchical study roadmap curriculum
-│   └── skill-roadmap-progress.json # Roadmap completion and notes by node id
+│   └── skill-roadmap-progress.json # Seed/local-dev roadmap progress by node id
 └── lib/
     ├── utils.ts            # Utility functions
     └── pdf.ts              # PDF generation helpers
@@ -155,6 +158,18 @@ theme: {
 ```
 
 **Why**: Easy to generate color variations, accessible, AI-friendly.
+
+### 6. Reusable Markdown Preview Pattern
+
+Roadmap task notes use a shared Markdown renderer in `src/components/markdown/MarkdownPreview.tsx`.
+The renderer covers common note formats without adding runtime dependencies:
+- headings, paragraphs, inline bold/italic/strike/code, links, and images
+- ordered, unordered, and task checklist lists
+- blockquotes and GitHub-style callouts
+- responsive Markdown tables
+- fenced code blocks with language labels, language auto-detection, line numbers, syntax token coloring, and SQL/database-oriented labels
+
+Global `.markdown-preview` styles in `src/app/globals.css` keep Markdown content readable in both light and dark themes.
 
 ## Component Communication
 

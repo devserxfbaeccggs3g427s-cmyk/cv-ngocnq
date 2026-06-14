@@ -120,11 +120,13 @@ bun typecheck      # Run TypeScript type checking
 - All content is static in data files
 - No database required for basic use
 - Can add database via recipe if needed
+- Vercel/serverless production runtimes must not be used as writable file storage; mutable roadmap progress is stored in browser `localStorage`, while JSON files are seed/local-dev sync only
 
 ### API Routes Available
 
 - Contact form handler
 - PDF/text/JSON export endpoints
+- Skill roadmap progress seed/local-dev JSON sync and optional GitHub backup endpoints
 - Can be extended for additional functionality
 
 ### Browser Support

@@ -77,10 +77,26 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type GithubBackupConfig = {
+  repoUrl: string;
+  branch: string;
+  backupPath: string;
+  commitMessage: string;
+  hasServerToken: boolean;
+};
+
+type TaskIndex = {
+  taskById: Map<string, RoadmapTask>;
+  ancestorIdsByTaskId: Map<string, string[]>;
+};
+
 const emptyProgress: ProgressFile = {
   updatedAt: null,
   items: {},
 };
+
+const progressStorageKey = 'skill-roadmap-progress:v1';
+const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 const levelStyles: Record<string, string> = {
   'Cơ bản': 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
@@ -108,6 +124,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [isBackingUpGithub, setIsBackingUpGithub] = useState(false);
+  const [hasServerGithubToken, setHasServerGithubToken] = useState(false);
   const [githubToken, setGithubToken] = useState('');
   const [githubRepoUrl, setGithubRepoUrl] = useState('');
   const [githubBranch, setGithubBranch] = useState('main');
@@ -132,6 +149,11 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const levels = useMemo(
     () => Array.from(new Set(allTasks.map((task) => task.level))),
     [allTasks]
+  );
+
+  const taskIndex = useMemo(
+    () => buildTaskIndex(roadmap.tracks),
+    [roadmap.tracks]
   );
 
   const completedCount = allTasks.filter(
@@ -171,6 +193,13 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     let ignore = false;
 
     async function loadProgress() {
+      const storedProgress = readStoredProgress();
+
+      if (storedProgress) {
+        setProgress(storedProgress);
+        return;
+      }
+
       try {
         const response = await fetch('/api/skill-roadmap/progress', {
           cache: 'no-store',
@@ -183,10 +212,11 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         const data = (await response.json()) as ProgressFile;
         if (!ignore) {
           setProgress(data);
+          storeProgress(data);
         }
       } catch {
         if (!ignore) {
-          setLoadError('Không tải được tiến độ từ file JSON. Các thay đổi có thể không được lưu.');
+          setLoadError('Không tải được tiến độ seed từ file JSON. Tiến độ mới vẫn được lưu trong trình duyệt này.');
         }
       }
     }
@@ -198,51 +228,85 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     };
   }, []);
 
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadGithubBackupConfig() {
+      try {
+        const response = await fetch('/api/skill-roadmap/backup/github', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const config = (await response.json()) as Partial<GithubBackupConfig>;
+
+        if (ignore) {
+          return;
+        }
+
+        if (typeof config.repoUrl === 'string' && config.repoUrl) {
+          setGithubRepoUrl(config.repoUrl);
+        }
+
+        if (typeof config.branch === 'string' && config.branch) {
+          setGithubBranch(config.branch);
+        }
+
+        if (typeof config.backupPath === 'string' && config.backupPath) {
+          setGithubBackupPath(config.backupPath);
+        }
+
+        if (typeof config.commitMessage === 'string' && config.commitMessage) {
+          setGithubCommitMessage(config.commitMessage);
+        }
+
+        setHasServerGithubToken(Boolean(config.hasServerToken));
+      } catch {
+        setHasServerGithubToken(false);
+      }
+    }
+
+    loadGithubBackupConfig();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   async function saveTask(taskId: string, nextItem: Partial<ProgressItem>) {
     setSavingTaskId(taskId);
 
     const previous = progress;
-    const current = previous.items[taskId] ?? {
-      completed: false,
-      note: '',
-      completedAt: null,
-      updatedAt: new Date().toISOString(),
-    };
-    const optimistic: ProgressFile = {
-      updatedAt: new Date().toISOString(),
-      items: {
-        ...previous.items,
-        [taskId]: {
-          ...current,
-          ...nextItem,
-          updatedAt: new Date().toISOString(),
-        },
-      },
-    };
+    const optimistic = applyTaskProgressUpdate(previous, taskId, nextItem, taskIndex);
 
     setProgress(optimistic);
+    storeProgress(optimistic);
 
     try {
-      const response = await fetch('/api/skill-roadmap/progress', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskId,
-          completed: optimistic.items[taskId].completed,
-          note: optimistic.items[taskId].note,
-        }),
-      });
+      if (shouldSyncProgressFile) {
+        const response = await fetch('/api/skill-roadmap/progress', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: optimistic.items,
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error('Save failed');
+        if (!response.ok) {
+          throw new Error('Save failed');
+        }
+
+        const saved = (await response.json()) as ProgressFile;
+        setProgress(saved);
+        storeProgress(saved);
       }
 
-      const saved = (await response.json()) as ProgressFile;
-      setProgress(saved);
       setLoadError(null);
     } catch {
-      setProgress(previous);
-      setLoadError('Không lưu được thay đổi vào file JSON. Vui lòng thử lại.');
+      setLoadError('Đã lưu vào trình duyệt, nhưng không sync được vào file JSON local.');
     } finally {
       setSavingTaskId(null);
     }
@@ -258,18 +322,24 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   }
 
   function updateNote(taskId: string, note: string) {
-    setProgress((current) => ({
-      ...current,
-      items: {
-        ...current.items,
-        [taskId]: {
-          completed: current.items[taskId]?.completed ?? true,
-          completedAt: current.items[taskId]?.completedAt ?? new Date().toISOString(),
-          updatedAt: current.items[taskId]?.updatedAt ?? new Date().toISOString(),
-          note,
+    setProgress((current) => {
+      const next: ProgressFile = {
+        ...current,
+        updatedAt: new Date().toISOString(),
+        items: {
+          ...current.items,
+          [taskId]: {
+            completed: current.items[taskId]?.completed ?? true,
+            completedAt: current.items[taskId]?.completedAt ?? new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            note,
+          },
         },
-      },
-    }));
+      };
+
+      storeProgress(next);
+      return next;
+    });
   }
 
   function toggleExpandedTask(taskId: string) {
@@ -326,16 +396,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setBackupMessage(null);
 
     try {
-      const response = await fetch('/api/skill-roadmap/progress', {
-        cache: 'no-store',
-      });
-
-      if (!response.ok) {
-        throw new Error('Không export được backup.');
-      }
-
-      const data = (await response.json()) as ProgressFile;
-      const blob = new Blob([`${JSON.stringify(data, null, 2)}\n`], {
+      const blob = new Blob([`${JSON.stringify(progress, null, 2)}\n`], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
@@ -367,25 +428,29 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
     try {
       const text = await file.text();
-      const data = JSON.parse(text) as ProgressFile;
-      const response = await fetch('/api/skill-roadmap/progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      const data = normalizeProgress(JSON.parse(text));
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(
-          typeof body?.error === 'string'
-            ? body.error
-            : 'File backup không đúng định dạng.'
-        );
+      if (!data) {
+        throw new Error('File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.');
       }
 
-      const imported = (await response.json()) as ProgressFile;
+      const imported = {
+        ...data,
+        updatedAt: new Date().toISOString(),
+      };
+
       setProgress(imported);
-      setBackupMessage('Đã import backup JSON vào tiến độ hiện tại.');
+      storeProgress(imported);
+
+      if (shouldSyncProgressFile) {
+        await fetch('/api/skill-roadmap/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(imported),
+        });
+      }
+
+      setBackupMessage('Đã import backup JSON vào tiến độ trong trình duyệt.');
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không import được file backup.'
@@ -412,6 +477,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           branch: githubBranch,
           backupPath: githubBackupPath,
           commitMessage: githubCommitMessage,
+          progress,
         }),
       });
 
@@ -558,7 +624,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                   type="password"
                   value={githubToken}
                   onChange={(event) => setGithubToken(event.target.value)}
-                  placeholder="Fine-grained token"
+                  placeholder={hasServerGithubToken ? 'Đang dùng token từ env nếu để trống' : 'Fine-grained token'}
                   className="mt-1 h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                 />
               </label>
@@ -612,7 +678,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                 <button
                   type="button"
                   onClick={backupProgressToGithub}
-                  disabled={isBackingUpGithub || !githubToken || !githubRepoUrl || !githubBranch || !githubBackupPath}
+                  disabled={isBackingUpGithub || (!githubToken && !hasServerGithubToken) || !githubRepoUrl || !githubBranch || !githubBackupPath}
                   className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:opacity-60 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
                 >
                   {isBackingUpGithub ? (
@@ -816,6 +882,82 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   );
 }
 
+function readStoredProgress(): ProgressFile | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(progressStorageKey);
+    return raw ? normalizeProgress(JSON.parse(raw)) : null;
+  } catch {
+    return null;
+  }
+}
+
+function storeProgress(progress: ProgressFile) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(progressStorageKey, JSON.stringify(progress));
+  } catch {
+    // localStorage can fail in private browsing or full quota. The in-memory UI still works.
+  }
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeProgressItem(input: unknown): ProgressItem | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  return {
+    completed: Boolean(input.completed),
+    note: typeof input.note === 'string' ? input.note : '',
+    completedAt: typeof input.completedAt === 'string' ? input.completedAt : null,
+    updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : new Date().toISOString(),
+  };
+}
+
+function normalizeProgress(input: unknown): ProgressFile | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const value = isRecord(input.progress) ? input.progress : input;
+  const rawItems = isRecord(value.items) ? value.items : value;
+
+  if (!isRecord(rawItems)) {
+    return null;
+  }
+
+  const items: Record<string, ProgressItem> = {};
+
+  for (const [taskId, item] of Object.entries(rawItems)) {
+    if (taskId === 'updatedAt') {
+      continue;
+    }
+
+    const progressItem = normalizeProgressItem(item);
+
+    if (!progressItem) {
+      return null;
+    }
+
+    items[taskId] = progressItem;
+  }
+
+  return {
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
+    items,
+  };
+}
+
 function TaskNode({
   task,
   depth,
@@ -849,10 +991,15 @@ function TaskNode({
   const completed = Boolean(item?.completed);
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
-  const childCount = flattenTasks(childTasks).length;
-  const completedChildren = flattenTasks(childTasks).filter(
+  const descendants = flattenTasks(childTasks);
+  const childCount = descendants.length;
+  const completedChildren = descendants.filter(
     (child) => progress.items[child.id]?.completed
   ).length;
+  const hasStartedChildren = completedChildren > 0;
+  const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
+  const effectivelyCompleted = completed || allChildrenCompleted;
+  const childProgressing = !effectivelyCompleted && hasStartedChildren;
   const isChild = depth > 0;
   const hasChildren = childTasks.length > 0;
   const isExpanded = expandedTaskIds.has(task.id);
@@ -867,7 +1014,8 @@ function TaskNode({
         className={cn(
           'grid gap-4 border-l-4 px-5 py-5 transition md:grid-cols-[auto_1fr] md:px-6',
           depthStyle,
-          completed && 'border-emerald-300 bg-emerald-50/70 dark:border-emerald-800 dark:bg-emerald-950/20'
+          childProgressing && 'border-amber-300 bg-amber-50/75 dark:border-amber-800 dark:bg-amber-950/20',
+          effectivelyCompleted && 'border-emerald-300 bg-emerald-50/70 dark:border-emerald-800 dark:bg-emerald-950/20'
         )}
         style={{ paddingLeft: `calc(1.25rem + ${depth * 1.5}rem)` }}
       >
@@ -878,11 +1026,11 @@ function TaskNode({
             'mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:hover:border-blue-700',
             isChild && 'h-8 w-8'
           )}
-          aria-label={completed ? 'Bỏ đánh dấu hoàn thành' : 'Đánh dấu hoàn thành'}
+          aria-label={effectivelyCompleted ? 'Bỏ đánh dấu hoàn thành' : 'Đánh dấu hoàn thành'}
         >
           {saving ? (
             <Loader2 className="h-5 w-5 animate-spin" />
-          ) : completed ? (
+          ) : effectivelyCompleted ? (
             <CheckCircle2 className="h-5 w-5 text-emerald-600" />
           ) : (
             <Circle className="h-5 w-5" />
@@ -912,7 +1060,15 @@ function TaskNode({
               {task.estimateHours}h
             </span>
             {childCount > 0 && (
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <span
+                className={cn(
+                  'rounded-full px-2 py-0.5 text-xs font-semibold',
+                  childProgressing
+                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300',
+                  effectivelyCompleted && 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200'
+                )}
+              >
                 {completedChildren}/{childCount} mục con
               </span>
             )}
@@ -994,7 +1150,7 @@ function TaskNode({
             )}
           </div>
 
-          {completed && (
+          {effectivelyCompleted && (
             <div className="mt-4 rounded-lg border border-emerald-100 bg-white p-3 dark:border-emerald-900/50 dark:bg-gray-950">
               <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
@@ -1130,6 +1286,92 @@ function flattenTasks(tasks: RoadmapTask[]): RoadmapTask[] {
     task,
     ...flattenTasks(task.children ?? []),
   ]);
+}
+
+function buildTaskIndex(tracks: RoadmapTrack[]): TaskIndex {
+  const taskById = new Map<string, RoadmapTask>();
+  const ancestorIdsByTaskId = new Map<string, string[]>();
+
+  function walk(tasks: RoadmapTask[], ancestorIds: string[]) {
+    for (const task of tasks) {
+      taskById.set(task.id, task);
+      ancestorIdsByTaskId.set(task.id, ancestorIds);
+      walk(task.children ?? [], [...ancestorIds, task.id]);
+    }
+  }
+
+  for (const track of tracks) {
+    for (const module of track.modules) {
+      walk(module.tasks, []);
+    }
+  }
+
+  return {
+    taskById,
+    ancestorIdsByTaskId,
+  };
+}
+
+function applyTaskProgressUpdate(
+  progress: ProgressFile,
+  taskId: string,
+  nextItem: Partial<ProgressItem>,
+  taskIndex: TaskIndex
+): ProgressFile {
+  const now = new Date().toISOString();
+  const items = {
+    ...progress.items,
+    [taskId]: mergeProgressItem(progress.items[taskId], nextItem, now),
+  };
+
+  const ancestorIds = taskIndex.ancestorIdsByTaskId.get(taskId) ?? [];
+
+  for (const ancestorId of [...ancestorIds].reverse()) {
+    const ancestor = taskIndex.taskById.get(ancestorId);
+
+    if (!ancestor) {
+      continue;
+    }
+
+    const descendants = flattenTasks(ancestor.children ?? []);
+    const allDescendantsCompleted = descendants.length > 0
+      && descendants.every((descendant) => items[descendant.id]?.completed);
+    const current = items[ancestorId];
+
+    if (allDescendantsCompleted) {
+      items[ancestorId] = mergeProgressItem(current, {
+        completed: true,
+        completedAt: current?.completedAt ?? now,
+      }, now);
+      continue;
+    }
+
+    if (current?.completed) {
+      items[ancestorId] = mergeProgressItem(current, {
+        completed: false,
+        completedAt: null,
+      }, now);
+    }
+  }
+
+  return {
+    updatedAt: now,
+    items,
+  };
+}
+
+function mergeProgressItem(
+  current: ProgressItem | undefined,
+  nextItem: Partial<ProgressItem>,
+  now: string
+): ProgressItem {
+  return {
+    completed: current?.completed ?? false,
+    note: current?.note ?? '',
+    completedAt: current?.completedAt ?? null,
+    ...nextItem,
+    updatedAt: now,
+  };
 }
 
 function filterTaskTree(

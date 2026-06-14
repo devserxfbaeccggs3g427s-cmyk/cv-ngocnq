@@ -8,12 +8,25 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Rebuilt `/skill-roadmap/notes/[taskId]` Markdown preview with a reusable professional renderer supporting headings, inline formatting, links, images, tables, ordered/unordered/task lists, blockquotes/callouts, horizontal rules, and language-labeled fenced code blocks including SQL/database formats
+- [x] Added light/dark Markdown preview styling in `src/app/globals.css` for readable typography, responsive tables, IDE-like syntax-highlighted code blocks with line numbers, language auto-detection, database code emphasis, checklist controls, and callout variants
+- [x] Split Markdown preview colors into dedicated light/dark CSS variables so headings, body text, links, inline code, lists, tables, callouts, images, code text, line numbers, and token colors keep readable contrast in both themes
+- [x] Added `prefers-color-scheme: dark` support for global and Markdown CSS variables so Markdown content and code blocks follow both class-based and system/browser dark mode
+- [x] Added rendered-theme detection in `MarkdownPreview` so Markdown/code palettes follow the actual visible page background, including class-based, data-theme, system dark mode, and computed body background cases
+- [x] Added env-driven defaults for `/skill-roadmap` GitHub backup form, including server-side token fallback via `GITHUB_BACKUP_TOKEN` without exposing the token to browser JavaScript
+- [x] Fixed TypeScript build error in `/api/skill-roadmap/backup/github` by normalizing unknown GitHub error responses before building contextual error messages
+- [x] Hardened `/api/skill-roadmap/backup/github` with GitHub repo/branch preflight checks, more tolerant repo URL parsing, normalized backup paths, and contextual Vietnamese errors for token permission, branch, repo access, conflict, and validation failures
+- [x] Made `/skill-roadmap` progress Vercel-safe by persisting runtime completion state and notes in browser `localStorage` instead of writing to bundled JSON files in production
+- [x] Updated `/skill-roadmap` hierarchical todo progress so parent rows show an in-progress color when any descendant task is completed and are auto-marked complete when all descendant tasks are completed
+- [x] Extended local-dev roadmap progress sync to persist multi-task updates in one request, including auto-updated parent task states
+- [x] Updated `/skill-roadmap/notes/[taskId]` to read notes from browser progress storage so Markdown preview reflects Vercel/runtime edits
+- [x] Kept `src/data/skill-roadmap-progress.json` as seed/local-dev sync fallback and made production API write attempts return a clear unsupported-runtime error
 - [x] Hardened `/api/skill-roadmap/progress` import handling so roadmap progress backups return clearer JSON format errors and accept compatible backup shapes
 - [x] Added `/skill-roadmap` professional study roadmap page for Nguyễn Quang Ngọc's full Backend / Full-Stack skill set
 - [x] Added manual roadmap progress backup controls: Export JSON, Import JSON, and optional GitHub commit backup
 - [x] Added per-task Markdown note preview opened from each completed task note via `/skill-roadmap/notes/[taskId]`
 - [x] Made the task info sidebar sticky on desktop in per-task Markdown note preview
-- [x] Added `/api/skill-roadmap/backup/github` route to commit `skill-roadmap-progress.json` to a configured GitHub repository using a one-time token
+- [x] Added `/api/skill-roadmap/backup/github` route to commit roadmap progress backups to a configured GitHub repository using a one-time token
 - [x] Added per-node AI learning prompts to `/skill-roadmap`, with preview, show/hide, and copy-to-clipboard controls
 - [x] Fixed TypeScript build error in `/skill-roadmap` task tree filtering by removing nullable map results
 - [x] Adjusted roadmap AI prompts to emphasize theory, internal mechanisms, why/how explanations, trade-offs, and deep interview questions
@@ -21,8 +34,8 @@ The template is fully implemented with all core sections working. It's ready for
 - [x] Added expand/collapse controls for roadmap todo nodes with child tasks, including open-all and collapse-all actions
 - [x] Expanded skill roadmap into a parent-child todo hierarchy where parent tasks, child tasks, and deeper child nodes all support completion state and notes
 - [x] Added JSON-backed roadmap data with 9 tracks, 18 modules, 298 todo nodes, estimated hours, levels, deliverables, and skill tags
-- [x] Added JSON progress storage for roadmap completion state and post-completion notes
-- [x] Added `/api/skill-roadmap/progress` route to read/write roadmap progress into `src/data/skill-roadmap-progress.json`
+- [x] Added roadmap progress storage for completion state and post-completion notes
+- [x] Added `/api/skill-roadmap/progress` route for seed reads and local-dev JSON sync into `src/data/skill-roadmap-progress.json`
 - [x] Added navigation entry for the new study roadmap page in header, side nav, and site config
 - [x] Added direct edit mode on `/print` so users can adjust visible CV text before saving the browser PDF
 - [x] Added local draft persistence for edited print CV content with reset support
@@ -75,6 +88,7 @@ The template is fully implemented with all core sections working. It's ready for
 | Portfolio Grid | `src/components/portfolio/ProjectGrid.tsx` | ✅ Complete |
 | Contact Form | `src/components/contact/ContactForm.tsx` | ✅ Complete |
 | Skill Roadmap | `src/components/roadmap/SkillRoadmapClient.tsx` | ✅ Complete |
+| Markdown Preview | `src/components/markdown/MarkdownPreview.tsx` | ✅ Complete |
 | Header | `src/components/layout/Header.tsx` | ✅ Complete |
 | Footer | `src/components/layout/Footer.tsx` | ✅ Complete |
 | Side Nav | `src/components/layout/SideNav.tsx` | ✅ Complete |
@@ -90,11 +104,15 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - `/skill-roadmap` provides a professional 24-week hierarchical study todo list covering Java/JVM, Spring backend, microservices/event-driven architecture, banking/payment domain, database/cache/storage, security, DevOps/observability, frontend/full-stack delivery, and senior engineering/testing
 - Each roadmap node includes a concise generated AI learning prompt with two-line preview, show/hide control, and copy-to-clipboard action; prompts emphasize theory, internal mechanisms, why/how explanations, trade-offs, and deep interview questions
 - Roadmap task rows use subtle depth-based background colors and left borders; completed rows keep a stronger green completion signal
+- Roadmap parent task rows now show an amber in-progress state as soon as at least one descendant task is completed; once all descendants are completed, the corresponding parent chain is auto-marked completed and persisted
 - Roadmap nodes with child tasks can be expanded/collapsed individually; the filter toolbar also has "Mở tất cả" and "Thu gọn tất cả" controls
 - The roadmap now breaks broad topics into important interview-level fundamentals; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees
-- Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in `src/data/skill-roadmap-progress.json` through `/api/skill-roadmap/progress`
-- `/skill-roadmap` includes backup tools for roadmap progress: browser JSON export/import plus optional GitHub commit backup. GitHub tokens are submitted per request and not persisted by the app.
-- `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab, with sticky task metadata and completion status on desktop
+- Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in browser `localStorage` under `skill-roadmap-progress:v1`, with `src/data/skill-roadmap-progress.json` kept as seed/local-dev JSON sync only
+- `/skill-roadmap` includes backup tools for roadmap progress: browser JSON export/import plus optional GitHub commit backup using the current browser progress payload. GitHub tokens are submitted per request and not persisted by the app.
+- GitHub backup form defaults can be configured with `GITHUB_BACKUP_REPO_URL`, `GITHUB_BACKUP_BRANCH`, `GITHUB_BACKUP_PATH`, `GITHUB_BACKUP_COMMIT_MESSAGE`, and `GITHUB_BACKUP_TOKEN`; the token is consumed server-side and never returned by the config API.
+- GitHub backup now checks repository and branch access before writing the backup file, accepts common repo URL forms (`https://github.com/owner/repo`, copied GitHub URLs, SSH URL, and `owner/repo`), and returns actionable/contextual Vietnamese errors for common GitHub API failures.
+- `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab by reading the same browser progress storage, with sticky task metadata and completion status on desktop
+- Markdown note preview now uses reusable `src/components/markdown/MarkdownPreview.tsx` and supports richer professional Markdown formatting for headings, body text, tables, syntax-highlighted source code with auto-detected languages, SQL/database snippets, checklists, links, images, callouts, and dedicated light/dark readability palettes that follow the actual rendered page theme
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
@@ -155,6 +173,12 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-14 | Upgraded per-task Markdown note preview with a reusable professional renderer, language auto-detection, IDE-like syntax-highlighted code, and light/dark styles for tables, database snippets, lists, links, images, and callouts |
+| 2026-06-14 | Fixed GitHub roadmap backup API typecheck failure by normalizing unknown GitHub error bodies before passing them to `buildGithubError` |
+| 2026-06-14 | Added env-driven default GitHub backup settings and server-side token fallback |
+| 2026-06-14 | Hardened GitHub roadmap backup diagnostics and repo URL/path normalization |
+| 2026-06-14 | Made roadmap progress Vercel-safe with browser localStorage persistence, local-dev JSON sync fallback, and client-side note preview storage |
+| 2026-06-14 | Added derived parent task state for hierarchical roadmap todos: partial descendant progress color and auto-complete parent chain |
 | 2026-06-14 | Hardened roadmap progress JSON import validation and improved backup format error messages |
 | 2026-06-14 | Added per-task Markdown note preview opened from each completed roadmap task |
 | 2026-06-14 | Fixed nullable `filterTaskTree` return typing in `/skill-roadmap` build |

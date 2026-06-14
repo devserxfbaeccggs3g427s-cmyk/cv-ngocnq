@@ -23,6 +23,7 @@ const progressFilePath = path.join(
   'data',
   'skill-roadmap-progress.json'
 );
+const canWriteProgressFile = process.env.NODE_ENV !== 'production' && !process.env.VERCEL;
 
 async function readProgress(): Promise<ProgressFile> {
   try {
@@ -94,6 +95,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!canWriteProgressFile) {
+    return NextResponse.json(
+      { error: 'Runtime production không hỗ trợ ghi vào file JSON. Hãy dùng localStorage/export/import hoặc database thật.' },
+      { status: 501 }
+    );
+  }
+
   let body: unknown;
 
   try {
@@ -125,19 +133,47 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  if (!canWriteProgressFile) {
+    return NextResponse.json(
+      { error: 'Runtime production không hỗ trợ ghi vào file JSON. Hãy dùng localStorage/export/import hoặc database thật.' },
+      { status: 501 }
+    );
+  }
+
   const body = (await request.json()) as {
     taskId?: string;
     completed?: boolean;
     note?: string;
+    items?: Record<string, unknown>;
   };
 
-  if (!body.taskId) {
+  if (!body.taskId && !body.items) {
     return NextResponse.json({ error: 'taskId is required' }, { status: 400 });
   }
 
   const now = new Date().toISOString();
   const progress = await readProgress();
-  const current = progress.items[body.taskId] ?? {
+
+  if (body.items) {
+    const normalized = normalizeProgress({ items: body.items });
+
+    if (!normalized) {
+      return NextResponse.json(
+        { error: 'items không đúng định dạng progress.' },
+        { status: 400 }
+      );
+    }
+
+    progress.items = normalized.items;
+    progress.updatedAt = now;
+
+    await writeProgress(progress);
+
+    return NextResponse.json(progress);
+  }
+
+  const taskId = body.taskId as string;
+  const current = progress.items[taskId] ?? {
     completed: false,
     note: '',
     completedAt: null,
@@ -146,7 +182,7 @@ export async function PUT(request: Request) {
 
   const completed = body.completed ?? current.completed;
 
-  progress.items[body.taskId] = {
+  progress.items[taskId] = {
     completed,
     note: body.note ?? current.note,
     completedAt: completed ? current.completedAt ?? now : null,
