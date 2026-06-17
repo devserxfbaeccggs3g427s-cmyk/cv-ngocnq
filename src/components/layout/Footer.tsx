@@ -17,7 +17,7 @@ const footerLinks = [
 ];
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
+  const version = '20260617.1';
 
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
@@ -81,7 +81,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-gray-500 dark:text-gray-500 text-sm">
-              © {currentYear} {profile.name}. Mọi quyền được bảo lưu.
+              © {version} {profile.name}. Mọi quyền được bảo lưu.
             </p>
             <p className="text-gray-500 dark:text-gray-500 text-sm flex items-center gap-1">
               Xây dựng với <Heart className="w-4 h-4 text-red-500" /> Next.js
