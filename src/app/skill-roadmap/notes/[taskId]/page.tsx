@@ -72,15 +72,15 @@ export default async function TaskNotePreviewPage({
 
   return (
     <Container size="lg" className="py-10 md:py-12">
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
+      <div className="mb-6 flex min-w-0 flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="min-w-0">
           <p className="text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
             Task Note Markdown Preview
           </p>
-          <h1 className="mt-1 text-3xl font-bold text-gray-950 dark:text-white">
+          <h1 className="mt-1 text-2xl font-bold text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-3xl">
             {task?.title ?? decodedTaskId}
           </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-sm text-gray-600 [overflow-wrap:anywhere] dark:text-gray-300">
             Preview note riêng của task `{decodedTaskId}`.
           </p>
         </div>

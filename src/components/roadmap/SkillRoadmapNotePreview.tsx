@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ListTree, X } from 'lucide-react';
 import { extractMarkdownHeadings, MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import type { MarkdownHeading } from '@/components/markdown/MarkdownPreview';
+import { cn } from '@/lib/utils';
 
 type ProgressItem = {
   completed: boolean;
@@ -29,6 +30,7 @@ type TaskContext = {
 };
 
 const progressStorageKey = 'skill-roadmap-progress:v1';
+const activeHeadingOffset = 120;
 
 export function SkillRoadmapNotePreview({
   taskId,
@@ -39,6 +41,7 @@ export function SkillRoadmapNotePreview({
 }) {
   const [item, setItem] = useState<ProgressItem | null>(null);
   const [appendixOpen, setAppendixOpen] = useState(false);
+  const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -51,11 +54,61 @@ export function SkillRoadmapNotePreview({
   }, [taskId]);
 
   const note = item?.note?.trim() ?? '';
-  const headings = extractMarkdownHeadings(note);
+  const headings = useMemo(() => extractMarkdownHeadings(note), [note]);
+  const headingIds = useMemo(() => headings.map((heading) => heading.id).join('|'), [headings]);
+
+  useEffect(() => {
+    if (!headings.length) {
+      window.queueMicrotask(() => setActiveHeadingId(null));
+      return;
+    }
+
+    let frameId = 0;
+
+    const updateActiveHeading = () => {
+      frameId = 0;
+
+      const headingElements = headings
+        .map((heading) => document.getElementById(heading.id))
+        .filter((element): element is HTMLElement => Boolean(element));
+
+      if (!headingElements.length) {
+        setActiveHeadingId(null);
+        return;
+      }
+
+      const current =
+        headingElements.findLast((element) => element.getBoundingClientRect().top <= activeHeadingOffset) ??
+        headingElements[0];
+
+      setActiveHeadingId(current.id);
+    };
+
+    const requestUpdate = () => {
+      if (frameId) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(updateActiveHeading);
+    };
+
+    requestUpdate();
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener('scroll', requestUpdate);
+      window.removeEventListener('resize', requestUpdate);
+    };
+  }, [headingIds, headings]);
 
   return (
-    <div className="grid gap-4 pb-20 lg:grid-cols-[320px_1fr] lg:pb-0">
-      <aside className="rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm dark:border-gray-800 dark:bg-gray-950 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-hidden">
+    <div className="grid min-w-0 max-w-full gap-4 pb-20 lg:grid-cols-[320px_minmax(0,1fr)] lg:pb-0">
+      <aside className="min-w-0 rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm dark:border-gray-800 dark:bg-gray-950 lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:self-start">
         <h2 className="font-bold text-gray-950 dark:text-white">Thông tin task</h2>
         <dl className="mt-3 grid gap-3 text-gray-600 dark:text-gray-300 sm:grid-cols-2 lg:block lg:space-y-3">
           <div>
@@ -81,23 +134,27 @@ export function SkillRoadmapNotePreview({
         </dl>
 
         {headings.length > 0 && (
-          <nav className="mt-5 hidden min-h-0 border-t border-gray-200 pt-4 dark:border-gray-800 lg:block" aria-label="Phụ lục">
+          <nav className="mt-5 hidden min-h-0 border-t border-gray-200 pt-4 dark:border-gray-800 lg:flex lg:flex-1 lg:flex-col" aria-label="Phụ lục">
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Phụ lục</h3>
               <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500 dark:bg-gray-900 dark:text-gray-400">
                 {headings.length} mục
               </span>
             </div>
-            <AppendixLinks headings={headings} className="mt-3 max-h-[calc(100vh-24rem)] overflow-y-auto overscroll-contain pr-1" />
+            <AppendixLinks
+              headings={headings}
+              activeHeadingId={activeHeadingId}
+              className="mt-3 min-h-0 overflow-y-auto overscroll-contain pr-1"
+            />
           </nav>
         )}
       </aside>
 
-      <article className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
-        <div className="border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:text-gray-200">
+      <article className="min-w-0 max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+        <div className="min-w-0 overflow-hidden text-ellipsis border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:text-gray-200">
           {taskId}.md
         </div>
-        <div className="p-5">
+        <div className="min-w-0 max-w-full overflow-hidden p-4 sm:p-5">
           <MarkdownPreview content={note} />
         </div>
       </article>
@@ -143,6 +200,7 @@ export function SkillRoadmapNotePreview({
                 </div>
                 <AppendixLinks
                   headings={headings}
+                  activeHeadingId={activeHeadingId}
                   className="max-h-[calc(76vh-4.5rem)] overflow-y-auto overscroll-contain p-4"
                   onNavigate={() => setAppendixOpen(false)}
                 />
@@ -157,10 +215,12 @@ export function SkillRoadmapNotePreview({
 
 function AppendixLinks({
   headings,
+  activeHeadingId,
   className,
   onNavigate,
 }: {
   headings: MarkdownHeading[];
+  activeHeadingId?: string | null;
   className?: string;
   onNavigate?: () => void;
 }) {
@@ -171,7 +231,12 @@ function AppendixLinks({
           <a
             href={`#${heading.id}`}
             onClick={onNavigate}
-            className="block rounded-md px-2 py-1.5 text-sm font-medium leading-snug text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+            aria-current={activeHeadingId === heading.id ? 'location' : undefined}
+            className={cn(
+              'block rounded-md border-l-2 border-transparent px-2 py-1.5 text-sm font-medium leading-snug text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white',
+              activeHeadingId === heading.id &&
+                'border-blue-500 bg-blue-50 text-blue-700 shadow-sm dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200'
+            )}
           >
             {heading.text}
           </a>
