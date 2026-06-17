@@ -1301,8 +1301,8 @@ function buildTaskIndex(tracks: RoadmapTrack[]): TaskIndex {
   }
 
   for (const track of tracks) {
-    for (const module of track.modules) {
-      walk(module.tasks, []);
+    for (const roadmapModule of track.modules) {
+      walk(roadmapModule.tasks, []);
     }
   }
 
