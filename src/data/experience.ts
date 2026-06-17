@@ -134,10 +134,10 @@ export const experience: Experience[] = [
     achievements: [
       'Phát triển GOV Payment Service cho luồng tạo giao dịch, sinh VietQR/Napas QR, truy vấn trạng thái, biên lai, vấn tin tài khoản, hoàn tiền, chi hộ và đối soát',
       'Thiết kế service/use-case layer, transfer strategy và retry failed Kafka messages; tích hợp ESB, Core Banking Oracle, Napas, Ebank và Signature Service',
-      'Phát triển SHB SAHA Mobile Banking Campuchia với 3 microservices: Identity, Account, Fund Transfer; xử lý JWT, Redis session, OTP/SMS, beneficiary và fund transfer',
-      'Tích hợp Oracle Stored Procedures/REF CURSOR, TCP Core Banking và xử lý nghiệp vụ USD/KHR, i18n EN/VI/KM cho thị trường Cambodia',
-      'Xây dựng SHB Debit Collection Portal với Gateway, Keycloak, Maker-Checker workflow, asset/search APIs, MinIO file service, Excel import/export và report module',
-      'Triển khai Redis cache/rate limit, Resilience4j, Actuator/Prometheus metrics, Docker/Kubernetes/GitLab CI và logging theo request ID',
+      'Phát triển SHB SAHA Mobile Banking Campuchia với 3 microservices: Identity, Account, Fund Transfer; xử lý JWT, Redis session, OTP/SMS, người thụ hưởng và chuyển tiền',
+      'Tích hợp Oracle Stored Procedures/REF CURSOR, TCP Core Banking và xử lý nghiệp vụ USD/KHR, đa ngôn ngữ EN/VI/KM cho thị trường Cambodia',
+      'Xây dựng SHB Debit Collection Portal với Gateway, Keycloak, quy trình Maker-Checker, API tài sản/tìm kiếm, dịch vụ tệp MinIO, nhập/xuất Excel và phân hệ báo cáo',
+      'Triển khai Redis cache/rate limit, Resilience4j, chỉ số Actuator/Prometheus, Docker/Kubernetes/GitLab CI và ghi log theo request ID',
     ],
     technologies: [
       'Java 17',
