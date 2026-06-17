@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Rà soát và chuẩn hóa ngôn ngữ CV/portfolio/print/PDF: giữ các keyword kỹ thuật và chức danh như Backend, Full Stack, Gateway, Microservices, JWT, Kafka, ECDH Encryption, Signature Service; Việt hóa các cụm mô tả thường gây lẫn Anh-Việt như Implement, check status, receipt, file service/report module, SQL performance, Export Excel, real-time integration, deployment assets
 - [x] Rebuilt `/skill-roadmap/notes/[taskId]` Markdown preview with a reusable professional renderer supporting headings, inline formatting, links, images, tables, ordered/unordered/task lists, blockquotes/callouts, horizontal rules, and language-labeled fenced code blocks including SQL/database formats
 - [x] Added light/dark Markdown preview styling in `src/app/globals.css` for readable typography, responsive tables, IDE-like syntax-highlighted code blocks with line numbers, language auto-detection, database code emphasis, checklist controls, and callout variants
 - [x] Split Markdown preview colors into dedicated light/dark CSS variables so headings, body text, links, inline code, lists, tables, callouts, images, code text, line numbers, and token colors keep readable contrast in both themes
@@ -116,6 +117,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
+- CV content now intentionally keeps technical recruiting keywords in English while using Vietnamese for surrounding descriptions, so the tone is less mixed without losing ATS/recruiter keywords
 - Print/PDF typography uses Times New Roman with 24px candidate name, 16px section headings, and 13px body content
 - Displayed month/year ranges use MM-YYYY format, with current items ending in `Hiện tại` or `Nay`
 - Print/PDF CV is intentionally concise; full project portfolio remains available on `/portfolio`
@@ -173,6 +175,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-17 | Rà soát lại ngôn ngữ CV/PDF và portfolio project text, Việt hóa cụm mô tả thường trong `src/data` và `cv-base.md` trong khi giữ keyword kỹ thuật/chức danh |
 | 2026-06-14 | Upgraded per-task Markdown note preview with a reusable professional renderer, language auto-detection, IDE-like syntax-highlighted code, and light/dark styles for tables, database snippets, lists, links, images, and callouts |
 | 2026-06-14 | Fixed GitHub roadmap backup API typecheck failure by normalizing unknown GitHub error bodies before passing them to `buildGithubError` |
 | 2026-06-14 | Added env-driven default GitHub backup settings and server-side token fallback |

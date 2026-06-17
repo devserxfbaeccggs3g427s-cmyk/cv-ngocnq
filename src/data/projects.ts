@@ -153,7 +153,7 @@ export const projects: Project[] = [
     title: 'GOV Payment Service – Cổng thanh toán Dịch vụ công',
     description:
       'Cổng thanh toán trung gian giữa Cổng Dịch vụ công Quốc gia và SHB, xử lý tạo giao dịch, QR, truy vấn, hoàn tiền, chi hộ và đối soát.',
-    longDescription: `GOV Payment Service là dịch vụ backend trung gian phục vụ thanh toán dịch vụ công giữa hệ thống TTTT/Cổng Dịch vụ công Quốc gia và ngân hàng SHB. Hệ thống tiếp nhận yêu cầu thanh toán, tạo giao dịch, sinh tài khoản alias, sinh VietQR/Napas QR, truy vấn trạng thái, tra cứu biên lai, vấn tin tài khoản, hoàn tiền, chi hộ, đối soát và xử lý lại các Kafka message lỗi. Kiến trúc được tái cấu trúc theo facade + use-case services, tách chiến lược chuyển tiền cho SHB nội bộ, Napas và Citad/Kho bạc, đồng thời áp dụng AOP logging, MDC request tracing, typed configuration và cơ chế tích hợp phòng thủ cho ESB/Core Banking.`,
+    longDescription: `GOV Payment Service là dịch vụ backend trung gian phục vụ thanh toán dịch vụ công giữa hệ thống TTTT/Cổng Dịch vụ công Quốc gia và ngân hàng SHB. Hệ thống tiếp nhận yêu cầu thanh toán, tạo giao dịch, sinh tài khoản alias, sinh VietQR/Napas QR, truy vấn trạng thái, tra cứu biên lai, vấn tin tài khoản, hoàn tiền, chi hộ, đối soát và xử lý lại thông điệp Kafka lỗi. Kiến trúc được tái cấu trúc theo facade và các use-case service, tách chiến lược chuyển tiền cho SHB nội bộ, Napas và Citad/Kho bạc, đồng thời áp dụng AOP logging, MDC request tracing, typed configuration và cơ chế tích hợp phòng thủ cho ESB/Core Banking.`,
     thumbnail: '/projects/gov-payment-thumb.jpg',
     images: [],
     technologies: [
@@ -179,11 +179,11 @@ export const projects: Project[] = [
     duration: '05-2026 – Nay',
     featured: true,
     highlights: [
-      'Implement các API thanh toán theo spec TTTT: tạo giao dịch/QR, check status, receipt, bank inquiry, refund, disbursement và reconciliation',
-      'Thiết kế idempotency bằng request ID, duplicate bill prevention, alias account generation bằng Oracle sequence và unique constraint',
-      'Tích hợp ESB/Core Banking/Napas/Ebank/Signature Service, xử lý JWT token cache, service signature và request/response signing',
-      'Áp dụng Strategy + Template Method cho transfer channel: SHB nội bộ, Napas và Citad/Kho bạc; hỗ trợ reversal khi lỗi tích hợp',
-      'Xây dựng cơ chế xử lý lại Kafka message lỗi, AOP API logging, MDC correlation ID, masking dữ liệu nhạy cảm và Actuator health endpoints',
+      'Triển khai các API thanh toán theo đặc tả TTTT: tạo giao dịch/QR, kiểm tra trạng thái, tra cứu biên lai, vấn tin ngân hàng, hoàn tiền, chi hộ và đối soát',
+      'Thiết kế cơ chế idempotency bằng request ID, chống trùng hóa đơn, sinh tài khoản alias bằng Oracle sequence và ràng buộc duy nhất',
+      'Tích hợp ESB/Core Banking/Napas/Ebank/Signature Service, xử lý JWT token cache, chữ ký dịch vụ và ký request/response',
+      'Áp dụng Strategy + Template Method cho kênh chuyển tiền: SHB nội bộ, Napas và Citad/Kho bạc; hỗ trợ đảo giao dịch khi lỗi tích hợp',
+      'Xây dựng cơ chế xử lý lại thông điệp Kafka lỗi, ghi log API bằng AOP, MDC correlation ID, che dữ liệu nhạy cảm và API kiểm tra sức khỏe Actuator',
     ],
   },
 
@@ -196,7 +196,7 @@ export const projects: Project[] = [
     title: 'SHB SAHA Mobile Banking – Campuchia',
     description:
       'Nền tảng Mobile Banking cho thị trường Campuchia với 3 microservices Spring Boot: Identity, Account và Fund Transfer.',
-    longDescription: `SHB SAHA Mobile Banking Campuchia là hệ thống backend mobile banking phục vụ thị trường Campuchia. Hệ thống gồm Identity Service, Account Service và Fund Transfer Service, xử lý đăng nhập, quản lý thiết bị, OTP/SMS, session Redis, tài khoản CASA, người thụ hưởng, lịch sử giao dịch, tỷ giá và chuyển tiền. Backend tích hợp Oracle Core Banking/EBANK qua stored procedures, REF CURSOR mapping, TCP Core Banking và HTTP client liên service. Hệ thống hỗ trợ đa ngôn ngữ tiếng Anh/Khmer/Việt và nghiệp vụ tiền tệ USD/KHR.`,
+    longDescription: `SHB SAHA Mobile Banking Campuchia là hệ thống backend mobile banking phục vụ thị trường Campuchia. Hệ thống gồm Identity Service, Account Service và Fund Transfer Service, xử lý đăng nhập, quản lý thiết bị, OTP/SMS, session Redis, tài khoản CASA, người thụ hưởng, lịch sử giao dịch, tỷ giá và chuyển tiền. Backend tích hợp Oracle Core Banking/EBANK qua stored procedures, ánh xạ REF CURSOR, TCP Core Banking và HTTP client liên service. Hệ thống hỗ trợ đa ngôn ngữ tiếng Anh/Khmer/Việt và nghiệp vụ tiền tệ USD/KHR.`,
     thumbnail: '/projects/shb-saha-thumb.jpg',
     images: [],
     technologies: [
@@ -222,11 +222,11 @@ export const projects: Project[] = [
     duration: '01-2026 – 06-2026',
     featured: true,
     highlights: [
-      'Phát triển authentication/session/device flow với JWT, refresh token, Redis session, device binding, lockout và trusted-device OTP',
-      'Xây dựng OTP/SMS service cho xác thực thiết bị và xác nhận chuyển tiền, có expiry, retry attempt, resend rate limit và masked logging',
-      'Tích hợp Oracle Core Banking/EBANK bằng stored procedures, REF CURSOR, reusable executor và mapping response chuẩn banking',
-      'Thiết kế fund transfer processing bằng Strategy pattern cho self-transfer và intra-bank transfer, gồm validate account, FX, OTP và Core posting',
-      'Chuẩn hóa error contract, localized messages EN/KM/VI, DTO mapping bằng MapStruct và cache Redis cho dữ liệu ngân hàng',
+      'Phát triển luồng xác thực/phiên/thiết bị với JWT, refresh token, Redis session, ràng buộc thiết bị, khóa đăng nhập và trusted-device OTP',
+      'Xây dựng OTP/SMS service cho xác thực thiết bị và xác nhận chuyển tiền, có thời hạn, số lần thử lại, giới hạn gửi lại và ghi log đã che dữ liệu',
+      'Tích hợp Oracle Core Banking/EBANK bằng stored procedures, REF CURSOR, reusable executor và ánh xạ response chuẩn ngân hàng',
+      'Thiết kế xử lý chuyển tiền bằng Strategy pattern cho self-transfer và intra-bank transfer, gồm kiểm tra tài khoản, FX, OTP và hạch toán Core',
+      'Chuẩn hóa hợp đồng lỗi, thông báo đa ngôn ngữ EN/KM/VI, ánh xạ DTO bằng MapStruct và cache Redis cho dữ liệu ngân hàng',
     ],
   },
 
@@ -239,7 +239,7 @@ export const projects: Project[] = [
     title: 'SHB Debit Collection Portal – Xử Lý Nợ & Thanh Lý Tài Sản',
     description:
       'Nền tảng microservices phục vụ nghiệp vụ xử lý nợ, thanh lý tài sản và quản trị nội dung website của SHB.',
-    longDescription: `SHB Debit Collection Portal là hệ thống microservices phục vụ nghiệp vụ xử lý nợ và thanh lý tài sản. Hệ thống cung cấp API public cho khách hàng tra cứu tài sản, đăng ký quan tâm, xem tin tức/thông báo/banner và tải file đính kèm; đồng thời cung cấp API quản trị cho nhân viên ngân hàng quản lý tài sản, danh mục, nội dung website, quy trình phê duyệt, upload file và xuất báo cáo. Kiến trúc gồm Gateway, Eureka, asset service, config/notification service và file/report service, triển khai với PostgreSQL, Redis, MinIO, Keycloak, Docker/Kubernetes và GitLab CI.`,
+    longDescription: `SHB Debit Collection Portal là hệ thống microservices phục vụ nghiệp vụ xử lý nợ và thanh lý tài sản. Hệ thống cung cấp API public cho khách hàng tra cứu tài sản, đăng ký quan tâm, xem tin tức/thông báo/banner và tải file đính kèm; đồng thời cung cấp API quản trị cho nhân viên ngân hàng quản lý tài sản, danh mục, nội dung website, quy trình phê duyệt, tải file lên và xuất báo cáo. Kiến trúc gồm Gateway, Eureka, dịch vụ tài sản, dịch vụ cấu hình/thông báo và dịch vụ file/báo cáo, triển khai với PostgreSQL, Redis, MinIO, Keycloak, Docker/Kubernetes và GitLab CI.`,
     thumbnail: '/projects/shb-debit-thumb.jpg',
     images: [],
     technologies: [
@@ -267,11 +267,11 @@ export const projects: Project[] = [
     duration: '11-2025 – 01-2026',
     featured: true,
     highlights: [
-      'Xây dựng Spring Cloud Gateway với Keycloak JWT validation, public/admin policy, Redis/Bucket4j rate limiting và Resilience4j',
-      'Implement asset APIs: public search/detail, admin CRUD, advanced filters, approval workflow, file attachment và view tracking',
-      'Thiết kế Maker-Checker workflow cho notice/content với audit trail và separation-of-duties validation',
-      'Tích hợp MinIO object storage, metadata persistence, multipart upload, batch delete và presigned URL generation',
-      'Xây dựng Excel import/export, report strategy, Redis cache/invalidation và Kubernetes/GitLab CI deployment assets',
+      'Xây dựng Spring Cloud Gateway với xác thực JWT qua Keycloak, chính sách công khai/quản trị, giới hạn tần suất bằng Redis/Bucket4j và Resilience4j',
+      'Triển khai API tài sản: tìm kiếm/chi tiết công khai, CRUD quản trị, bộ lọc nâng cao, quy trình phê duyệt, file đính kèm và theo dõi lượt xem',
+      'Thiết kế Maker-Checker workflow cho thông báo/nội dung với audit trail và kiểm soát phân tách nhiệm vụ',
+      'Tích hợp lưu trữ đối tượng MinIO, lưu siêu dữ liệu, tải lên nhiều phần, xóa hàng loạt và sinh presigned URL',
+      'Xây dựng nhập/xuất Excel, chiến lược báo cáo, Redis cache và cơ chế vô hiệu hóa cache, cấu hình triển khai Kubernetes/GitLab CI',
     ],
   },
 
@@ -284,7 +284,7 @@ export const projects: Project[] = [
     title: 'Collateral Management & Valuation (CMV) – MBBank',
     description:
       'Hệ thống thẩm định và quản lý tài sản thế chấp ngân hàng MBBank theo kiến trúc Microservices, tích hợp AI và Kafka.',
-    longDescription: `CMV phục vụ nghiệp vụ thẩm định tài sản thế chấp tại MBBank. Hệ thống được xây dựng theo kiến trúc Microservices và Event-Driven Architecture với Apache Kafka, tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ pháp lý/hình ảnh và phát hiện trùng lặp tài sản. API được quản lý qua Apigee Gateway với ECDH Encryption; ETL Pipeline dùng Pentaho PDI để đồng bộ dữ liệu sang CMV MBV (S600); hệ thống được giám sát bằng ELK Stack.`,
+    longDescription: `CMV phục vụ nghiệp vụ thẩm định tài sản thế chấp tại MBBank. Hệ thống được xây dựng theo kiến trúc Microservices và Event-Driven Architecture với Apache Kafka, tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ pháp lý/hình ảnh và phát hiện trùng lặp tài sản. API được quản lý qua Apigee Gateway với ECDH Encryption; luồng ETL dùng Pentaho PDI để đồng bộ dữ liệu sang CMV MBV (S600); hệ thống được giám sát bằng ELK Stack.`,
     thumbnail: '/projects/cmv-thumb.jpg',
     images: [],
     technologies: [
@@ -305,10 +305,10 @@ export const projects: Project[] = [
     featured: false,
     highlights: [
       'Giảm 60% khối lượng nhập tay nhờ tích hợp AI trích xuất dữ liệu và phát hiện trùng lặp hình ảnh',
-      'Triển khai Microservices + Event-Driven Architecture với Kafka cho tích hợp CMS/kho hàng',
+      'Triển khai Microservices và Event-Driven Architecture với Kafka cho tích hợp CMS/kho hàng',
       'Bảo mật API qua Apigee Gateway với ECDH Encryption và quản lý dữ liệu ngân hàng nhạy cảm',
-      'Xây dựng ETL Pipeline Pentaho PDI đồng bộ CMV MBBank sang CMV MBV',
-      'Phát triển các module định giá tài sản, định giá lại, tư vấn giá, kho giá và tích hợp dữ liệu real-time',
+      'Xây dựng luồng ETL Pentaho PDI đồng bộ CMV MBBank sang CMV MBV',
+      'Phát triển các phân hệ định giá tài sản, định giá lại, tư vấn giá, kho giá và tích hợp dữ liệu thời gian thực',
     ],
   },
 
@@ -333,7 +333,7 @@ export const projects: Project[] = [
       'Xây dựng API thanh toán hợp đồng bảo hiểm qua Napas Gateway',
       'Thiết kế API giao nhận hợp đồng điện tử và đồng bộ với hệ thống lõi IMS',
       'Tối ưu truy vấn và đồng bộ hóa dữ liệu hóa đơn với hệ thống đối tác DCS',
-      'Đảm bảo tính toàn vẹn, bảo mật và an toàn dữ liệu trong domain tài chính - bảo hiểm',
+      'Đảm bảo tính toàn vẹn, bảo mật và an toàn dữ liệu trong nghiệp vụ tài chính - bảo hiểm',
     ],
   },
 
@@ -355,7 +355,7 @@ export const projects: Project[] = [
     featured: false,
     highlights: [
       'Phát triển module đặt lịch khám, phân công bác sĩ và quản lý lịch hẹn',
-      'Tối ưu SQL performance và xử lý yêu cầu thay đổi dữ liệu từ khách hàng Nhật Bản',
+      'Tối ưu hiệu năng SQL và xử lý yêu cầu thay đổi dữ liệu từ khách hàng Nhật Bản',
       'Làm việc theo Agile, chú trọng tính ổn định, kỷ luật và chất lượng bàn giao',
     ],
   },
@@ -378,7 +378,7 @@ export const projects: Project[] = [
     featured: false,
     highlights: [
       'Phát triển tính năng quản lý chỗ ngồi và đồng bộ nhân sự từ AMIS',
-      'Xây dựng báo cáo thống kê sử dụng, export Excel phục vụ quản lý vận hành',
+      'Xây dựng báo cáo thống kê sử dụng, xuất Excel phục vụ quản lý vận hành',
     ],
   },
 ];
