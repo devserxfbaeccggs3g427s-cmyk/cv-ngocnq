@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added a `/skill-roadmap` study status filter so users can show all tasks, completed tasks, not-started tasks, partially in-progress parent tasks, or tasks with notes while keeping matching child tasks visible under their parent hierarchy
 - [x] Added a confirmed reset action in `/skill-roadmap` backup tools to clear browser `skill-roadmap-progress:v1` localStorage and reload the latest progress seed from the project JSON
 - [x] Added a Markdown heading appendix to `/skill-roadmap/notes/[taskId]` under the task info sidebar, with generated in-page anchor links to each rendered heading
 - [x] Optimized the Markdown note appendix for long notes by making the appendix list independently scrollable, keeping the desktop sidebar viewport-bound, and compacting task metadata on mobile/tablet
@@ -114,6 +115,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Roadmap task rows use subtle depth-based background colors and left borders; completed rows keep a stronger green completion signal
 - Roadmap parent task rows now show an amber in-progress state as soon as at least one descendant task is completed; once all descendants are completed, the corresponding parent chain is auto-marked completed and persisted
 - Roadmap nodes with child tasks can be expanded/collapsed individually; the filter toolbar also has "Mở tất cả" and "Thu gọn tất cả" controls
+- The `/skill-roadmap` filter toolbar includes a study status dropdown for all/completed/not-started/in-progress/with-note filtering, using descendant completion to identify partially in-progress parent tasks
 - The roadmap now breaks broad topics into important interview-level fundamentals; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees
 - Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in browser `localStorage` under `skill-roadmap-progress:v1`, with `src/data/skill-roadmap-progress.json` kept as seed/local-dev JSON sync only
 - `/skill-roadmap` includes backup tools for roadmap progress: browser JSON export/import plus optional GitHub commit backup using the current browser progress payload. GitHub tokens are submitted per request and not persisted by the app.
@@ -183,6 +185,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Added study status filtering to `/skill-roadmap` for completed, not-started, in-progress parent tasks, and tasks with notes |
 | 2026-06-18 | Added confirmed `/skill-roadmap` backup action to clear progress localStorage and reload the newest project JSON seed |
 | 2026-06-17 | Rà soát lại ngôn ngữ CV/PDF và portfolio project text, Việt hóa cụm mô tả thường trong `src/data` và `cv-base.md` trong khi giữ keyword kỹ thuật/chức danh |
 | 2026-06-14 | Upgraded per-task Markdown note preview with a reusable professional renderer, language auto-detection, IDE-like syntax-highlighted code, and light/dark styles for tables, database snippets, lists, links, images, and callouts |

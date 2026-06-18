@@ -78,6 +78,8 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type StudyStatusFilter = 'all' | 'completed' | 'incomplete' | 'in-progress' | 'with-note';
+
 type GithubBackupConfig = {
   repoUrl: string;
   branch: string;
@@ -106,6 +108,14 @@ const levelStyles: Record<string, string> = {
   'Chuyên sâu': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
 };
 
+const studyStatusOptions: Array<{ value: StudyStatusFilter; label: string }> = [
+  { value: 'all', label: 'Tất cả trạng thái' },
+  { value: 'completed', label: 'Đã học' },
+  { value: 'incomplete', label: 'Chưa học' },
+  { value: 'in-progress', label: 'Đang học' },
+  { value: 'with-note', label: 'Có ghi chú' },
+];
+
 interface SkillRoadmapClientProps {
   roadmap: Roadmap;
 }
@@ -114,6 +124,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [progress, setProgress] = useState<ProgressFile>(emptyProgress);
   const [activeTrackId, setActiveTrackId] = useState('all');
   const [levelFilter, setLevelFilter] = useState('all');
+  const [studyStatusFilter, setStudyStatusFilter] = useState<StudyStatusFilter>('all');
   const [query, setQuery] = useState('');
   const [savingTaskId, setSavingTaskId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -181,15 +192,18 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
             ...module,
             tasks: filterTaskTree(module.tasks, (task) => {
               const matchesLevel = levelFilter === 'all' || task.level === levelFilter;
+              const matchesStudyStatus = matchesTaskStudyStatus(task, progress, studyStatusFilter);
               const searchable = collectTaskSearchText(task, module.title, track.title, track.skills);
 
-              return matchesLevel && (!normalizedQuery || searchable.includes(normalizedQuery));
+              return matchesLevel
+                && matchesStudyStatus
+                && (!normalizedQuery || searchable.includes(normalizedQuery));
             }),
           }))
           .filter((module) => module.tasks.length > 0),
       }))
       .filter((track) => track.modules.length > 0);
-  }, [activeTrackId, levelFilter, query, roadmap.tracks]);
+  }, [activeTrackId, levelFilter, progress, query, roadmap.tracks, studyStatusFilter]);
 
   useEffect(() => {
     let ignore = false;
@@ -781,7 +795,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       <Card>
         <CardContent className="p-4 md:p-5">
-          <div className="grid gap-3 lg:grid-cols-[1fr_220px_180px]">
+          <div className="grid gap-3 lg:grid-cols-[1fr_220px_180px_180px]">
             <label className="relative block">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
@@ -814,6 +828,18 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
               {levels.map((level) => (
                 <option key={level} value={level}>
                   {level}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={studyStatusFilter}
+              onChange={(event) => setStudyStatusFilter(event.target.value as StudyStatusFilter)}
+              className="h-11 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+            >
+              {studyStatusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
@@ -1344,6 +1370,55 @@ function getTaskDepthStyle(depth: number): string {
   }
 
   return 'border-amber-200 bg-amber-50/40 dark:border-amber-900/70 dark:bg-amber-950/15';
+}
+
+function getTaskStudyState(task: RoadmapTask, progress: ProgressFile) {
+  const item = progress.items[task.id];
+  const completed = Boolean(item?.completed);
+  const descendants = flattenTasks(task.children ?? []);
+  const childCount = descendants.length;
+  const completedChildren = descendants.filter(
+    (child) => progress.items[child.id]?.completed
+  ).length;
+  const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
+  const effectivelyCompleted = completed || allChildrenCompleted;
+  const childProgressing = !effectivelyCompleted && completedChildren > 0;
+  const hasNote = Boolean(item?.note.trim());
+
+  return {
+    completed,
+    childCount,
+    completedChildren,
+    effectivelyCompleted,
+    childProgressing,
+    hasNote,
+  };
+}
+
+function matchesTaskStudyStatus(
+  task: RoadmapTask,
+  progress: ProgressFile,
+  statusFilter: StudyStatusFilter
+): boolean {
+  const studyState = getTaskStudyState(task, progress);
+
+  if (statusFilter === 'completed') {
+    return studyState.effectivelyCompleted;
+  }
+
+  if (statusFilter === 'incomplete') {
+    return !studyState.effectivelyCompleted && !studyState.childProgressing;
+  }
+
+  if (statusFilter === 'in-progress') {
+    return studyState.childProgressing;
+  }
+
+  if (statusFilter === 'with-note') {
+    return studyState.hasNote;
+  }
+
+  return true;
 }
 
 function buildLearningPrompt(task: RoadmapTask): string {
