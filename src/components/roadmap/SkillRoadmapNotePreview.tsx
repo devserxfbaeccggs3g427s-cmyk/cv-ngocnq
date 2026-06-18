@@ -34,6 +34,7 @@ type TaskContext = {
 type NavigationTask = Pick<TaskContext, 'id' | 'title' | 'trackTitle' | 'moduleTitle'>;
 
 const progressStorageKey = 'skill-roadmap-progress:v1';
+const commentsStorageKey = 'skill-roadmap-note-comments:v1';
 const activeHeadingOffset = 120;
 
 export function SkillRoadmapNotePreview({
@@ -51,13 +52,60 @@ export function SkillRoadmapNotePreview({
   const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let hasLocalProgress = false;
+
     try {
       const raw = window.localStorage.getItem(progressStorageKey);
-      const progress = raw ? (JSON.parse(raw) as ProgressFile) : null;
-      window.queueMicrotask(() => setProgress(progress));
+      hasLocalProgress = raw !== null;
+      const storedProgress = raw ? (JSON.parse(raw) as ProgressFile) : null;
+      window.queueMicrotask(() => setProgress(storedProgress));
     } catch {
       window.queueMicrotask(() => setProgress(null));
     }
+
+    async function hydrateMissingSeedData() {
+      if (hasLocalProgress && hasStoredComments()) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/skill-roadmap/progress', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const seed = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!hasLocalProgress) {
+          const seedProgress = normalizeSeedProgress(seed);
+
+          if (seedProgress) {
+            setProgress(seedProgress);
+            storeProgress(seedProgress);
+          }
+        }
+
+        if (!hasStoredComments()) {
+          storeSeedComments(seed);
+        }
+      } catch {
+        // The page can still render browser-local data only.
+      }
+    }
+
+    hydrateMissingSeedData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [taskId]);
 
   const item = progress?.items?.[taskId] ?? null;
@@ -452,6 +500,71 @@ function AppendixLinks({
       ))}
     </ol>
   );
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeSeedProgress(input: unknown): ProgressFile | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const value = isRecord(input.progress) ? input.progress : input;
+  const rawItems = isRecord(value.items) ? value.items : null;
+
+  if (!rawItems) {
+    return null;
+  }
+
+  const items: Record<string, ProgressItem> = {};
+
+  for (const [taskId, rawItem] of Object.entries(rawItems)) {
+    if (!isRecord(rawItem)) {
+      return null;
+    }
+
+    items[taskId] = {
+      completed: Boolean(rawItem.completed),
+      note: typeof rawItem.note === 'string' ? rawItem.note : '',
+      completedAt: typeof rawItem.completedAt === 'string' ? rawItem.completedAt : null,
+      updatedAt: typeof rawItem.updatedAt === 'string' ? rawItem.updatedAt : new Date().toISOString(),
+    };
+  }
+
+  return {
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
+    items,
+  };
+}
+
+function storeProgress(progress: ProgressFile) {
+  try {
+    window.localStorage.setItem(progressStorageKey, JSON.stringify(progress));
+  } catch {
+    // The in-memory note preview still works if localStorage is unavailable.
+  }
+}
+
+function hasStoredComments() {
+  try {
+    return window.localStorage.getItem(commentsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function storeSeedComments(seed: unknown) {
+  if (!isRecord(seed) || !isRecord(seed.comments)) {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(commentsStorageKey, JSON.stringify(seed.comments));
+  } catch {
+    // Comments can still be imported manually if localStorage is unavailable.
+  }
 }
 
 function formatDate(value: string | null) {

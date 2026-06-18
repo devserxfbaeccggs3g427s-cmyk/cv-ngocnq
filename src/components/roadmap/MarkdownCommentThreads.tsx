@@ -35,6 +35,11 @@ type NoteComment = {
   provider?: string;
 };
 
+type SeedProgress = {
+  updatedAt: string | null;
+  items: Record<string, { note?: string; completed?: boolean; completedAt?: string | null; updatedAt?: string }>;
+};
+
 type CommentDraft = {
   mode: CommentMode;
   body: string;
@@ -103,13 +108,51 @@ export function MarkdownCommentThreads({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let hasLocalComments = false;
+
     try {
       const raw = window.localStorage.getItem(commentsStorageKey);
+      hasLocalComments = raw !== null;
       const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
       window.queueMicrotask(() => setComments(Array.isArray(parsed[taskId]) ? parsed[taskId] : []));
     } catch {
       window.queueMicrotask(() => setComments([]));
     }
+
+    async function hydrateSeedComments() {
+      if (hasLocalComments) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/skill-roadmap/progress', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const seed = await response.json();
+        const seedComments = readSeedComments(seed);
+
+        if (cancelled) {
+          return;
+        }
+
+        saveCommentsByTask(seedComments);
+        setComments(seedComments[taskId] ?? []);
+      } catch {
+        // The comment panel can still work with browser-local comments only.
+      }
+    }
+
+    hydrateSeedComments();
+
+    return () => {
+      cancelled = true;
+    };
   }, [taskId]);
 
   const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
@@ -415,8 +458,13 @@ export function MarkdownCommentThreadDetail({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let hasLocalComments = false;
+    let hasLocalProgress = false;
+
     try {
       const raw = window.localStorage.getItem(commentsStorageKey);
+      hasLocalComments = raw !== null;
       const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
       window.queueMicrotask(() => setComments(Array.isArray(parsed[taskId]) ? parsed[taskId] : []));
     } catch {
@@ -425,6 +473,7 @@ export function MarkdownCommentThreadDetail({
 
     try {
       const rawProgress = window.localStorage.getItem(progressStorageKey);
+      hasLocalProgress = rawProgress !== null;
       const parsedProgress = rawProgress
         ? (JSON.parse(rawProgress) as { items?: Record<string, { note?: string }> })
         : null;
@@ -432,6 +481,48 @@ export function MarkdownCommentThreadDetail({
     } catch {
       window.queueMicrotask(() => setMarkdown(''));
     }
+
+    async function hydrateSeedData() {
+      if (hasLocalComments && hasLocalProgress) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/skill-roadmap/progress', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const seed = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!hasLocalComments) {
+          const seedComments = readSeedComments(seed);
+          saveCommentsByTask(seedComments);
+          setComments(seedComments[taskId] ?? []);
+        }
+
+        if (!hasLocalProgress) {
+          const seedProgress = readSeedProgress(seed);
+          saveSeedProgress(seedProgress);
+          setMarkdown(seedProgress.items?.[taskId]?.note?.trim() ?? '');
+        }
+      } catch {
+        // The focused thread can still work with browser-local data only.
+      }
+    }
+
+    hydrateSeedData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [taskId]);
 
   const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
@@ -1476,6 +1567,90 @@ function plainTextPreview(markdown: string) {
 
 function isLongComment(body: string) {
   return body.length > longCommentLength || body.split(/\r\n|\r|\n/).length > longCommentLineCount;
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function readSeedComments(input: unknown): Record<string, NoteComment[]> {
+  if (!isRecord(input) || !isRecord(input.comments)) {
+    return {};
+  }
+
+  const commentsByTask: Record<string, NoteComment[]> = {};
+
+  for (const [taskId, rawComments] of Object.entries(input.comments)) {
+    if (!Array.isArray(rawComments)) {
+      continue;
+    }
+
+    const taskComments: NoteComment[] = [];
+
+    for (const comment of rawComments) {
+      if (!isRecord(comment) || typeof comment.id !== 'string' || typeof comment.body !== 'string') {
+        continue;
+      }
+
+      taskComments.push({
+        id: comment.id,
+        parentId: typeof comment.parentId === 'string' ? comment.parentId : null,
+        author: comment.author === 'ai' ? 'ai' : 'user',
+        body: comment.body,
+        createdAt: typeof comment.createdAt === 'string' ? comment.createdAt : new Date().toISOString(),
+        model: typeof comment.model === 'string' ? comment.model : undefined,
+        provider: typeof comment.provider === 'string' ? comment.provider : undefined,
+      });
+    }
+
+    commentsByTask[taskId] = taskComments;
+  }
+
+  return commentsByTask;
+}
+
+function readSeedProgress(input: unknown): SeedProgress {
+  if (!isRecord(input)) {
+    return { updatedAt: null, items: {} };
+  }
+
+  const value = isRecord(input.progress) ? input.progress : input;
+  const rawItems = isRecord(value.items) ? value.items : {};
+  const items: SeedProgress['items'] = {};
+
+  for (const [taskId, rawItem] of Object.entries(rawItems)) {
+    if (!isRecord(rawItem)) {
+      continue;
+    }
+
+    items[taskId] = {
+      note: typeof rawItem.note === 'string' ? rawItem.note : '',
+      completed: Boolean(rawItem.completed),
+      completedAt: typeof rawItem.completedAt === 'string' ? rawItem.completedAt : null,
+      updatedAt: typeof rawItem.updatedAt === 'string' ? rawItem.updatedAt : new Date().toISOString(),
+    };
+  }
+
+  return {
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
+    items,
+  };
+}
+
+function saveCommentsByTask(commentsByTask: Record<string, NoteComment[]>) {
+  try {
+    window.localStorage.setItem(commentsStorageKey, JSON.stringify(commentsByTask));
+  } catch {
+    // The in-memory thread still renders if localStorage is unavailable.
+  }
+}
+
+function saveSeedProgress(progress: SeedProgress) {
+  try {
+    window.localStorage.setItem(progressStorageKey, JSON.stringify(progress));
+  } catch {
+    // The focused thread can still render in memory if localStorage is unavailable.
+  }
 }
 
 function buildCommentTree(comments: NoteComment[]) {

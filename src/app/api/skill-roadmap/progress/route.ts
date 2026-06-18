@@ -17,6 +17,14 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type RoadmapBackupFile = {
+  version: number;
+  exportedAt: string;
+  progress: ProgressFile;
+  comments?: unknown;
+  flashcards?: unknown;
+};
+
 const progressFilePath = path.join(
   process.cwd(),
   'src',
@@ -25,17 +33,17 @@ const progressFilePath = path.join(
 );
 const canWriteProgressFile = process.env.NODE_ENV !== 'production' && !process.env.VERCEL;
 
-async function readProgress(): Promise<ProgressFile> {
+async function readProgressSeed(): Promise<unknown> {
   try {
     const raw = await fs.readFile(progressFilePath, 'utf8');
-    return JSON.parse(raw) as ProgressFile;
+    return JSON.parse(raw) as unknown;
   } catch {
     return { updatedAt: null, items: {} };
   }
 }
 
-async function writeProgress(progress: ProgressFile) {
-  await fs.writeFile(progressFilePath, `${JSON.stringify(progress, null, 2)}\n`, 'utf8');
+async function writeProgressSeed(seed: unknown) {
+  await fs.writeFile(progressFilePath, `${JSON.stringify(seed, null, 2)}\n`, 'utf8');
 }
 
 function isRecord(input: unknown): input is Record<string, unknown> {
@@ -89,9 +97,26 @@ function normalizeProgress(input: unknown): ProgressFile | null {
   };
 }
 
+function isCombinedBackup(input: unknown): input is RoadmapBackupFile {
+  return isRecord(input) && isRecord(input.progress);
+}
+
+function updateSeedProgress(seed: unknown, progress: ProgressFile): unknown {
+  if (!isCombinedBackup(seed)) {
+    return progress;
+  }
+
+  return {
+    ...seed,
+    version: typeof seed.version === 'number' ? seed.version : 3,
+    exportedAt: new Date().toISOString(),
+    progress,
+  };
+}
+
 export async function GET() {
-  const progress = await readProgress();
-  return NextResponse.json(progress);
+  const seed = await readProgressSeed();
+  return NextResponse.json(seed);
 }
 
 export async function POST(request: Request) {
@@ -127,7 +152,7 @@ export async function POST(request: Request) {
     updatedAt: new Date().toISOString(),
   };
 
-  await writeProgress(importedProgress);
+  await writeProgressSeed(updateSeedProgress(body, importedProgress));
 
   return NextResponse.json(importedProgress);
 }
@@ -152,7 +177,8 @@ export async function PUT(request: Request) {
   }
 
   const now = new Date().toISOString();
-  const progress = await readProgress();
+  const seed = await readProgressSeed();
+  const progress = normalizeProgress(seed) ?? { updatedAt: null, items: {} };
 
   if (body.items) {
     const normalized = normalizeProgress({ items: body.items });
@@ -167,7 +193,7 @@ export async function PUT(request: Request) {
     progress.items = normalized.items;
     progress.updatedAt = now;
 
-    await writeProgress(progress);
+    await writeProgressSeed(updateSeedProgress(seed, progress));
 
     return NextResponse.json(progress);
   }
@@ -190,7 +216,7 @@ export async function PUT(request: Request) {
   };
   progress.updatedAt = now;
 
-  await writeProgress(progress);
+  await writeProgressSeed(updateSeedProgress(seed, progress));
 
   return NextResponse.json(progress);
 }

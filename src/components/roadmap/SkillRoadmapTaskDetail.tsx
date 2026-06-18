@@ -116,18 +116,23 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
   const [flashcardRatings, setFlashcardRatings] = useState<Record<string, 'hard' | 'good'>>({});
 
   useEffect(() => {
+    let cancelled = false;
+    let hasLocalProgress = false;
+    let hasLocalComments = false;
+    let hasLocalFlashcards = false;
+
     try {
       const raw = window.localStorage.getItem(progressStorageKey);
+      hasLocalProgress = raw !== null;
       const storedProgress = raw ? (JSON.parse(raw) as ProgressFile) : null;
       window.queueMicrotask(() => setProgress(storedProgress));
     } catch {
       window.queueMicrotask(() => setProgress(null));
     }
-  }, [task.id]);
 
-  useEffect(() => {
     try {
       const raw = window.localStorage.getItem(commentsStorageKey);
+      hasLocalComments = raw !== null;
       const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
       window.queueMicrotask(() => setNoteComments(Array.isArray(parsed[task.id]) ? parsed[task.id] : []));
     } catch {
@@ -136,6 +141,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
 
     try {
       const raw = window.localStorage.getItem(flashcardsStorageKey);
+      hasLocalFlashcards = raw !== null;
       const parsed = raw ? (JSON.parse(raw) as Record<string, FlashcardDeck>) : {};
       window.queueMicrotask(() => {
         setFlashcardDeck(parsed[task.id] ?? null);
@@ -146,6 +152,57 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
     } catch {
       window.queueMicrotask(() => setFlashcardDeck(null));
     }
+
+    async function hydrateMissingSeedData() {
+      if (hasLocalProgress && hasLocalComments && hasLocalFlashcards) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/skill-roadmap/progress', {
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const seed = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!hasLocalProgress) {
+          const seedProgress = normalizeSeedProgress(seed);
+
+          if (seedProgress) {
+            setProgress(seedProgress);
+            storeProgress(seedProgress);
+          }
+        }
+
+        if (!hasLocalComments) {
+          const seedComments = readSeedComments(seed);
+          storeComments(seedComments);
+          setNoteComments(seedComments[task.id] ?? []);
+        }
+
+        if (!hasLocalFlashcards) {
+          const seedFlashcards = readSeedFlashcards(seed);
+          storeFlashcards(seedFlashcards);
+          setFlashcardDeck(seedFlashcards[task.id] ?? null);
+        }
+      } catch {
+        // The page can still work with browser-local data only.
+      }
+    }
+
+    hydrateMissingSeedData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [task.id]);
 
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
@@ -971,6 +1028,143 @@ function storeFlashcardDeck(taskId: string, deck: FlashcardDeck) {
   } catch {
     // The generated deck remains usable in memory for the current screen.
   }
+}
+
+function storeComments(comments: Record<string, NoteComment[]>) {
+  try {
+    window.localStorage.setItem(commentsStorageKey, JSON.stringify(comments));
+  } catch {
+    // The current screen can still render the in-memory comments.
+  }
+}
+
+function storeFlashcards(flashcards: Record<string, FlashcardDeck>) {
+  try {
+    window.localStorage.setItem(flashcardsStorageKey, JSON.stringify(flashcards));
+  } catch {
+    // The current screen can still render the in-memory flashcard deck.
+  }
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeSeedProgress(input: unknown): ProgressFile | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const value = isRecord(input.progress) ? input.progress : input;
+  const rawItems = isRecord(value.items) ? value.items : null;
+
+  if (!rawItems) {
+    return null;
+  }
+
+  const items: Record<string, ProgressItem> = {};
+
+  for (const [taskId, rawItem] of Object.entries(rawItems)) {
+    if (!isRecord(rawItem)) {
+      return null;
+    }
+
+    items[taskId] = {
+      completed: Boolean(rawItem.completed),
+      note: typeof rawItem.note === 'string' ? rawItem.note : '',
+      completedAt: typeof rawItem.completedAt === 'string' ? rawItem.completedAt : null,
+      updatedAt: typeof rawItem.updatedAt === 'string' ? rawItem.updatedAt : new Date().toISOString(),
+    };
+  }
+
+  return {
+    updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null,
+    items,
+  };
+}
+
+function readSeedComments(input: unknown): Record<string, NoteComment[]> {
+  if (!isRecord(input) || !isRecord(input.comments)) {
+    return {};
+  }
+
+  const comments: Record<string, NoteComment[]> = {};
+
+  for (const [taskId, rawComments] of Object.entries(input.comments)) {
+    if (!Array.isArray(rawComments)) {
+      continue;
+    }
+
+    const taskComments: NoteComment[] = [];
+
+    for (const comment of rawComments) {
+      if (!isRecord(comment) || typeof comment.id !== 'string' || typeof comment.body !== 'string') {
+        continue;
+      }
+
+      taskComments.push({
+        id: comment.id,
+        parentId: typeof comment.parentId === 'string' ? comment.parentId : null,
+        author: comment.author === 'ai' ? 'ai' : 'user',
+        body: comment.body,
+        createdAt: typeof comment.createdAt === 'string' ? comment.createdAt : new Date().toISOString(),
+        model: typeof comment.model === 'string' ? comment.model : undefined,
+        provider: typeof comment.provider === 'string' ? comment.provider : undefined,
+      });
+    }
+
+    comments[taskId] = taskComments;
+  }
+
+  return comments;
+}
+
+function readSeedFlashcards(input: unknown): Record<string, FlashcardDeck> {
+  if (!isRecord(input) || !isRecord(input.flashcards)) {
+    return {};
+  }
+
+  const flashcards: Record<string, FlashcardDeck> = {};
+
+  for (const [taskId, rawDeck] of Object.entries(input.flashcards)) {
+    if (!isRecord(rawDeck) || !Array.isArray(rawDeck.cards) || !isRecord(rawDeck.source)) {
+      continue;
+    }
+
+    const cards = rawDeck.cards
+      .map((card) => {
+        if (
+          !isRecord(card) ||
+          typeof card.id !== 'string' ||
+          typeof card.front !== 'string' ||
+          typeof card.back !== 'string'
+        ) {
+          return null;
+        }
+
+        return {
+          id: card.id,
+          front: card.front,
+          back: card.back,
+          hint: typeof card.hint === 'string' ? card.hint : '',
+          tag: typeof card.tag === 'string' ? card.tag : 'Ôn tập',
+        };
+      })
+      .filter((card): card is Flashcard => Boolean(card));
+
+    flashcards[taskId] = {
+      taskId: typeof rawDeck.taskId === 'string' ? rawDeck.taskId : taskId,
+      taskTitle: typeof rawDeck.taskTitle === 'string' ? rawDeck.taskTitle : '',
+      createdAt: typeof rawDeck.createdAt === 'string' ? rawDeck.createdAt : new Date().toISOString(),
+      source: {
+        noteCharacters: typeof rawDeck.source.noteCharacters === 'number' ? rawDeck.source.noteCharacters : 0,
+        commentCount: typeof rawDeck.source.commentCount === 'number' ? rawDeck.source.commentCount : 0,
+      },
+      cards,
+    };
+  }
+
+  return flashcards;
 }
 
 function getFlashcardRequirement({

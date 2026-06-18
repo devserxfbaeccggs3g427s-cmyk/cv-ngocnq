@@ -251,11 +251,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     async function loadProgress() {
       const storedProgress = readStoredProgress();
 
-      if (storedProgress) {
-        setProgress(storedProgress);
-        return;
-      }
-
       try {
         const response = await fetch('/api/skill-roadmap/progress', {
           cache: 'no-store',
@@ -265,13 +260,32 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           throw new Error('Không đọc được file tiến độ');
         }
 
-        const data = (await response.json()) as ProgressFile;
+        const seed = normalizeRoadmapBackup(await response.json());
+
+        if (!seed) {
+          throw new Error('File tiến độ không đúng định dạng');
+        }
+
         if (!ignore) {
-          setProgress(data);
-          storeProgress(data);
+          const nextProgress = storedProgress ?? seed.progress;
+
+          setProgress(nextProgress);
+          storeProgress(nextProgress);
+
+          if (!hasStoredComments()) {
+            storeComments(seed.comments);
+          }
+
+          if (!hasStoredFlashcards()) {
+            storeFlashcards(seed.flashcards);
+          }
         }
       } catch {
         if (!ignore) {
+          if (storedProgress) {
+            setProgress(storedProgress);
+          }
+
           setLoadError('Không tải được tiến độ seed từ file JSON. Tiến độ mới vẫn được lưu trong trình duyệt này.');
         }
       }
@@ -505,7 +519,13 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         await fetch('/api/skill-roadmap/progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(imported),
+          body: JSON.stringify({
+            version: 3,
+            exportedAt: new Date().toISOString(),
+            progress: imported,
+            comments: data.comments,
+            flashcards: data.flashcards,
+          }),
         });
       }
 
@@ -1074,6 +1094,30 @@ function removeStoredFlashcards() {
     window.localStorage.removeItem(flashcardsStorageKey);
   } catch {
     // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
+function hasStoredComments() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(commentsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function hasStoredFlashcards() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(flashcardsStorageKey) !== null;
+  } catch {
+    return false;
   }
 }
 
