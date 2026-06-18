@@ -8,6 +8,9 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added dedicated `/skill-roadmap/tasks/[taskId]` task detail pages with roadmap/task metadata, localStorage-based completion/note status, parent breadcrumb, recursive child task list, and direct links from each roadmap task row; note content is intentionally not rendered as a preview on this detail screen
+- [x] Updated `/skill-roadmap/tasks/[taskId]` so the detail screen includes a note textarea that saves to the same browser progress store while keeping Markdown preview separate, and nested child task branches can be expanded/collapsed to keep parent task pages compact
+- [x] Added Prompt AI support to `/skill-roadmap/tasks/[taskId]`, matching the roadmap list behavior with two-line preview, show/hide, and clipboard copy controls
 - [x] Fixed Markdown comment thread detail deletion so removing the root comment saves the deletion and immediately returns users to the parent note instead of leaving an empty thread screen
 - [x] Added dedicated Markdown comment thread detail pages at `/skill-roadmap/notes/[taskId]/comments/[commentId]`; the Markdown note page now acts as a compact thread inbox while reading/replying happens on the focused thread page backed by the same localStorage comment data
 - [x] Compact Markdown preview discussion threads so the root composer opens on demand, only recent root threads render initially, collapsed root threads show a two-line preview with reply/activity metadata, and opened threads show only the latest replies until users expand older replies
@@ -129,6 +132,9 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Education: UTT (2023–2025) and FPT Polytechnic (2020–2022)
 - 7 projects: GOV Payment Service / C12, SHB SAHA Mobile Banking Cambodia, SHB Debit Collection Portal, CMV MBBank, MyBV Life, Veritas, Hywork
 - `/skill-roadmap` provides a professional 24-week hierarchical study todo list covering Java/JVM, Spring backend, microservices/event-driven architecture, banking/payment domain, database/cache/storage, security, DevOps/observability, frontend/full-stack delivery, and senior engineering/testing
+- `/skill-roadmap/tasks/[taskId]` provides a focused task detail screen for any roadmap node, showing full task metadata, parent path, completion/note status from browser progress, and recursive child tasks for parent tasks while intentionally keeping Markdown note preview out of this screen
+- Task detail pages include direct note editing with localStorage persistence and local-dev progress sync on blur, while nested task children are collapsed until opened branch-by-branch
+- Task detail pages also show the generated AI learning prompt for the current task with show/hide and copy controls, using the same theory-focused prompt structure as the main roadmap list
 - Each roadmap node includes a concise generated AI learning prompt with two-line preview, show/hide control, and copy-to-clipboard action; prompts emphasize theory, internal mechanisms, why/how explanations, trade-offs, and deep interview questions
 - Roadmap task rows use subtle depth-based background colors and left borders; completed rows keep a stronger green completion signal
 - Roadmap parent task rows now show an amber in-progress state as soon as at least one descendant task is completed; once all descendants are completed, the corresponding parent chain is auto-marked completed and persisted
@@ -213,6 +219,9 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Added focused skill roadmap task detail pages with child task drill-down and no note preview rendering |
+| 2026-06-18 | Added note editing and collapsible child task branches to focused skill roadmap task detail pages |
+| 2026-06-18 | Added show/hide and copy controls for generated AI learning prompts on skill roadmap task detail pages |
 | 2026-06-18 | Redirected Markdown comment thread detail back to the note after deleting the root thread comment |
 | 2026-06-18 | Added dedicated Markdown comment thread detail pages and changed note comments into compact links to focused thread conversations |
 | 2026-06-18 | Compacted Markdown preview discussion threads with on-demand composer, root thread previews, visible thread limits, and collapsed older replies |

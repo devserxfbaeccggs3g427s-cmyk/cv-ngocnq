@@ -25,6 +25,7 @@ import {
   Trash2,
   Upload,
   AlertTriangle,
+  ListTree,
 } from 'lucide-react';
 import { Badge, Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
@@ -1351,6 +1352,16 @@ function TaskNode({
             </span>{' '}
             {task.deliverable}
           </p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+            >
+              <ListTree className="h-3.5 w-3.5" />
+              Chi tiết task
+            </a>
+          </div>
 
           <div className="mt-3 rounded-lg border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
