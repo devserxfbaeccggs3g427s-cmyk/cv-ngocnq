@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
   Bot,
   Check,
@@ -53,8 +54,11 @@ type CommentNode = NoteComment & {
 };
 
 const commentsStorageKey = 'skill-roadmap-note-comments:v1';
+const progressStorageKey = 'skill-roadmap-progress:v1';
 const longCommentLength = 900;
 const longCommentLineCount = 14;
+const initialVisibleRootThreads = 6;
+const visibleReplyPreviewCount = 2;
 const defaultDraft: CommentDraft = {
   mode: 'comment',
   body: '',
@@ -91,10 +95,10 @@ export function MarkdownCommentThreads({
 }) {
   const [comments, setComments] = useState<NoteComment[]>([]);
   const [drafts, setDrafts] = useState<Record<string, CommentDraft>>({});
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [submittingKey, setSubmittingKey] = useState<string | null>(null);
   const [streamingCommentIds, setStreamingCommentIds] = useState<Set<string>>(() => new Set());
-  const [expandedCommentIds, setExpandedCommentIds] = useState<Set<string>>(() => new Set());
+  const [visibleRootThreadCount, setVisibleRootThreadCount] = useState(initialVisibleRootThreads);
+  const [rootComposerOpen, setRootComposerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -109,6 +113,8 @@ export function MarkdownCommentThreads({
 
   const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
   const commentCount = comments.length;
+  const visibleRootThreads = commentTree.slice(Math.max(commentTree.length - visibleRootThreadCount, 0));
+  const hiddenRootThreadCount = Math.max(commentTree.length - visibleRootThreads.length, 0);
   const markdownContext = useMemo(() => summarizeMarkdown(markdown), [markdown]);
 
   const saveComments = (nextComments: NoteComment[]) => {
@@ -143,22 +149,356 @@ export function MarkdownCommentThreads({
     });
   };
 
-  const toggleCommentExpanded = (commentId: string) => {
+  const deleteCommentBranch = (commentId: string) => {
+    const deleteIds = collectCommentBranchIds(comments, commentId);
+
+    if (!deleteIds.size) {
+      return;
+    }
+
+    const message =
+      deleteIds.size === 1
+        ? 'Xóa comment này?'
+        : `Xóa comment này cùng ${deleteIds.size - 1} trả lời bên trong?`;
+
+    if (!window.confirm(message)) {
+      return;
+    }
+
+    saveComments(comments.filter((comment) => !deleteIds.has(comment.id)));
+    setDrafts((current) => {
+      const next = { ...current };
+      deleteIds.forEach((id) => delete next[id]);
+      return next;
+    });
+  };
+
+  const submitDraft = async (event: FormEvent<HTMLFormElement>, parentId: string | null) => {
+    event.preventDefault();
+
+    const draftKey = parentId ?? 'root';
+    const draft = getDraft(draftKey);
+    const body = draft.body.trim();
+
+    if (!body) {
+      setError('Vui lòng nhập nội dung trước khi gửi.');
+      return;
+    }
+
+    setError(null);
+    setSubmittingKey(draftKey);
+
+    if (draft.mode === 'comment') {
+      const nextComment = createComment({
+        parentId,
+        author: 'user',
+        body,
+      });
+
+      saveComments([...comments, nextComment]);
+      resetDraft(draftKey);
+      setRootComposerOpen(false);
+      setSubmittingKey(null);
+      return;
+    }
+
+    let streamingReplyId: string | null = null;
+    let rollbackComments: NoteComment[] | null = null;
+
+    try {
+      const questionComment = createComment({
+        parentId,
+        author: 'user',
+        body,
+      });
+      const nextBeforeAi = [...comments, questionComment];
+      rollbackComments = nextBeforeAi;
+
+      saveComments(nextBeforeAi);
+      resetDraft(draftKey);
+      setRootComposerOpen(false);
+
+      const aiReply = createComment({
+        parentId: questionComment.id,
+        author: 'ai',
+        body: '',
+        model: draft.model,
+        provider: draft.provider,
+      });
+      const nextWithPlaceholder = [...nextBeforeAi, aiReply];
+      let streamedAnswer = '';
+      streamingReplyId = aiReply.id;
+
+      setStreamingCommentIds((current) => new Set(current).add(aiReply.id));
+      saveComments(nextWithPlaceholder);
+
+      const response = await fetch('/api/ai/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          provider: draft.provider,
+          apiKey: draft.apiKey,
+          model: draft.model,
+          baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
+          question: body,
+          markdownContext,
+          threadContext: summarizeThread(nextBeforeAi, questionComment.id),
+        }),
+      });
+
+      if (!response.ok) {
+        const responseBody = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(responseBody.error ?? 'Không nhận được câu trả lời từ AI.');
+      }
+
+      if (!response.body) {
+        throw new Error('Không đọc được stream trả lời từ AI.');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        streamedAnswer += decoder.decode(value, { stream: true });
+        saveComments([
+          ...nextBeforeAi,
+          {
+            ...aiReply,
+            body: streamedAnswer,
+          },
+        ]);
+      }
+
+      streamedAnswer += decoder.decode();
+
+      if (!streamedAnswer.trim()) {
+        throw new Error('AI provider không trả về nội dung trả lời.');
+      }
+
+      saveComments([
+        ...nextBeforeAi,
+        {
+          ...aiReply,
+          body: streamedAnswer.trim(),
+        },
+      ]);
+    } catch (submitError) {
+      if (rollbackComments) {
+        saveComments(rollbackComments);
+      }
+
+      setError(submitError instanceof Error ? submitError.message : 'Không gửi được câu hỏi tới AI.');
+    } finally {
+      if (streamingReplyId) {
+        const completedStreamingReplyId = streamingReplyId;
+
+        setStreamingCommentIds((current) => {
+          const next = new Set(current);
+          next.delete(completedStreamingReplyId);
+          return next;
+        });
+      }
+
+      setSubmittingKey(null);
+    }
+  };
+
+  return (
+    <section className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+      <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
+            Discussion
+          </p>
+          <h2 className="mt-1 text-lg font-bold text-gray-950 dark:text-white">Comment & hỏi AI</h2>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-semibold text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+            <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
+            {commentCount} comment
+          </div>
+          <button
+            type="button"
+            onClick={() => setRootComposerOpen((current) => !current)}
+            className="inline-flex h-9 items-center gap-2 rounded-lg bg-gray-950 px-3 text-sm font-semibold text-white transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+            aria-expanded={rootComposerOpen}
+          >
+            {rootComposerOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />}
+            {rootComposerOpen ? 'Đóng form' : 'Thêm comment'}
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-5 p-4 sm:p-5">
+        {rootComposerOpen && (
+          <CommentComposer
+            draft={getDraft('root')}
+            isSubmitting={submittingKey === 'root'}
+            submitLabel="Gửi"
+            onSubmit={(event) => submitDraft(event, null)}
+            onChange={(update) => updateDraft('root', update)}
+            onCancel={() => {
+              setRootComposerOpen(false);
+              resetDraft('root');
+            }}
+          />
+        )}
+
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {commentTree.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
+              Chưa có comment nào cho note này.
+            </div>
+          ) : (
+            <>
+              {hiddenRootThreadCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setVisibleRootThreadCount((current) => current + initialVisibleRootThreads)}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-300 dark:hover:border-blue-900 dark:hover:bg-blue-950/30 dark:hover:text-blue-200"
+                >
+                  <ChevronUp className="h-4 w-4" aria-hidden="true" />
+                  Xem thêm {Math.min(hiddenRootThreadCount, initialVisibleRootThreads)} thread cũ hơn
+                </button>
+              )}
+
+              {visibleRootThreads.map((comment) => (
+                <CommentThreadCard
+                  key={comment.id}
+                  taskId={taskId}
+                  comment={comment}
+                  streamingCommentIds={streamingCommentIds}
+                  onDelete={deleteCommentBranch}
+                />
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function MarkdownCommentThreadDetail({
+  taskId,
+  commentId,
+  backHref,
+}: {
+  taskId: string;
+  commentId: string;
+  backHref: string;
+}) {
+  const [comments, setComments] = useState<NoteComment[]>([]);
+  const [markdown, setMarkdown] = useState('');
+  const [drafts, setDrafts] = useState<Record<string, CommentDraft>>({});
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [submittingKey, setSubmittingKey] = useState<string | null>(null);
+  const [streamingCommentIds, setStreamingCommentIds] = useState<Set<string>>(() => new Set());
+  const [expandedCommentIds, setExpandedCommentIds] = useState<Set<string>>(() => new Set());
+  const [expandedReplyGroupIds, setExpandedReplyGroupIds] = useState<Set<string>>(() => new Set());
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(commentsStorageKey);
+      const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
+      window.queueMicrotask(() => setComments(Array.isArray(parsed[taskId]) ? parsed[taskId] : []));
+    } catch {
+      window.queueMicrotask(() => setComments([]));
+    }
+
+    try {
+      const rawProgress = window.localStorage.getItem(progressStorageKey);
+      const parsedProgress = rawProgress
+        ? (JSON.parse(rawProgress) as { items?: Record<string, { note?: string }> })
+        : null;
+      window.queueMicrotask(() => setMarkdown(parsedProgress?.items?.[taskId]?.note?.trim() ?? ''));
+    } catch {
+      window.queueMicrotask(() => setMarkdown(''));
+    }
+  }, [taskId]);
+
+  const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
+  const thread = useMemo(() => findCommentNode(commentTree, commentId), [commentId, commentTree]);
+  const openThreadIds = useMemo(() => new Set(thread ? [thread.id] : []), [thread]);
+  const markdownContext = useMemo(() => summarizeMarkdown(markdown), [markdown]);
+
+  const saveComments = (nextComments: NoteComment[]) => {
+    setComments(nextComments);
+
+    try {
+      const raw = window.localStorage.getItem(commentsStorageKey);
+      const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
+      parsed[taskId] = nextComments;
+      window.localStorage.setItem(commentsStorageKey, JSON.stringify(parsed));
+    } catch {
+      setError('Không lưu được comment vào localStorage của trình duyệt.');
+    }
+  };
+
+  const getDraft = (key: string) => drafts[key] ?? defaultDraft;
+  const updateDraft = (key: string, update: Partial<CommentDraft>) => {
+    setDrafts((current) => ({
+      ...current,
+      [key]: {
+        ...(current[key] ?? defaultDraft),
+        ...update,
+      },
+    }));
+  };
+
+  const resetDraft = (key: string) => {
+    setDrafts((current) => {
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+  };
+
+  const toggleCommentExpanded = (targetCommentId: string) => {
     setExpandedCommentIds((current) => {
       const next = new Set(current);
 
-      if (next.has(commentId)) {
-        next.delete(commentId);
+      if (next.has(targetCommentId)) {
+        next.delete(targetCommentId);
       } else {
-        next.add(commentId);
+        next.add(targetCommentId);
       }
 
       return next;
     });
   };
 
-  const deleteCommentBranch = (commentId: string) => {
-    const deleteIds = collectCommentBranchIds(comments, commentId);
+  const toggleReplyGroupExpanded = (targetCommentId: string) => {
+    setExpandedReplyGroupIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(targetCommentId)) {
+        next.delete(targetCommentId);
+      } else {
+        next.add(targetCommentId);
+      }
+
+      return next;
+    });
+  };
+
+  const deleteCommentBranch = (targetCommentId: string) => {
+    const deleteIds = collectCommentBranchIds(comments, targetCommentId);
 
     if (!deleteIds.size) {
       return;
@@ -181,6 +521,11 @@ export function MarkdownCommentThreads({
       return next;
     });
     setExpandedCommentIds((current) => {
+      const next = new Set(current);
+      deleteIds.forEach((id) => next.delete(id));
+      return next;
+    });
+    setExpandedReplyGroupIds((current) => {
       const next = new Set(current);
       deleteIds.forEach((id) => next.delete(id));
       return next;
@@ -328,64 +673,151 @@ export function MarkdownCommentThreads({
   return (
     <section className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
       <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-            Discussion
+            Discussion Thread
           </p>
-          <h2 className="mt-1 text-lg font-bold text-gray-950 dark:text-white">Comment & hỏi AI</h2>
+          <h2 className="mt-1 text-lg font-bold text-gray-950 dark:text-white">Chi tiết thread comment</h2>
         </div>
-        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-semibold text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
-          <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
-          {commentCount} comment
-        </div>
+        <Link
+          href={backHref}
+          className="inline-flex h-9 w-fit items-center justify-center rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+        >
+          Quay lại note
+        </Link>
       </div>
 
       <div className="space-y-5 p-4 sm:p-5">
-        <CommentComposer
-          draft={getDraft('root')}
-          isSubmitting={submittingKey === 'root'}
-          submitLabel="Gửi"
-          onSubmit={(event) => submitDraft(event, null)}
-          onChange={(update) => updateDraft('root', update)}
-        />
-
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
             {error}
           </div>
         )}
 
-        <div className="space-y-3">
-          {commentTree.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
-              Chưa có comment nào cho note này.
-            </div>
-          ) : (
-            commentTree.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                depth={0}
-                replyingTo={replyingTo}
-                getDraft={getDraft}
-                submittingKey={submittingKey}
-                streamingCommentIds={streamingCommentIds}
-                expandedCommentIds={expandedCommentIds}
-                onReply={setReplyingTo}
-                onDelete={deleteCommentBranch}
-                onToggleExpanded={toggleCommentExpanded}
-                onCancelReply={(commentId) => {
-                  setReplyingTo(null);
-                  resetDraft(commentId);
-                }}
-                onDraftChange={updateDraft}
-                onSubmit={submitDraft}
-              />
-            ))
-          )}
-        </div>
+        {thread ? (
+          <CommentItem
+            comment={thread}
+            depth={0}
+            replyingTo={replyingTo}
+            getDraft={getDraft}
+            submittingKey={submittingKey}
+            streamingCommentIds={streamingCommentIds}
+            expandedCommentIds={expandedCommentIds}
+            openThreadIds={openThreadIds}
+            expandedReplyGroupIds={expandedReplyGroupIds}
+            showThreadToggle={false}
+            onReply={setReplyingTo}
+            onDelete={deleteCommentBranch}
+            onToggleExpanded={toggleCommentExpanded}
+            onToggleThread={() => undefined}
+            onToggleReplyGroup={toggleReplyGroupExpanded}
+            onCancelReply={(targetCommentId) => {
+              setReplyingTo(null);
+              resetDraft(targetCommentId);
+            }}
+            onDraftChange={updateDraft}
+            onSubmit={submitDraft}
+          />
+        ) : (
+          <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
+            Không tìm thấy thread comment này trong localStorage của trình duyệt.
+          </div>
+        )}
       </div>
     </section>
+  );
+}
+
+function CommentThreadCard({
+  taskId,
+  comment,
+  streamingCommentIds,
+  onDelete,
+}: {
+  taskId: string;
+  comment: CommentNode;
+  streamingCommentIds: Set<string>;
+  onDelete: (commentId: string) => void;
+}) {
+  const isAi = comment.author === 'ai';
+  const nestedReplyCount = countNestedReplies(comment);
+  const latestActivity = getLatestActivityDate(comment);
+  const hasStreamingReply = hasStreamingComment(comment, streamingCommentIds);
+  const href = getThreadHref(taskId, comment.id);
+
+  return (
+    <article className={cn('rounded-lg border p-3', isAi ? 'border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/20' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950')}>
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <Link href={href} className="flex min-w-0 flex-1 items-center gap-2">
+          <span className={cn('inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full', isAi ? 'bg-blue-600 text-white' : 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-950')}>
+            {isAi ? <Bot className="h-4 w-4" aria-hidden="true" /> : <UserRound className="h-4 w-4" aria-hidden="true" />}
+          </span>
+          <span className="min-w-0">
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-bold text-gray-950 dark:text-white">
+                {isAi ? 'AI Assistant' : 'Bạn'}
+              </span>
+              {comment.model && (
+                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:ring-blue-900">
+                  {comment.model}
+                </span>
+              )}
+              {hasStreamingReply && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+                  <LoaderCircle className="h-3 w-3 animate-spin" aria-hidden="true" />
+                  Đang nhận
+                </span>
+              )}
+            </span>
+            <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">
+              {formatDate(comment.createdAt)}
+              {latestActivity !== comment.createdAt ? ` · mới nhất ${formatDate(latestActivity)}` : ''}
+            </span>
+          </span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => onDelete(comment.id)}
+          className="inline-flex h-8 shrink-0 items-center justify-center rounded-lg border border-red-200 px-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/70 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200"
+          aria-label="Xóa thread"
+          title="Xóa thread"
+        >
+          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      </div>
+
+      <Link
+        href={href}
+        className="mt-3 block rounded-md bg-white/72 p-3 transition hover:bg-gray-50 dark:bg-gray-950/45 dark:hover:bg-gray-900/80"
+      >
+        <p className="line-clamp-2 text-sm leading-6 text-gray-700 dark:text-gray-300">
+          {comment.body ? plainTextPreview(comment.body) : 'AI đang soạn câu trả lời...'}
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+          {nestedReplyCount > 0 && (
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-900">
+              {nestedReplyCount} trả lời
+            </span>
+          )}
+          {isAi && (
+            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+              Câu trả lời AI
+            </span>
+          )}
+          <span>Mở thread để đọc và trả lời</span>
+        </div>
+      </Link>
+
+      <div className="mt-3 flex justify-end">
+        <Link
+          href={href}
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+        >
+          <Reply className="h-3.5 w-3.5" aria-hidden="true" />
+          Mở thread
+        </Link>
+      </div>
+    </article>
   );
 }
 
@@ -747,9 +1179,14 @@ function CommentItem({
   submittingKey,
   streamingCommentIds,
   expandedCommentIds,
+  openThreadIds,
+  expandedReplyGroupIds,
+  showThreadToggle = true,
   onReply,
   onDelete,
   onToggleExpanded,
+  onToggleThread,
+  onToggleReplyGroup,
   onCancelReply,
   onDraftChange,
   onSubmit,
@@ -761,9 +1198,14 @@ function CommentItem({
   submittingKey: string | null;
   streamingCommentIds: Set<string>;
   expandedCommentIds: Set<string>;
+  openThreadIds: Set<string>;
+  expandedReplyGroupIds: Set<string>;
+  showThreadToggle?: boolean;
   onReply: (commentId: string) => void;
   onDelete: (commentId: string) => void;
   onToggleExpanded: (commentId: string) => void;
+  onToggleThread: (commentId: string) => void;
+  onToggleReplyGroup: (commentId: string) => void;
   onCancelReply: (commentId: string) => void;
   onDraftChange: (key: string, update: Partial<CommentDraft>) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>, parentId: string | null) => void;
@@ -775,6 +1217,16 @@ function CommentItem({
   const isStreaming = streamingCommentIds.has(comment.id);
   const isLong = isLongComment(comment.body);
   const isExpanded = expandedCommentIds.has(comment.id);
+  const nestedReplyCount = countNestedReplies(comment);
+  const latestActivity = getLatestActivityDate(comment);
+  const hasStreamingReply = hasStreamingComment(comment, streamingCommentIds);
+  const isThreadOpen = depth > 0 || openThreadIds.has(comment.id) || replyingTo === comment.id || hasStreamingReply;
+  const isReplyGroupExpanded = expandedReplyGroupIds.has(comment.id);
+  const visibleReplies =
+    depth === 0 && !isReplyGroupExpanded
+      ? comment.replies.slice(Math.max(comment.replies.length - visibleReplyPreviewCount, 0))
+      : comment.replies;
+  const hiddenReplyCount = Math.max(comment.replies.length - visibleReplies.length, 0);
 
   return (
     <div className={cn(depth > 0 && 'border-l border-gray-200 pl-3 dark:border-gray-800')} style={{ marginLeft: `${compactDepth * 0.4}rem` }}>
@@ -795,10 +1247,24 @@ function CommentItem({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(comment.createdAt)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {formatDate(comment.createdAt)}
+                {depth === 0 && latestActivity !== comment.createdAt ? ` · mới nhất ${formatDate(latestActivity)}` : ''}
+              </p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
+            {depth === 0 && showThreadToggle && (
+              <button
+                type="button"
+                onClick={() => onToggleThread(comment.id)}
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+                aria-expanded={isThreadOpen}
+              >
+                {isThreadOpen ? <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" /> : <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />}
+                {isThreadOpen ? 'Thu gọn' : 'Mở'}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onReply(comment.id)}
@@ -819,57 +1285,82 @@ function CommentItem({
           </div>
         </div>
 
-        <div className="mt-3 rounded-md bg-white/72 dark:bg-gray-950/45">
-          <div
-            className={cn(
-              'relative overflow-hidden p-3',
-              isLong && !isExpanded && 'max-h-72'
-            )}
+        {depth === 0 && !isThreadOpen ? (
+          <button
+            type="button"
+            onClick={() => onToggleThread(comment.id)}
+            className="mt-3 block w-full rounded-md bg-white/72 p-3 text-left transition hover:bg-gray-50 dark:bg-gray-950/45 dark:hover:bg-gray-900/80"
           >
-            {comment.body ? (
-              <MarkdownPreview content={comment.body} />
-            ) : (
-              <div className="flex items-center gap-2 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
-                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
-                AI đang soạn câu trả lời...
+            <p className="line-clamp-2 text-sm leading-6 text-gray-700 dark:text-gray-300">
+              {comment.body ? plainTextPreview(comment.body) : 'AI đang soạn câu trả lời...'}
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+              {nestedReplyCount > 0 && (
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-900">
+                  {nestedReplyCount} trả lời
+                </span>
+              )}
+              {isAi && (
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+                  Câu trả lời AI
+                </span>
+              )}
+              <span>Mở thread để đọc chi tiết</span>
+            </div>
+          </button>
+        ) : (
+          <div className="mt-3 rounded-md bg-white/72 dark:bg-gray-950/45">
+            <div
+              className={cn(
+                'relative overflow-hidden p-3',
+                isLong && !isExpanded && 'max-h-72'
+              )}
+            >
+              {comment.body ? (
+                <MarkdownPreview content={comment.body} />
+              ) : (
+                <div className="flex items-center gap-2 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  AI đang soạn câu trả lời...
+                </div>
+              )}
+              {isStreaming && comment.body && (
+                <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
+                  <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  Đang nhận nội dung
+                </span>
+              )}
+              {isLong && !isExpanded && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white dark:to-gray-950" />
+              )}
+            </div>
+            {isLong && (
+              <div className="border-t border-gray-200 px-3 py-2 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => onToggleExpanded(comment.id)}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 transition hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+                  aria-expanded={isExpanded}
+                >
+                  {isExpanded ? (
+                    <>
+                      <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
+                      Thu gọn
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+                      {isAi ? 'Mở câu trả lời AI' : 'Xem thêm nội dung Markdown'}
+                    </>
+                  )}
+                </button>
               </div>
             )}
-            {isStreaming && comment.body && (
-              <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
-                <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                Đang nhận nội dung
-              </span>
-            )}
-            {isLong && !isExpanded && (
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white dark:to-gray-950" />
-            )}
           </div>
-          {isLong && (
-            <div className="border-t border-gray-200 px-3 py-2 dark:border-gray-800">
-              <button
-                type="button"
-                onClick={() => onToggleExpanded(comment.id)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 transition hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
-                aria-expanded={isExpanded}
-              >
-                {isExpanded ? (
-                  <>
-                    <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
-                    Thu gọn
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
-                    Xem thêm nội dung Markdown
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
+        )}
       </article>
 
-      {replyingTo === comment.id && (
+      {isThreadOpen && replyingTo === comment.id && (
         <div className="mt-3">
           <CommentComposer
             draft={draft}
@@ -882,9 +1373,21 @@ function CommentItem({
         </div>
       )}
 
-      {comment.replies.length > 0 && (
+      {isThreadOpen && comment.replies.length > 0 && (
         <div className="mt-3 space-y-3">
-          {comment.replies.map((reply) => (
+          {hiddenReplyCount > 0 && (
+            <button
+              type="button"
+              onClick={() => onToggleReplyGroup(comment.id)}
+              className="ml-3 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+              aria-expanded={isReplyGroupExpanded}
+            >
+              <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+              Xem thêm {hiddenReplyCount} trả lời cũ hơn
+            </button>
+          )}
+
+          {visibleReplies.map((reply) => (
             <CommentItem
               key={reply.id}
               comment={reply}
@@ -894,9 +1397,14 @@ function CommentItem({
               submittingKey={submittingKey}
               streamingCommentIds={streamingCommentIds}
               expandedCommentIds={expandedCommentIds}
+              openThreadIds={openThreadIds}
+              expandedReplyGroupIds={expandedReplyGroupIds}
+              showThreadToggle={showThreadToggle}
               onReply={onReply}
               onDelete={onDelete}
               onToggleExpanded={onToggleExpanded}
+              onToggleThread={onToggleThread}
+              onToggleReplyGroup={onToggleReplyGroup}
               onCancelReply={onCancelReply}
               onDraftChange={onDraftChange}
               onSubmit={onSubmit}
@@ -932,6 +1440,32 @@ function collectCommentBranchIds(comments: NoteComment[], commentId: string) {
   return deleteIds;
 }
 
+function countNestedReplies(comment: CommentNode): number {
+  return comment.replies.reduce((count, reply) => count + 1 + countNestedReplies(reply), 0);
+}
+
+function getLatestActivityDate(comment: CommentNode): string {
+  return [comment.createdAt, ...comment.replies.map(getLatestActivityDate)].sort(
+    (left, right) => new Date(right).getTime() - new Date(left).getTime()
+  )[0];
+}
+
+function hasStreamingComment(comment: CommentNode, streamingCommentIds: Set<string>): boolean {
+  return streamingCommentIds.has(comment.id) || comment.replies.some((reply) => hasStreamingComment(reply, streamingCommentIds));
+}
+
+function plainTextPreview(markdown: string) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, ' [code] ')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/[*_~>#-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function isLongComment(body: string) {
   return body.length > longCommentLength || body.split(/\r\n|\r|\n/).length > longCommentLineCount;
 }
@@ -960,6 +1494,26 @@ function buildCommentTree(comments: NoteComment[]) {
 
   sortByCreatedAt(roots);
   return roots;
+}
+
+function findCommentNode(comments: CommentNode[], commentId: string): CommentNode | null {
+  for (const comment of comments) {
+    if (comment.id === commentId) {
+      return comment;
+    }
+
+    const nested = findCommentNode(comment.replies, commentId);
+
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return null;
+}
+
+function getThreadHref(taskId: string, commentId: string) {
+  return `/skill-roadmap/notes/${encodeURIComponent(taskId)}/comments/${encodeURIComponent(commentId)}`;
 }
 
 function createComment({

@@ -8,6 +8,8 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added dedicated Markdown comment thread detail pages at `/skill-roadmap/notes/[taskId]/comments/[commentId]`; the Markdown note page now acts as a compact thread inbox while reading/replying happens on the focused thread page backed by the same localStorage comment data
+- [x] Compact Markdown preview discussion threads so the root composer opens on demand, only recent root threads render initially, collapsed root threads show a two-line preview with reply/activity metadata, and opened threads show only the latest replies until users expand older replies
 - [x] Reworked the Markdown preview AI model selector into a professional searchable model picker with provider model filtering by name/id/owner, selected-model highlighting, result counts, empty search state, manual model fallback before provider models are loaded, and auto-collapse after model selection
 - [x] Upgraded Markdown preview "Hỏi AI" answers to stream progressively: `/api/ai/comment` now requests OpenAI-compatible streaming chat completions and the comment UI creates a temporary AI reply, renders incoming Markdown chunks live, shows a professional typing/receiving state, and persists the final answer
 - [x] Added AI model discovery for Markdown preview comment composer: `/api/ai/models` now calls OpenAI-compatible `/models` using the provider Base URL without requiring an API key unless the provider itself requires one, with Kilo AI preset to `https://api.kilo.ai/api/gateway`; the "Hỏi AI" composer can load provider models into a selectable dropdown while keeping manual model entry as fallback
@@ -210,6 +212,8 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Added dedicated Markdown comment thread detail pages and changed note comments into compact links to focused thread conversations |
+| 2026-06-18 | Compacted Markdown preview discussion threads with on-demand composer, root thread previews, visible thread limits, and collapsed older replies |
 | 2026-06-18 | Reworked Markdown preview AI model selection into a searchable model picker |
 | 2026-06-18 | Changed Markdown preview AI answers from wait-then-render to progressive streaming replies |
 | 2026-06-18 | Added provider model discovery and selectable model dropdown to Markdown preview AI questions |
