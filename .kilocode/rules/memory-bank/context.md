@@ -8,6 +8,10 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added Markdown note preview comment threads with unlimited nested replies, browser localStorage persistence per task, and a composer that can switch between normal comments and AI questions
+- [x] Added `/api/ai/comment` OpenAI-compatible AI bridge for Markdown preview comments, supporting OpenRouter by default and custom/Kilo AI-compatible Base URLs, with API keys entered per AI request and never stored by the app
+- [x] Added Markdown preview comment deletion and professional long-comment collapsing with rendered Markdown fade-out/expand controls, including branch deletion for comments with replies
+- [x] Extended `/skill-roadmap` backup tools so Export JSON, Import JSON, and GitHub commit backup include Markdown preview comments alongside roadmap progress while remaining compatible with old progress-only backup files
 - [x] Updated `/skill-roadmap` completed-task note inputs so empty notes show a red border and notes with trimmed content show a green border
 - [x] Added a `/skill-roadmap` study status filter so users can show all tasks, completed tasks, not-started tasks, partially in-progress parent tasks, or tasks with notes while keeping matching child tasks visible under their parent hierarchy
 - [x] Added a confirmed reset action in `/skill-roadmap` backup tools to clear browser `skill-roadmap-progress:v1` localStorage and reload the latest progress seed from the project JSON
@@ -126,6 +130,10 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab by reading the same browser progress storage, with sticky task metadata and completion status on desktop
 - Completed task note inputs on `/skill-roadmap` visually flag missing note content with red borders and switch to green once the note has non-whitespace content.
 - Markdown note preview now uses reusable `src/components/markdown/MarkdownPreview.tsx` and supports richer professional Markdown formatting for headings, body text, tables, syntax-highlighted source code with auto-detected languages, SQL/database snippets, checklists, links, images, callouts, generated heading anchors, a desktop sidebar appendix/table of contents with independent scrolling and active-section highlighting, a mobile floating appendix bottom sheet, horizontal-overflow-safe responsive containers, and dedicated light/dark readability palettes that follow the actual rendered page theme
+- Markdown note preview now includes `src/components/roadmap/MarkdownCommentThreads.tsx`, which stores nested comment/reply threads in browser `localStorage` under `skill-roadmap-note-comments:v1`. The composer can submit normal comments or ask AI; AI answers are inserted as replies, and follow-up AI requests include a compact Markdown summary plus the active comment ancestry for context.
+- Markdown preview comments can be deleted; deleting a parent comment also removes its nested replies after confirmation. Long comments stay rendered as Markdown but are height-constrained with a fade-out and "Xem thêm nội dung Markdown" / "Thu gọn" control.
+- `/skill-roadmap` backup now exports a versioned JSON object containing `progress` and `comments`, where comments come from `skill-roadmap-note-comments:v1`. Import accepts both this combined format and older progress-only JSON backups. GitHub backup commits the combined payload, and the Clear localStorage action now clears both progress and comment storage before reloading progress from the project seed.
+- `/api/ai/comment` proxies one-off AI questions to OpenAI-compatible chat completion endpoints. OpenRouter uses a preset base URL, while Kilo AI or other providers can be used through the custom Base URL field. API keys are submitted only with the request and are not persisted in localStorage or environment defaults.
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
@@ -187,6 +195,9 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Extended roadmap backup/export/import/GitHub commit flow to include Markdown preview comments in addition to progress and notes |
+| 2026-06-18 | Added delete controls for Markdown preview comments, including nested branch deletion, plus rendered Markdown long-comment collapse/expand behavior |
+| 2026-06-18 | Added nested Markdown preview comment threads with normal-comment/ask-AI composer, OpenRouter/custom OpenAI-compatible AI bridge, per-request API key entry, and compact Markdown/thread context for AI replies |
 | 2026-06-18 | Updated `/skill-roadmap` note input borders to red when empty and green when populated |
 | 2026-06-18 | Added study status filtering to `/skill-roadmap` for completed, not-started, in-progress parent tasks, and tasks with notes |
 | 2026-06-18 | Added confirmed `/skill-roadmap` backup action to clear progress localStorage and reload the newest project JSON seed |

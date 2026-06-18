@@ -127,6 +127,7 @@ bun typecheck      # Run TypeScript type checking
 - Contact form handler
 - PDF/text/JSON export endpoints
 - Skill roadmap progress seed/local-dev JSON sync and optional GitHub backup endpoints
+- Markdown preview AI comment bridge at `/api/ai/comment`, using OpenAI-compatible chat completion APIs with user-supplied per-request API keys
 - Can be extended for additional functionality
 
 ### Browser Support

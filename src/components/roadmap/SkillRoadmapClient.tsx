@@ -78,6 +78,23 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type NoteComment = {
+  id: string;
+  parentId: string | null;
+  author: 'user' | 'ai';
+  body: string;
+  createdAt: string;
+  model?: string;
+  provider?: string;
+};
+
+type RoadmapBackupFile = {
+  version: 2;
+  exportedAt: string;
+  progress: ProgressFile;
+  comments: Record<string, NoteComment[]>;
+};
+
 type StudyStatusFilter = 'all' | 'completed' | 'incomplete' | 'in-progress' | 'with-note';
 
 type GithubBackupConfig = {
@@ -99,6 +116,7 @@ const emptyProgress: ProgressFile = {
 };
 
 const progressStorageKey = 'skill-roadmap-progress:v1';
+const commentsStorageKey = 'skill-roadmap-note-comments:v1';
 const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 const levelStyles: Record<string, string> = {
@@ -412,18 +430,19 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setBackupMessage(null);
 
     try {
-      const blob = new Blob([`${JSON.stringify(progress, null, 2)}\n`], {
+      const backup = buildRoadmapBackup(progress);
+      const blob = new Blob([`${JSON.stringify(backup, null, 2)}\n`], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = `skill-roadmap-progress-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.download = `skill-roadmap-backup-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập và comment.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -444,19 +463,20 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
     try {
       const text = await file.text();
-      const data = normalizeProgress(JSON.parse(text));
+      const data = normalizeRoadmapBackup(JSON.parse(text));
 
       if (!data) {
-        throw new Error('File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.');
+        throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress và comments.');
       }
 
       const imported = {
-        ...data,
+        ...data.progress,
         updatedAt: new Date().toISOString(),
       };
 
       setProgress(imported);
       storeProgress(imported);
+      storeComments(data.comments);
 
       if (shouldSyncProgressFile) {
         await fetch('/api/skill-roadmap/progress', {
@@ -466,7 +486,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         });
       }
 
-      setBackupMessage('Đã import backup JSON vào tiến độ trong trình duyệt.');
+      setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập và comment.');
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không import được file backup.'
@@ -479,7 +499,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
   async function resetProgressFromProject() {
     const confirmed = window.confirm(
-      'Bạn chắc chắn muốn xoá tiến độ đang lưu trong trình duyệt và tải lại dữ liệu mới nhất từ file JSON trong project?'
+      'Bạn chắc chắn muốn xoá tiến độ và comment đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
     );
 
     if (!confirmed) {
@@ -493,6 +513,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
     try {
       removeStoredProgress();
+      removeStoredComments();
 
       const response = await fetch('/api/skill-roadmap/progress', {
         cache: 'no-store',
@@ -511,7 +532,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       setProgress(data);
       storeProgress(data);
       setLoadError(null);
-      setBackupMessage('Đã xoá localStorage và tải lại tiến độ mới nhất từ project.');
+      setBackupMessage('Đã xoá tiến độ/comment trong localStorage và tải lại tiến độ mới nhất từ project.');
     } catch (error) {
       setBackupError(
         error instanceof Error
@@ -539,7 +560,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           branch: githubBranch,
           backupPath: githubBackupPath,
           commitMessage: githubCommitMessage,
-          progress,
+          progress: buildRoadmapBackup(progress),
         }),
       });
 
@@ -556,7 +577,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       setGithubToken('');
       setGithubCommitUrl(result.commitUrl ?? null);
-      setBackupMessage(`Đã commit backup lên GitHub: ${result.path ?? githubBackupPath}.`);
+      setBackupMessage(`Đã commit backup gồm tiến độ và comment lên GitHub: ${result.path ?? githubBackupPath}.`);
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không backup được lên GitHub.'
@@ -621,9 +642,10 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                 Backup tiến độ học tập
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
-                Export/Import JSON là lựa chọn an toàn nhất cho backup thủ công. GitHub
-                backup phù hợp khi dùng riêng; token chỉ gửi một lần tới API server và
-                không được lưu lại.
+                Export/Import JSON là lựa chọn an toàn nhất cho backup thủ công. File
+                backup hiện bao gồm cả tiến độ học tập, note và comment trong màn hình
+                preview Markdown. GitHub backup phù hợp khi dùng riêng; token chỉ gửi
+                một lần tới API server và không được lưu lại.
               </p>
             </div>
 
@@ -1007,8 +1029,129 @@ function removeStoredProgress() {
   }
 }
 
+function removeStoredComments() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(commentsStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
+function readStoredComments(): Record<string, NoteComment[]> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(commentsStorageKey);
+    return raw ? normalizeCommentsByTask(JSON.parse(raw)) ?? {} : {};
+  } catch {
+    return {};
+  }
+}
+
+function storeComments(comments: Record<string, NoteComment[]>) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(commentsStorageKey, JSON.stringify(comments));
+  } catch {
+    // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
+function buildRoadmapBackup(progress: ProgressFile): RoadmapBackupFile {
+  return {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    progress,
+    comments: readStoredComments(),
+  };
+}
+
 function isRecord(input: unknown): input is Record<string, unknown> {
   return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeComment(input: unknown): NoteComment | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const author = input.author === 'ai' ? 'ai' : input.author === 'user' ? 'user' : null;
+
+  if (
+    typeof input.id !== 'string' ||
+    (typeof input.parentId !== 'string' && input.parentId !== null) ||
+    !author ||
+    typeof input.body !== 'string' ||
+    typeof input.createdAt !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    parentId: input.parentId,
+    author,
+    body: input.body,
+    createdAt: input.createdAt,
+    model: typeof input.model === 'string' ? input.model : undefined,
+    provider: typeof input.provider === 'string' ? input.provider : undefined,
+  };
+}
+
+function normalizeCommentsByTask(input: unknown): Record<string, NoteComment[]> | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const comments: Record<string, NoteComment[]> = {};
+
+  for (const [taskId, rawComments] of Object.entries(input)) {
+    if (!Array.isArray(rawComments)) {
+      return null;
+    }
+
+    const normalized = rawComments.map(normalizeComment);
+
+    if (normalized.some((comment) => !comment)) {
+      return null;
+    }
+
+    comments[taskId] = normalized as NoteComment[];
+  }
+
+  return comments;
+}
+
+function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]> } | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const progress = normalizeProgress(input.progress ?? input);
+
+  if (!progress) {
+    return null;
+  }
+
+  const comments = input.comments === undefined ? readStoredComments() : normalizeCommentsByTask(input.comments);
+
+  if (!comments) {
+    return null;
+  }
+
+  return {
+    progress,
+    comments,
+  };
 }
 
 function normalizeProgressItem(input: unknown): ProgressItem | null {

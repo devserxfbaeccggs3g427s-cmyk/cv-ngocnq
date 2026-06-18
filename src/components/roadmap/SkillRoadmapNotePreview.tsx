@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ListTree, X } from 'lucide-react';
 import { extractMarkdownHeadings, MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import type { MarkdownHeading } from '@/components/markdown/MarkdownPreview';
+import { MarkdownCommentThreads } from '@/components/roadmap/MarkdownCommentThreads';
 import { cn } from '@/lib/utils';
 
 type ProgressItem = {
@@ -150,14 +151,18 @@ export function SkillRoadmapNotePreview({
         )}
       </aside>
 
-      <article className="min-w-0 max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
-        <div className="min-w-0 overflow-hidden text-ellipsis border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:text-gray-200">
-          {taskId}.md
-        </div>
-        <div className="min-w-0 max-w-full overflow-hidden p-4 sm:p-5">
-          <MarkdownPreview content={note} />
-        </div>
-      </article>
+      <div className="min-w-0 space-y-4">
+        <article className="min-w-0 max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+          <div className="min-w-0 overflow-hidden text-ellipsis border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:text-gray-200">
+            {taskId}.md
+          </div>
+          <div className="min-w-0 max-w-full overflow-hidden p-4 sm:p-5">
+            <MarkdownPreview content={note} />
+          </div>
+        </article>
+
+        <MarkdownCommentThreads taskId={taskId} markdown={note} />
+      </div>
 
       {headings.length > 0 && (
         <>
