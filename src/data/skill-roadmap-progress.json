@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "exportedAt": "2026-06-18T04:17:01.239Z",
+  "exportedAt": "2026-06-18T04:17:36.620Z",
   "progress": {
-    "updatedAt": "2026-06-18T03:41:33.843Z",
+    "updatedAt": "2026-06-18T04:17:32.898Z",
     "items": {
       "java-001.oop.composition": {
         "completed": true,
@@ -150,5 +150,43 @@
       }
     }
   },
-  "comments": {}
+  "comments": {
+    "java-001": [
+      {
+        "id": "bd741431-a909-44a4-9e61-f2164e85e8ea",
+        "parentId": null,
+        "author": "user",
+        "body": "xin chào 1",
+        "createdAt": "2026-06-18T03:29:01.617Z"
+      },
+      {
+        "id": "40113068-d3fc-491e-a109-a6759e46443d",
+        "parentId": "bd741431-a909-44a4-9e61-f2164e85e8ea",
+        "author": "user",
+        "body": "xin chào 1.1",
+        "createdAt": "2026-06-18T03:29:08.773Z"
+      },
+      {
+        "id": "4c8c3b79-c224-4657-8bb0-0aad4f196692",
+        "parentId": "40113068-d3fc-491e-a109-a6759e46443d",
+        "author": "user",
+        "body": "xin chào 1.1.1",
+        "createdAt": "2026-06-18T03:29:15.149Z"
+      },
+      {
+        "id": "a146af81-718a-451a-894a-796af36cb57e",
+        "parentId": "bd741431-a909-44a4-9e61-f2164e85e8ea",
+        "author": "user",
+        "body": "xin chào 1.2",
+        "createdAt": "2026-06-18T03:29:20.502Z"
+      },
+      {
+        "id": "576d160c-8e33-44e9-aca2-f4d9c35b73c8",
+        "parentId": null,
+        "author": "user",
+        "body": "xin chào 2",
+        "createdAt": "2026-06-18T03:30:20.252Z"
+      }
+    ]
+  }
 }
