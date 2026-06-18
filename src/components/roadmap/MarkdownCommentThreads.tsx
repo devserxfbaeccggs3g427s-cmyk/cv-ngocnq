@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Bot,
   Check,
@@ -402,6 +403,7 @@ export function MarkdownCommentThreadDetail({
   commentId: string;
   backHref: string;
 }) {
+  const router = useRouter();
   const [comments, setComments] = useState<NoteComment[]>([]);
   const [markdown, setMarkdown] = useState('');
   const [drafts, setDrafts] = useState<Record<string, CommentDraft>>({});
@@ -514,6 +516,12 @@ export function MarkdownCommentThreadDetail({
     }
 
     saveComments(comments.filter((comment) => !deleteIds.has(comment.id)));
+
+    if (targetCommentId === commentId) {
+      router.replace(backHref);
+      return;
+    }
+
     setReplyingTo((current) => (current && deleteIds.has(current) ? null : current));
     setDrafts((current) => {
       const next = { ...current };

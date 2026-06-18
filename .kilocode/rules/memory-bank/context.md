@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Fixed Markdown comment thread detail deletion so removing the root comment saves the deletion and immediately returns users to the parent note instead of leaving an empty thread screen
 - [x] Added dedicated Markdown comment thread detail pages at `/skill-roadmap/notes/[taskId]/comments/[commentId]`; the Markdown note page now acts as a compact thread inbox while reading/replying happens on the focused thread page backed by the same localStorage comment data
 - [x] Compact Markdown preview discussion threads so the root composer opens on demand, only recent root threads render initially, collapsed root threads show a two-line preview with reply/activity metadata, and opened threads show only the latest replies until users expand older replies
 - [x] Reworked the Markdown preview AI model selector into a professional searchable model picker with provider model filtering by name/id/owner, selected-model highlighting, result counts, empty search state, manual model fallback before provider models are loaded, and auto-collapse after model selection
@@ -212,6 +213,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Redirected Markdown comment thread detail back to the note after deleting the root thread comment |
 | 2026-06-18 | Added dedicated Markdown comment thread detail pages and changed note comments into compact links to focused thread conversations |
 | 2026-06-18 | Compacted Markdown preview discussion threads with on-demand composer, root thread previews, visible thread limits, and collapsed older replies |
 | 2026-06-18 | Reworked Markdown preview AI model selection into a searchable model picker |
