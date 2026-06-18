@@ -3,11 +3,15 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   Bot,
+  Check,
   ChevronDown,
   ChevronUp,
   KeyRound,
+  LoaderCircle,
   MessageSquarePlus,
+  RefreshCw,
   Reply,
+  Search,
   Send,
   Trash2,
   UserRound,
@@ -17,7 +21,7 @@ import { MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import { cn } from '@/lib/utils';
 
 type CommentMode = 'comment' | 'ai';
-type AiProvider = 'openrouter' | 'custom';
+type AiProvider = 'openrouter' | 'kilo' | 'custom';
 
 type NoteComment = {
   id: string;
@@ -38,6 +42,12 @@ type CommentDraft = {
   apiKey: string;
 };
 
+type AiModelOption = {
+  id: string;
+  name?: string;
+  owner?: string;
+};
+
 type CommentNode = NoteComment & {
   replies: CommentNode[];
 };
@@ -48,13 +58,18 @@ const longCommentLineCount = 14;
 const defaultDraft: CommentDraft = {
   mode: 'comment',
   body: '',
-  provider: 'openrouter',
+  provider: 'kilo',
   baseUrl: '',
   model: '',
   apiKey: '',
 };
 
 const providerOptions: Array<{ value: AiProvider; label: string; hint: string }> = [
+  {
+    value: 'kilo',
+    label: 'Kilo AI',
+    hint: 'Dùng Base URL mặc định https://api.kilo.ai/api/gateway.',
+  },
   {
     value: 'openrouter',
     label: 'OpenRouter',
@@ -78,6 +93,7 @@ export function MarkdownCommentThreads({
   const [drafts, setDrafts] = useState<Record<string, CommentDraft>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [submittingKey, setSubmittingKey] = useState<string | null>(null);
+  const [streamingCommentIds, setStreamingCommentIds] = useState<Set<string>>(() => new Set());
   const [expandedCommentIds, setExpandedCommentIds] = useState<Set<string>>(() => new Set());
   const [error, setError] = useState<string | null>(null);
 
@@ -200,6 +216,9 @@ export function MarkdownCommentThreads({
       return;
     }
 
+    let streamingReplyId: string | null = null;
+    let rollbackComments: NoteComment[] | null = null;
+
     try {
       const questionComment = createComment({
         parentId,
@@ -207,10 +226,25 @@ export function MarkdownCommentThreads({
         body,
       });
       const nextBeforeAi = [...comments, questionComment];
+      rollbackComments = nextBeforeAi;
 
       saveComments(nextBeforeAi);
       resetDraft(draftKey);
       setReplyingTo(null);
+
+      const aiReply = createComment({
+        parentId: questionComment.id,
+        author: 'ai',
+        body: '',
+        model: draft.model,
+        provider: draft.provider,
+      });
+      const nextWithPlaceholder = [...nextBeforeAi, aiReply];
+      let streamedAnswer = '';
+      streamingReplyId = aiReply.id;
+
+      setStreamingCommentIds((current) => new Set(current).add(aiReply.id));
+      saveComments(nextWithPlaceholder);
 
       const response = await fetch('/api/ai/comment', {
         method: 'POST',
@@ -228,24 +262,65 @@ export function MarkdownCommentThreads({
         }),
       });
 
-      const responseBody = (await response.json().catch(() => ({}))) as { answer?: string; error?: string };
-
-      if (!response.ok || !responseBody.answer) {
+      if (!response.ok) {
+        const responseBody = (await response.json().catch(() => ({}))) as { error?: string };
         throw new Error(responseBody.error ?? 'Không nhận được câu trả lời từ AI.');
       }
 
-      const aiReply = createComment({
-        parentId: questionComment.id,
-        author: 'ai',
-        body: responseBody.answer,
-        model: draft.model,
-        provider: draft.provider,
-      });
+      if (!response.body) {
+        throw new Error('Không đọc được stream trả lời từ AI.');
+      }
 
-      saveComments([...nextBeforeAi, aiReply]);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        streamedAnswer += decoder.decode(value, { stream: true });
+        saveComments([
+          ...nextBeforeAi,
+          {
+            ...aiReply,
+            body: streamedAnswer,
+          },
+        ]);
+      }
+
+      streamedAnswer += decoder.decode();
+
+      if (!streamedAnswer.trim()) {
+        throw new Error('AI provider không trả về nội dung trả lời.');
+      }
+
+      saveComments([
+        ...nextBeforeAi,
+        {
+          ...aiReply,
+          body: streamedAnswer.trim(),
+        },
+      ]);
     } catch (submitError) {
+      if (rollbackComments) {
+        saveComments(rollbackComments);
+      }
+
       setError(submitError instanceof Error ? submitError.message : 'Không gửi được câu hỏi tới AI.');
     } finally {
+      if (streamingReplyId) {
+        const completedStreamingReplyId = streamingReplyId;
+
+        setStreamingCommentIds((current) => {
+          const next = new Set(current);
+          next.delete(completedStreamingReplyId);
+          return next;
+        });
+      }
+
       setSubmittingKey(null);
     }
   };
@@ -294,6 +369,7 @@ export function MarkdownCommentThreads({
                 replyingTo={replyingTo}
                 getDraft={getDraft}
                 submittingKey={submittingKey}
+                streamingCommentIds={streamingCommentIds}
                 expandedCommentIds={expandedCommentIds}
                 onReply={setReplyingTo}
                 onDelete={deleteCommentBranch}
@@ -328,6 +404,78 @@ function CommentComposer({
   onChange: (update: Partial<CommentDraft>) => void;
   onCancel?: () => void;
 }) {
+  const [modelOptions, setModelOptions] = useState<AiModelOption[]>([]);
+  const [modelSearch, setModelSearch] = useState('');
+  const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
+  const [loadedModelKey, setLoadedModelKey] = useState('');
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [modelError, setModelError] = useState<{ key: string; message: string } | null>(null);
+  const modelRequestKey = [
+    draft.provider,
+    draft.provider === 'custom' ? draft.baseUrl.trim() : '',
+  ].join('|');
+  const currentModelOptions = loadedModelKey === modelRequestKey ? modelOptions : [];
+  const currentModelError = modelError?.key === modelRequestKey ? modelError.message : null;
+  const normalizedModelSearch = modelSearch.trim().toLowerCase();
+  const filteredModelOptions = normalizedModelSearch
+    ? currentModelOptions.filter((model) =>
+        [model.id, model.name, model.owner]
+          .filter(Boolean)
+          .some((value) => value?.toLowerCase().includes(normalizedModelSearch))
+      )
+    : currentModelOptions;
+  const selectedModel = currentModelOptions.find((model) => model.id === draft.model);
+
+  const canLoadModels =
+    draft.mode === 'ai' &&
+    (draft.provider !== 'custom' || Boolean(draft.baseUrl.trim()));
+
+  const loadModels = async () => {
+    setModelError(null);
+    setIsLoadingModels(true);
+
+    try {
+      const response = await fetch('/api/ai/models', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          provider: draft.provider,
+          apiKey: draft.apiKey,
+          baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
+        }),
+      });
+
+      const responseBody = (await response.json().catch(() => ({}))) as {
+        models?: AiModelOption[];
+        error?: string;
+      };
+
+      if (!response.ok || !Array.isArray(responseBody.models)) {
+        throw new Error(responseBody.error ?? 'Không tải được danh sách model.');
+      }
+
+      setModelOptions(responseBody.models);
+      setLoadedModelKey(modelRequestKey);
+      setModelSearch('');
+      setIsModelPickerOpen(true);
+
+      if (!draft.model && responseBody.models[0]?.id) {
+        onChange({ model: responseBody.models[0].id });
+      }
+    } catch (error) {
+      setModelOptions([]);
+      setLoadedModelKey('');
+      setModelError({
+        key: modelRequestKey,
+        message: error instanceof Error ? error.message : 'Không tải được danh sách model.',
+      });
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
+
   return (
     <form onSubmit={onSubmit} className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900/70">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -356,7 +504,7 @@ function CommentComposer({
             </span>
             <select
               value={draft.provider}
-              onChange={(event) => onChange({ provider: event.target.value as AiProvider })}
+              onChange={(event) => onChange({ provider: event.target.value as AiProvider, model: '' })}
               className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
             >
               {providerOptions.map((option) => (
@@ -371,12 +519,110 @@ function CommentComposer({
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
               Model
             </span>
-            <input
-              value={draft.model}
-              onChange={(event) => onChange({ model: event.target.value })}
-              placeholder="Nhập model theo provider"
-              className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
-            />
+            {currentModelOptions.length > 0 ? (
+              <div className="mt-1">
+                <button
+                  type="button"
+                  onClick={() => setIsModelPickerOpen((current) => !current)}
+                  className="flex min-h-10 w-full min-w-0 items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-sm transition hover:border-blue-300 focus:border-blue-400 focus:outline-none dark:border-gray-800 dark:bg-gray-950 dark:hover:border-blue-800 dark:focus:border-blue-700"
+                  aria-expanded={isModelPickerOpen}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold text-gray-900 dark:text-gray-100">
+                      {selectedModel?.name || draft.model || 'Chọn model'}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-gray-500 dark:text-gray-400">
+                      {selectedModel?.name ? selectedModel.id : selectedModel?.owner || `${currentModelOptions.length} model đã tải`}
+                    </span>
+                  </span>
+                  <ChevronDown
+                    className={cn('h-4 w-4 shrink-0 text-gray-400 transition', isModelPickerOpen && 'rotate-180')}
+                    aria-hidden="true"
+                  />
+                </button>
+
+                {isModelPickerOpen && (
+                  <div className="mt-2 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+                    <div className="border-b border-gray-200 p-2 dark:border-gray-800">
+                      <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-2 focus-within:border-blue-400 focus-within:bg-white dark:border-gray-800 dark:bg-gray-900 dark:focus-within:border-blue-700 dark:focus-within:bg-gray-950">
+                        <Search className="h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+                        <input
+                          value={modelSearch}
+                          onChange={(event) => setModelSearch(event.target.value)}
+                          placeholder="Tìm model theo tên, id hoặc owner"
+                          className="min-w-0 flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-gray-100"
+                        />
+                      </div>
+                      <div className="mt-2 flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span>{filteredModelOptions.length}/{currentModelOptions.length} model</span>
+                        {selectedModel && (
+                          <span className="truncate font-semibold text-blue-700 dark:text-blue-300">
+                            Đang chọn: {selectedModel.name || selectedModel.id}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="max-h-56 overflow-y-auto p-1">
+                      {filteredModelOptions.length > 0 ? (
+                        filteredModelOptions.map((model) => {
+                          const isSelected = model.id === draft.model;
+
+                          return (
+                            <button
+                              key={model.id}
+                              type="button"
+                              onClick={() => {
+                                onChange({ model: model.id });
+                                setModelSearch('');
+                                setIsModelPickerOpen(false);
+                              }}
+                              className={cn(
+                                'flex w-full min-w-0 items-start gap-2 rounded-md px-2.5 py-2 text-left transition',
+                                isSelected
+                                  ? 'bg-blue-50 text-blue-900 dark:bg-blue-950/50 dark:text-blue-100'
+                                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-900'
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
+                                  isSelected
+                                    ? 'border-blue-600 bg-blue-600 text-white dark:border-blue-400 dark:bg-blue-400 dark:text-blue-950'
+                                    : 'border-gray-300 text-transparent dark:border-gray-700'
+                                )}
+                              >
+                                <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-sm font-semibold">
+                                  {model.name || model.id}
+                                </span>
+                                <span className="mt-0.5 block truncate text-xs text-gray-500 dark:text-gray-400">
+                                  {model.name ? model.id : model.owner || 'OpenAI-compatible model'}
+                                  {model.name && model.owner ? ` · ${model.owner}` : ''}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <div className="px-3 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                          Không tìm thấy model phù hợp.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <input
+                value={draft.model}
+                onChange={(event) => onChange({ model: event.target.value })}
+                placeholder="Tải danh sách hoặc nhập model thủ công"
+                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+              />
+            )}
           </label>
 
           {draft.provider === 'custom' && (
@@ -409,6 +655,27 @@ function CommentComposer({
               className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
             />
           </label>
+
+          <div className="flex flex-col gap-2 md:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Tải danh sách model do kênh AI cung cấp. API key chỉ cần khi gửi câu hỏi; Base URL chỉ cần nhập khi chọn Custom.
+            </p>
+            <button
+              type="button"
+              onClick={loadModels}
+              disabled={!canLoadModels || isLoadingModels}
+              className="inline-flex h-9 w-fit items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-blue-800 dark:hover:text-blue-300"
+            >
+              <RefreshCw className={cn('h-4 w-4', isLoadingModels && 'animate-spin')} aria-hidden="true" />
+              {isLoadingModels ? 'Đang tải model...' : 'Tải danh sách model'}
+            </button>
+          </div>
+
+          {currentModelError && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 md:col-span-2">
+              {currentModelError}
+            </div>
+          )}
         </div>
       )}
 
@@ -478,6 +745,7 @@ function CommentItem({
   replyingTo,
   getDraft,
   submittingKey,
+  streamingCommentIds,
   expandedCommentIds,
   onReply,
   onDelete,
@@ -491,6 +759,7 @@ function CommentItem({
   replyingTo: string | null;
   getDraft: (key: string) => CommentDraft;
   submittingKey: string | null;
+  streamingCommentIds: Set<string>;
   expandedCommentIds: Set<string>;
   onReply: (commentId: string) => void;
   onDelete: (commentId: string) => void;
@@ -503,6 +772,7 @@ function CommentItem({
   const compactDepth = Math.min(depth, 4);
   const draft = getDraft(comment.id);
   const isSubmitting = submittingKey === comment.id;
+  const isStreaming = streamingCommentIds.has(comment.id);
   const isLong = isLongComment(comment.body);
   const isExpanded = expandedCommentIds.has(comment.id);
 
@@ -556,7 +826,20 @@ function CommentItem({
               isLong && !isExpanded && 'max-h-72'
             )}
           >
-            <MarkdownPreview content={comment.body} />
+            {comment.body ? (
+              <MarkdownPreview content={comment.body} />
+            ) : (
+              <div className="flex items-center gap-2 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
+                <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+                AI đang soạn câu trả lời...
+              </div>
+            )}
+            {isStreaming && comment.body && (
+              <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
+                <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                Đang nhận nội dung
+              </span>
+            )}
             {isLong && !isExpanded && (
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white dark:to-gray-950" />
             )}
@@ -609,6 +892,7 @@ function CommentItem({
               replyingTo={replyingTo}
               getDraft={getDraft}
               submittingKey={submittingKey}
+              streamingCommentIds={streamingCommentIds}
               expandedCommentIds={expandedCommentIds}
               onReply={onReply}
               onDelete={onDelete}

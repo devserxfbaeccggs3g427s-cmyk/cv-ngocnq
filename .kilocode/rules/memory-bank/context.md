@@ -8,6 +8,9 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Reworked the Markdown preview AI model selector into a professional searchable model picker with provider model filtering by name/id/owner, selected-model highlighting, result counts, empty search state, manual model fallback before provider models are loaded, and auto-collapse after model selection
+- [x] Upgraded Markdown preview "Hỏi AI" answers to stream progressively: `/api/ai/comment` now requests OpenAI-compatible streaming chat completions and the comment UI creates a temporary AI reply, renders incoming Markdown chunks live, shows a professional typing/receiving state, and persists the final answer
+- [x] Added AI model discovery for Markdown preview comment composer: `/api/ai/models` now calls OpenAI-compatible `/models` using the provider Base URL without requiring an API key unless the provider itself requires one, with Kilo AI preset to `https://api.kilo.ai/api/gateway`; the "Hỏi AI" composer can load provider models into a selectable dropdown while keeping manual model entry as fallback
 - [x] Added previous/next lesson navigation to `/skill-roadmap/notes/[taskId]`, using roadmap order and browser progress completion state to jump only to the nearest already-completed lesson before or after the current note, with disabled professional states when no completed lesson exists
 - [x] Polished the Markdown preview previous/next lesson controls on mobile with a compact two-column navigation bar, circular icons, two-line title clamp, and clearer disabled states
 - [x] Added desktop-only Markdown file scroll controls in the note preview sidebar so readers can jump to the start or end of the rendered Markdown article without scrolling into the comment section
@@ -142,7 +145,10 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Markdown note preview has previous/next lesson controls based on full roadmap order plus `skill-roadmap-progress:v1` completion state, skipping unfinished tasks and rendering disabled states when no completed lesson exists. On mobile these controls stay as a floating bottom navigation bar, with the appendix floating button lifted above it to avoid overlap.
 - Markdown note preview includes floating icon controls for "Đầu file" and "Cuối file" on both desktop and mobile. The controls scroll only within the rendered Markdown article bounds, keeping the comment section outside the target range. On mobile, the scroll controls sit above the floating appendix button and previous/next lesson bar to avoid overlap on narrow screens.
 - `/skill-roadmap` backup now exports a versioned JSON object containing `progress` and `comments`, where comments come from `skill-roadmap-note-comments:v1`. Import accepts both this combined format and older progress-only JSON backups. GitHub backup commits the combined payload, and the Clear localStorage action now clears both progress and comment storage before reloading progress from the project seed.
-- `/api/ai/comment` proxies one-off AI questions to OpenAI-compatible chat completion endpoints. OpenRouter uses a preset base URL, while Kilo AI or other providers can be used through the custom Base URL field. API keys are submitted only with the request and are not persisted in localStorage or environment defaults.
+- `/api/ai/comment` proxies one-off AI questions to OpenAI-compatible streaming chat completion endpoints. Kilo AI and OpenRouter use preset Base URLs, while other providers can be used through the custom Base URL field. API keys are submitted only with the request and are not persisted in localStorage or environment defaults.
+- AI comment answers now stream into the Markdown comment thread as they arrive. The UI inserts a temporary AI reply under the user's question, renders partial Markdown progressively, shows "AI đang soạn câu trả lời..." / "Đang nhận nội dung" states, and rolls back the temporary reply if the stream fails before a final answer is produced.
+- `/api/ai/models` loads available OpenAI-compatible models from the selected provider using the provider preset Base URL or the custom Base URL when selected. API key is optional for model loading and is only forwarded when entered. The Markdown comment composer shows the returned models as a dropdown and still accepts manual model IDs when a provider does not support `/models`.
+- The Markdown comment composer now uses a searchable model picker after models are loaded: users can filter by model name, id, or owner; see match counts; select from a scrollable list that auto-collapses after choosing a model; and keep manual model entry before loading models.
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
 - Visible UI language is Vietnamese across home, portfolio, contact, print/PDF page, and text/PDF helper endpoints
@@ -204,6 +210,9 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Reworked Markdown preview AI model selection into a searchable model picker |
+| 2026-06-18 | Changed Markdown preview AI answers from wait-then-render to progressive streaming replies |
+| 2026-06-18 | Added provider model discovery and selectable model dropdown to Markdown preview AI questions |
 | 2026-06-18 | Added desktop Markdown article start/end scroll controls to note preview sidebar |
 | 2026-06-18 | Refined Markdown preview mobile prev/next and desktop quick-scroll controls for a more professional navigation UI |
 | 2026-06-18 | Converted Markdown preview prev/next and file-scroll actions into floating controls |

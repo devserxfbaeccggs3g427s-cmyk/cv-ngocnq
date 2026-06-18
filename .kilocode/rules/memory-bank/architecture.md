@@ -16,6 +16,8 @@ src/
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
+│       ├── ai/models/route.ts # OpenAI-compatible model discovery for comment AI
+│       ├── ai/comment/route.ts # OpenAI-compatible comment AI proxy
 │       ├── skill-roadmap/progress/route.ts # Roadmap progress seed + local-dev JSON sync
 │       ├── skill-roadmap/backup/github/route.ts # Optional browser progress GitHub backup
 │       └── pdf/

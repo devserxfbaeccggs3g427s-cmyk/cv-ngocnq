@@ -24,7 +24,22 @@ type ChatCompletionResponse = {
   };
 };
 
+type ChatCompletionChunk = {
+  choices?: Array<{
+    delta?: {
+      content?: string;
+    };
+    message?: {
+      content?: string;
+    };
+  }>;
+  error?: {
+    message?: string;
+  };
+};
+
 const providerBaseUrls: Record<string, string> = {
+  kilo: 'https://api.kilo.ai/api/gateway',
   openrouter: 'https://openrouter.ai/api/v1',
 };
 
@@ -58,13 +73,17 @@ function compactText(value: string, maxLength: number) {
   return `${compacted.slice(0, maxLength).trim()}\n\n[Context đã được rút gọn để giới hạn payload.]`;
 }
 
+function jsonError(message: string, status: number) {
+  return NextResponse.json({ error: message }, { status });
+}
+
 export async function POST(request: Request) {
   let body: AiCommentRequest;
 
   try {
     body = (await request.json()) as AiCommentRequest;
   } catch {
-    return NextResponse.json({ error: 'Payload không phải JSON hợp lệ.' }, { status: 400 });
+    return jsonError('Payload không phải JSON hợp lệ.', 400);
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'openrouter';
@@ -74,22 +93,19 @@ export async function POST(request: Request) {
   const baseUrl = resolveBaseUrl(provider, body.baseUrl);
 
   if (!apiKey) {
-    return NextResponse.json({ error: 'Vui lòng nhập API key trước khi hỏi AI.' }, { status: 400 });
+    return jsonError('Vui lòng nhập API key trước khi hỏi AI.', 400);
   }
 
   if (!model) {
-    return NextResponse.json({ error: 'Vui lòng nhập hoặc chọn model.' }, { status: 400 });
+    return jsonError('Vui lòng nhập hoặc chọn model.', 400);
   }
 
   if (!question) {
-    return NextResponse.json({ error: 'Vui lòng nhập câu hỏi cho AI.' }, { status: 400 });
+    return jsonError('Vui lòng nhập câu hỏi cho AI.', 400);
   }
 
   if (!baseUrl) {
-    return NextResponse.json(
-      { error: 'Vui lòng nhập Base URL cho kênh AI tương thích OpenAI.' },
-      { status: 400 }
-    );
+    return jsonError('Vui lòng nhập Base URL cho kênh AI tương thích OpenAI.', 400);
   }
 
   const markdownContext = compactText(
@@ -142,37 +158,96 @@ export async function POST(request: Request) {
         model,
         messages,
         temperature: 0.3,
+        stream: true,
       }),
     });
 
-    const responseBody = (await response.json().catch(() => ({}))) as ChatCompletionResponse;
-
     if (!response.ok) {
-      return NextResponse.json(
-        {
-          error:
-            responseBody.error?.message ??
-            `Không gọi được AI provider. HTTP status: ${response.status}.`,
-        },
-        { status: 502 }
+      const responseBody = (await response.json().catch(() => ({}))) as ChatCompletionResponse;
+      return jsonError(
+        responseBody.error?.message ??
+          `Không gọi được AI provider. HTTP status: ${response.status}.`,
+        502
       );
     }
 
-    const answer = responseBody.choices?.[0]?.message?.content?.trim();
-
-    if (!answer) {
-      return NextResponse.json(
-        { error: 'AI provider không trả về nội dung trả lời.' },
-        { status: 502 }
-      );
+    if (!response.body) {
+      return jsonError('AI provider không trả về stream nội dung.', 502);
     }
 
-    return NextResponse.json({ answer });
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const reader = response.body?.getReader();
+
+        if (!reader) {
+          controller.error(new Error('Không đọc được stream từ AI provider.'));
+          return;
+        }
+
+        let buffer = '';
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) {
+              break;
+            }
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split(/\r?\n/);
+            buffer = lines.pop() ?? '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+
+              if (!trimmed || !trimmed.startsWith('data:')) {
+                continue;
+              }
+
+              const data = trimmed.slice(5).trim();
+
+              if (data === '[DONE]') {
+                controller.close();
+                return;
+              }
+
+              try {
+                const chunk = JSON.parse(data) as ChatCompletionChunk;
+                const content =
+                  chunk.choices?.[0]?.delta?.content ??
+                  chunk.choices?.[0]?.message?.content ??
+                  '';
+
+                if (content) {
+                  controller.enqueue(encoder.encode(content));
+                }
+              } catch {
+                // Ignore malformed provider events and continue the stream.
+              }
+            }
+          }
+
+          controller.close();
+        } catch (streamError) {
+          console.error('AI comment stream failed:', streamError);
+          controller.error(streamError);
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Accel-Buffering': 'no',
+      },
+    });
   } catch (error) {
     console.error('AI comment request failed:', error);
-    return NextResponse.json(
-      { error: 'Không kết nối được tới AI provider. Kiểm tra Base URL, API key hoặc mạng.' },
-      { status: 502 }
-    );
+    return jsonError('Không kết nối được tới AI provider. Kiểm tra Base URL, API key hoặc mạng.', 502);
   }
 }
