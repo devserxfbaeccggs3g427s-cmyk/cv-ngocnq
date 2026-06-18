@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
+  ArrowRight,
   BookOpen,
+  Brain,
+  Check,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
@@ -18,8 +21,11 @@ import {
   Layers,
   Loader2,
   ListTree,
+  RotateCcw,
   Save,
+  Sparkles,
   StickyNote,
+  X,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
@@ -52,7 +58,38 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type NoteComment = {
+  id: string;
+  parentId: string | null;
+  author: 'user' | 'ai';
+  body: string;
+  createdAt: string;
+  model?: string;
+  provider?: string;
+};
+
+type Flashcard = {
+  id: string;
+  front: string;
+  back: string;
+  hint: string;
+  tag: string;
+};
+
+type FlashcardDeck = {
+  taskId: string;
+  taskTitle: string;
+  createdAt: string;
+  source: {
+    noteCharacters: number;
+    commentCount: number;
+  };
+  cards: Flashcard[];
+};
+
 const progressStorageKey = 'skill-roadmap-progress:v1';
+const commentsStorageKey = 'skill-roadmap-note-comments:v1';
+const flashcardsStorageKey = 'skill-roadmap-flashcards:v1';
 const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 const levelStyles: Record<string, string> = {
@@ -70,6 +107,13 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
   const [promptVisible, setPromptVisible] = useState(false);
   const [promptCopied, setPromptCopied] = useState(false);
   const [promptCopyError, setPromptCopyError] = useState<string | null>(null);
+  const [noteComments, setNoteComments] = useState<NoteComment[]>([]);
+  const [flashcardDeck, setFlashcardDeck] = useState<FlashcardDeck | null>(null);
+  const [generatingFlashcards, setGeneratingFlashcards] = useState(false);
+  const [flashcardError, setFlashcardError] = useState<string | null>(null);
+  const [activeFlashcardIndex, setActiveFlashcardIndex] = useState(0);
+  const [flashcardFlipped, setFlashcardFlipped] = useState(false);
+  const [flashcardRatings, setFlashcardRatings] = useState<Record<string, 'hard' | 'good'>>({});
 
   useEffect(() => {
     try {
@@ -78,6 +122,29 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
       window.queueMicrotask(() => setProgress(storedProgress));
     } catch {
       window.queueMicrotask(() => setProgress(null));
+    }
+  }, [task.id]);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(commentsStorageKey);
+      const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
+      window.queueMicrotask(() => setNoteComments(Array.isArray(parsed[task.id]) ? parsed[task.id] : []));
+    } catch {
+      window.queueMicrotask(() => setNoteComments([]));
+    }
+
+    try {
+      const raw = window.localStorage.getItem(flashcardsStorageKey);
+      const parsed = raw ? (JSON.parse(raw) as Record<string, FlashcardDeck>) : {};
+      window.queueMicrotask(() => {
+        setFlashcardDeck(parsed[task.id] ?? null);
+        setActiveFlashcardIndex(0);
+        setFlashcardFlipped(false);
+        setFlashcardRatings({});
+      });
+    } catch {
+      window.queueMicrotask(() => setFlashcardDeck(null));
     }
   }, [task.id]);
 
@@ -91,6 +158,12 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
   const childProgressing = !effectivelyCompleted && completedDescendants > 0;
   const totalChildHours = descendants.reduce((sum, child) => sum + child.estimateHours, 0);
   const learningPrompt = useMemo(() => buildLearningPrompt(task), [task]);
+  const canCreateFlashcards = effectivelyCompleted && hasNote && !flashcardDeck;
+  const flashcardRequirement = getFlashcardRequirement({
+    completed: effectivelyCompleted,
+    hasNote,
+    hasDeck: Boolean(flashcardDeck),
+  });
 
   function updateNote(note: string) {
     setProgress((current) => {
@@ -176,6 +249,56 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
     }
   }
 
+  async function createFlashcards() {
+    if (!canCreateFlashcards || !item?.note.trim()) {
+      setFlashcardError(flashcardRequirement);
+      return;
+    }
+
+    setGeneratingFlashcards(true);
+    setFlashcardError(null);
+
+    try {
+      const response = await fetch('/api/ai/flashcards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task: {
+            id: task.id,
+            title: task.title,
+            level: task.level,
+            deliverable: task.deliverable,
+          },
+          note: item.note,
+          comments: noteComments.map((comment) => ({
+            author: comment.author,
+            body: comment.body,
+            createdAt: comment.createdAt,
+          })),
+        }),
+      });
+
+      const responseBody = (await response.json().catch(() => ({}))) as {
+        deck?: FlashcardDeck;
+        error?: string;
+      };
+
+      if (!response.ok || !responseBody.deck) {
+        throw new Error(responseBody.error ?? 'Không tạo được flashcard.');
+      }
+
+      storeFlashcardDeck(task.id, responseBody.deck);
+      setFlashcardDeck(responseBody.deck);
+      setActiveFlashcardIndex(0);
+      setFlashcardFlipped(false);
+      setFlashcardRatings({});
+    } catch (error) {
+      setFlashcardError(error instanceof Error ? error.message : 'Không tạo được flashcard.');
+    } finally {
+      setGeneratingFlashcards(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -252,6 +375,37 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
               </div>
             </CardContent>
           </Card>
+
+          <FlashcardStudyPanel
+            deck={flashcardDeck}
+            commentCount={noteComments.length}
+            canCreate={canCreateFlashcards}
+            requirement={flashcardRequirement}
+            isGenerating={generatingFlashcards}
+            error={flashcardError}
+            activeIndex={activeFlashcardIndex}
+            flipped={flashcardFlipped}
+            ratings={flashcardRatings}
+            onCreate={createFlashcards}
+            onFlip={() => setFlashcardFlipped((current) => !current)}
+            onPrevious={() => {
+              setActiveFlashcardIndex((current) => Math.max(current - 1, 0));
+              setFlashcardFlipped(false);
+            }}
+            onNext={() => {
+              setActiveFlashcardIndex((current) =>
+                Math.min(current + 1, (flashcardDeck?.cards.length ?? 1) - 1)
+              );
+              setFlashcardFlipped(false);
+            }}
+            onRate={(cardId, rating) => {
+              setFlashcardRatings((current) => ({ ...current, [cardId]: rating }));
+            }}
+            onRestart={() => {
+              setActiveFlashcardIndex(0);
+              setFlashcardFlipped(false);
+            }}
+          />
 
           <Card>
             <CardContent className="p-5 md:p-6">
@@ -397,6 +551,231 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
             </CardContent>
           </Card>
         </aside>
+      </div>
+    </div>
+  );
+}
+
+function FlashcardStudyPanel({
+  deck,
+  commentCount,
+  canCreate,
+  requirement,
+  isGenerating,
+  error,
+  activeIndex,
+  flipped,
+  ratings,
+  onCreate,
+  onFlip,
+  onPrevious,
+  onNext,
+  onRate,
+  onRestart,
+}: {
+  deck: FlashcardDeck | null;
+  commentCount: number;
+  canCreate: boolean;
+  requirement: string | null;
+  isGenerating: boolean;
+  error: string | null;
+  activeIndex: number;
+  flipped: boolean;
+  ratings: Record<string, 'hard' | 'good'>;
+  onCreate: () => void;
+  onFlip: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+  onRate: (cardId: string, rating: 'hard' | 'good') => void;
+  onRestart: () => void;
+}) {
+  const cards = deck?.cards ?? [];
+  const activeCard = cards[activeIndex] ?? null;
+  const reviewedCount = Object.keys(ratings).length;
+  const hardCount = Object.values(ratings).filter((rating) => rating === 'hard').length;
+  const goodCount = Object.values(ratings).filter((rating) => rating === 'good').length;
+  const progressPercent = cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0;
+
+  return (
+    <Card>
+      <CardContent className="p-5 md:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-violet-600 dark:text-violet-400">
+              AI Flashcards
+            </p>
+            <h2 className="mt-1 flex items-center gap-2 text-lg font-bold text-gray-950 dark:text-white">
+              <Brain className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              Bộ thẻ ôn tập từ note và comment
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+              Nguồn học gồm toàn bộ note hiện tại và {commentCount} comment của note này. Mỗi task chỉ tạo bộ flashcard một lần.
+            </p>
+          </div>
+
+          {!deck && (
+            <button
+              type="button"
+              onClick={onCreate}
+              disabled={!canCreate || isGenerating}
+              className={cn(
+                'inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition',
+                canCreate
+                  ? 'bg-violet-600 text-white hover:bg-violet-700 disabled:cursor-wait disabled:bg-violet-400'
+                  : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+              )}
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              {isGenerating ? 'Đang tạo' : 'Tạo flashcard'}
+            </button>
+          )}
+        </div>
+
+        {!deck && requirement && (
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+            {requirement}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+            {error}
+          </div>
+        )}
+
+        {deck && activeCard && (
+          <div className="mt-5 space-y-4">
+            <div className="grid gap-3 sm:grid-cols-4">
+              <FlashcardStat label="Tổng thẻ" value={String(cards.length)} />
+              <FlashcardStat label="Đã ôn" value={`${reviewedCount}/${cards.length}`} />
+              <FlashcardStat label="Nhớ tốt" value={String(goodCount)} />
+              <FlashcardStat label="Cần ôn lại" value={String(hardCount)} />
+            </div>
+
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
+              <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-950 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-800 dark:bg-violet-900/40 dark:text-violet-200">
+                      {activeCard.tag}
+                    </span>
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Thẻ {activeIndex + 1}/{cards.length}
+                    </span>
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Tạo lúc {formatDate(deck.createdAt)}
+                    </span>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                    <div
+                      className="h-full rounded-full bg-violet-600 transition-all"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={onRestart}
+                  className="inline-flex h-9 w-fit items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-700 transition hover:border-violet-300 hover:text-violet-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-violet-700 dark:hover:text-violet-300"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Ôn lại từ đầu
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={onFlip}
+                className="block min-h-64 w-full px-4 py-8 text-left transition hover:bg-white dark:hover:bg-gray-950 sm:px-8"
+                aria-label={flipped ? 'Xem mặt câu hỏi' : 'Xem mặt đáp án'}
+              >
+                <div className="mx-auto flex min-h-48 max-w-3xl flex-col justify-center rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-950 sm:p-7">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    {flipped ? 'Đáp án' : 'Câu hỏi'}
+                  </div>
+                  <div className="mt-3 text-xl font-bold leading-8 text-gray-950 [overflow-wrap:anywhere] dark:text-white">
+                    {flipped ? activeCard.back : activeCard.front}
+                  </div>
+                  {!flipped && activeCard.hint && (
+                    <p className="mt-5 rounded-lg border border-violet-100 bg-violet-50 px-3 py-2 text-sm leading-6 text-violet-800 dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-200">
+                      Gợi ý: {activeCard.hint}
+                    </p>
+                  )}
+                  <div className="mt-5 text-xs font-semibold text-gray-400">
+                    Nhấn vào thẻ để lật
+                  </div>
+                </div>
+              </button>
+
+              <div className="flex flex-col gap-3 border-t border-gray-200 bg-white px-4 py-4 dark:border-gray-800 dark:bg-gray-950 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onRate(activeCard.id, 'hard')}
+                    className={cn(
+                      'inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition',
+                      ratings[activeCard.id] === 'hard'
+                        ? 'border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-200'
+                        : 'border-gray-200 text-gray-700 hover:border-rose-300 hover:text-rose-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-rose-800 dark:hover:text-rose-200'
+                    )}
+                  >
+                    <X className="h-4 w-4" />
+                    Khó nhớ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRate(activeCard.id, 'good')}
+                    className={cn(
+                      'inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold transition',
+                      ratings[activeCard.id] === 'good'
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200'
+                        : 'border-gray-200 text-gray-700 hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-emerald-800 dark:hover:text-emerald-200'
+                    )}
+                  >
+                    <Check className="h-4 w-4" />
+                    Đã nhớ
+                  </button>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={onPrevious}
+                    disabled={activeIndex === 0}
+                    className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-700 transition hover:border-violet-300 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-300 dark:hover:border-violet-700 dark:hover:text-violet-300"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Trước
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onNext}
+                    disabled={activeIndex >= cards.length - 1}
+                    className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-gray-950 px-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+                  >
+                    Sau
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function FlashcardStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
+      <div className="text-lg font-bold text-gray-950 dark:text-white">{value}</div>
+      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        {label}
       </div>
     </div>
   );
@@ -581,6 +960,45 @@ function storeProgress(progress: ProgressFile) {
   } catch {
     // The in-memory UI still reflects the note if localStorage is unavailable.
   }
+}
+
+function storeFlashcardDeck(taskId: string, deck: FlashcardDeck) {
+  try {
+    const raw = window.localStorage.getItem(flashcardsStorageKey);
+    const parsed = raw ? (JSON.parse(raw) as Record<string, FlashcardDeck>) : {};
+    parsed[taskId] = deck;
+    window.localStorage.setItem(flashcardsStorageKey, JSON.stringify(parsed));
+  } catch {
+    // The generated deck remains usable in memory for the current screen.
+  }
+}
+
+function getFlashcardRequirement({
+  completed,
+  hasNote,
+  hasDeck,
+}: {
+  completed: boolean;
+  hasNote: boolean;
+  hasDeck: boolean;
+}) {
+  if (hasDeck) {
+    return null;
+  }
+
+  if (!completed && !hasNote) {
+    return 'Cần hoàn thành task và có note trước khi tạo flashcard.';
+  }
+
+  if (!completed) {
+    return 'Chỉ tạo flashcard sau khi task đã hoàn thành.';
+  }
+
+  if (!hasNote) {
+    return 'Cần có note trước khi tạo flashcard.';
+  }
+
+  return null;
 }
 
 function formatDate(value: string | null): string {

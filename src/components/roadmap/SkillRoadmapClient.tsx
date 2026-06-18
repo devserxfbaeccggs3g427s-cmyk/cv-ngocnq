@@ -89,11 +89,31 @@ type NoteComment = {
   provider?: string;
 };
 
+type Flashcard = {
+  id: string;
+  front: string;
+  back: string;
+  hint: string;
+  tag: string;
+};
+
+type FlashcardDeck = {
+  taskId: string;
+  taskTitle: string;
+  createdAt: string;
+  source: {
+    noteCharacters: number;
+    commentCount: number;
+  };
+  cards: Flashcard[];
+};
+
 type RoadmapBackupFile = {
-  version: 2;
+  version: 3;
   exportedAt: string;
   progress: ProgressFile;
   comments: Record<string, NoteComment[]>;
+  flashcards: Record<string, FlashcardDeck>;
 };
 
 type StudyStatusFilter = 'all' | 'completed' | 'incomplete' | 'in-progress' | 'with-note';
@@ -118,6 +138,7 @@ const emptyProgress: ProgressFile = {
 
 const progressStorageKey = 'skill-roadmap-progress:v1';
 const commentsStorageKey = 'skill-roadmap-note-comments:v1';
+const flashcardsStorageKey = 'skill-roadmap-flashcards:v1';
 const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 const levelStyles: Record<string, string> = {
@@ -443,7 +464,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập và comment.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, comment và flashcard.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -467,7 +488,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       const data = normalizeRoadmapBackup(JSON.parse(text));
 
       if (!data) {
-        throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress và comments.');
+        throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress, comments và flashcards.');
       }
 
       const imported = {
@@ -478,6 +499,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       setProgress(imported);
       storeProgress(imported);
       storeComments(data.comments);
+      storeFlashcards(data.flashcards);
 
       if (shouldSyncProgressFile) {
         await fetch('/api/skill-roadmap/progress', {
@@ -487,7 +509,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         });
       }
 
-      setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập và comment.');
+      setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, comment và flashcard.');
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không import được file backup.'
@@ -500,7 +522,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
   async function resetProgressFromProject() {
     const confirmed = window.confirm(
-      'Bạn chắc chắn muốn xoá tiến độ và comment đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
+      'Bạn chắc chắn muốn xoá tiến độ, comment và flashcard đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
     );
 
     if (!confirmed) {
@@ -515,6 +537,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     try {
       removeStoredProgress();
       removeStoredComments();
+      removeStoredFlashcards();
 
       const response = await fetch('/api/skill-roadmap/progress', {
         cache: 'no-store',
@@ -533,7 +556,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       setProgress(data);
       storeProgress(data);
       setLoadError(null);
-      setBackupMessage('Đã xoá tiến độ/comment trong localStorage và tải lại tiến độ mới nhất từ project.');
+      setBackupMessage('Đã xoá tiến độ/comment/flashcard trong localStorage và tải lại tiến độ mới nhất từ project.');
     } catch (error) {
       setBackupError(
         error instanceof Error
@@ -578,7 +601,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       setGithubToken('');
       setGithubCommitUrl(result.commitUrl ?? null);
-      setBackupMessage(`Đã commit backup gồm tiến độ và comment lên GitHub: ${result.path ?? githubBackupPath}.`);
+      setBackupMessage(`Đã commit backup gồm tiến độ, comment và flashcard lên GitHub: ${result.path ?? githubBackupPath}.`);
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không backup được lên GitHub.'
@@ -644,8 +667,8 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
                 Export/Import JSON là lựa chọn an toàn nhất cho backup thủ công. File
-                backup hiện bao gồm cả tiến độ học tập, note và comment trong màn hình
-                preview Markdown. GitHub backup phù hợp khi dùng riêng; token chỉ gửi
+                backup hiện bao gồm cả tiến độ học tập, note, comment trong màn hình
+                preview Markdown và flashcard đã tạo. GitHub backup phù hợp khi dùng riêng; token chỉ gửi
                 một lần tới API server và không được lưu lại.
               </p>
             </div>
@@ -1042,6 +1065,18 @@ function removeStoredComments() {
   }
 }
 
+function removeStoredFlashcards() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(flashcardsStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
 function readStoredComments(): Record<string, NoteComment[]> {
   if (typeof window === 'undefined') {
     return {};
@@ -1050,6 +1085,19 @@ function readStoredComments(): Record<string, NoteComment[]> {
   try {
     const raw = window.localStorage.getItem(commentsStorageKey);
     return raw ? normalizeCommentsByTask(JSON.parse(raw)) ?? {} : {};
+  } catch {
+    return {};
+  }
+}
+
+function readStoredFlashcards(): Record<string, FlashcardDeck> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(flashcardsStorageKey);
+    return raw ? normalizeFlashcardsByTask(JSON.parse(raw)) ?? {} : {};
   } catch {
     return {};
   }
@@ -1067,12 +1115,25 @@ function storeComments(comments: Record<string, NoteComment[]>) {
   }
 }
 
+function storeFlashcards(flashcards: Record<string, FlashcardDeck>) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(flashcardsStorageKey, JSON.stringify(flashcards));
+  } catch {
+    // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
 function buildRoadmapBackup(progress: ProgressFile): RoadmapBackupFile {
   return {
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
     progress,
     comments: readStoredComments(),
+    flashcards: readStoredFlashcards(),
   };
 }
 
@@ -1132,7 +1193,77 @@ function normalizeCommentsByTask(input: unknown): Record<string, NoteComment[]> 
   return comments;
 }
 
-function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]> } | null {
+function normalizeFlashcard(input: unknown): Flashcard | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.front !== 'string' ||
+    typeof input.back !== 'string' ||
+    typeof input.hint !== 'string' ||
+    typeof input.tag !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    front: input.front,
+    back: input.back,
+    hint: input.hint,
+    tag: input.tag,
+  };
+}
+
+function normalizeFlashcardDeck(input: unknown): FlashcardDeck | null {
+  if (!isRecord(input) || !isRecord(input.source) || !Array.isArray(input.cards)) {
+    return null;
+  }
+
+  const cards = input.cards.map(normalizeFlashcard);
+
+  if (cards.some((card) => !card)) {
+    return null;
+  }
+
+  return {
+    taskId: typeof input.taskId === 'string' ? input.taskId : '',
+    taskTitle: typeof input.taskTitle === 'string' ? input.taskTitle : '',
+    createdAt: typeof input.createdAt === 'string' ? input.createdAt : new Date().toISOString(),
+    source: {
+      noteCharacters: typeof input.source.noteCharacters === 'number' ? input.source.noteCharacters : 0,
+      commentCount: typeof input.source.commentCount === 'number' ? input.source.commentCount : 0,
+    },
+    cards: cards as Flashcard[],
+  };
+}
+
+function normalizeFlashcardsByTask(input: unknown): Record<string, FlashcardDeck> | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const flashcards: Record<string, FlashcardDeck> = {};
+
+  for (const [taskId, rawDeck] of Object.entries(input)) {
+    const deck = normalizeFlashcardDeck(rawDeck);
+
+    if (!deck) {
+      return null;
+    }
+
+    flashcards[taskId] = {
+      ...deck,
+      taskId: deck.taskId || taskId,
+    };
+  }
+
+  return flashcards;
+}
+
+function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]>; flashcards: Record<string, FlashcardDeck> } | null {
   if (!isRecord(input)) {
     return null;
   }
@@ -1149,9 +1280,16 @@ function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comme
     return null;
   }
 
+  const flashcards = input.flashcards === undefined ? readStoredFlashcards() : normalizeFlashcardsByTask(input.flashcards);
+
+  if (!flashcards) {
+    return null;
+  }
+
   return {
     progress,
     comments,
+    flashcards,
   };
 }
 
