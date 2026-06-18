@@ -8,6 +8,13 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added previous/next lesson navigation to `/skill-roadmap/notes/[taskId]`, using roadmap order and browser progress completion state to jump only to the nearest already-completed lesson before or after the current note, with disabled professional states when no completed lesson exists
+- [x] Polished the Markdown preview previous/next lesson controls on mobile with a compact two-column navigation bar, circular icons, two-line title clamp, and clearer disabled states
+- [x] Added desktop-only Markdown file scroll controls in the note preview sidebar so readers can jump to the start or end of the rendered Markdown article without scrolling into the comment section
+- [x] Refined Markdown preview navigation UI again: mobile previous/next now renders as a tighter segmented reading navigation control, and desktop Markdown file quick-scroll uses a compact sidebar action panel
+- [x] Converted Markdown preview navigation controls to floating UI: mobile previous/next now stays as a floating bottom bar, while desktop Markdown start/end scroll is an icon rail floating above the page
+- [x] Enabled the floating Markdown start/end scroll controls on mobile too, positioned separately from the mobile appendix and previous/next controls
+- [x] Repositioned mobile Markdown start/end scroll controls beside the floating appendix button for a cleaner grouped reading toolbar
 - [x] Added Markdown note preview comment threads with unlimited nested replies, browser localStorage persistence per task, and a composer that can switch between normal comments and AI questions
 - [x] Added `/api/ai/comment` OpenAI-compatible AI bridge for Markdown preview comments, supporting OpenRouter by default and custom/Kilo AI-compatible Base URLs, with API keys entered per AI request and never stored by the app
 - [x] Added Markdown preview comment deletion and professional long-comment collapsing with rendered Markdown fade-out/expand controls, including branch deletion for comments with replies
@@ -132,6 +139,8 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Markdown note preview now uses reusable `src/components/markdown/MarkdownPreview.tsx` and supports richer professional Markdown formatting for headings, body text, tables, syntax-highlighted source code with auto-detected languages, SQL/database snippets, checklists, links, images, callouts, generated heading anchors, a desktop sidebar appendix/table of contents with independent scrolling and active-section highlighting, a mobile floating appendix bottom sheet, horizontal-overflow-safe responsive containers, and dedicated light/dark readability palettes that follow the actual rendered page theme
 - Markdown note preview now includes `src/components/roadmap/MarkdownCommentThreads.tsx`, which stores nested comment/reply threads in browser `localStorage` under `skill-roadmap-note-comments:v1`. The composer can submit normal comments or ask AI; AI answers are inserted as replies, and follow-up AI requests include a compact Markdown summary plus the active comment ancestry for context.
 - Markdown preview comments can be deleted; deleting a parent comment also removes its nested replies after confirmation. Long comments stay rendered as Markdown but are height-constrained with a fade-out and "Xem thêm nội dung Markdown" / "Thu gọn" control.
+- Markdown note preview has previous/next lesson controls based on full roadmap order plus `skill-roadmap-progress:v1` completion state, skipping unfinished tasks and rendering disabled states when no completed lesson exists. On mobile these controls stay as a floating bottom navigation bar, with the appendix floating button lifted above it to avoid overlap.
+- Markdown note preview includes floating icon controls for "Đầu file" and "Cuối file" on both desktop and mobile. The controls scroll only within the rendered Markdown article bounds, keeping the comment section outside the target range. On mobile, the scroll controls sit above the floating appendix button and previous/next lesson bar to avoid overlap on narrow screens.
 - `/skill-roadmap` backup now exports a versioned JSON object containing `progress` and `comments`, where comments come from `skill-roadmap-note-comments:v1`. Import accepts both this combined format and older progress-only JSON backups. GitHub backup commits the combined payload, and the Clear localStorage action now clears both progress and comment storage before reloading progress from the project seed.
 - `/api/ai/comment` proxies one-off AI questions to OpenAI-compatible chat completion endpoints. OpenRouter uses a preset base URL, while Kilo AI or other providers can be used through the custom Base URL field. API keys are submitted only with the request and are not persisted in localStorage or environment defaults.
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
@@ -195,6 +204,13 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Added desktop Markdown article start/end scroll controls to note preview sidebar |
+| 2026-06-18 | Refined Markdown preview mobile prev/next and desktop quick-scroll controls for a more professional navigation UI |
+| 2026-06-18 | Converted Markdown preview prev/next and file-scroll actions into floating controls |
+| 2026-06-18 | Enabled floating Markdown file start/end scroll controls on mobile |
+| 2026-06-18 | Moved mobile Markdown file scroll controls above the appendix floating button to avoid overlap |
+| 2026-06-18 | Polished mobile UI for Markdown preview previous/next lesson navigation |
+| 2026-06-18 | Added completed-lesson previous/next navigation to Markdown note preview |
 | 2026-06-18 | Extended roadmap backup/export/import/GitHub commit flow to include Markdown preview comments in addition to progress and notes |
 | 2026-06-18 | Added delete controls for Markdown preview comments, including nested branch deletion, plus rendered Markdown long-comment collapse/expand behavior |
 | 2026-06-18 | Added nested Markdown preview comment threads with normal-comment/ask-AI composer, OpenRouter/custom OpenAI-compatible AI bridge, per-request API key entry, and compact Markdown/thread context for AI replies |

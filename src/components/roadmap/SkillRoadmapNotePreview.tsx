@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { ListTree, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { ArrowDownToLine, ArrowUpToLine, ChevronLeft, ChevronRight, ListTree, X } from 'lucide-react';
 import { extractMarkdownHeadings, MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import type { MarkdownHeading } from '@/components/markdown/MarkdownPreview';
 import { MarkdownCommentThreads } from '@/components/roadmap/MarkdownCommentThreads';
@@ -30,17 +31,22 @@ type TaskContext = {
   depth: number;
 };
 
+type NavigationTask = Pick<TaskContext, 'id' | 'title' | 'trackTitle' | 'moduleTitle'>;
+
 const progressStorageKey = 'skill-roadmap-progress:v1';
 const activeHeadingOffset = 120;
 
 export function SkillRoadmapNotePreview({
   taskId,
   task,
+  navigationTasks = [],
 }: {
   taskId: string;
   task?: TaskContext;
+  navigationTasks?: NavigationTask[];
 }) {
-  const [item, setItem] = useState<ProgressItem | null>(null);
+  const markdownArticleRef = useRef<HTMLElement | null>(null);
+  const [progress, setProgress] = useState<ProgressFile | null>(null);
   const [appendixOpen, setAppendixOpen] = useState(false);
   const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
 
@@ -48,15 +54,57 @@ export function SkillRoadmapNotePreview({
     try {
       const raw = window.localStorage.getItem(progressStorageKey);
       const progress = raw ? (JSON.parse(raw) as ProgressFile) : null;
-      window.queueMicrotask(() => setItem(progress?.items?.[taskId] ?? null));
+      window.queueMicrotask(() => setProgress(progress));
     } catch {
-      window.queueMicrotask(() => setItem(null));
+      window.queueMicrotask(() => setProgress(null));
     }
   }, [taskId]);
 
+  const item = progress?.items?.[taskId] ?? null;
   const note = item?.note?.trim() ?? '';
   const headings = useMemo(() => extractMarkdownHeadings(note), [note]);
   const headingIds = useMemo(() => headings.map((heading) => heading.id).join('|'), [headings]);
+  const learnedNavigation = useMemo(() => {
+    const currentIndex = navigationTasks.findIndex((navigationTask) => navigationTask.id === taskId);
+
+    if (!progress || currentIndex < 0) {
+      return {
+        previous: null,
+        next: null,
+      };
+    }
+
+    return {
+      previous:
+        navigationTasks
+          .slice(0, currentIndex)
+          .reverse()
+          .find((navigationTask) => progress.items[navigationTask.id]?.completed) ?? null,
+      next:
+        navigationTasks
+          .slice(currentIndex + 1)
+          .find((navigationTask) => progress.items[navigationTask.id]?.completed) ?? null,
+    };
+  }, [navigationTasks, progress, taskId]);
+
+  function scrollMarkdownFileTo(position: 'start' | 'end') {
+    const article = markdownArticleRef.current;
+
+    if (!article) {
+      return;
+    }
+
+    const articleTop = article.getBoundingClientRect().top + window.scrollY;
+    const targetTop =
+      position === 'start'
+        ? articleTop - 96
+        : articleTop + article.offsetHeight - window.innerHeight + 24;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: 'smooth',
+    });
+  }
 
   useEffect(() => {
     if (!headings.length) {
@@ -108,7 +156,7 @@ export function SkillRoadmapNotePreview({
   }, [headingIds, headings]);
 
   return (
-    <div className="grid min-w-0 max-w-full gap-4 pb-20 lg:grid-cols-[320px_minmax(0,1fr)] lg:pb-0">
+    <div className="grid min-w-0 max-w-full gap-4 pb-32 sm:pb-20 lg:grid-cols-[320px_minmax(0,1fr)] lg:pb-0">
       <aside className="min-w-0 rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm dark:border-gray-800 dark:bg-gray-950 lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:self-start">
         <h2 className="font-bold text-gray-950 dark:text-white">Thông tin task</h2>
         <dl className="mt-3 grid gap-3 text-gray-600 dark:text-gray-300 sm:grid-cols-2 lg:block lg:space-y-3">
@@ -149,10 +197,16 @@ export function SkillRoadmapNotePreview({
             />
           </nav>
         )}
+
       </aside>
 
       <div className="min-w-0 space-y-4">
-        <article className="min-w-0 max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
+        <NoteLessonNavigation previous={learnedNavigation.previous} next={learnedNavigation.next} />
+
+        <article
+          ref={markdownArticleRef}
+          className="min-w-0 max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950"
+        >
           <div className="min-w-0 overflow-hidden text-ellipsis border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:text-gray-200">
             {taskId}.md
           </div>
@@ -169,7 +223,7 @@ export function SkillRoadmapNotePreview({
           <button
             type="button"
             onClick={() => setAppendixOpen(true)}
-            className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-gray-950 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-gray-950/20 transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200 lg:hidden"
+            className="fixed bottom-28 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-gray-950 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-gray-950/20 transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200 sm:bottom-4 lg:hidden"
             aria-haspopup="dialog"
             aria-expanded={appendixOpen}
           >
@@ -214,7 +268,156 @@ export function SkillRoadmapNotePreview({
           )}
         </>
       )}
+
+      <MarkdownFileScrollControls onScrollTo={scrollMarkdownFileTo} hasAppendix={headings.length > 0} />
     </div>
+  );
+}
+
+function MarkdownFileScrollControls({
+  onScrollTo,
+  hasAppendix,
+}: {
+  onScrollTo: (position: 'start' | 'end') => void;
+  hasAppendix: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'fixed z-40 flex overflow-hidden rounded-full border border-gray-200 bg-white/95 p-1 shadow-xl shadow-gray-950/15 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95 lg:right-6 lg:flex-col',
+        hasAppendix
+          ? 'bottom-44 right-4 sm:bottom-20 sm:right-4 lg:bottom-6'
+          : 'bottom-24 right-4 sm:bottom-4 lg:bottom-6'
+      )}
+      aria-label="Cuộn nhanh file Markdown"
+    >
+      <MarkdownFileScrollButton
+        icon={ArrowUpToLine}
+        label="Đầu file"
+        onClick={() => onScrollTo('start')}
+      />
+      <div className="my-2 hidden h-px bg-gray-200 dark:bg-gray-800 lg:block" aria-hidden="true" />
+      <div className="mx-1 w-px bg-gray-200 dark:bg-gray-800 lg:hidden" aria-hidden="true" />
+      <MarkdownFileScrollButton
+        icon={ArrowDownToLine}
+        label="Cuối file"
+        onClick={() => onScrollTo('end')}
+      />
+    </div>
+  );
+}
+
+function MarkdownFileScrollButton({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: typeof ArrowUpToLine;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className="group inline-flex h-11 w-11 items-center justify-center rounded-full text-gray-600 transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:text-gray-300 dark:hover:bg-blue-950/35 dark:hover:text-blue-200"
+    >
+      <Icon className="h-5 w-5 transition group-hover:scale-105" aria-hidden="true" />
+    </button>
+  );
+}
+
+function NoteLessonNavigation({
+  previous,
+  next,
+}: {
+  previous: NavigationTask | null;
+  next: NavigationTask | null;
+}) {
+  return (
+    <nav
+      className="fixed inset-x-3 bottom-4 z-40 grid min-w-0 grid-cols-2 overflow-hidden rounded-2xl border border-gray-200 bg-white/95 shadow-2xl shadow-gray-950/20 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95 sm:static sm:gap-3 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none sm:backdrop-blur-none"
+      aria-label="Điều hướng bài học đã hoàn thành"
+    >
+      <LessonNavigationButton direction="previous" task={previous} />
+      <LessonNavigationButton direction="next" task={next} />
+    </nav>
+  );
+}
+
+function LessonNavigationButton({
+  direction,
+  task,
+}: {
+  direction: 'previous' | 'next';
+  task: NavigationTask | null;
+}) {
+  const isPrevious = direction === 'previous';
+  const label = isPrevious ? 'Bài trước' : 'Bài tiếp theo';
+  const unavailableLabel = isPrevious
+    ? 'Không có bài trước'
+    : 'Không có bài sau';
+  const icon = isPrevious ? (
+    <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+  ) : (
+    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+  );
+  const iconClassName = cn(
+    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition sm:h-9 sm:w-9',
+    task
+      ? 'bg-blue-50 text-blue-700 group-hover:bg-blue-100 dark:bg-blue-950/35 dark:text-blue-200 dark:group-hover:bg-blue-950'
+      : 'bg-gray-100 text-gray-400 dark:bg-gray-900 dark:text-gray-600'
+  );
+  const content = (
+    <>
+      {isPrevious && (
+        <span className={iconClassName}>
+          {icon}
+        </span>
+      )}
+      <span className={cn('min-w-0 flex-1', !isPrevious && 'text-right')}>
+        <span className="block text-[0.62rem] font-bold uppercase leading-none tracking-wide text-gray-400 sm:text-xs">
+          {label}
+        </span>
+        <span className="mt-1.5 line-clamp-2 min-h-[2rem] text-xs font-semibold leading-snug text-gray-900 dark:text-gray-100 sm:min-h-0 sm:truncate sm:text-sm">
+          {task?.title ?? unavailableLabel}
+        </span>
+        {task && (
+          <span className="mt-1 hidden truncate text-xs text-gray-500 dark:text-gray-400 sm:block">
+            {task.moduleTitle}
+          </span>
+        )}
+      </span>
+      {!isPrevious && (
+        <span className={iconClassName}>
+          {icon}
+        </span>
+      )}
+    </>
+  );
+  const className = cn(
+    'group flex min-h-[5rem] min-w-0 items-center gap-2 px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset sm:min-h-0 sm:gap-3 sm:rounded-lg sm:border sm:px-4 sm:shadow-sm sm:focus-visible:ring-offset-2 sm:focus-visible:ring-offset-white dark:sm:focus-visible:ring-offset-gray-950',
+    task
+      ? 'hover:bg-blue-50/70 hover:text-blue-700 dark:hover:bg-blue-950/25 dark:hover:text-blue-200 sm:border-gray-200 sm:bg-white sm:hover:border-blue-300 dark:sm:border-gray-800 dark:sm:bg-gray-950 dark:sm:hover:border-blue-800'
+      : 'cursor-not-allowed bg-gray-50 opacity-70 dark:bg-gray-900/35 sm:border-gray-200 sm:bg-gray-50 dark:sm:border-gray-800 dark:sm:bg-gray-900/50',
+    isPrevious && 'border-r border-gray-200 dark:border-gray-800 sm:border-r',
+    !isPrevious && 'justify-end'
+  );
+
+  if (!task) {
+    return (
+      <span className={className} aria-disabled="true">
+        {content}
+      </span>
+    );
+  }
+
+  return (
+    <Link href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`} className={className}>
+      {content}
+    </Link>
   );
 }
 

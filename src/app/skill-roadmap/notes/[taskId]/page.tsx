@@ -61,6 +61,19 @@ function getTaskContexts(): Map<string, TaskContext> {
   return new Map(entries.map((task) => [task.id, task]));
 }
 
+function getTaskNavigationItems() {
+  return roadmap.tracks.flatMap((track) =>
+    track.modules.flatMap((module) =>
+      flattenTasks(module.tasks, track.title, module.title).map((task) => ({
+        id: task.id,
+        title: task.title,
+        trackTitle: task.trackTitle,
+        moduleTitle: task.moduleTitle,
+      }))
+    )
+  );
+}
+
 export default async function TaskNotePreviewPage({
   params,
 }: {
@@ -69,6 +82,7 @@ export default async function TaskNotePreviewPage({
   const { taskId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
   const task = getTaskContexts().get(decodedTaskId);
+  const navigationTasks = getTaskNavigationItems();
 
   return (
     <Container size="lg" className="py-10 md:py-12">
@@ -92,7 +106,11 @@ export default async function TaskNotePreviewPage({
         </Link>
       </div>
 
-      <SkillRoadmapNotePreview taskId={decodedTaskId} task={task} />
+      <SkillRoadmapNotePreview
+        taskId={decodedTaskId}
+        task={task}
+        navigationTasks={navigationTasks}
+      />
     </Container>
   );
 }
