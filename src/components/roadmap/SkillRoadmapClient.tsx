@@ -22,6 +22,7 @@ import {
   Search,
   StickyNote,
   Target,
+  Trash2,
   Upload,
   AlertTriangle,
 } from 'lucide-react';
@@ -123,6 +124,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [githubCommitUrl, setGithubCommitUrl] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isResettingProgress, setIsResettingProgress] = useState(false);
   const [isBackingUpGithub, setIsBackingUpGithub] = useState(false);
   const [hasServerGithubToken, setHasServerGithubToken] = useState(false);
   const [githubToken, setGithubToken] = useState('');
@@ -461,6 +463,52 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     }
   }
 
+  async function resetProgressFromProject() {
+    const confirmed = window.confirm(
+      'Bạn chắc chắn muốn xoá tiến độ đang lưu trong trình duyệt và tải lại dữ liệu mới nhất từ file JSON trong project?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsResettingProgress(true);
+    setBackupError(null);
+    setBackupMessage(null);
+    setGithubCommitUrl(null);
+
+    try {
+      removeStoredProgress();
+
+      const response = await fetch('/api/skill-roadmap/progress', {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Không đọc được file tiến độ mới nhất từ project.');
+      }
+
+      const data = normalizeProgress(await response.json());
+
+      if (!data) {
+        throw new Error('File tiến độ trong project không đúng định dạng.');
+      }
+
+      setProgress(data);
+      storeProgress(data);
+      setLoadError(null);
+      setBackupMessage('Đã xoá localStorage và tải lại tiến độ mới nhất từ project.');
+    } catch (error) {
+      setBackupError(
+        error instanceof Error
+          ? error.message
+          : 'Không tải lại được tiến độ từ project.'
+      );
+    } finally {
+      setIsResettingProgress(false);
+    }
+  }
+
   async function backupProgressToGithub() {
     setIsBackingUpGithub(true);
     setBackupError(null);
@@ -595,6 +643,20 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                   className="hidden"
                 />
               </label>
+
+              <button
+                type="button"
+                onClick={resetProgressFromProject}
+                disabled={isResettingProgress}
+                className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60 dark:border-red-900/70 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-950/30"
+              >
+                {isResettingProgress ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                Clear localStorage
+              </button>
             </div>
           </div>
 
@@ -904,6 +966,18 @@ function storeProgress(progress: ProgressFile) {
     window.localStorage.setItem(progressStorageKey, JSON.stringify(progress));
   } catch {
     // localStorage can fail in private browsing or full quota. The in-memory UI still works.
+  }
+}
+
+function removeStoredProgress() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(progressStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. The reload flow still reports API errors.
   }
 }
 

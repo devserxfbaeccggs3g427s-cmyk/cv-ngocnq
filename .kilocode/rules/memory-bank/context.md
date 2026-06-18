@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Added a confirmed reset action in `/skill-roadmap` backup tools to clear browser `skill-roadmap-progress:v1` localStorage and reload the latest progress seed from the project JSON
 - [x] Added a Markdown heading appendix to `/skill-roadmap/notes/[taskId]` under the task info sidebar, with generated in-page anchor links to each rendered heading
 - [x] Optimized the Markdown note appendix for long notes by making the appendix list independently scrollable, keeping the desktop sidebar viewport-bound, and compacting task metadata on mobile/tablet
 - [x] Reworked the Markdown note appendix on mobile into a floating action button plus bottom sheet so readers can open the appendix from anywhere in the note without scrolling back to the top
@@ -116,6 +117,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - The roadmap now breaks broad topics into important interview-level fundamentals; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees
 - Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in browser `localStorage` under `skill-roadmap-progress:v1`, with `src/data/skill-roadmap-progress.json` kept as seed/local-dev JSON sync only
 - `/skill-roadmap` includes backup tools for roadmap progress: browser JSON export/import plus optional GitHub commit backup using the current browser progress payload. GitHub tokens are submitted per request and not persisted by the app.
+- Backup tools now include a confirmed local reset action that removes browser `skill-roadmap-progress:v1` and reloads the newest seed from `src/data/skill-roadmap-progress.json` through `/api/skill-roadmap/progress`.
 - GitHub backup form defaults can be configured with `GITHUB_BACKUP_REPO_URL`, `GITHUB_BACKUP_BRANCH`, `GITHUB_BACKUP_PATH`, `GITHUB_BACKUP_COMMIT_MESSAGE`, and `GITHUB_BACKUP_TOKEN`; the token is consumed server-side and never returned by the config API.
 - GitHub backup now checks repository and branch access before writing the backup file, accepts common repo URL forms (`https://github.com/owner/repo`, copied GitHub URLs, SSH URL, and `owner/repo`), and returns actionable/contextual Vietnamese errors for common GitHub API failures.
 - `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab by reading the same browser progress storage, with sticky task metadata and completion status on desktop
@@ -181,6 +183,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Added confirmed `/skill-roadmap` backup action to clear progress localStorage and reload the newest project JSON seed |
 | 2026-06-17 | Rà soát lại ngôn ngữ CV/PDF và portfolio project text, Việt hóa cụm mô tả thường trong `src/data` và `cv-base.md` trong khi giữ keyword kỹ thuật/chức danh |
 | 2026-06-14 | Upgraded per-task Markdown note preview with a reusable professional renderer, language auto-detection, IDE-like syntax-highlighted code, and light/dark styles for tables, database snippets, lists, links, images, and callouts |
 | 2026-06-14 | Fixed GitHub roadmap backup API typecheck failure by normalizing unknown GitHub error bodies before passing them to `buildGithubError` |
