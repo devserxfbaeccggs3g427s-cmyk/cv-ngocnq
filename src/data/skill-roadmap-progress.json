@@ -1,8 +1,8 @@
 {
-  "version": 2,
-  "exportedAt": "2026-06-18T07:25:36.175Z",
+  "version": 3,
+  "exportedAt": "2026-06-18T08:19:08.274Z",
   "progress": {
-    "updatedAt": "2026-06-18T07:23:33.722Z",
+    "updatedAt": "2026-06-18T07:58:51.010Z",
     "items": {
       "java-001.oop.composition": {
         "completed": true,
@@ -216,5 +216,211 @@
       }
     }
   },
-  "comments": {}
+  "comments": {},
+  "flashcards": {
+    "java-001": {
+      "taskId": "java-001",
+      "taskTitle": "Ôn lại OOP, SOLID, immutable object, equals/hashCode và defensive copying",
+      "createdAt": "2026-06-18T07:41:24.542Z",
+      "source": {
+        "noteCharacters": 26222,
+        "commentCount": 0
+      },
+      "cards": [
+        {
+          "id": "37fcda6f-b376-4ded-b45c-fe56d18d8934",
+          "front": "Entity khác Value Object ở điểm cốt lõi nào? Cho ví dụ minh họa.",
+          "back": "Entity có identity riêng và có lifecycle; Value Object không có identity, được định nghĩa hoàn toàn bằng giá trị. Hai User cùng id là một entity dù name/email đổi; hai Money(100, VND) bằng nhau dù khác instance.",
+          "hint": "Identity vs value equality",
+          "tag": "OOP"
+        },
+        {
+          "id": "5b82d557-2874-4942-b52f-626bc01dbcf5",
+          "front": "Vì sao không nên dùng toàn bộ field để override equals cho Entity?",
+          "back": "Vì identity của entity là id/business key, không phải toàn bộ thuộc tính. Nếu equals theo mọi field thì đổi email hay name làm object bị coi là entity khác -> mất danh tính, sai logic so sánh trong Set/Map và trong persistence context.",
+          "hint": "Entity equality dựa trên identity",
+          "tag": "equals/hashCode"
+        },
+        {
+          "id": "d9c5c9cf-03dd-460f-8e4f-d8839bd5adc3",
+          "front": "Contract bắt buộc giữa equals và hashCode là gì?",
+          "back": "Nếu a.equals(b) == true thì bắt buộc a.hashCode() == b.hashCode(). Ngược lại không bắt buộc (hai object cùng hashCode chưa chắc equals). Vi phạm contract sẽ gây lỗi khi dùng làm key trong HashMap/HashSet.",
+          "hint": "Hai chiều quan hệ",
+          "tag": "equals/hashCode"
+        },
+        {
+          "id": "08be8840-2828-4151-a686-2bc5df468765",
+          "front": "Tại sao field `final` chưa đảm bảo object immutable?",
+          "back": "`final` chỉ khóa reference, không khóa nội dung object bên trong. Nếu field là List, Map, Date... mutable, caller vẫn có thể add/remove/sort để mutate state nội bộ. Phải defensive copy hoặc dùng immutable collection.",
+          "hint": "Reference vs content",
+          "tag": "Immutability"
+        },
+        {
+          "id": "e52d8de4-616f-473f-841e-83a7bd2c8e01",
+          "front": "Khi nào bắt buộc phải defensive copy?",
+          "back": "Khi class giữ field là mutable object (List, Map, Set, Date, array, custom mutable type). Cần copy ở cả constructor (input) và getter (output). Nếu không copy, caller giữ reference gốc và có thể làm hỏng invariant bên trong object.",
+          "hint": "Cả input lẫn output",
+          "tag": "Defensive Copy"
+        },
+        {
+          "id": "f0b1b7f0-1f5e-4185-a19a-7b642fb45292",
+          "front": "Vì sao không nên trả Entity JPA trực tiếp ra API response?",
+          "back": "Vì: (1) leak field nhạy cảm, (2) dính annotation persistence vào contract API, (3) lazy loading gây lỗi serialization ngoài transaction, (4) API bị coupling với database model, (5) dễ sinh vòng lặp JSON User -> Orders -> User. Nên map sang DTO.",
+          "hint": "Boundary separation",
+          "tag": "DTO"
+        },
+        {
+          "id": "2d81ee17-440c-4c4a-a961-3673fce9020e",
+          "front": "Đặt object mutable vào HashSet rồi đổi field dùng trong hashCode sẽ xảy ra gì?",
+          "back": "Object vẫn nằm ở bucket cũ dựa trên hash cũ, nhưng khi gọi contains/get Java tính hash mới và tìm ở bucket khác -> trả về false dù object vẫn còn trong set. Đây là lý do key trong Map/Set nên immutable.",
+          "hint": "Bucket nào quyết định bởi hashCode",
+          "tag": "equals/hashCode"
+        },
+        {
+          "id": "fb63297b-2066-40df-8b9b-c26019341c9f",
+          "front": "Override equals/hashCode cho JPA entity có id tự sinh thì rủi ro gì?",
+          "back": "Trước khi persist, id thường null; sau khi persist id được gán. Nếu hashCode dùng id thì hashCode đổi sau khi save -> object đang nằm trong HashSet/HashMap sẽ bị 'mất tích' (không tìm ra). Giải pháp: dùng business key bất biến hoặc constant hashCode.",
+          "hint": "id null trước khi save",
+          "tag": "JPA"
+        },
+        {
+          "id": "93d02d45-3489-4174-9897-013c31f6ac49",
+          "front": "SRP trong backend nghĩa là gì, áp dụng thế nào?",
+          "back": "Một class chỉ nên có một lý do để thay đổi, nghĩa là chỉ chịu trách nhiệm cho một actor/nghiệp vụ. Ví dụ: UserService không nên vừa xử lý authentication vừa gửi email; tách thành AuthService và EmailService để thay đổi logic email không ảnh hưởng auth.",
+          "hint": "Một class, một trách nhiệm",
+          "tag": "SOLID"
+        },
+        {
+          "id": "7a8276eb-30ff-431c-b48c-b13e72c736de",
+          "front": "DIP (Dependency Inversion Principle) áp dụng thế nào trong Spring/Backend?",
+          "back": "Module cấp cao (service, business logic) phụ thuộc vào abstraction (interface), không phụ thuộc implementation cụ thể. Ví dụ: OrderService phụ thuộc PaymentGateway interface, inject StripePaymentGateway hoặc MomoPaymentGateway. Dễ test bằng mock, dễ thay đổi provider.",
+          "hint": "Abstraction, không concrete",
+          "tag": "SOLID"
+        },
+        {
+          "id": "679e8cd0-338a-4d1f-8e33-b753d5b8dab6",
+          "front": "Lỗi phổ biến khi override equals mà quên override hashCode?",
+          "back": "Object được coi là 'bằng nhau' qua equals nhưng có hashCode khác nhau -> khi cho vào HashMap/HashSet, put ở bucket này nhưng get/contains lại tìm ở bucket khác -> mất key, duplicate không bị gộp. Luôn override cả hai cùng nhau, tốt nhất dùng @Data của Lombok hoặc Objects.equals/hash.",
+          "hint": "Phải đi cùng nhau",
+          "tag": "equals/hashCode"
+        },
+        {
+          "id": "d2d8c21d-e348-4e33-be19-8f31e244930f",
+          "front": "Khi nào KHÔNG nên override equals/hashCode?",
+          "back": "Không override khi object đã có identity tự nhiên của JVM là đủ (mỗi instance là duy nhất), ví dụ: service, controller, repository, command object chỉ mang ý nghĩa hành động một lần. Cũng không nên override cho entity nếu chưa có id ổn định.",
+          "hint": "Mỗi instance là một đối tượng riêng",
+          "tag": "equals/hashCode"
+        },
+        {
+          "id": "dcc0a63a-5035-4bf4-9f01-146473264840",
+          "front": "Tạo Value Object cho mọi field đơn giản có phải lúc nào cũng tốt không?",
+          "back": "Không. Value Object tốt khi field có rule, hành vi, validation tập trung (Email, Money, PhoneNumber). Nếu chỉ là text hiển thị thuần, không có rule domain, không có hành vi -> dùng String đủ, tránh over-engineering. Tiêu chí: có làm code rõ nghĩa hơn không?",
+          "hint": "Tránh over-engineering",
+          "tag": "Value Object"
+        }
+      ]
+    },
+    "java-001.oop.encapsulation": {
+      "taskId": "java-001.oop.encapsulation",
+      "taskTitle": "Encapsulation: private field, invariant, getter/setter có kiểm soát",
+      "createdAt": "2026-06-18T08:08:04.024Z",
+      "source": {
+        "noteCharacters": 15998,
+        "commentCount": 0
+      },
+      "cards": [
+        {
+          "id": "7b37dd99-d20d-40e4-b357-bc5c65d5ac32",
+          "front": "Encapsulation có phải chỉ là private field + getter/setter không? Bản chất đúng là gì?",
+          "back": "Không. private + getter/setter chỉ là biểu hiện kỹ thuật. Bản chất encapsulation là: class tự bảo vệ invariant (trạng thái hợp lệ) của chính nó và che giấu implementation detail. Field private nhưng setter public cho mọi giá trị vẫn là encapsulation kém.",
+          "hint": "Mục đích quan trọng hơn cú pháp",
+          "tag": "encapsulation-core"
+        },
+        {
+          "id": "ad7c72bb-0fac-4335-859f-5a767e7bbf40",
+          "front": "Invariant là gì? Cho ví dụ.",
+          "back": "Invariant là điều kiện luôn đúng để object được coi là hợp lệ, phải được giữ sau constructor và sau mỗi public method. Ví dụ: BankAccount.balance >= 0, BookingPeriod.start < end, Order.totalAmount >= 0, Money.amount không null.",
+          "hint": "Always-true condition của object",
+          "tag": "invariant"
+        },
+        {
+          "id": "de53766e-4e14-4ab1-aa8a-b33eab13ab7f",
+          "front": "Vì sao setter public từng field riêng lẻ lại nguy hiểm cho object có nhiều field liên quan?",
+          "back": "Vì invariant thường là quan hệ giữa nhiều field. Setter riêng lẻ không nhìn thấy tổng thể. Ví dụ: period.setStart(20/6) rồi period.setEnd(10/6) → start > end, phá invariant, dù mỗi setter riêng lẻ trông có vẻ vô hại.",
+          "hint": "Gọi 2 setter liên tiếp sẽ ra sao?",
+          "tag": "setter-pitfall"
+        },
+        {
+          "id": "6709bb97-02f0-4c8e-95c2-8bb9bbc69185",
+          "front": "So sánh order.setStatus(CANCELLED) và order.cancel(). Cách nào tốt hơn cho domain object?",
+          "back": "order.cancel() tốt hơn. Setter chỉ đổi dữ liệu; method nghiệp vụ thể hiện ý định rõ ràng và chứa được rule nghiệp vụ: order đã shipped chưa, đã paid chưa, có cần refund không, ai có quyền cancel. Setter không diễn đạt được các rule này.",
+          "hint": "Tell-don't-ask và business rule",
+          "tag": "domain-modeling"
+        },
+        {
+          "id": "dd8f0aaa-13cf-481e-b68c-875d9a4e7caa",
+          "front": "Getter có thể phá encapsulation không? Cho ví dụ và cách fix.",
+          "back": "Có, khi getter trả về reference tới mutable object bên trong. Ví dụ: order.getItems().clear() xóa luôn list nội bộ. Cách fix: trả Collections.unmodifiableList(items) hoặc List.copyOf(items) (defensive copy), hoặc không expose list, chỉ cung cấp addItem()/removeItem() nghiệp vụ.",
+          "hint": "Defensive copy / unmodifiable view",
+          "tag": "getter-pitfall"
+        },
+        {
+          "id": "22404ee3-9d44-4efb-8a59-89557d05d0fd",
+          "front": "Constructor có vai trò gì trong việc bảo vệ invariant?",
+          "back": "Constructor là tuyến phòng thủ đầu tiên. Object không nên được tạo ra ở trạng thái sai ngay từ đầu. Nên validate toàn bộ tham số (null, range, quan hệ giữa các field) trước khi gán, throw exception nếu vi phạm. Constructor không validate → object lỗi tồn tại từ lúc sinh ra.",
+          "hint": "First line of defense",
+          "tag": "constructor"
+        },
+        {
+          "id": "eb31644b-5ebb-4656-b935-608abefb6463",
+          "front": "Entity JPA có nên có setter public cho mọi field không? Thiết kế nào phù hợp?",
+          "back": "Không nên. JPA chỉ cần no-args constructor (nên để protected) chứ không cần setter public. Setter public cho phép code bất kỳ phá invariant. Thiết kế tốt: protected constructor cho JPA, setter private/protected, public chỉ là method nghiệp vụ (cancel, addItem, changePrice...) có validate.",
+          "hint": "Framework requirement ≠ design license",
+          "tag": "jpa-entity"
+        },
+        {
+          "id": "da47cd8e-a297-4cf2-ad2d-9331f51ab23c",
+          "front": "Liên hệ giữa immutable object và encapsulation?",
+          "back": "Immutable là dạng encapsulation mạnh nhất: field private final, không setter, constructor validate đầy đủ, không expose mutable internal state. Vì state không đổi được sau khi tạo, invariant tự bảo vệ - không lo bị phá giữa chừng. Trade-off: mỗi lần thay đổi phải tạo object mới.",
+          "hint": "Không thay đổi được thì không phá được",
+          "tag": "immutability"
+        },
+        {
+          "id": "7b7137ce-d03e-4f43-a55b-8e85f5c8333f",
+          "front": "Khi nào KHÔNG nên encapsulate quá chặt?",
+          "back": "Các trường hợp chỉ là data carrier: DTO request/response, projection object, test fixture, Java record value carrier, object dùng nội bộ phạm vi rất nhỏ. Validate ở đây có thể để Bean Validation (@NotBlank, @Email) hoặc đơn giản là field. Over-engineer sẽ tốn công vô ích.",
+          "hint": "Phân biệt domain object vs data carrier",
+          "tag": "trade-off"
+        },
+        {
+          "id": "8793026b-337c-4fe1-aba2-6c5a21459d09",
+          "front": "Class Product có 3 field name, price, stock với setter public cho cả 3. Liệt kê các vấn đề encapsulation.",
+          "back": "(1) name có thể null/blank. (2) price có thể null hoặc âm. (3) stock có thể âm. (4) Không có constructor đảm bảo object hợp lệ từ đầu. (5) Setter public cho phép bất kỳ đoạn code nào phá invariant. (6) Tên method chỉ là set dữ liệu, không thể hiện nghiệp vụ (rename/changePrice/adjustStock).",
+          "hint": "Đóng vai người dùng class này",
+          "tag": "code-review"
+        },
+        {
+          "id": "ccf48540-0d73-41c6-897c-255fdfb37f95",
+          "front": "Khi bắt buộc cho phép đổi từng field riêng lẻ (changeStart, changeEnd), làm sao vẫn giữ được invariant?",
+          "back": "Mỗi method phải validate TOÀN BỘ điều kiện invariant liên quan đến field khác, không chỉ field đang đổi. Ví dụ: changeStart(newStart) phải check newStart < this.end; changeEnd(newEnd) phải check this.start < newEnd. Mỗi lần sửa 1 field phải nhìn lại các field còn lại.",
+          "hint": "Đổi 1 field, validate cả object",
+          "tag": "invariant"
+        },
+        {
+          "id": "ce9ca8dc-a42a-4770-ab48-ec5047cf9ada",
+          "front": "Trade-off chính của encapsulation là gì?",
+          "back": "(1) Nhiều code hơn: cần constructor validate, method nghiệp vụ, exception rõ ràng. (2) Có thể over-engineering cho DTO đơn giản. (3) Framework (JPA, Jackson) đôi khi cần no-args constructor và setter - phải cân nhắc giữa framework requirement và việc bảo vệ invariant. Không nên dùng đồng nhất cho mọi loại class.",
+          "hint": "Cost vs benefit",
+          "tag": "trade-off"
+        },
+        {
+          "id": "b7cbd882-4b4e-4846-90b5-0cc089a8bfb7",
+          "front": "Vì sao nên ưu tiên method nghiệp vụ (withdraw, deposit, cancel, changePeriod) hơn setter (setBalance, setStatus) trong domain object?",
+          "back": "Method nghiệp vụ: thể hiện ý định rõ ràng, đóng gói rule nghiệp vụ, tập trung logic dễ audit/debug/test, code đọc tự nhiên. Setter chỉ thay đổi dữ liệu không kèm ngữ cảnh, dễ dẫn đến setBalance(getBalance() - amount) rải logic khắp nơi, khó kiểm soát invariant.",
+          "hint": "Đọc code như đọc câu tiếng Việt",
+          "tag": "domain-modeling"
+        }
+      ]
+    }
+  }
 }
