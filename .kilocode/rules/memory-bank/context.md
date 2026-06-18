@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Reworked `src/data/skill-roadmap.json` into a deeper multi-level learning hierarchy; roadmap now has 624 todo nodes, grouped as parent task → focused learning branch → concrete issue/task leaf, with no repeated concept/interview/edge-case/practice placeholders, no flat broad parents, and no single-child wrapper branches
 - [x] Updated roadmap seed hydration so `src/data/skill-roadmap-progress.json` can be a version-3 combined backup; `/api/skill-roadmap/progress` now preserves `comments` and `flashcards` when syncing progress, while `/skill-roadmap`, note preview/comment pages, and task detail pages hydrate missing `localStorage` keys from the file seed
 - [x] Extended `/skill-roadmap` backup tools to include AI flashcard decks from `skill-roadmap-flashcards:v1`; exported/GitHub backup JSON is now version 3 with `progress`, `comments`, and `flashcards`, import remains compatible with older progress-only/version-2 files, and Clear localStorage removes flashcards too
 - [x] Added AI flashcard generation to `/skill-roadmap/tasks/[taskId]`: completed tasks with non-empty notes can generate one flashcard deck from the full note plus all note comments, using server-side env-configured OpenAI-compatible AI settings; generated decks are stored in browser `localStorage` and rendered in a modern study panel with flip cards, progress stats, previous/next navigation, and hard/good self-ratings
@@ -144,7 +145,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - Roadmap parent task rows now show an amber in-progress state as soon as at least one descendant task is completed; once all descendants are completed, the corresponding parent chain is auto-marked completed and persisted
 - Roadmap nodes with child tasks can be expanded/collapsed individually; the filter toolbar also has "Mở tất cả" and "Thu gọn tất cả" controls
 - The `/skill-roadmap` filter toolbar includes a study status dropdown for all/completed/not-started/in-progress/with-note filtering, using descendant completion to identify partially in-progress parent tasks
-- The roadmap now breaks broad topics into important interview-level fundamentals; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees
+- The roadmap now breaks broad topics into important interview-level fundamentals with multiple nested levels; examples include detailed OOP/SOLID/immutable/equals-hashCode/defensive-copying/entity-value-DTO subtrees plus branch-level grouping for Stream/Optional, ExecutorService/CompletableFuture, REST API design, JPA/Hibernate, Kafka/resilience, banking/payment flows, database/cache/storage, security, DevOps/observability, frontend, testing, and system design
 - Skill roadmap source data is stored in `src/data/skill-roadmap.json`; user completion state and notes are persisted in browser `localStorage` under `skill-roadmap-progress:v1`, with `src/data/skill-roadmap-progress.json` kept as seed/local-dev JSON sync only
 - `/skill-roadmap` includes backup tools for roadmap progress: browser JSON export/import plus optional GitHub commit backup using the current browser progress payload. GitHub tokens are submitted per request and not persisted by the app.
 - Backup tools now include a confirmed local reset action that removes browser `skill-roadmap-progress:v1` and reloads the newest seed from `src/data/skill-roadmap-progress.json` through `/api/skill-roadmap/progress`.
@@ -224,6 +225,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Reworked `skill-roadmap.json` from broad generated child placeholders into 624 multi-level topic/branch/leaf todo nodes |
 | 2026-06-18 | Added focused skill roadmap task detail pages with child task drill-down and no note preview rendering |
 | 2026-06-18 | Added note editing and collapsible child task branches to focused skill roadmap task detail pages |
 | 2026-06-18 | Added show/hide and copy controls for generated AI learning prompts on skill roadmap task detail pages |
