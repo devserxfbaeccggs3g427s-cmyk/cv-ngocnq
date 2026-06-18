@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Updated `/skill-roadmap` completed-task note inputs so empty notes show a red border and notes with trimmed content show a green border
 - [x] Added a `/skill-roadmap` study status filter so users can show all tasks, completed tasks, not-started tasks, partially in-progress parent tasks, or tasks with notes while keeping matching child tasks visible under their parent hierarchy
 - [x] Added a confirmed reset action in `/skill-roadmap` backup tools to clear browser `skill-roadmap-progress:v1` localStorage and reload the latest progress seed from the project JSON
 - [x] Added a Markdown heading appendix to `/skill-roadmap/notes/[taskId]` under the task info sidebar, with generated in-page anchor links to each rendered heading
@@ -123,6 +124,7 @@ The resume has been fully customized for **Nguyễn Quang Ngọc** (Backend / Fu
 - GitHub backup form defaults can be configured with `GITHUB_BACKUP_REPO_URL`, `GITHUB_BACKUP_BRANCH`, `GITHUB_BACKUP_PATH`, `GITHUB_BACKUP_COMMIT_MESSAGE`, and `GITHUB_BACKUP_TOKEN`; the token is consumed server-side and never returned by the config API.
 - GitHub backup now checks repository and branch access before writing the backup file, accepts common repo URL forms (`https://github.com/owner/repo`, copied GitHub URLs, SSH URL, and `owner/repo`), and returns actionable/contextual Vietnamese errors for common GitHub API failures.
 - `/skill-roadmap/notes/[taskId]` previews the selected task note as Markdown in a new tab by reading the same browser progress storage, with sticky task metadata and completion status on desktop
+- Completed task note inputs on `/skill-roadmap` visually flag missing note content with red borders and switch to green once the note has non-whitespace content.
 - Markdown note preview now uses reusable `src/components/markdown/MarkdownPreview.tsx` and supports richer professional Markdown formatting for headings, body text, tables, syntax-highlighted source code with auto-detected languages, SQL/database snippets, checklists, links, images, callouts, generated heading anchors, a desktop sidebar appendix/table of contents with independent scrolling and active-section highlighting, a mobile floating appendix bottom sheet, horizontal-overflow-safe responsive containers, and dedicated light/dark readability palettes that follow the actual rendered page theme
 - Print/PDF route `/print` now includes full project experience and is optimized for professional A4 PDF export
 - `/print` supports direct in-browser editing before PDF export; edited DOM content is persisted in localStorage and used by the browser print/save-PDF flow
@@ -185,6 +187,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-06-18 | Updated `/skill-roadmap` note input borders to red when empty and green when populated |
 | 2026-06-18 | Added study status filtering to `/skill-roadmap` for completed, not-started, in-progress parent tasks, and tasks with notes |
 | 2026-06-18 | Added confirmed `/skill-roadmap` backup action to clear progress localStorage and reload the newest project JSON seed |
 | 2026-06-17 | Rà soát lại ngôn ngữ CV/PDF và portfolio project text, Việt hóa cụm mô tả thường trong `src/data` và `cv-base.md` trong khi giữ keyword kỹ thuật/chức danh |

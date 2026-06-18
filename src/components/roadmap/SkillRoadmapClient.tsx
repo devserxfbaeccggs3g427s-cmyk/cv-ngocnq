@@ -1089,6 +1089,7 @@ function TaskNode({
 }) {
   const item = progress.items[task.id];
   const completed = Boolean(item?.completed);
+  const hasNote = Boolean(item?.note.trim());
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
   const descendants = flattenTasks(childTasks);
@@ -1251,10 +1252,22 @@ function TaskNode({
           </div>
 
           {effectivelyCompleted && (
-            <div className="mt-4 rounded-lg border border-emerald-100 bg-white p-3 dark:border-emerald-900/50 dark:bg-gray-950">
+            <div
+              className={cn(
+                'mt-4 rounded-lg border bg-white p-3 dark:bg-gray-950',
+                hasNote
+                  ? 'border-emerald-200 dark:border-emerald-900/60'
+                  : 'border-red-300 dark:border-red-800'
+              )}
+            >
               <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
-                  <StickyNote className="h-4 w-4 text-emerald-600" />
+                  <StickyNote
+                    className={cn(
+                      'h-4 w-4',
+                      hasNote ? 'text-emerald-600' : 'text-red-600'
+                    )}
+                  />
                   Note sau khi đã thực hiện
                 </label>
                 <a
@@ -1273,7 +1286,12 @@ function TaskNode({
                 onBlur={(event) => onNoteBlur(task.id, event.target.value)}
                 rows={3}
                 placeholder="Ghi lại nội dung đã học, link tài liệu, lỗi gặp phải, checklist cần ôn lại..."
-                className="min-h-24 w-full resize-y rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                className={cn(
+                  'min-h-24 w-full resize-y rounded-lg border bg-white p-3 text-sm text-gray-900 outline-none transition focus:ring-2 dark:bg-gray-900 dark:text-white',
+                  hasNote
+                    ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20 dark:border-emerald-800'
+                    : 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
+                )}
               />
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <span>
