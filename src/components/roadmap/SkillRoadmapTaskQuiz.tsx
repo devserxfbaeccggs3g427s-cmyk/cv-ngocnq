@@ -14,6 +14,7 @@ import {
   Sparkles,
   XCircle,
 } from 'lucide-react';
+import { MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
@@ -664,9 +665,9 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
                     )}
                   </div>
 
-                  <h2 className="mt-4 text-xl font-bold leading-8 text-gray-950 [overflow-wrap:anywhere] dark:text-white">
-                    {activeQuestion.question}
-                  </h2>
+                  <div className="quiz-markdown quiz-markdown-question mt-4 text-gray-950 dark:text-white">
+                    <MarkdownPreview content={activeQuestion.question} />
+                  </div>
 
                   <div className="mt-5 space-y-3">
                     {activeQuestion.options.map((option, optionIndex) => {
@@ -695,7 +696,9 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
                           <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-current text-xs font-bold">
                             {String.fromCharCode(65 + optionIndex)}
                           </span>
-                          <span className="[overflow-wrap:anywhere]">{option}</span>
+                          <span className="quiz-markdown quiz-markdown-option min-w-0 flex-1 [overflow-wrap:anywhere]">
+                            <MarkdownPreview content={option} />
+                          </span>
                         </button>
                       );
                     })}
@@ -706,7 +709,9 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
                       <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                         Giải thích
                       </div>
-                      <p className="mt-2">{activeQuestion.explanation || 'AI không trả về giải thích cho câu này.'}</p>
+                      <div className="quiz-markdown quiz-markdown-explanation mt-2">
+                        <MarkdownPreview content={activeQuestion.explanation || 'AI không trả về giải thích cho câu này.'} />
+                      </div>
                     </div>
                   )}
 

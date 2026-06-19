@@ -770,6 +770,110 @@ body.dark .markdown-preview,
   box-shadow: none;
 }
 
+.quiz-markdown .markdown-preview {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.quiz-markdown .markdown-preview h1,
+.quiz-markdown .markdown-preview h2,
+.quiz-markdown .markdown-preview h3,
+.quiz-markdown .markdown-preview h4,
+.quiz-markdown .markdown-preview h5,
+.quiz-markdown .markdown-preview h6 {
+  border-bottom: 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0.35rem 0;
+  padding-bottom: 0;
+}
+
+.quiz-markdown-question .markdown-preview {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 2rem;
+}
+
+.quiz-markdown-option .markdown-preview {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.quiz-markdown-explanation .markdown-preview {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.quiz-markdown .markdown-preview p,
+.quiz-markdown .markdown-preview ul,
+.quiz-markdown .markdown-preview ol,
+.quiz-markdown .markdown-preview blockquote,
+.quiz-markdown .markdown-preview .markdown-table-wrap,
+.quiz-markdown .markdown-preview .markdown-code {
+  margin: 0.45rem 0;
+}
+
+.quiz-markdown .markdown-preview > *:first-child {
+  margin-top: 0;
+}
+
+.quiz-markdown .markdown-preview > *:last-child {
+  margin-bottom: 0;
+}
+
+.quiz-markdown .markdown-preview ul,
+.quiz-markdown .markdown-preview ol {
+  padding-left: 1.1rem;
+}
+
+.quiz-markdown .markdown-preview li {
+  margin: 0.2rem 0;
+}
+
+.quiz-markdown .markdown-preview blockquote {
+  border-radius: 0 0.375rem 0.375rem 0;
+  border-left-width: 3px;
+  padding: 0.55rem 0.75rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-table-wrap {
+  border-radius: 0.5rem;
+}
+
+.quiz-markdown .markdown-preview table {
+  min-width: 480px;
+}
+
+.quiz-markdown .markdown-preview th,
+.quiz-markdown .markdown-preview td {
+  padding: 0.5rem 0.65rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-code {
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+
+.quiz-markdown .markdown-preview .markdown-code figcaption {
+  padding: 0.4rem 0.65rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-code pre {
+  max-height: 320px;
+  padding: 0.65rem 0;
+}
+
+.quiz-markdown .markdown-preview .markdown-code code {
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.quiz-markdown .markdown-preview .markdown-code-line {
+  padding-right: 0.75rem;
+}
+
 /* ================================
    PRINT STYLES
    ================================ */
