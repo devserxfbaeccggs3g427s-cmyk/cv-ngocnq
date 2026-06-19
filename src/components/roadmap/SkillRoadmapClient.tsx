@@ -108,12 +108,48 @@ type FlashcardDeck = {
   cards: Flashcard[];
 };
 
+type QuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation: string;
+  tag: string;
+};
+
+type QuizAttempt = {
+  id: string;
+  startedAt: string;
+  submittedAt: string | null;
+  durationSeconds: number;
+  answers: Record<string, number>;
+  score: number | null;
+  total: number;
+  submittedBy: 'user' | 'timeout' | null;
+};
+
+type QuizDeck = {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  title: string;
+  durationMinutes: number;
+  createdAt: string;
+  source: {
+    noteCharacters: number;
+    commentCount: number;
+  };
+  questions: QuizQuestion[];
+  attempts: QuizAttempt[];
+};
+
 type RoadmapBackupFile = {
-  version: 3;
+  version: 4;
   exportedAt: string;
   progress: ProgressFile;
   comments: Record<string, NoteComment[]>;
   flashcards: Record<string, FlashcardDeck>;
+  quizzes: Record<string, QuizDeck[]>;
 };
 
 type StudyStatusFilter = 'all' | 'completed' | 'incomplete' | 'in-progress' | 'with-note';
@@ -139,6 +175,7 @@ const emptyProgress: ProgressFile = {
 const progressStorageKey = 'skill-roadmap-progress:v1';
 const commentsStorageKey = 'skill-roadmap-note-comments:v1';
 const flashcardsStorageKey = 'skill-roadmap-flashcards:v1';
+const quizzesStorageKey = 'skill-roadmap-quizzes:v1';
 const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 const levelStyles: Record<string, string> = {
@@ -278,6 +315,10 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
           if (!hasStoredFlashcards()) {
             storeFlashcards(seed.flashcards);
+          }
+
+          if (!hasStoredQuizzes()) {
+            storeQuizzes(seed.quizzes);
           }
         }
       } catch {
@@ -478,7 +519,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, comment và flashcard.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, comment, flashcard và trắc nghiệm.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -502,7 +543,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       const data = normalizeRoadmapBackup(JSON.parse(text));
 
       if (!data) {
-        throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress, comments và flashcards.');
+        throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress, comments, flashcards và quizzes.');
       }
 
       const imported = {
@@ -514,22 +555,24 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       storeProgress(imported);
       storeComments(data.comments);
       storeFlashcards(data.flashcards);
+      storeQuizzes(data.quizzes);
 
       if (shouldSyncProgressFile) {
         await fetch('/api/skill-roadmap/progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            version: 3,
+            version: 4,
             exportedAt: new Date().toISOString(),
             progress: imported,
             comments: data.comments,
             flashcards: data.flashcards,
+            quizzes: data.quizzes,
           }),
         });
       }
 
-      setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, comment và flashcard.');
+      setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, comment, flashcard và trắc nghiệm.');
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không import được file backup.'
@@ -542,7 +585,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
   async function resetProgressFromProject() {
     const confirmed = window.confirm(
-      'Bạn chắc chắn muốn xoá tiến độ, comment và flashcard đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
+      'Bạn chắc chắn muốn xoá tiến độ, comment, flashcard và trắc nghiệm đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
     );
 
     if (!confirmed) {
@@ -558,6 +601,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       removeStoredProgress();
       removeStoredComments();
       removeStoredFlashcards();
+      removeStoredQuizzes();
 
       const response = await fetch('/api/skill-roadmap/progress', {
         cache: 'no-store',
@@ -567,16 +611,19 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
         throw new Error('Không đọc được file tiến độ mới nhất từ project.');
       }
 
-      const data = normalizeProgress(await response.json());
+      const data = normalizeRoadmapBackup(await response.json());
 
       if (!data) {
         throw new Error('File tiến độ trong project không đúng định dạng.');
       }
 
-      setProgress(data);
-      storeProgress(data);
+      setProgress(data.progress);
+      storeProgress(data.progress);
+      storeComments(data.comments);
+      storeFlashcards(data.flashcards);
+      storeQuizzes(data.quizzes);
       setLoadError(null);
-      setBackupMessage('Đã xoá tiến độ/comment/flashcard trong localStorage và tải lại tiến độ mới nhất từ project.');
+      setBackupMessage('Đã xoá localStorage và tải lại tiến độ/comment/flashcard/trắc nghiệm mới nhất từ project.');
     } catch (error) {
       setBackupError(
         error instanceof Error
@@ -1097,6 +1144,18 @@ function removeStoredFlashcards() {
   }
 }
 
+function removeStoredQuizzes() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(quizzesStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
 function hasStoredComments() {
   if (typeof window === 'undefined') {
     return false;
@@ -1116,6 +1175,18 @@ function hasStoredFlashcards() {
 
   try {
     return window.localStorage.getItem(flashcardsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function hasStoredQuizzes() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(quizzesStorageKey) !== null;
   } catch {
     return false;
   }
@@ -1147,6 +1218,19 @@ function readStoredFlashcards(): Record<string, FlashcardDeck> {
   }
 }
 
+function readStoredQuizzes(): Record<string, QuizDeck[]> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(quizzesStorageKey);
+    return raw ? normalizeQuizzesByTask(JSON.parse(raw)) ?? {} : {};
+  } catch {
+    return {};
+  }
+}
+
 function storeComments(comments: Record<string, NoteComment[]>) {
   if (typeof window === 'undefined') {
     return;
@@ -1171,13 +1255,26 @@ function storeFlashcards(flashcards: Record<string, FlashcardDeck>) {
   }
 }
 
+function storeQuizzes(quizzes: Record<string, QuizDeck[]>) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(quizzesStorageKey, JSON.stringify(quizzes));
+  } catch {
+    // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
 function buildRoadmapBackup(progress: ProgressFile): RoadmapBackupFile {
   return {
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     progress,
     comments: readStoredComments(),
     flashcards: readStoredFlashcards(),
+    quizzes: readStoredQuizzes(),
   };
 }
 
@@ -1307,7 +1404,126 @@ function normalizeFlashcardsByTask(input: unknown): Record<string, FlashcardDeck
   return flashcards;
 }
 
-function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]>; flashcards: Record<string, FlashcardDeck> } | null {
+function normalizeQuizQuestion(input: unknown): QuizQuestion | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.question !== 'string' ||
+    !Array.isArray(input.options) ||
+    typeof input.correctOptionIndex !== 'number' ||
+    typeof input.explanation !== 'string' ||
+    typeof input.tag !== 'string'
+  ) {
+    return null;
+  }
+
+  const options = input.options.filter((option): option is string => typeof option === 'string');
+
+  if (options.length < 2 || input.correctOptionIndex < 0 || input.correctOptionIndex >= options.length) {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    question: input.question,
+    options,
+    correctOptionIndex: input.correctOptionIndex,
+    explanation: input.explanation,
+    tag: input.tag,
+  };
+}
+
+function normalizeQuizDeck(input: unknown): QuizDeck | null {
+  if (!isRecord(input) || !isRecord(input.source) || !Array.isArray(input.questions)) {
+    return null;
+  }
+
+  const questions = input.questions.map(normalizeQuizQuestion);
+
+  if (questions.some((question) => !question)) {
+    return null;
+  }
+
+  return {
+    id: typeof input.id === 'string' ? input.id : crypto.randomUUID(),
+    taskId: typeof input.taskId === 'string' ? input.taskId : '',
+    taskTitle: typeof input.taskTitle === 'string' ? input.taskTitle : '',
+    title: typeof input.title === 'string' ? input.title : '',
+    durationMinutes: typeof input.durationMinutes === 'number' ? input.durationMinutes : 10,
+    createdAt: typeof input.createdAt === 'string' ? input.createdAt : new Date().toISOString(),
+    source: {
+      noteCharacters: typeof input.source.noteCharacters === 'number' ? input.source.noteCharacters : 0,
+      commentCount: typeof input.source.commentCount === 'number' ? input.source.commentCount : 0,
+    },
+    questions: questions as QuizQuestion[],
+    attempts: Array.isArray(input.attempts)
+      ? input.attempts.map(normalizeQuizAttempt).filter((attempt): attempt is QuizAttempt => Boolean(attempt))
+      : [],
+  };
+}
+
+function normalizeQuizAttempt(input: unknown): QuizAttempt | null {
+  if (!isRecord(input) || !isRecord(input.answers)) {
+    return null;
+  }
+
+  const answers: Record<string, number> = {};
+
+  for (const [questionId, answer] of Object.entries(input.answers)) {
+    if (typeof answer === 'number') {
+      answers[questionId] = answer;
+    }
+  }
+
+  return {
+    id: typeof input.id === 'string' ? input.id : crypto.randomUUID(),
+    startedAt: typeof input.startedAt === 'string' ? input.startedAt : new Date().toISOString(),
+    submittedAt: typeof input.submittedAt === 'string' ? input.submittedAt : null,
+    durationSeconds: typeof input.durationSeconds === 'number' ? input.durationSeconds : 600,
+    answers,
+    score: typeof input.score === 'number' ? input.score : null,
+    total: typeof input.total === 'number' ? input.total : 0,
+    submittedBy: input.submittedBy === 'user' || input.submittedBy === 'timeout' ? input.submittedBy : null,
+  };
+}
+
+function normalizeQuizzesByTask(input: unknown): Record<string, QuizDeck[]> | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const quizzes: Record<string, QuizDeck[]> = {};
+
+  for (const [taskId, rawValue] of Object.entries(input)) {
+    const rawDecks = Array.isArray(rawValue) ? rawValue : [rawValue];
+    const decks = rawDecks
+      .map((rawDeck, index) => {
+        const deck = normalizeQuizDeck(rawDeck);
+
+        if (!deck) {
+          return null;
+        }
+
+        return {
+          ...deck,
+          taskId: deck.taskId || taskId,
+          title: deck.title || `Bài trắc nghiệm ${index + 1}`,
+        };
+      })
+      .filter((deck): deck is QuizDeck => Boolean(deck));
+
+    if (decks.length > 0) {
+      quizzes[taskId] = decks;
+    }
+  }
+
+  return quizzes;
+}
+
+function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]>; flashcards: Record<string, FlashcardDeck>; quizzes: Record<string, QuizDeck[]> } | null {
   if (!isRecord(input)) {
     return null;
   }
@@ -1330,10 +1546,17 @@ function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comme
     return null;
   }
 
+  const quizzes = input.quizzes === undefined ? readStoredQuizzes() : normalizeQuizzesByTask(input.quizzes);
+
+  if (!quizzes) {
+    return null;
+  }
+
   return {
     progress,
     comments,
     flashcards,
+    quizzes,
   };
 }
 

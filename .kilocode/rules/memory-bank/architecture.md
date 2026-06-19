@@ -13,11 +13,13 @@ src/
 │   │   └── [slug]/page.tsx # Project detail page
 │   ├── skill-roadmap/page.tsx # JSON-backed curriculum with browser-persisted progress
 │   ├── skill-roadmap/notes/[taskId]/page.tsx # Per-task Markdown note preview
+│   ├── skill-roadmap/tasks/[taskId]/quiz/page.tsx # Dedicated AI quiz screen for a roadmap task
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
 │       ├── ai/models/route.ts # OpenAI-compatible model discovery for comment AI
 │       ├── ai/comment/route.ts # OpenAI-compatible comment AI proxy
+│       ├── ai/quizzes/route.ts # OpenAI-compatible roadmap task quiz generator
 │       ├── skill-roadmap/progress/route.ts # Roadmap progress seed + local-dev JSON sync
 │       ├── skill-roadmap/backup/github/route.ts # Optional browser progress GitHub backup
 │       └── pdf/
