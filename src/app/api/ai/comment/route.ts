@@ -56,7 +56,28 @@ function resolveBaseUrl(provider: string, baseUrl: unknown) {
     return isNonEmptyString(baseUrl) ? normalizeBaseUrl(baseUrl) : null;
   }
 
+  if (provider === 'kilo') {
+    return normalizeBaseUrl(process.env.AI_COMMENT_KILO_BASE_URL ?? providerBaseUrls.kilo);
+  }
+
   return providerBaseUrls[provider] ?? null;
+}
+
+function resolveApiKey(provider: string, apiKey: unknown) {
+  if (isNonEmptyString(apiKey)) {
+    return apiKey.trim();
+  }
+
+  if (provider === 'kilo') {
+    return (
+      process.env.AI_COMMENT_KILO_API_KEY?.trim() ??
+      process.env.AI_COMMENT_API_KEY?.trim() ??
+      process.env.AI_FLASHCARD_API_KEY?.trim() ??
+      ''
+    );
+  }
+
+  return '';
 }
 
 function compactText(value: string, maxLength: number) {
@@ -87,13 +108,18 @@ export async function POST(request: Request) {
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'openrouter';
-  const apiKey = isNonEmptyString(body.apiKey) ? body.apiKey.trim() : '';
+  const apiKey = resolveApiKey(provider, body.apiKey);
   const model = isNonEmptyString(body.model) ? body.model.trim() : '';
   const question = isNonEmptyString(body.question) ? body.question.trim() : '';
   const baseUrl = resolveBaseUrl(provider, body.baseUrl);
 
   if (!apiKey) {
-    return jsonError('Vui lòng nhập API key trước khi hỏi AI.', 400);
+    return jsonError(
+      provider === 'kilo'
+        ? 'Chưa cấu hình API key Kilo AI trong env.'
+        : 'Vui lòng nhập API key trước khi hỏi AI.',
+      provider === 'kilo' ? 500 : 400
+    );
   }
 
   if (!model) {

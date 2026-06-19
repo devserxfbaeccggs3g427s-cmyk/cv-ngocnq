@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -283,7 +283,7 @@ export function MarkdownCommentThreads({
         },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: draft.apiKey,
+          apiKey: draft.provider === 'kilo' ? undefined : draft.apiKey,
           model: draft.model,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
           question: body,
@@ -697,7 +697,7 @@ export function MarkdownCommentThreadDetail({
         },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: draft.apiKey,
+          apiKey: draft.provider === 'kilo' ? undefined : draft.apiKey,
           model: draft.model,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
           question: body,
@@ -939,12 +939,14 @@ function CommentComposer({
   const [modelSearch, setModelSearch] = useState('');
   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
   const [loadedModelKey, setLoadedModelKey] = useState('');
+  const autoLoadedModelKeyRef = useRef('');
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<{ key: string; message: string } | null>(null);
   const modelRequestKey = [
     draft.provider,
     draft.provider === 'custom' ? draft.baseUrl.trim() : '',
   ].join('|');
+  const usesServerApiKey = draft.provider === 'kilo';
   const currentModelOptions = loadedModelKey === modelRequestKey ? modelOptions : [];
   const currentModelError = modelError?.key === modelRequestKey ? modelError.message : null;
   const normalizedModelSearch = modelSearch.trim().toLowerCase();
@@ -961,7 +963,7 @@ function CommentComposer({
     draft.mode === 'ai' &&
     (draft.provider !== 'custom' || Boolean(draft.baseUrl.trim()));
 
-  const loadModels = async () => {
+  const loadModels = useCallback(async () => {
     setModelError(null);
     setIsLoadingModels(true);
 
@@ -973,13 +975,14 @@ function CommentComposer({
         },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: draft.apiKey,
+          apiKey: usesServerApiKey ? undefined : draft.apiKey,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
         }),
       });
 
       const responseBody = (await response.json().catch(() => ({}))) as {
         models?: AiModelOption[];
+        defaultModel?: string;
         error?: string;
       };
 
@@ -992,8 +995,11 @@ function CommentComposer({
       setModelSearch('');
       setIsModelPickerOpen(true);
 
-      if (!draft.model && responseBody.models[0]?.id) {
-        onChange({ model: responseBody.models[0].id });
+      const defaultModel = responseBody.defaultModel?.trim();
+      const nextModel = defaultModel || responseBody.models[0]?.id || '';
+
+      if (!draft.model && nextModel) {
+        onChange({ model: nextModel });
       }
     } catch (error) {
       setModelOptions([]);
@@ -1005,7 +1011,29 @@ function CommentComposer({
     } finally {
       setIsLoadingModels(false);
     }
-  };
+  }, [draft.apiKey, draft.baseUrl, draft.model, draft.provider, modelRequestKey, onChange, usesServerApiKey]);
+
+  useEffect(() => {
+    if (
+      draft.mode !== 'ai' ||
+      draft.provider !== 'kilo' ||
+      loadedModelKey === modelRequestKey ||
+      autoLoadedModelKeyRef.current === modelRequestKey ||
+      isLoadingModels
+    ) {
+      return;
+    }
+
+    autoLoadedModelKeyRef.current = modelRequestKey;
+    loadModels();
+  }, [
+    draft.mode,
+    draft.provider,
+    isLoadingModels,
+    loadModels,
+    loadedModelKey,
+    modelRequestKey,
+  ]);
 
   return (
     <form onSubmit={onSubmit} className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900/70">
@@ -1022,7 +1050,9 @@ function CommentComposer({
         {draft.mode === 'ai' && (
           <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
             <KeyRound className="h-4 w-4" aria-hidden="true" />
-            API key chỉ dùng cho request này, không lưu vào localStorage.
+            {usesServerApiKey
+              ? 'Kilo AI dùng API key cấu hình trong env, không hiển thị trên màn hình.'
+              : 'API key chỉ dùng cho request này, không lưu vào localStorage.'}
           </div>
         )}
       </div>
@@ -1035,7 +1065,14 @@ function CommentComposer({
             </span>
             <select
               value={draft.provider}
-              onChange={(event) => onChange({ provider: event.target.value as AiProvider, model: '' })}
+              onChange={(event) => {
+                const provider = event.target.value as AiProvider;
+                onChange({
+                  provider,
+                  model: '',
+                  apiKey: provider === 'kilo' ? '' : draft.apiKey,
+                });
+              }}
               className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
             >
               {providerOptions.map((option) => (
@@ -1173,23 +1210,27 @@ function CommentComposer({
             </label>
           )}
 
-          <label className="block min-w-0 md:col-span-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              API key
-            </span>
-            <input
-              value={draft.apiKey}
-              onChange={(event) => onChange({ apiKey: event.target.value })}
-              type="password"
-              placeholder="Nhập API key khi hỏi AI"
-              autoComplete="off"
-              className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
-            />
-          </label>
+          {!usesServerApiKey && (
+            <label className="block min-w-0 md:col-span-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                API key
+              </span>
+              <input
+                value={draft.apiKey}
+                onChange={(event) => onChange({ apiKey: event.target.value })}
+                type="password"
+                placeholder="Nhập API key khi hỏi AI"
+                autoComplete="off"
+                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+              />
+            </label>
+          )}
 
           <div className="flex flex-col gap-2 md:col-span-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Tải danh sách model do kênh AI cung cấp. API key chỉ cần khi gửi câu hỏi; Base URL chỉ cần nhập khi chọn Custom.
+              {usesServerApiKey
+                ? 'Kilo AI tự tải model bằng cấu hình env phía server; Base URL và API key không được đưa ra trình duyệt.'
+                : 'Tải danh sách model do kênh AI cung cấp. API key chỉ cần khi gửi câu hỏi; Base URL chỉ cần nhập khi chọn Custom.'}
             </p>
             <button
               type="button"

@@ -40,7 +40,41 @@ function resolveBaseUrl(provider: string, baseUrl: unknown) {
     return isNonEmptyString(baseUrl) ? normalizeBaseUrl(baseUrl) : null;
   }
 
+  if (provider === 'kilo') {
+    return normalizeBaseUrl(process.env.AI_COMMENT_KILO_BASE_URL ?? providerBaseUrls.kilo);
+  }
+
   return providerBaseUrls[provider] ?? null;
+}
+
+function resolveApiKey(provider: string, apiKey: unknown) {
+  if (isNonEmptyString(apiKey)) {
+    return apiKey.trim();
+  }
+
+  if (provider === 'kilo') {
+    return (
+      process.env.AI_COMMENT_KILO_API_KEY?.trim() ??
+      process.env.AI_COMMENT_API_KEY?.trim() ??
+      process.env.AI_FLASHCARD_API_KEY?.trim() ??
+      ''
+    );
+  }
+
+  return '';
+}
+
+function resolveDefaultModel(provider: string) {
+  if (provider === 'kilo') {
+    return (
+      process.env.AI_COMMENT_KILO_MODEL?.trim() ??
+      process.env.AI_COMMENT_MODEL?.trim() ??
+      process.env.AI_FLASHCARD_MODEL?.trim() ??
+      ''
+    );
+  }
+
+  return '';
 }
 
 export async function POST(request: Request) {
@@ -53,8 +87,9 @@ export async function POST(request: Request) {
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'openrouter';
-  const apiKey = isNonEmptyString(body.apiKey) ? body.apiKey.trim() : '';
+  const apiKey = resolveApiKey(provider, body.apiKey);
   const baseUrl = resolveBaseUrl(provider, body.baseUrl);
+  const defaultModel = resolveDefaultModel(provider);
 
   if (!baseUrl) {
     return NextResponse.json(
@@ -107,7 +142,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ models });
+    return NextResponse.json({ models, defaultModel });
   } catch (error) {
     console.error('AI models request failed:', error);
     return NextResponse.json(
