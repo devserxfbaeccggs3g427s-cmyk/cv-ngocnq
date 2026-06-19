@@ -98,8 +98,10 @@ type Flashcard = {
 };
 
 type FlashcardDeck = {
+  id: string;
   taskId: string;
   taskTitle: string;
+  title: string;
   createdAt: string;
   source: {
     noteCharacters: number;
@@ -148,7 +150,7 @@ type RoadmapBackupFile = {
   exportedAt: string;
   progress: ProgressFile;
   comments: Record<string, NoteComment[]>;
-  flashcards: Record<string, FlashcardDeck>;
+  flashcards: Record<string, FlashcardDeck[]>;
   quizzes: Record<string, QuizDeck[]>;
 };
 
@@ -1205,7 +1207,7 @@ function readStoredComments(): Record<string, NoteComment[]> {
   }
 }
 
-function readStoredFlashcards(): Record<string, FlashcardDeck> {
+function readStoredFlashcards(): Record<string, FlashcardDeck[]> {
   if (typeof window === 'undefined') {
     return {};
   }
@@ -1243,7 +1245,7 @@ function storeComments(comments: Record<string, NoteComment[]>) {
   }
 }
 
-function storeFlashcards(flashcards: Record<string, FlashcardDeck>) {
+function storeFlashcards(flashcards: Record<string, FlashcardDeck[]>) {
   if (typeof window === 'undefined') {
     return;
   }
@@ -1358,11 +1360,12 @@ function normalizeFlashcard(input: unknown): Flashcard | null {
   };
 }
 
-function normalizeFlashcardDeck(input: unknown): FlashcardDeck | null {
-  if (!isRecord(input) || !isRecord(input.source) || !Array.isArray(input.cards)) {
+function normalizeFlashcardDeck(input: unknown, fallbackTaskId: string, index: number): FlashcardDeck | null {
+  if (!isRecord(input) || !Array.isArray(input.cards)) {
     return null;
   }
 
+  const rawSource = isRecord(input.source) ? input.source : {};
   const cards = input.cards.map(normalizeFlashcard);
 
   if (cards.some((card) => !card)) {
@@ -1370,35 +1373,39 @@ function normalizeFlashcardDeck(input: unknown): FlashcardDeck | null {
   }
 
   return {
-    taskId: typeof input.taskId === 'string' ? input.taskId : '',
+    id: typeof input.id === 'string' ? input.id : crypto.randomUUID(),
+    taskId: typeof input.taskId === 'string' ? input.taskId : fallbackTaskId,
     taskTitle: typeof input.taskTitle === 'string' ? input.taskTitle : '',
+    title: typeof input.title === 'string' ? input.title : `Bộ flashcard ${index + 1}`,
     createdAt: typeof input.createdAt === 'string' ? input.createdAt : new Date().toISOString(),
     source: {
-      noteCharacters: typeof input.source.noteCharacters === 'number' ? input.source.noteCharacters : 0,
-      commentCount: typeof input.source.commentCount === 'number' ? input.source.commentCount : 0,
+      noteCharacters: typeof rawSource.noteCharacters === 'number' ? rawSource.noteCharacters : 0,
+      commentCount: typeof rawSource.commentCount === 'number' ? rawSource.commentCount : 0,
     },
     cards: cards as Flashcard[],
   };
 }
 
-function normalizeFlashcardsByTask(input: unknown): Record<string, FlashcardDeck> | null {
+function normalizeFlashcardsByTask(input: unknown): Record<string, FlashcardDeck[]> | null {
   if (!isRecord(input)) {
     return null;
   }
 
-  const flashcards: Record<string, FlashcardDeck> = {};
+  const flashcards: Record<string, FlashcardDeck[]> = {};
 
-  for (const [taskId, rawDeck] of Object.entries(input)) {
-    const deck = normalizeFlashcardDeck(rawDeck);
+  for (const [taskId, rawDecks] of Object.entries(input)) {
+    const sourceDecks = Array.isArray(rawDecks) ? rawDecks : [rawDecks];
+    const decks = sourceDecks
+      .map((rawDeck, index) => normalizeFlashcardDeck(rawDeck, taskId, index))
+      .filter((deck): deck is FlashcardDeck => Boolean(deck));
 
-    if (!deck) {
-      return null;
+    if (decks.length > 0) {
+      flashcards[taskId] = decks.map((deck, index) => ({
+        ...deck,
+        taskId: deck.taskId || taskId,
+        title: deck.title || `Bộ flashcard ${index + 1}`,
+      }));
     }
-
-    flashcards[taskId] = {
-      ...deck,
-      taskId: deck.taskId || taskId,
-    };
   }
 
   return flashcards;
@@ -1523,7 +1530,7 @@ function normalizeQuizzesByTask(input: unknown): Record<string, QuizDeck[]> | nu
   return quizzes;
 }
 
-function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]>; flashcards: Record<string, FlashcardDeck>; quizzes: Record<string, QuizDeck[]> } | null {
+function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]>; flashcards: Record<string, FlashcardDeck[]>; quizzes: Record<string, QuizDeck[]> } | null {
   if (!isRecord(input)) {
     return null;
   }

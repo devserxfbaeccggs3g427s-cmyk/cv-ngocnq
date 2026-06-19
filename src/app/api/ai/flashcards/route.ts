@@ -9,6 +9,7 @@ type FlashcardRequest = {
   task?: unknown;
   note?: unknown;
   comments?: unknown;
+  existingCards?: unknown;
 };
 
 type FlashcardTask = {
@@ -29,6 +30,14 @@ type AiFlashcard = {
   back?: unknown;
   hint?: unknown;
   tag?: unknown;
+};
+
+type NormalizedFlashcard = {
+  id: string;
+  front: string;
+  back: string;
+  hint: string;
+  tag: string;
 };
 
 type ChatCompletionResponse = {
@@ -121,6 +130,28 @@ function readComments(value: unknown): FlashcardComment[] {
   return comments;
 }
 
+function readExistingCards(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((card) => {
+      if (isNonEmptyString(card)) {
+        return card.trim();
+      }
+
+      if (card && typeof card === 'object') {
+        const item = card as Record<string, unknown>;
+        return isNonEmptyString(item.front) ? item.front.trim() : '';
+      }
+
+      return '';
+    })
+    .filter(Boolean)
+    .slice(0, 120);
+}
+
 function extractJsonArray(content: string): unknown {
   try {
     return JSON.parse(content);
@@ -139,7 +170,7 @@ function extractJsonArray(content: string): unknown {
   }
 }
 
-function normalizeFlashcards(value: unknown) {
+function normalizeFlashcards(value: unknown): NormalizedFlashcard[] {
   if (!Array.isArray(value)) {
     return [];
   }
@@ -166,6 +197,57 @@ function normalizeFlashcards(value: unknown) {
     .slice(0, 18);
 }
 
+function normalizeForSimilarity(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenSet(value: string) {
+  return new Set(
+    normalizeForSimilarity(value)
+      .split(' ')
+      .filter((token) => token.length > 2)
+  );
+}
+
+function jaccardSimilarity(left: string, right: string) {
+  const leftTokens = tokenSet(left);
+  const rightTokens = tokenSet(right);
+
+  if (leftTokens.size === 0 || rightTokens.size === 0) {
+    return 0;
+  }
+
+  let intersection = 0;
+
+  for (const token of leftTokens) {
+    if (rightTokens.has(token)) {
+      intersection += 1;
+    }
+  }
+
+  return intersection / (leftTokens.size + rightTokens.size - intersection);
+}
+
+function isSimilarToExisting(cardFront: string, existingCards: string[]) {
+  return existingCards.some((existingCard) => jaccardSimilarity(cardFront, existingCard) >= 0.5);
+}
+
+function hasTooMuchOverlap(cards: NormalizedFlashcard[], existingCards: string[]) {
+  if (cards.length === 0 || existingCards.length === 0) {
+    return false;
+  }
+
+  const similarCount = cards.filter((card) => isSimilarToExisting(card.front, existingCards)).length;
+
+  return similarCount / cards.length > 0.5;
+}
+
 export async function POST(request: Request) {
   let body: FlashcardRequest;
 
@@ -178,6 +260,7 @@ export async function POST(request: Request) {
   const task = readTask(body.task);
   const note = isNonEmptyString(body.note) ? body.note.trim() : '';
   const comments = readComments(body.comments);
+  const existingCards = readExistingCards(body.existingCards);
 
   if (!task) {
     return jsonError('Thiếu thông tin task để tạo flashcard.', 400);
@@ -213,6 +296,9 @@ export async function POST(request: Request) {
         })
         .join('\n')
     : 'Không có comment.';
+  const previousCardContext = existingCards.length
+    ? existingCards.map((card, index) => `${index + 1}. ${card}`).join('\n')
+    : 'Chưa có bộ flashcard trước đó.';
 
   const messages = [
     {
@@ -222,6 +308,7 @@ export async function POST(request: Request) {
         'Chỉ trả về JSON object hợp lệ dạng {"flashcards":[...]}, không markdown, không giải thích ngoài JSON.',
         'Mỗi flashcard có front, back, hint, tag. front là câu hỏi ngắn; back là đáp án súc tích nhưng đủ ý; hint là gợi ý một dòng; tag là nhóm kiến thức.',
         'Ưu tiên active recall, câu hỏi phỏng vấn, bản chất/cơ chế, trade-off và lỗi dễ nhầm.',
+        'Nếu có danh sách flashcard đã tạo trước đó, bộ mới không được trùng hoặc tương tự quá 50% số thẻ với bất kỳ thẻ cũ nào.',
       ].join(' '),
     },
     {
@@ -238,7 +325,11 @@ export async function POST(request: Request) {
         '## Toàn bộ comment của note',
         compactText(commentContext, 9000),
         '',
+        '## Flashcard đã có trong các bộ trước',
+        compactText(previousCardContext, 7000),
+        '',
         'Hãy tạo 8 đến 14 flashcard chất lượng cao bằng tiếng Việt. Không tạo câu hỏi quá hiển nhiên.',
+        'Ưu tiên đổi góc hỏi so với các flashcard đã có: đổi tình huống, đổi trọng tâm cơ chế, đổi trade-off, hoặc hỏi lỗi dễ nhầm khác.',
       ].join('\n'),
     },
   ];
@@ -276,10 +367,16 @@ export async function POST(request: Request) {
       return jsonError('AI không trả về flashcard hợp lệ. Hãy thử model khác hoặc kiểm tra note.', 502);
     }
 
+    if (hasTooMuchOverlap(cards, existingCards)) {
+      return jsonError('Bộ flashcard mới quá giống các bộ đã có trên 50%. Hãy tạo lại để AI đổi góc hỏi.', 409);
+    }
+
     return NextResponse.json({
       deck: {
+        id: crypto.randomUUID(),
         taskId: task.id,
         taskTitle: task.title,
+        title: '',
         createdAt: new Date().toISOString(),
         source: {
           noteCharacters: note.length,
