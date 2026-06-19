@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "exportedAt": "2026-06-19T01:43:05.221Z",
+  "version": 4,
+  "exportedAt": "2026-06-19T02:17:41.293Z",
   "progress": {
     "updatedAt": "2026-06-19T01:40:47.504Z",
     "items": {
@@ -301,5 +301,334 @@
     }
   },
   "comments": {},
-  "flashcards": {}
+  "flashcards": {},
+  "quizzes": {
+    "java-001": [
+      {
+        "id": "3747b23a-e71f-4d6b-bc91-25e90ae9dcd5",
+        "taskId": "java-001",
+        "taskTitle": "Ôn lại OOP, SOLID, immutable object, equals/hashCode và defensive copying",
+        "title": "Bài trắc nghiệm 1",
+        "durationMinutes": 10,
+        "createdAt": "2026-06-19T01:57:00.337Z",
+        "source": {
+          "noteCharacters": 26222,
+          "commentCount": 0
+        },
+        "questions": [
+          {
+            "id": "a9cb4dfe-512b-4750-bfa9-c512975cd909",
+            "question": "Hai đối tượng User cùng id=1 nhưng khác name và email (ví dụ user1 lưu tên cũ, user2 lưu tên mới sau khi đổi). Nếu User là entity, kết quả user1.equals(user2) nên là gì?",
+            "options": [
+              "false vì name và email khác nhau",
+              "true vì cùng id đại diện cùng một thực thể",
+              "false vì entity bắt buộc phải so sánh toàn bộ field",
+              "true chỉ khi hashCode của hai object trùng nhau"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Entity được định danh bằng identity (id/business key), không phải toàn bộ field. Hai User cùng id là cùng một thực thể, dù name/email có thay đổi theo thời gian. Vì vậy equals của entity nên dựa trên id ổn định, không dựa trên toàn bộ giá trị field. Nếu equals theo toàn bộ field, mỗi lần update state sẽ làm object đổi 'danh tính', phá vỡ ý nghĩa entity.",
+            "tag": "entity-vs-value-object"
+          },
+          {
+            "id": "7dd1a2a3-99f3-4808-9e41-47137132113f",
+            "question": "Class có field `private final List<String> roles;` và constructor gán trực tiếp list truyền vào. Phát biểu nào đúng về tính bất biến (immutability) của class này?",
+            "options": [
+              "Class này đã immutable vì field là final",
+              "Class chưa thực sự immutable vì nội dung list vẫn có thể bị sửa từ bên ngoài",
+              "Class immutable nếu list truyền vào rỗng",
+              "Class chỉ immutable khi list chứa các String bất biến"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "`final` chỉ bảo vệ reference (không thể gán sang list khác), không bảo vệ nội dung bên trong list. Nếu constructor không copy, caller vẫn giữ reference tới list gốc và có thể gọi add/remove làm thay đổi state bên trong object. Để thực sự immutable, phải dùng `List.copyOf(roles)` trong constructor và trả bản copy (hoặc unmodifiable view) ở getter.",
+            "tag": "defensive-copy"
+          },
+          {
+            "id": "096e5e46-6cc9-4e57-80a9-8a09d1097b84",
+            "question": "Developer override equals() để so sánh theo business key, nhưng quên override hashCode(). Khi đưa object này vào HashMap làm key, hậu quả điển hình là gì?",
+            "options": [
+              "HashMap ném ra NullPointerException ngay khi put",
+              "HashMap hoạt động bình thường vì chỉ cần equals là đủ",
+              "Có thể put thành công nhưng get trả về null dù key vừa được thêm",
+              "HashMap tự động sinh hashCode dựa trên equals"
+            ],
+            "correctOptionIndex": 2,
+            "explanation": "Theo contract: nếu a.equals(b) thì a.hashCode() == b.hashCode() bắt buộc. Nếu chỉ override equals mà giữ hashCode mặc định (dựa trên identity), hai object 'bằng nhau' sẽ có hashCode khác nhau -> rơi vào bucket khác nhau trong HashMap -> get không tìm thấy dù key vừa put. Đây là lỗi rất khó debug vì put không lỗi, chỉ lỗi khi đọc lại.",
+            "tag": "equals-hashcode"
+          },
+          {
+            "id": "07c81256-6e77-42aa-a892-6c1a9623449d",
+            "question": "Đoạn code nào vi phạm nguyên tắc Liskov Substitution Principle (LSP) rõ ràng nhất?",
+            "options": [
+              "Subclass override method toString() của superclass",
+              "Subclass thêm field mới mà superclass không có",
+              "Subclass bỏ qua một method public của superclass",
+              "Subclass override equals/hashCode của superclass"
+            ],
+            "correctOptionIndex": 2,
+            "explanation": "LSP yêu cầu subclass phải thay thế được superclass mà không phá vỡ hợp đồng. Việc thêm field, override toString, override equals/hashCode đều có thể hợp lệ. Nhưng nếu subclass 'bỏ qua' (no-op hoặc throw UnsupportedOperationException) một method mà superclass đã định nghĩa hành vi, nghĩa là subclass đang thu hẹp khả năng mà client dựa vào -> phá vỡ hợp đồng -> vi phạm LSP.",
+            "tag": "solid-lsp"
+          },
+          {
+            "id": "b4bdebca-42bd-4653-b41a-055f62122672",
+            "question": "Một Order entity có các trạng thái CREATED -> PAID -> SHIPPED theo vòng đời tự nhiên. Thiết kế nào phù hợp nhất cho Order này?",
+            "options": [
+              "Bắt buộc thiết kế Order thành immutable object và copy toàn bộ field mỗi lần đổi trạng thái",
+              "Giữ Order mutable với state có thể thay đổi, vì đây là entity có lifecycle cần cập nhật",
+              "Thiết kế Order thành record để đảm bảo value semantics",
+              "Tách Order thành nhiều immutable class cho từng trạng thái"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Order có identity ổn định (orderId) và trạng thái thay đổi tự nhiên theo nghiệp vụ -> đây là entity mutable. Ép immutable sẽ tốn chi phí copy vô ích và sai domain semantics. Immutable phù hợp cho Value Object, event payload, cache key, command - những thứ 'tạo xong là xong'. Với entity có state transition, hãy để nó mutable nhưng kiểm soát thay đổi qua method hợp lệ (state machine).",
+            "tag": "immutable-tradeoff"
+          },
+          {
+            "id": "6e030945-8612-4793-973c-c2839cf08da1",
+            "question": "JPA entity User dùng @GeneratedValue cho id. Developer override hashCode() dựa trên id. Tình huống nào xảy ra lỗi thực tế?",
+            "options": [
+              "Hibernate tự động ngăn việc override hashCode trên entity",
+              "Khi persist, id thay đổi từ null sang giá trị thật, hashCode thay đổi, object có thể 'biến mất' khỏi HashSet đang chứa nó",
+              "Entity bị lỗi transaction do hashCode không khớp với database",
+              "Không có vấn đề gì vì JPA luôn tạo hashCode riêng"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Đây là pitfall cổ điển của JPA entity. Nếu hashCode dựa trên id, khi object mới tạo (id=null) được thêm vào HashSet, sau khi save và id được generate, hashCode thay đổi -> object nằm sai bucket. contains(), remove() sẽ thất bại. Giải pháp phổ biến: dùng business key ổn định (username, code...) cho equals/hashCode, hoặc dùng identity-based equals (Object.equals) cho entity, hoặc dùng @AccessType(PROPERTY) cẩn thận.",
+            "tag": "equals-hashcode-jpa"
+          },
+          {
+            "id": "80ae1388-ff9d-4c8b-975e-4f2fa762d799",
+            "question": "Interface `AnimalOperations` có 10 method: fly(), swim(), run(), bark(), meow(), layEggs(), giveBirth(), hunt(), graze(), buildNest(). Theo Interface Segregation Principle, nên xử lý thế nào?",
+            "options": [
+              "Giữ nguyên vì interface lớn giúp client dùng được nhiều chức năng",
+              "Tách thành các interface nhỏ theo vai trò (FlyingAbility, SwimmingAbility, EggLayingAbility...) để client chỉ implement phần liên quan",
+              "Đánh dấu một số method là default để giảm nghĩa vụ implement",
+              "Chuyển tất cả method thành static trong utility class"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "ISP nói interface nên nhỏ, đúng nhu cầu client. Interface 'béo' (fat interface) buộc implement tạo method no-op hoặc throw exception, làm code dính coupling không cần thiết. Tách theo vai trò giúp class chỉ implement phần thực sự có. Ví dụ Dog chỉ cần implement Runnable, MammalBehavior; không cần implement fly() hay layEggs().",
+            "tag": "solid-isp"
+          },
+          {
+            "id": "45924939-620f-412b-bd1b-c66850c46f7c",
+            "question": "Tại sao không nên trả entity JPA trực tiếp từ controller API, mà nên map sang DTO?",
+            "options": [
+              "Vì Java không cho phép trả entity ra HTTP response",
+              "Vì entity chứa annotation persistence, có thể gây lazy loading exception khi serialize, leak field nội bộ, và coupling API với database model",
+              "Vì DTO nhanh hơn entity về performance",
+              "Vì entity không thể serialize thành JSON"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Trả entity trực tiếp gây nhiều vấn đề: (1) lazy collection chưa load -> LazyInitializationException khi Jackson serialize; (2) field nội bộ (password hash, flag nội bộ...) bị leak; (3) quan hệ @OneToMany/@ManyToOne dễ tạo vòng lặp JSON vô tận; (4) API contract bị coupling với database schema -> đổi DB là vỡ API. DTO là lớp trung gian chuyên phục vụ boundary, giải quyết tất cả vấn đề trên.",
+            "tag": "dto-entity"
+          },
+          {
+            "id": "3982b460-c6db-4c03-ba31-9ab41453f3c4",
+            "question": "Khi nào cần defensive copy ở getter trả về collection, khi nào chỉ cần copy ở constructor?",
+            "options": [
+              "Chỉ cần copy ở constructor là đủ vì caller không giữ reference lâu",
+              "Cần copy ở getter nếu collection mutable và object có thể bị caller giữ reference lâu dài, vì caller có thể mutate giữa các lần gọi",
+              "Defensive copy ở getter làm chậm code, không bao giờ nên dùng",
+              "Getter không bao giờ trả collection, chỉ trả từng phần tử"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Defensive copy ở constructor chỉ bảo vệ khỏi input tại thời điểm khởi tạo. Nếu getter trả thẳng reference tới collection mutable bên trong, caller có thể giữ reference và mutate bất kỳ lúc nào trong tương lai, kể cả từ thread khác -> phá vỡ tính đóng gói. Copy ở getter (hoặc trả unmodifiable view) giúp object giữ quyền kiểm soát state. Trade-off: tốn chi phí copy mỗi lần gọi, cần cân nhắc giữa correctness và performance.",
+            "tag": "defensive-copy"
+          },
+          {
+            "id": "8bd528ef-cdf7-453b-a095-8db0b98d9954",
+            "question": "Class `Money` có field `private final BigDecimal amount` và `private final String currency`, không có setter, validate trong constructor, override equals/hashCode dựa trên cả amount và currency. Phát biểu nào phù hợp nhất?",
+            "options": [
+              "Đây là entity vì có equals/hashCode",
+              "Đây là value object điển hình: không có identity, so sánh bằng giá trị, bất biến, an toàn làm key trong Map/Set",
+              "Đây là DTO vì dùng BigDecimal",
+              "Đây không phải value object vì thiếu annotation @Value"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Value object đặc trưng bởi: (1) không có identity riêng - hai Money cùng amount+currency là bằng nhau; (2) bất biến - final + không setter; (3) validate trong constructor; (4) an toàn làm key trong HashMap/HashSet. Money, Email, Address, DateRange là các ví dụ kinh điển. equals/hashCode dựa trên giá trị là đặc trưng, không phải dấu hiệu của entity.",
+            "tag": "value-object"
+          }
+        ],
+        "attempts": [
+          {
+            "id": "eb4de536-8ca0-44a3-810b-66ae2511b7f9",
+            "startedAt": "2026-06-19T02:10:09.654Z",
+            "submittedAt": "2026-06-19T02:12:20.600Z",
+            "durationSeconds": 600,
+            "answers": {
+              "a9cb4dfe-512b-4750-bfa9-c512975cd909": 1,
+              "7dd1a2a3-99f3-4808-9e41-47137132113f": 0,
+              "096e5e46-6cc9-4e57-80a9-8a09d1097b84": 1,
+              "07c81256-6e77-42aa-a892-6c1a9623449d": 3,
+              "b4bdebca-42bd-4653-b41a-055f62122672": 3,
+              "6e030945-8612-4793-973c-c2839cf08da1": 1,
+              "80ae1388-ff9d-4c8b-975e-4f2fa762d799": 1,
+              "45924939-620f-412b-bd1b-c66850c46f7c": 2,
+              "3982b460-c6db-4c03-ba31-9ab41453f3c4": 3,
+              "8bd528ef-cdf7-453b-a095-8db0b98d9954": 1
+            },
+            "score": 4,
+            "total": 10,
+            "submittedBy": "user"
+          }
+        ]
+      },
+      {
+        "id": "7bec2d22-fbb9-4af4-a8ac-e5f48464997a",
+        "taskId": "java-001",
+        "taskTitle": "Ôn lại OOP, SOLID, immutable object, equals/hashCode và defensive copying",
+        "title": "Bài trắc nghiệm 2",
+        "durationMinutes": 10,
+        "createdAt": "2026-06-19T01:59:50.633Z",
+        "source": {
+          "noteCharacters": 26222,
+          "commentCount": 0
+        },
+        "questions": [
+          {
+            "id": "6df67aaf-8ea9-4cb7-b3d2-9fdb0abcfee2",
+            "question": "Class `OrderService` có method `calculatePrice(Order order, String customerType)` với if/else cho từng loại \"VIP\", \"NORMAL\", \"EMPLOYEE\". Khi cần thêm loại \"STUDENT\" với logic giảm giá riêng, phương án nào phù hợp nhất với Open/Closed Principle?",
+            "options": [
+              "Thêm else if vào method hiện tại",
+              "Tạo interface `PricePolicy`, mỗi loại khách hàng là một implementation riêng; thêm loại mới chỉ cần tạo class mới",
+              "Copy method `calculatePrice` ra nhiều phiên bản rồi chọn theo `customerType`",
+              "Dùng static helper method cho từng loại khách hàng"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "OCP yêu cầu mở rộng bằng code mới, hạn chế sửa code cũ. Strategy pattern với interface `PricePolicy` cho phép thêm loại khách hàng mới mà không phải đụng vào `OrderService` hiện tại, đồng thời mỗi policy có thể test độc lập.",
+            "tag": "ocp"
+          },
+          {
+            "id": "15a4191a-6e5b-483a-b271-f86459ce7264",
+            "question": "`OrderService` có field `private MySQLOrderRepository repo = new MySQLOrderRepository();`. Phát biểu nào mô tả đúng vấn đề theo Dependency Inversion Principle?",
+            "options": [
+              "Service chạy chậm hơn bình thường vì MySQL chậm",
+              "Module cấp cao (`OrderService`) phụ thuộc trực tiếp vào implementation cụ thể (`MySQLOrderRepository`), khó thay thế khi đổi DB và rất khó viết unit test với mock",
+              "Field nên khai báo `static` thay vì `private`",
+              "`MySQLOrderRepository` nên là abstract class"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "DIP yêu cầu module cấp cao phụ thuộc abstraction (interface `OrderRepository`), không phụ thuộc concrete class. `OrderService` nên nhận `OrderRepository` qua constructor injection; lúc đó muốn đổi sang PostgreSQL hay dùng mock trong test chỉ cần truyền implementation khác vào constructor.",
+            "tag": "dip"
+          },
+          {
+            "id": "c02e502c-1994-422c-81c2-51531af6500c",
+            "question": "Class `UserService` có các method: `createUser()`, `validateEmail()`, `saveToDatabase()`, `sendWelcomeEmail()`, `generateUserReport()`. Phát biểu nào đúng về class này?",
+            "options": [
+              "Đây là class tuân thủ SRP tốt vì mọi method đều liên quan đến User",
+              "Class vi phạm SRP vì có nhiều lý do để thay đổi: rule validate, persistence, email template, format report",
+              "Class thiếu method để xử lý thanh toán",
+              "SRP chỉ áp dụng cho entity, không áp dụng cho service"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "SRP: một class chỉ nên có một lý do để thay đổi. `UserService` này có tới 4 lý do thay đổi khác nhau, nên tách thành `UserValidator`, `UserRepository`, `EmailService`, `ReportGenerator` rồi phối hợp ở tầng use case/application.",
+            "tag": "srp"
+          },
+          {
+            "id": "3fb5035c-c959-423e-9a88-b0ab58ba3984",
+            "question": "Value Object `Money` có method `plus(Money other)` và `minus(Money other)`, mỗi method trả về một `Money` mới thay vì thay đổi `this.amount`. Phát biểu nào đúng về thiết kế này?",
+            "options": [
+              "Sai, Value Object không được có method, chỉ chứa data",
+              "Đúng, Value Object có thể có hành vi liên quan đến giá trị của nó, miễn là không mutate state mà trả về instance mới",
+              "Sai, các phép toán `plus`/`minus` bắt buộc phải nằm ở domain service",
+              "Sai, Value Object chỉ nên có field private final, không có method public"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Value Object không chỉ chứa data mà còn có thể mang hành vi (behavior) gắn liền với giá trị. Điều cốt lõi là không mutate state: `plus`/`minus` tạo `Money` mới thay vì đổi `this`. Pattern này vừa giữ immutability vừa đẩy logic tính toán vào đúng nơi có dữ liệu.",
+            "tag": "value-object"
+          },
+          {
+            "id": "0bb579ec-85dc-4668-bd84-881f90f9f7d3",
+            "question": "Class `Employee extends Person`. `Person.equals()` so sánh theo `name`. `Employee.equals()` so sánh theo `name` và `salary`. Cho `Person p = new Person(\"An\"); Employee e = new Employee(\"An\", 100);`. Kết quả và vấn đề là gì?",
+            "options": [
+              "`p.equals(e)` trả về `true` nhưng `e.equals(p)` trả về `false` - vi phạm tính đối xứng (symmetry) của equals contract",
+              "`p.equals(e)` trả về `false`, `e.equals(p)` trả về `true` - hoàn toàn hợp lệ",
+              "Cả hai đều trả về `false` - không có vấn đề gì",
+              "Code không compile vì override equals ở subclass"
+            ],
+            "correctOptionIndex": 0,
+            "explanation": "Equals contract yêu cầu: nếu `a.equals(b)` thì `b.equals(a)`. Khi override equals ở 2 class khác nhau theo field khác nhau, rất dễ vi phạm symmetry. Giải pháp: dùng `if (other == null || getClass() != other.getClass()) return false;` để chặn so sánh khác loại, hoặc không override equals ở subclass mà đặt logic vào superclass.",
+            "tag": "equals-hashcode"
+          },
+          {
+            "id": "79aedfe6-7fa4-47ef-9ca0-39c5a68ce102",
+            "question": "Class `Key` override `hashCode()` luôn trả về `1`. Khi đưa 1000 instance vào `HashMap<Key, Value>` và gọi `get(key)`, độ phức tạp thực tế xấp xỉ là gì?",
+            "options": [
+              "O(1) vì HashMap lý thuyết luôn O(1)",
+              "O(log n)",
+              "O(n) vì tất cả key rơi vào cùng một bucket, `get` phải duyệt `equals` từng key trong bucket đó",
+              "HashMap ném exception vì hashCode không hợp lệ"
+            ],
+            "correctOptionIndex": 2,
+            "explanation": "HashCode tốt giúp phân bố key đều vào các bucket. HashCode tệ (ví dụ luôn trả 1, hoặc trả theo field không phân biệt) khiến mọi key nằm cùng bucket, lúc đó `get`/`put` trở thành linear search O(n). Đây là lý do `hashCode` phải phân bố đều, không chỉ đúng.",
+            "tag": "performance"
+          },
+          {
+            "id": "a03741db-e389-460e-a804-5be38afa76eb",
+            "question": "`public record UserResponse(Long id, String username, String email) {}`. Phát biểu nào đúng về `record` trong Java?",
+            "options": [
+              "Record có thể bị mutate qua setter",
+              "Record tự động sinh constructor canonical, accessor, `equals`, `hashCode`, `toString` dựa trên tất cả field; field là `final` nên mặc định immutable, rất phù hợp làm DTO response hoặc Value Object",
+              "Record không có constructor nào, phải tự viết",
+              "Record luôn cần annotation `@Entity` để hoạt động"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Java record (từ Java 16) tự sinh constructor canonical, accessor method, `equals`, `hashCode`, `toString` dựa trên tất cả field. Field là `final` nên record mặc định immutable - rất phù hợp làm DTO response, command object, hoặc value object. Không cần Lombok hay IDE sinh code thủ công.",
+            "tag": "java-record"
+          },
+          {
+            "id": "b18ff7a7-05ef-4d17-88ac-0d32eab533fa",
+            "question": "Cho `new BigDecimal(\"1.0\").equals(new BigDecimal(\"1.00\"))`. Kết quả là gì và tại sao quan trọng?",
+            "options": [
+              "Trả về `true` vì cùng giá trị toán học",
+              "Trả về `false` vì `BigDecimal.equals()` so sánh cả value và scale; nếu chỉ quan tâm giá trị thuần thì dùng `compareTo()` (trả về 0)",
+              "Compile error vì kiểu không tương thích",
+              "Ném `NullPointerException` vì chuỗi rỗng"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "`BigDecimal.equals()` so sánh cả value lẫn scale, nên `1.0` khác `1.00`. `compareTo()` chỉ so sánh giá trị thuần. Khi dùng `BigDecimal` làm value object hoặc key trong `HashMap`/`HashSet`, dùng `equals` có thể gây bug logic khó debug; nên chọn `compareTo == 0` cho so sánh giá trị.",
+            "tag": "bigdecimal"
+          },
+          {
+            "id": "e29a0736-ef71-4381-89bf-debae8452ce6",
+            "question": "```java\npublic final class Token {\n    private final byte[] data;\n    public Token(byte[] data) { this.data = data; }\n    public byte[] getData() { return data; }\n}\n```\nPhát biểu nào đúng về tính bất biến của class này?",
+            "options": [
+              "Class thực sự immutable vì đã khai báo `final` ở cả class và field",
+              "Class không thực sự immutable vì caller vẫn giữ reference tới `data` và có thể thay đổi nội dung mảng; cần defensive copy ở cả constructor (nhận vào) và getter (trả ra) bằng `Arrays.copyOf`",
+              "`byte[]` đã là immutable nên không cần copy",
+              "`final` ở field đã đủ bảo vệ toàn bộ state"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "`final` chỉ bảo vệ reference, không bảo vệ nội dung object bên trong. Với array, caller có thể mutate từng phần tử qua reference đang giữ. Cần `Arrays.copyOf(data, data.length)` ở constructor lẫn getter để class thực sự bất biến. Nguyên tắc này áp dụng tương tự cho mọi object mutable: `List`, `Map`, `Date`, `Calendar`.",
+            "tag": "defensive-copy"
+          },
+          {
+            "id": "7ce920b2-ab0f-48fb-8040-444856dd7e33",
+            "question": "```java\nif (shape instanceof Circle c) {\n    return Math.PI * c.radius() * c.radius();\n} else if (shape instanceof Rectangle r) {\n    return r.width() * r.height();\n}\n```\nCách nào thay thế phù hợp hơn với OOP và polymorphism?",
+            "options": [
+              "Giữ nguyên vì code ngắn gọn, dễ đọc",
+              "Thêm method `area()` vào interface `Shape`; mỗi shape tự implement cách tính diện tích của mình, caller chỉ gọi `shape.area()`",
+              "Dùng `switch (shape.getType())` với enum cho gọn",
+              "Dùng reflection để gọi method phù hợp theo tên class"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Polymorphism cho phép caller gọi cùng method `area()` trên mọi `Shape` mà không cần biết loại cụ thể. Dùng `instanceof` ở caller vi phạm OCP: thêm `Triangle` mới phải sửa mọi nơi đang check `instanceof`. Đẩy logic vào chính subclass vừa đúng OOP vừa dễ mở rộng.",
+            "tag": "polymorphism"
+          },
+          {
+            "id": "13ef34cc-0956-41ec-8289-38b1d8af411c",
+            "question": "Endpoint `POST /users` nhận JSON body. Tại sao nên tạo `CreateUserRequest` (record/DTO) làm parameter thay vì bind trực tiếp vào `User` entity?",
+            "options": [
+              "Entity không thể làm parameter của controller method",
+              "Tách API contract khỏi domain model: tránh client gửi field nội bộ như `id`, `role`, `isAdmin` (lỗ hổng over-posting/mass assignment), tránh để validation rule và annotation persistence lẫn vào API",
+              "Java yêu cầu bắt buộc phải có DTO cho mọi API",
+              "Record luôn chạy nhanh hơn entity"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Khi dùng entity làm request, client có thể gửi field không mong muốn (`id`, `role`, `isAdmin`, `createdAt`...) gây lỗ hổng mass assignment/over-posting. DTO là boundary contract rõ ràng: chỉ expose field mà API thật sự chấp nhận, tách biệt khỏi domain và persistence, dễ versioning API sau này.",
+            "tag": "dto"
+          }
+        ],
+        "attempts": []
+      }
+    ]
+  }
 }
