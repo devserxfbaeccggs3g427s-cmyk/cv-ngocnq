@@ -17,7 +17,7 @@ const footerLinks = [
 ];
 
 export function Footer() {
-  const version = '20260619.001';
+  const version = '20260619.004';
 
   return (
     <footer className="max-w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">

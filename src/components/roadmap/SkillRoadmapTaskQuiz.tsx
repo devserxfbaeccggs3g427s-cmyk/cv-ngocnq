@@ -99,6 +99,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
   const [noteComments, setNoteComments] = useState<NoteComment[]>([]);
   const [quizDecks, setQuizDecks] = useState<QuizDeck[]>([]);
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
+  const [aiConfirmPassword, setAiConfirmPassword] = useState('');
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [quizError, setQuizError] = useState<string | null>(null);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
@@ -239,6 +240,11 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
       return;
     }
 
+    if (!aiConfirmPassword.trim()) {
+      setQuizError('Vui lòng nhập mật khẩu xác nhận trước khi dùng AI cấu hình trong env.');
+      return;
+    }
+
     setGeneratingQuiz(true);
     setQuizError(null);
 
@@ -247,6 +253,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          confirmPassword: aiConfirmPassword,
           task: {
             id: task.id,
             title: task.title,
@@ -480,20 +487,35 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
                 Bạn có thể tạo nhiều bài khác nhau cho cùng task. Khi tạo bài mới, hệ thống gửi các câu đã có để AI đổi góc hỏi và chặn bài mới nếu trùng quá 50%.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={createQuiz}
-              disabled={!canCreateQuiz || generatingQuiz}
-              className={cn(
-                'inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition',
-                canCreateQuiz
-                  ? 'bg-cyan-600 text-white hover:bg-cyan-700 disabled:cursor-wait disabled:bg-cyan-400'
-                  : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-              )}
-            >
-              {generatingQuiz ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {generatingQuiz ? 'Đang tạo' : quizDecks.length > 0 ? 'Tạo bài mới' : 'Tạo trắc nghiệm'}
-            </button>
+            <div className="w-full shrink-0 space-y-2 md:w-72">
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Mật khẩu xác nhận
+                </span>
+                <input
+                  value={aiConfirmPassword}
+                  onChange={(event) => setAiConfirmPassword(event.target.value)}
+                  type="password"
+                  placeholder="Password dùng AI env"
+                  autoComplete="off"
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-cyan-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={createQuiz}
+                disabled={!canCreateQuiz || generatingQuiz}
+                className={cn(
+                  'inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition',
+                  canCreateQuiz
+                    ? 'bg-cyan-600 text-white hover:bg-cyan-700 disabled:cursor-wait disabled:bg-cyan-400'
+                    : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                )}
+              >
+                {generatingQuiz ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {generatingQuiz ? 'Đang tạo' : quizDecks.length > 0 ? 'Tạo bài mới' : 'Tạo trắc nghiệm'}
+              </button>
+            </div>
           </div>
 
           {requirement && (

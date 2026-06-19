@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { validateEnvAiPassword } from '../env-confirmation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -6,6 +7,7 @@ export const dynamic = 'force-dynamic';
 type AiCommentRequest = {
   provider?: unknown;
   apiKey?: unknown;
+  confirmPassword?: unknown;
   model?: unknown;
   baseUrl?: unknown;
   question?: unknown;
@@ -80,6 +82,10 @@ function resolveApiKey(provider: string, apiKey: unknown) {
   return '';
 }
 
+function usesEnvApiKey(provider: string, apiKey: unknown) {
+  return provider === 'kilo' && !isNonEmptyString(apiKey);
+}
+
 function compactText(value: string, maxLength: number) {
   const compacted = value
     .replace(/\r\n/g, '\n')
@@ -108,6 +114,15 @@ export async function POST(request: Request) {
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'openrouter';
+  const shouldValidateEnvPassword = usesEnvApiKey(provider, body.apiKey);
+  const passwordError = shouldValidateEnvPassword
+    ? validateEnvAiPassword(body.confirmPassword)
+    : null;
+
+  if (passwordError) {
+    return jsonError(passwordError.message, passwordError.status);
+  }
+
   const apiKey = resolveApiKey(provider, body.apiKey);
   const model = isNonEmptyString(body.model) ? body.model.trim() : '';
   const question = isNonEmptyString(body.question) ? body.question.trim() : '';

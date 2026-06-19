@@ -110,6 +110,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
   const [promptCopyError, setPromptCopyError] = useState<string | null>(null);
   const [noteComments, setNoteComments] = useState<NoteComment[]>([]);
   const [flashcardDeck, setFlashcardDeck] = useState<FlashcardDeck | null>(null);
+  const [aiConfirmPassword, setAiConfirmPassword] = useState('');
   const [generatingFlashcards, setGeneratingFlashcards] = useState(false);
   const [flashcardError, setFlashcardError] = useState<string | null>(null);
   const [activeFlashcardIndex, setActiveFlashcardIndex] = useState(0);
@@ -313,6 +314,11 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
       return;
     }
 
+    if (!aiConfirmPassword.trim()) {
+      setFlashcardError('Vui lòng nhập mật khẩu xác nhận trước khi dùng AI cấu hình trong env.');
+      return;
+    }
+
     setGeneratingFlashcards(true);
     setFlashcardError(null);
 
@@ -321,6 +327,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          confirmPassword: aiConfirmPassword,
           task: {
             id: task.id,
             title: task.title,
@@ -470,6 +477,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
           <FlashcardStudyPanel
             deck={flashcardDeck}
             commentCount={noteComments.length}
+            confirmPassword={aiConfirmPassword}
             canCreate={canCreateFlashcards}
             requirement={flashcardRequirement}
             isGenerating={generatingFlashcards}
@@ -478,6 +486,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
             flipped={flashcardFlipped}
             ratings={flashcardRatings}
             onCreate={createFlashcards}
+            onConfirmPasswordChange={setAiConfirmPassword}
             onFlip={() => setFlashcardFlipped((current) => !current)}
             onPrevious={() => {
               setActiveFlashcardIndex((current) => Math.max(current - 1, 0));
@@ -650,6 +659,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
 function FlashcardStudyPanel({
   deck,
   commentCount,
+  confirmPassword,
   canCreate,
   requirement,
   isGenerating,
@@ -658,6 +668,7 @@ function FlashcardStudyPanel({
   flipped,
   ratings,
   onCreate,
+  onConfirmPasswordChange,
   onFlip,
   onPrevious,
   onNext,
@@ -666,6 +677,7 @@ function FlashcardStudyPanel({
 }: {
   deck: FlashcardDeck | null;
   commentCount: number;
+  confirmPassword: string;
   canCreate: boolean;
   requirement: string | null;
   isGenerating: boolean;
@@ -674,6 +686,7 @@ function FlashcardStudyPanel({
   flipped: boolean;
   ratings: Record<string, 'hard' | 'good'>;
   onCreate: () => void;
+  onConfirmPasswordChange: (value: string) => void;
   onFlip: () => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -705,24 +718,39 @@ function FlashcardStudyPanel({
           </div>
 
           {!deck && (
-            <button
-              type="button"
-              onClick={onCreate}
-              disabled={!canCreate || isGenerating}
-              className={cn(
-                'inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition',
-                canCreate
-                  ? 'bg-violet-600 text-white hover:bg-violet-700 disabled:cursor-wait disabled:bg-violet-400'
-                  : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-              )}
-            >
-              {isGenerating ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              {isGenerating ? 'Đang tạo' : 'Tạo flashcard'}
-            </button>
+            <div className="w-full shrink-0 space-y-2 lg:w-72">
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Mật khẩu xác nhận
+                </span>
+                <input
+                  value={confirmPassword}
+                  onChange={(event) => onConfirmPasswordChange(event.target.value)}
+                  type="password"
+                  placeholder="Password dùng AI env"
+                  autoComplete="off"
+                  className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-violet-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={onCreate}
+                disabled={!canCreate || isGenerating}
+                className={cn(
+                  'inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition',
+                  canCreate
+                    ? 'bg-violet-600 text-white hover:bg-violet-700 disabled:cursor-wait disabled:bg-violet-400'
+                    : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                )}
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {isGenerating ? 'Đang tạo' : 'Tạo flashcard'}
+              </button>
+            </div>
           )}
         </div>
 

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { validateEnvAiPassword } from '../env-confirmation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 type QuizRequest = {
+  confirmPassword?: unknown;
   task?: unknown;
   note?: unknown;
   comments?: unknown;
@@ -289,6 +291,12 @@ export async function POST(request: Request) {
 
   if (!note) {
     return jsonError('Task cần có note trước khi tạo trắc nghiệm.', 400);
+  }
+
+  const passwordError = validateEnvAiPassword(body.confirmPassword);
+
+  if (passwordError) {
+    return jsonError(passwordError.message, passwordError.status);
   }
 
   const apiKey = process.env.AI_FLASHCARD_API_KEY?.trim() ?? '';

@@ -47,6 +47,7 @@ type CommentDraft = {
   baseUrl: string;
   model: string;
   apiKey: string;
+  confirmPassword: string;
 };
 
 type AiModelOption = {
@@ -72,6 +73,7 @@ const defaultDraft: CommentDraft = {
   baseUrl: '',
   model: '',
   apiKey: '',
+  confirmPassword: '',
 };
 
 const providerOptions: Array<{ value: AiProvider; label: string; hint: string }> = [
@@ -284,6 +286,7 @@ export function MarkdownCommentThreads({
         body: JSON.stringify({
           provider: draft.provider,
           apiKey: draft.provider === 'kilo' ? undefined : draft.apiKey,
+          confirmPassword: draft.provider === 'kilo' ? draft.confirmPassword : undefined,
           model: draft.model,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
           question: body,
@@ -698,6 +701,7 @@ export function MarkdownCommentThreadDetail({
         body: JSON.stringify({
           provider: draft.provider,
           apiKey: draft.provider === 'kilo' ? undefined : draft.apiKey,
+          confirmPassword: draft.provider === 'kilo' ? draft.confirmPassword : undefined,
           model: draft.model,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
           question: body,
@@ -942,11 +946,12 @@ function CommentComposer({
   const autoLoadedModelKeyRef = useRef('');
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<{ key: string; message: string } | null>(null);
+  const usesServerApiKey = draft.provider === 'kilo';
   const modelRequestKey = [
     draft.provider,
     draft.provider === 'custom' ? draft.baseUrl.trim() : '',
+    usesServerApiKey ? draft.confirmPassword : '',
   ].join('|');
-  const usesServerApiKey = draft.provider === 'kilo';
   const currentModelOptions = loadedModelKey === modelRequestKey ? modelOptions : [];
   const currentModelError = modelError?.key === modelRequestKey ? modelError.message : null;
   const normalizedModelSearch = modelSearch.trim().toLowerCase();
@@ -961,7 +966,8 @@ function CommentComposer({
 
   const canLoadModels =
     draft.mode === 'ai' &&
-    (draft.provider !== 'custom' || Boolean(draft.baseUrl.trim()));
+    (draft.provider !== 'custom' || Boolean(draft.baseUrl.trim())) &&
+    (!usesServerApiKey || Boolean(draft.confirmPassword.trim()));
 
   const loadModels = useCallback(async () => {
     setModelError(null);
@@ -976,6 +982,7 @@ function CommentComposer({
         body: JSON.stringify({
           provider: draft.provider,
           apiKey: usesServerApiKey ? undefined : draft.apiKey,
+          confirmPassword: usesServerApiKey ? draft.confirmPassword : undefined,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
         }),
       });
@@ -1011,7 +1018,16 @@ function CommentComposer({
     } finally {
       setIsLoadingModels(false);
     }
-  }, [draft.apiKey, draft.baseUrl, draft.model, draft.provider, modelRequestKey, onChange, usesServerApiKey]);
+  }, [
+    draft.apiKey,
+    draft.baseUrl,
+    draft.confirmPassword,
+    draft.model,
+    draft.provider,
+    modelRequestKey,
+    onChange,
+    usesServerApiKey,
+  ]);
 
   useEffect(() => {
     if (
@@ -1071,6 +1087,7 @@ function CommentComposer({
                   provider,
                   model: '',
                   apiKey: provider === 'kilo' ? '' : draft.apiKey,
+                  confirmPassword: provider === 'kilo' ? draft.confirmPassword : '',
                 });
               }}
               className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
@@ -1220,6 +1237,22 @@ function CommentComposer({
                 onChange={(event) => onChange({ apiKey: event.target.value })}
                 type="password"
                 placeholder="Nhập API key khi hỏi AI"
+                autoComplete="off"
+                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+              />
+            </label>
+          )}
+
+          {usesServerApiKey && (
+            <label className="block min-w-0 md:col-span-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Mật khẩu xác nhận
+              </span>
+              <input
+                value={draft.confirmPassword}
+                onChange={(event) => onChange({ confirmPassword: event.target.value })}
+                type="password"
+                placeholder="Nhập mật khẩu để dùng AI cấu hình trong env"
                 autoComplete="off"
                 className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
               />
