@@ -299,13 +299,13 @@ export async function POST(request: Request) {
     return jsonError(passwordError.message, passwordError.status);
   }
 
-  const apiKey = process.env.AI_FLASHCARD_API_KEY?.trim() ?? '';
-  const baseUrl = normalizeBaseUrl(process.env.AI_FLASHCARD_BASE_URL ?? '');
-  const model = process.env.AI_FLASHCARD_MODEL?.trim() ?? '';
+  const apiKey = process.env.AI_QUIZZ_API_KEY?.trim() ?? '';
+  const baseUrl = normalizeBaseUrl(process.env.AI_QUIZZ_BASE_URL ?? '');
+  const model = process.env.AI_QUIZZ_MODEL?.trim() ?? '';
 
   if (!apiKey || !baseUrl || !model) {
     return jsonError(
-      'Chưa cấu hình AI_FLASHCARD_API_KEY, AI_FLASHCARD_BASE_URL hoặc AI_FLASHCARD_MODEL trong env.',
+      'Chưa cấu hình AI_QUIZZ_API_KEY, AI_QUIZZ_BASE_URL hoặc AI_QUIZZ_MODEL trong env.',
       500
     );
   }
