@@ -13,9 +13,14 @@ src/
 │   │   └── [slug]/page.tsx # Project detail page
 │   ├── skill-roadmap/page.tsx # JSON-backed curriculum with browser-persisted progress
 │   ├── skill-roadmap/notes/[taskId]/page.tsx # Per-task Markdown note preview
+│   ├── skill-roadmap/tasks/[taskId]/flashcards/page.tsx # Dedicated AI flashcard screen for a roadmap task
+│   ├── skill-roadmap/tasks/[taskId]/quiz/page.tsx # Dedicated AI quiz screen for a roadmap task
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
+│       ├── ai/models/route.ts # OpenAI-compatible model discovery for comment AI
+│       ├── ai/comment/route.ts # OpenAI-compatible comment AI proxy
+│       ├── ai/quizzes/route.ts # OpenAI-compatible roadmap task quiz generator
 │       ├── skill-roadmap/progress/route.ts # Roadmap progress seed + local-dev JSON sync
 │       ├── skill-roadmap/backup/github/route.ts # Optional browser progress GitHub backup
 │       └── pdf/
@@ -43,6 +48,8 @@ src/
 │   │   └── ProjectDetail.tsx
 │   ├── roadmap/            # Hierarchical study roadmap checklist components
 │   │   ├── SkillRoadmapClient.tsx
+│   │   ├── SkillRoadmapTaskFlashcards.tsx
+│   │   ├── SkillRoadmapTaskQuiz.tsx
 │   │   └── SkillRoadmapNotePreview.tsx
 │   ├── markdown/           # Reusable Markdown rendering components
 │   │   └── MarkdownPreview.tsx
@@ -210,6 +217,7 @@ page.tsx
 - React Hook Form for contact form
 - Local `useState` for filters, toggles
 - No global state needed (data is static)
+- Skill roadmap learning artifacts use browser `localStorage`: progress, note comments, flashcard decks, and quiz packs. Flashcards and quizzes are stored as multiple decks/packs per task with backup/import compatibility for older single-deck flashcard data.
 
 ## File Naming Conventions
 

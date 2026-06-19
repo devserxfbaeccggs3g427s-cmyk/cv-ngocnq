@@ -44,6 +44,12 @@ type SyntaxToken = {
   type: SyntaxTokenType;
 };
 
+export type MarkdownHeading = {
+  id: string;
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+  text: string;
+};
+
 const emptyMessage = '_Chưa có note._';
 const headingLevels = [1, 2, 3, 4, 5, 6] as const;
 const sqlLanguages = new Set(['sql', 'mysql', 'pgsql', 'postgresql', 'oracle', 'plsql', 'ddl']);
@@ -54,6 +60,7 @@ const xmlLanguages = new Set(['html', 'xml', 'tsx', 'jsx']);
 
 export function MarkdownPreview({ content }: { content: string }) {
   const blocks = parseMarkdown(content.trim() ? content : emptyMessage);
+  const headingIdsByBlockIndex = buildHeadingIdsByBlockIndex(blocks);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
@@ -80,9 +87,24 @@ export function MarkdownPreview({ content }: { content: string }) {
 
   return (
     <div className="markdown-preview" data-theme={theme}>
-      {blocks.map((block, index) => renderBlock(block, index))}
+      {blocks.map((block, index) => renderBlock(block, index, headingIdsByBlockIndex.get(index)))}
     </div>
   );
+}
+
+export function extractMarkdownHeadings(content: string): MarkdownHeading[] {
+  const blocks = parseMarkdown(content.trim() ? content : emptyMessage);
+  const headingIdsByBlockIndex = buildHeadingIdsByBlockIndex(blocks);
+
+  return blocks.flatMap((block, index) => {
+    if (block.type !== 'heading') {
+      return [];
+    }
+
+    const id = headingIdsByBlockIndex.get(index);
+
+    return id ? [{ id, level: block.level, text: stripInlineMarkdown(block.text) }] : [];
+  });
 }
 
 function resolveRenderedTheme(): 'light' | 'dark' {
@@ -129,6 +151,44 @@ function getRgbLuminance(color: string) {
   const blue = Number(match[3]);
 
   return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+function buildHeadingIdsByBlockIndex(blocks: MarkdownBlock[]) {
+  const idCounts = new Map<string, number>();
+  const idsByBlockIndex = new Map<number, string>();
+
+  blocks.forEach((block, index) => {
+    if (block.type !== 'heading') {
+      return;
+    }
+
+    const baseId = slugifyHeading(block.text) || `heading-${index + 1}`;
+    const count = idCounts.get(baseId) ?? 0;
+    idCounts.set(baseId, count + 1);
+    idsByBlockIndex.set(index, count === 0 ? baseId : `${baseId}-${count + 1}`);
+  });
+
+  return idsByBlockIndex;
+}
+
+function slugifyHeading(text: string) {
+  return stripInlineMarkdown(text)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function stripInlineMarkdown(text: string) {
+  return text
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[`*_~]/g, '')
+    .trim();
 }
 
 function parseMarkdown(content: string): MarkdownBlock[] {
@@ -245,10 +305,10 @@ function parseMarkdown(content: string): MarkdownBlock[] {
   return blocks;
 }
 
-function renderBlock(block: MarkdownBlock, index: number) {
+function renderBlock(block: MarkdownBlock, index: number, headingId?: string) {
   switch (block.type) {
     case 'heading':
-      return renderHeading(block.level, block.text, index);
+      return renderHeading(block.level, block.text, index, headingId);
 
     case 'paragraph':
       return <p key={index}>{renderInlineMarkdown(block.text)}</p>;
@@ -336,24 +396,24 @@ function renderBlock(block: MarkdownBlock, index: number) {
   }
 }
 
-function renderHeading(level: 1 | 2 | 3 | 4 | 5 | 6, text: string, key: number) {
+function renderHeading(level: 1 | 2 | 3 | 4 | 5 | 6, text: string, key: number, id?: string) {
   const children = renderInlineMarkdown(text);
 
   switch (level) {
     case 1:
-      return <h1 key={key}>{children}</h1>;
+      return <h1 key={key} id={id}>{children}</h1>;
     case 2:
-      return <h2 key={key}>{children}</h2>;
+      return <h2 key={key} id={id}>{children}</h2>;
     case 3:
-      return <h3 key={key}>{children}</h3>;
+      return <h3 key={key} id={id}>{children}</h3>;
     case 4:
-      return <h4 key={key}>{children}</h4>;
+      return <h4 key={key} id={id}>{children}</h4>;
     case 5:
-      return <h5 key={key}>{children}</h5>;
+      return <h5 key={key} id={id}>{children}</h5>;
     case 6:
-      return <h6 key={key}>{children}</h6>;
+      return <h6 key={key} id={id}>{children}</h6>;
     default:
-      return <h3 key={key}>{children}</h3>;
+      return <h3 key={key} id={id}>{children}</h3>;
   }
 }
 
@@ -995,8 +1055,16 @@ function renderInlineMarkdown(text: string) {
         />
       );
     } else if (match[4] !== undefined && match[5] !== undefined) {
+      const href = sanitizeUrl(match[5]);
+      const isPageAnchor = href.startsWith('#');
+
       nodes.push(
-        <a key={nodes.length} href={sanitizeUrl(match[5])} target="_blank" rel="noreferrer">
+        <a
+          key={nodes.length}
+          href={href}
+          target={isPageAnchor ? undefined : '_blank'}
+          rel={isPageAnchor ? undefined : 'noreferrer'}
+        >
           {renderInlineMarkdown(match[4])}
         </a>
       );

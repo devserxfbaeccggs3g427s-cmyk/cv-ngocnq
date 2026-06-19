@@ -22,8 +22,10 @@ import {
   Search,
   StickyNote,
   Target,
+  Trash2,
   Upload,
   AlertTriangle,
+  ListTree,
 } from 'lucide-react';
 import { Badge, Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
@@ -77,6 +79,83 @@ type ProgressFile = {
   items: Record<string, ProgressItem>;
 };
 
+type NoteComment = {
+  id: string;
+  parentId: string | null;
+  author: 'user' | 'ai';
+  body: string;
+  createdAt: string;
+  model?: string;
+  provider?: string;
+};
+
+type Flashcard = {
+  id: string;
+  front: string;
+  back: string;
+  hint: string;
+  tag: string;
+};
+
+type FlashcardDeck = {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  title: string;
+  createdAt: string;
+  source: {
+    noteCharacters: number;
+    commentCount: number;
+  };
+  cards: Flashcard[];
+};
+
+type QuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation: string;
+  tag: string;
+};
+
+type QuizAttempt = {
+  id: string;
+  startedAt: string;
+  submittedAt: string | null;
+  durationSeconds: number;
+  answers: Record<string, number>;
+  score: number | null;
+  total: number;
+  submittedBy: 'user' | 'timeout' | null;
+};
+
+type QuizDeck = {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  title: string;
+  durationMinutes: number;
+  createdAt: string;
+  source: {
+    noteCharacters: number;
+    commentCount: number;
+  };
+  questions: QuizQuestion[];
+  attempts: QuizAttempt[];
+};
+
+type RoadmapBackupFile = {
+  version: 4;
+  exportedAt: string;
+  progress: ProgressFile;
+  comments: Record<string, NoteComment[]>;
+  flashcards: Record<string, FlashcardDeck[]>;
+  quizzes: Record<string, QuizDeck[]>;
+};
+
+type StudyStatusFilter = 'all' | 'completed' | 'incomplete' | 'in-progress' | 'with-note';
+
 type GithubBackupConfig = {
   repoUrl: string;
   branch: string;
@@ -96,6 +175,9 @@ const emptyProgress: ProgressFile = {
 };
 
 const progressStorageKey = 'skill-roadmap-progress:v1';
+const commentsStorageKey = 'skill-roadmap-note-comments:v1';
+const flashcardsStorageKey = 'skill-roadmap-flashcards:v1';
+const quizzesStorageKey = 'skill-roadmap-quizzes:v1';
 const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 const levelStyles: Record<string, string> = {
@@ -105,6 +187,14 @@ const levelStyles: Record<string, string> = {
   'Chuyên sâu': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
 };
 
+const studyStatusOptions: Array<{ value: StudyStatusFilter; label: string }> = [
+  { value: 'all', label: 'Tất cả trạng thái' },
+  { value: 'completed', label: 'Đã học' },
+  { value: 'incomplete', label: 'Chưa học' },
+  { value: 'in-progress', label: 'Đang học' },
+  { value: 'with-note', label: 'Có ghi chú' },
+];
+
 interface SkillRoadmapClientProps {
   roadmap: Roadmap;
 }
@@ -113,6 +203,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [progress, setProgress] = useState<ProgressFile>(emptyProgress);
   const [activeTrackId, setActiveTrackId] = useState('all');
   const [levelFilter, setLevelFilter] = useState('all');
+  const [studyStatusFilter, setStudyStatusFilter] = useState<StudyStatusFilter>('all');
   const [query, setQuery] = useState('');
   const [savingTaskId, setSavingTaskId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -123,6 +214,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [githubCommitUrl, setGithubCommitUrl] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isResettingProgress, setIsResettingProgress] = useState(false);
   const [isBackingUpGithub, setIsBackingUpGithub] = useState(false);
   const [hasServerGithubToken, setHasServerGithubToken] = useState(false);
   const [githubToken, setGithubToken] = useState('');
@@ -179,26 +271,24 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
             ...module,
             tasks: filterTaskTree(module.tasks, (task) => {
               const matchesLevel = levelFilter === 'all' || task.level === levelFilter;
+              const matchesStudyStatus = matchesTaskStudyStatus(task, progress, studyStatusFilter);
               const searchable = collectTaskSearchText(task, module.title, track.title, track.skills);
 
-              return matchesLevel && (!normalizedQuery || searchable.includes(normalizedQuery));
+              return matchesLevel
+                && matchesStudyStatus
+                && (!normalizedQuery || searchable.includes(normalizedQuery));
             }),
           }))
           .filter((module) => module.tasks.length > 0),
       }))
       .filter((track) => track.modules.length > 0);
-  }, [activeTrackId, levelFilter, query, roadmap.tracks]);
+  }, [activeTrackId, levelFilter, progress, query, roadmap.tracks, studyStatusFilter]);
 
   useEffect(() => {
     let ignore = false;
 
     async function loadProgress() {
       const storedProgress = readStoredProgress();
-
-      if (storedProgress) {
-        setProgress(storedProgress);
-        return;
-      }
 
       try {
         const response = await fetch('/api/skill-roadmap/progress', {
@@ -209,13 +299,36 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           throw new Error('Không đọc được file tiến độ');
         }
 
-        const data = (await response.json()) as ProgressFile;
+        const seed = normalizeRoadmapBackup(await response.json());
+
+        if (!seed) {
+          throw new Error('File tiến độ không đúng định dạng');
+        }
+
         if (!ignore) {
-          setProgress(data);
-          storeProgress(data);
+          const nextProgress = storedProgress ?? seed.progress;
+
+          setProgress(nextProgress);
+          storeProgress(nextProgress);
+
+          if (!hasStoredComments()) {
+            storeComments(seed.comments);
+          }
+
+          if (!hasStoredFlashcards()) {
+            storeFlashcards(seed.flashcards);
+          }
+
+          if (!hasStoredQuizzes()) {
+            storeQuizzes(seed.quizzes);
+          }
         }
       } catch {
         if (!ignore) {
+          if (storedProgress) {
+            setProgress(storedProgress);
+          }
+
           setLoadError('Không tải được tiến độ seed từ file JSON. Tiến độ mới vẫn được lưu trong trình duyệt này.');
         }
       }
@@ -396,18 +509,19 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setBackupMessage(null);
 
     try {
-      const blob = new Blob([`${JSON.stringify(progress, null, 2)}\n`], {
+      const backup = buildRoadmapBackup(progress);
+      const blob = new Blob([`${JSON.stringify(backup, null, 2)}\n`], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = `skill-roadmap-progress-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.download = `skill-roadmap-backup-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, comment, flashcard và trắc nghiệm.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -428,29 +542,39 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
     try {
       const text = await file.text();
-      const data = normalizeProgress(JSON.parse(text));
+      const data = normalizeRoadmapBackup(JSON.parse(text));
 
       if (!data) {
-        throw new Error('File backup không đúng định dạng. File cần có object items chứa tiến độ theo task id.');
+        throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress, comments, flashcards và quizzes.');
       }
 
       const imported = {
-        ...data,
+        ...data.progress,
         updatedAt: new Date().toISOString(),
       };
 
       setProgress(imported);
       storeProgress(imported);
+      storeComments(data.comments);
+      storeFlashcards(data.flashcards);
+      storeQuizzes(data.quizzes);
 
       if (shouldSyncProgressFile) {
         await fetch('/api/skill-roadmap/progress', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(imported),
+          body: JSON.stringify({
+            version: 4,
+            exportedAt: new Date().toISOString(),
+            progress: imported,
+            comments: data.comments,
+            flashcards: data.flashcards,
+            quizzes: data.quizzes,
+          }),
         });
       }
 
-      setBackupMessage('Đã import backup JSON vào tiến độ trong trình duyệt.');
+      setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, comment, flashcard và trắc nghiệm.');
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không import được file backup.'
@@ -458,6 +582,58 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     } finally {
       event.target.value = '';
       setIsImporting(false);
+    }
+  }
+
+  async function resetProgressFromProject() {
+    const confirmed = window.confirm(
+      'Bạn chắc chắn muốn xoá tiến độ, comment, flashcard và trắc nghiệm đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsResettingProgress(true);
+    setBackupError(null);
+    setBackupMessage(null);
+    setGithubCommitUrl(null);
+
+    try {
+      removeStoredProgress();
+      removeStoredComments();
+      removeStoredFlashcards();
+      removeStoredQuizzes();
+
+      const response = await fetch('/api/skill-roadmap/progress', {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Không đọc được file tiến độ mới nhất từ project.');
+      }
+
+      const data = normalizeRoadmapBackup(await response.json());
+
+      if (!data) {
+        throw new Error('File tiến độ trong project không đúng định dạng.');
+      }
+
+      setProgress(data.progress);
+      storeProgress(data.progress);
+      storeComments(data.comments);
+      storeFlashcards(data.flashcards);
+      storeQuizzes(data.quizzes);
+      setLoadError(null);
+      setBackupMessage('Đã xoá localStorage và tải lại tiến độ/comment/flashcard/trắc nghiệm mới nhất từ project.');
+    } catch (error) {
+      setBackupError(
+        error instanceof Error
+          ? error.message
+          : 'Không tải lại được tiến độ từ project.'
+      );
+    } finally {
+      setIsResettingProgress(false);
     }
   }
 
@@ -477,7 +653,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
           branch: githubBranch,
           backupPath: githubBackupPath,
           commitMessage: githubCommitMessage,
-          progress,
+          progress: buildRoadmapBackup(progress),
         }),
       });
 
@@ -494,7 +670,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       setGithubToken('');
       setGithubCommitUrl(result.commitUrl ?? null);
-      setBackupMessage(`Đã commit backup lên GitHub: ${result.path ?? githubBackupPath}.`);
+      setBackupMessage(`Đã commit backup gồm tiến độ, comment và flashcard lên GitHub: ${result.path ?? githubBackupPath}.`);
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không backup được lên GitHub.'
@@ -559,9 +735,10 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                 Backup tiến độ học tập
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
-                Export/Import JSON là lựa chọn an toàn nhất cho backup thủ công. GitHub
-                backup phù hợp khi dùng riêng; token chỉ gửi một lần tới API server và
-                không được lưu lại.
+                Export/Import JSON là lựa chọn an toàn nhất cho backup thủ công. File
+                backup hiện bao gồm cả tiến độ học tập, note, comment trong màn hình
+                preview Markdown và flashcard đã tạo. GitHub backup phù hợp khi dùng riêng; token chỉ gửi
+                một lần tới API server và không được lưu lại.
               </p>
             </div>
 
@@ -595,6 +772,20 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
                   className="hidden"
                 />
               </label>
+
+              <button
+                type="button"
+                onClick={resetProgressFromProject}
+                disabled={isResettingProgress}
+                className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60 dark:border-red-900/70 dark:text-red-300 dark:hover:border-red-800 dark:hover:bg-red-950/30"
+              >
+                {isResettingProgress ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                Clear localStorage
+              </button>
             </div>
           </div>
 
@@ -719,7 +910,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
 
       <Card>
         <CardContent className="p-4 md:p-5">
-          <div className="grid gap-3 lg:grid-cols-[1fr_220px_180px]">
+          <div className="grid gap-3 lg:grid-cols-[1fr_220px_180px_180px]">
             <label className="relative block">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
@@ -752,6 +943,18 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
               {levels.map((level) => (
                 <option key={level} value={level}>
                   {level}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={studyStatusFilter}
+              onChange={(event) => setStudyStatusFilter(event.target.value as StudyStatusFilter)}
+              className="h-11 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+            >
+              {studyStatusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
@@ -907,8 +1110,461 @@ function storeProgress(progress: ProgressFile) {
   }
 }
 
+function removeStoredProgress() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(progressStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. The reload flow still reports API errors.
+  }
+}
+
+function removeStoredComments() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(commentsStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
+function removeStoredFlashcards() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(flashcardsStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
+function removeStoredQuizzes() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(quizzesStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
+function hasStoredComments() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(commentsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function hasStoredFlashcards() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(flashcardsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function hasStoredQuizzes() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(quizzesStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function readStoredComments(): Record<string, NoteComment[]> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(commentsStorageKey);
+    return raw ? normalizeCommentsByTask(JSON.parse(raw)) ?? {} : {};
+  } catch {
+    return {};
+  }
+}
+
+function readStoredFlashcards(): Record<string, FlashcardDeck[]> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(flashcardsStorageKey);
+    return raw ? normalizeFlashcardsByTask(JSON.parse(raw)) ?? {} : {};
+  } catch {
+    return {};
+  }
+}
+
+function readStoredQuizzes(): Record<string, QuizDeck[]> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(quizzesStorageKey);
+    return raw ? normalizeQuizzesByTask(JSON.parse(raw)) ?? {} : {};
+  } catch {
+    return {};
+  }
+}
+
+function storeComments(comments: Record<string, NoteComment[]>) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(commentsStorageKey, JSON.stringify(comments));
+  } catch {
+    // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
+function storeFlashcards(flashcards: Record<string, FlashcardDeck[]>) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(flashcardsStorageKey, JSON.stringify(flashcards));
+  } catch {
+    // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
+function storeQuizzes(quizzes: Record<string, QuizDeck[]>) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(quizzesStorageKey, JSON.stringify(quizzes));
+  } catch {
+    // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
+function buildRoadmapBackup(progress: ProgressFile): RoadmapBackupFile {
+  return {
+    version: 4,
+    exportedAt: new Date().toISOString(),
+    progress,
+    comments: readStoredComments(),
+    flashcards: readStoredFlashcards(),
+    quizzes: readStoredQuizzes(),
+  };
+}
+
 function isRecord(input: unknown): input is Record<string, unknown> {
   return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
+}
+
+function normalizeComment(input: unknown): NoteComment | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const author = input.author === 'ai' ? 'ai' : input.author === 'user' ? 'user' : null;
+
+  if (
+    typeof input.id !== 'string' ||
+    (typeof input.parentId !== 'string' && input.parentId !== null) ||
+    !author ||
+    typeof input.body !== 'string' ||
+    typeof input.createdAt !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    parentId: input.parentId,
+    author,
+    body: input.body,
+    createdAt: input.createdAt,
+    model: typeof input.model === 'string' ? input.model : undefined,
+    provider: typeof input.provider === 'string' ? input.provider : undefined,
+  };
+}
+
+function normalizeCommentsByTask(input: unknown): Record<string, NoteComment[]> | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const comments: Record<string, NoteComment[]> = {};
+
+  for (const [taskId, rawComments] of Object.entries(input)) {
+    if (!Array.isArray(rawComments)) {
+      return null;
+    }
+
+    const normalized = rawComments.map(normalizeComment);
+
+    if (normalized.some((comment) => !comment)) {
+      return null;
+    }
+
+    comments[taskId] = normalized as NoteComment[];
+  }
+
+  return comments;
+}
+
+function normalizeFlashcard(input: unknown): Flashcard | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.front !== 'string' ||
+    typeof input.back !== 'string' ||
+    typeof input.hint !== 'string' ||
+    typeof input.tag !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    front: input.front,
+    back: input.back,
+    hint: input.hint,
+    tag: input.tag,
+  };
+}
+
+function normalizeFlashcardDeck(input: unknown, fallbackTaskId: string, index: number): FlashcardDeck | null {
+  if (!isRecord(input) || !Array.isArray(input.cards)) {
+    return null;
+  }
+
+  const rawSource = isRecord(input.source) ? input.source : {};
+  const cards = input.cards.map(normalizeFlashcard);
+
+  if (cards.some((card) => !card)) {
+    return null;
+  }
+
+  return {
+    id: typeof input.id === 'string' ? input.id : crypto.randomUUID(),
+    taskId: typeof input.taskId === 'string' ? input.taskId : fallbackTaskId,
+    taskTitle: typeof input.taskTitle === 'string' ? input.taskTitle : '',
+    title: typeof input.title === 'string' ? input.title : `Bộ flashcard ${index + 1}`,
+    createdAt: typeof input.createdAt === 'string' ? input.createdAt : new Date().toISOString(),
+    source: {
+      noteCharacters: typeof rawSource.noteCharacters === 'number' ? rawSource.noteCharacters : 0,
+      commentCount: typeof rawSource.commentCount === 'number' ? rawSource.commentCount : 0,
+    },
+    cards: cards as Flashcard[],
+  };
+}
+
+function normalizeFlashcardsByTask(input: unknown): Record<string, FlashcardDeck[]> | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const flashcards: Record<string, FlashcardDeck[]> = {};
+
+  for (const [taskId, rawDecks] of Object.entries(input)) {
+    const sourceDecks = Array.isArray(rawDecks) ? rawDecks : [rawDecks];
+    const decks = sourceDecks
+      .map((rawDeck, index) => normalizeFlashcardDeck(rawDeck, taskId, index))
+      .filter((deck): deck is FlashcardDeck => Boolean(deck));
+
+    if (decks.length > 0) {
+      flashcards[taskId] = decks.map((deck, index) => ({
+        ...deck,
+        taskId: deck.taskId || taskId,
+        title: deck.title || `Bộ flashcard ${index + 1}`,
+      }));
+    }
+  }
+
+  return flashcards;
+}
+
+function normalizeQuizQuestion(input: unknown): QuizQuestion | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.question !== 'string' ||
+    !Array.isArray(input.options) ||
+    typeof input.correctOptionIndex !== 'number' ||
+    typeof input.explanation !== 'string' ||
+    typeof input.tag !== 'string'
+  ) {
+    return null;
+  }
+
+  const options = input.options.filter((option): option is string => typeof option === 'string');
+
+  if (options.length < 2 || input.correctOptionIndex < 0 || input.correctOptionIndex >= options.length) {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    question: input.question,
+    options,
+    correctOptionIndex: input.correctOptionIndex,
+    explanation: input.explanation,
+    tag: input.tag,
+  };
+}
+
+function normalizeQuizDeck(input: unknown): QuizDeck | null {
+  if (!isRecord(input) || !isRecord(input.source) || !Array.isArray(input.questions)) {
+    return null;
+  }
+
+  const questions = input.questions.map(normalizeQuizQuestion);
+
+  if (questions.some((question) => !question)) {
+    return null;
+  }
+
+  return {
+    id: typeof input.id === 'string' ? input.id : crypto.randomUUID(),
+    taskId: typeof input.taskId === 'string' ? input.taskId : '',
+    taskTitle: typeof input.taskTitle === 'string' ? input.taskTitle : '',
+    title: typeof input.title === 'string' ? input.title : '',
+    durationMinutes: typeof input.durationMinutes === 'number' ? input.durationMinutes : 10,
+    createdAt: typeof input.createdAt === 'string' ? input.createdAt : new Date().toISOString(),
+    source: {
+      noteCharacters: typeof input.source.noteCharacters === 'number' ? input.source.noteCharacters : 0,
+      commentCount: typeof input.source.commentCount === 'number' ? input.source.commentCount : 0,
+    },
+    questions: questions as QuizQuestion[],
+    attempts: Array.isArray(input.attempts)
+      ? input.attempts.map(normalizeQuizAttempt).filter((attempt): attempt is QuizAttempt => Boolean(attempt))
+      : [],
+  };
+}
+
+function normalizeQuizAttempt(input: unknown): QuizAttempt | null {
+  if (!isRecord(input) || !isRecord(input.answers)) {
+    return null;
+  }
+
+  const answers: Record<string, number> = {};
+
+  for (const [questionId, answer] of Object.entries(input.answers)) {
+    if (typeof answer === 'number') {
+      answers[questionId] = answer;
+    }
+  }
+
+  return {
+    id: typeof input.id === 'string' ? input.id : crypto.randomUUID(),
+    startedAt: typeof input.startedAt === 'string' ? input.startedAt : new Date().toISOString(),
+    submittedAt: typeof input.submittedAt === 'string' ? input.submittedAt : null,
+    durationSeconds: typeof input.durationSeconds === 'number' ? input.durationSeconds : 600,
+    answers,
+    score: typeof input.score === 'number' ? input.score : null,
+    total: typeof input.total === 'number' ? input.total : 0,
+    submittedBy: input.submittedBy === 'user' || input.submittedBy === 'timeout' ? input.submittedBy : null,
+  };
+}
+
+function normalizeQuizzesByTask(input: unknown): Record<string, QuizDeck[]> | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const quizzes: Record<string, QuizDeck[]> = {};
+
+  for (const [taskId, rawValue] of Object.entries(input)) {
+    const rawDecks = Array.isArray(rawValue) ? rawValue : [rawValue];
+    const decks = rawDecks
+      .map((rawDeck, index) => {
+        const deck = normalizeQuizDeck(rawDeck);
+
+        if (!deck) {
+          return null;
+        }
+
+        return {
+          ...deck,
+          taskId: deck.taskId || taskId,
+          title: deck.title || `Bài trắc nghiệm ${index + 1}`,
+        };
+      })
+      .filter((deck): deck is QuizDeck => Boolean(deck));
+
+    if (decks.length > 0) {
+      quizzes[taskId] = decks;
+    }
+  }
+
+  return quizzes;
+}
+
+function normalizeRoadmapBackup(input: unknown): { progress: ProgressFile; comments: Record<string, NoteComment[]>; flashcards: Record<string, FlashcardDeck[]>; quizzes: Record<string, QuizDeck[]> } | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  const progress = normalizeProgress(input.progress ?? input);
+
+  if (!progress) {
+    return null;
+  }
+
+  const comments = input.comments === undefined ? readStoredComments() : normalizeCommentsByTask(input.comments);
+
+  if (!comments) {
+    return null;
+  }
+
+  const flashcards = input.flashcards === undefined ? readStoredFlashcards() : normalizeFlashcardsByTask(input.flashcards);
+
+  if (!flashcards) {
+    return null;
+  }
+
+  const quizzes = input.quizzes === undefined ? readStoredQuizzes() : normalizeQuizzesByTask(input.quizzes);
+
+  if (!quizzes) {
+    return null;
+  }
+
+  return {
+    progress,
+    comments,
+    flashcards,
+    quizzes,
+  };
 }
 
 function normalizeProgressItem(input: unknown): ProgressItem | null {
@@ -989,6 +1645,7 @@ function TaskNode({
 }) {
   const item = progress.items[task.id];
   const completed = Boolean(item?.completed);
+  const hasNote = Boolean(item?.note.trim());
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
   const descendants = flattenTasks(childTasks);
@@ -1108,6 +1765,16 @@ function TaskNode({
             {task.deliverable}
           </p>
 
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+            >
+              <ListTree className="h-3.5 w-3.5" />
+              Chi tiết task
+            </a>
+          </div>
+
           <div className="mt-3 rounded-lg border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -1151,10 +1818,22 @@ function TaskNode({
           </div>
 
           {effectivelyCompleted && (
-            <div className="mt-4 rounded-lg border border-emerald-100 bg-white p-3 dark:border-emerald-900/50 dark:bg-gray-950">
+            <div
+              className={cn(
+                'mt-4 rounded-lg border bg-white p-3 dark:bg-gray-950',
+                hasNote
+                  ? 'border-emerald-200 dark:border-emerald-900/60'
+                  : 'border-red-300 dark:border-red-800'
+              )}
+            >
               <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
-                  <StickyNote className="h-4 w-4 text-emerald-600" />
+                  <StickyNote
+                    className={cn(
+                      'h-4 w-4',
+                      hasNote ? 'text-emerald-600' : 'text-red-600'
+                    )}
+                  />
                   Note sau khi đã thực hiện
                 </label>
                 <a
@@ -1173,7 +1852,12 @@ function TaskNode({
                 onBlur={(event) => onNoteBlur(task.id, event.target.value)}
                 rows={3}
                 placeholder="Ghi lại nội dung đã học, link tài liệu, lỗi gặp phải, checklist cần ôn lại..."
-                className="min-h-24 w-full resize-y rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                className={cn(
+                  'min-h-24 w-full resize-y rounded-lg border bg-white p-3 text-sm text-gray-900 outline-none transition focus:ring-2 dark:bg-gray-900 dark:text-white',
+                  hasNote
+                    ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20 dark:border-emerald-800'
+                    : 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
+                )}
               />
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <span>
@@ -1272,6 +1956,55 @@ function getTaskDepthStyle(depth: number): string {
   return 'border-amber-200 bg-amber-50/40 dark:border-amber-900/70 dark:bg-amber-950/15';
 }
 
+function getTaskStudyState(task: RoadmapTask, progress: ProgressFile) {
+  const item = progress.items[task.id];
+  const completed = Boolean(item?.completed);
+  const descendants = flattenTasks(task.children ?? []);
+  const childCount = descendants.length;
+  const completedChildren = descendants.filter(
+    (child) => progress.items[child.id]?.completed
+  ).length;
+  const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
+  const effectivelyCompleted = completed || allChildrenCompleted;
+  const childProgressing = !effectivelyCompleted && completedChildren > 0;
+  const hasNote = Boolean(item?.note.trim());
+
+  return {
+    completed,
+    childCount,
+    completedChildren,
+    effectivelyCompleted,
+    childProgressing,
+    hasNote,
+  };
+}
+
+function matchesTaskStudyStatus(
+  task: RoadmapTask,
+  progress: ProgressFile,
+  statusFilter: StudyStatusFilter
+): boolean {
+  const studyState = getTaskStudyState(task, progress);
+
+  if (statusFilter === 'completed') {
+    return studyState.effectivelyCompleted;
+  }
+
+  if (statusFilter === 'incomplete') {
+    return !studyState.effectivelyCompleted && !studyState.childProgressing;
+  }
+
+  if (statusFilter === 'in-progress') {
+    return studyState.childProgressing;
+  }
+
+  if (statusFilter === 'with-note') {
+    return studyState.hasNote;
+  }
+
+  return true;
+}
+
 function buildLearningPrompt(task: RoadmapTask): string {
   return [
     'Bạn là mentor Backend/Senior Engineer, ưu tiên dạy lý thuyết và bản chất.',
@@ -1301,8 +2034,8 @@ function buildTaskIndex(tracks: RoadmapTrack[]): TaskIndex {
   }
 
   for (const track of tracks) {
-    for (const module of track.modules) {
-      walk(module.tasks, []);
+    for (const roadmapModule of track.modules) {
+      walk(roadmapModule.tasks, []);
     }
   }
 

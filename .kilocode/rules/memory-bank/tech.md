@@ -127,6 +127,8 @@ bun typecheck      # Run TypeScript type checking
 - Contact form handler
 - PDF/text/JSON export endpoints
 - Skill roadmap progress seed/local-dev JSON sync and optional GitHub backup endpoints
+- Markdown preview AI comment bridge at `/api/ai/comment`, using OpenAI-compatible chat completion APIs with user-supplied per-request API keys
+- AI flashcard generator at `/api/ai/flashcards`, using server-side env variables `AI_FLASHCARD_API_KEY`, `AI_FLASHCARD_BASE_URL`, and `AI_FLASHCARD_MODEL`; it accepts existing card fronts for anti-duplication and powers the dedicated `/skill-roadmap/tasks/[taskId]/flashcards` screen
 - Can be extended for additional functionality
 
 ### Browser Support
@@ -166,6 +168,7 @@ bun typecheck      # Run TypeScript type checking
 
 - None required for base template
 - Add as needed for analytics, form integrations
+- Task flashcard generation requires `AI_FLASHCARD_API_KEY`, `AI_FLASHCARD_BASE_URL`, and `AI_FLASHCARD_MODEL`; values stay server-side and are not exposed to browser JavaScript. Flashcard storage uses `skill-roadmap-flashcards:v1` as `Record<taskId, FlashcardDeck[]>`, with normalizers still accepting the older `Record<taskId, FlashcardDeck>` shape.
 
 ## Development Workflow
 
