@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "exportedAt": "2026-06-20T07:24:07.860Z",
+  "exportedAt": "2026-06-20T15:01:42.757Z",
   "progress": {
     "updatedAt": "2026-06-20T07:23:21.763Z",
     "items": {
@@ -486,7 +486,108 @@
       }
     }
   },
-  "comments": {},
+  "comments": {
+    "java-001": [
+      {
+        "id": "fdb5573b-c9e7-45ff-93a5-511157775f3a",
+        "parentId": null,
+        "author": "user",
+        "body": "tóm lược toàn bộ lý thuyết cơ bản cần nắm vững",
+        "createdAt": "2026-06-20T08:37:58.014Z"
+      },
+      {
+        "id": "2d37ae74-ff48-47c7-b15b-e985c7880baf",
+        "parentId": "fdb5573b-c9e7-45ff-93a5-511157775f3a",
+        "author": "ai",
+        "body": "<think>\nThe user is asking me to summarize all the basic theory that needs to be mastered. Looking at the context, this is a review/discussion of a Markdown note covering OOP, SOLID, Immutable object, Defensive copying, equals/hashCode, and Entity/Value Object/DTO concepts from a Backend/Senior Engineer perspective.\n\nLet me create a comprehensive summary in Vietnamese, organized clearly, focusing on the key theoretical points that need to be mastered. I should structure it well and focus on the practical backend perspective as the original note does.\n\nThe user's question is \"tóm lược toàn bộ lý thuyết cơ bản cần nắm vững\" - summarize all the basic theory that needs to be mastered.\n\nI'll structure the summary around the 4 main pillars from the note:\n1. OOP & SOLID (foundation)\n2. Identity vs Value (Entity vs Value Object)\n3. Immutability & Defensive Copying\n4. equals/hashCode contract\n5. DTO as boundary\n\nLet me make it concise but comprehensive, with the senior engineer perspective.</think>\n\n# Tóm lược lý thuyết cần nắm vững (góc nhìn Backend/Senior)\n\nTrọng tâm không phải nhớ định nghĩa, mà trả lời được 4 câu hỏi cho **mỗi object**:\n1. **Đại diện cho cái gì?** (identity hay value?)\n2. **So sánh bằng gì?** (id, toàn bộ field, hay không quan trọng?)\n3. **Có bị mutate không?** (immutable hay mutable?)\n4. **Có nên expose ra boundary không?** (DTO hay không?)\n\n---\n\n## 1. Nền tảng OOP & SOLID\n\n### OOP — 4 tính chất cốt lõi\n\n| Tính chất | Ý nghĩa thực tế backend |\n|---|---|\n| **Encapsulation** | Che state, chỉ đổi qua method hợp lệ |\n| **Abstraction** | Gọi qua interface/hợp đồng |\n| **Inheritance** | Quan hệ `is-a` (dùng hạn chế, ưu tiên composition) |\n| **Polymorphism** | Cùng interface, nhiều implementation |\n\n### SOLID — 5 nguyên lý\n\n| Nguyên lý | Hiểu ngắn |\n|---|---|\n| **SRP** | 1 class = 1 lý do để đổi |\n| **OCP** | Mở rộng bằng code mới, hạn chế sửa code cũ |\n| **LSP** | Subclass thay thế được superclass, không phá hợp đồng |\n| **ISP** | Interface nhỏ, đúng nhu cầu client |\n| **DIP** | Phụ thuộc abstraction, không phụ thuộc concrete |\n\n---\n\n## 2. Phân biệt Entity / Value Object / DTO\n\nĐây là phần **dễ bị trộn sai nhất** trong thực tế.\n\n| Tiêu chí | Entity | Value Object | DTO |\n|---|---|---|---|\n| Identity | **Có** (id) | Không | Không quan trọng |\n| So sánh bằng | `id` / business key | Toàn bộ value | Thường không cần |\n| Mutable? | Có thể | **Nên immutable** | Record / mutable OK |\n| Lifecycle | Có | Không | Không |\n| Business rule | Có | Có, nhỏ & tập trung | **Không nên** |\n| Persistence | `@Entity` | `@Embeddable` | Không |\n| API contract | **Không nên expose** | Có thể nằm trong DTO | **Dùng cho cái này** |\n| Ví dụ | `Order`, `User` | `Money`, `Email`, `Address` | `CreateUserRequest`, `UserResponse` |\n\n**Nguyên tắc vàng:**\n- Entity = domain + persistence → không bao giờ trả thẳng ra API\n- DTO = contract truyền dữ liệu qua boundary → tách khỏi entity\n- Value Object = khái niệm theo giá trị → `Money(100, USD)` ở đâu cũng là `Money(100, USD)`\n\n---\n\n## 3. Immutability & Defensive Copying\n\n### Immutable object — 4 nguyên tắc\n\n1. Không setter\n2. Field `final`\n3. Validate trong constructor\n4. **Defensive copy** mọi object mutable bên trong (List, Map, Date…)\n\n**Ví dụ chuẩn:** `Money`, `Email`, `LocalDate`\n\n**Trade-off thực tế:**\n- ✅ Thread-safe tự nhiên, dùng làm key an toàn, dễ cache, dễ test\n- ❌ Tạo object mới khi \"thay đổi\" → tốn allocation (thường chấp nhận được)\n\n### Defensive copying — bảo vệ cái gì?\n\n> `final` chỉ bảo vệ **reference**, **KHÔNG** bảo vệ nội dung bên trong.\n\n```java\n// Nguy hiểm: roles là final, nhưng list vẫn bị mutate được\nprivate final List<String> roles = new ArrayList<>(inputRoles);\n\n// Cách 1: Defensive copy khi nhận vào & trả ra\nthis.roles = new ArrayList<>(inputRoles);\npublic List<String> getRoles() { return new ArrayList<>(roles); }\n\n// Cách 2: Immutable collection (Collections.unmodifiableList, List.copyOf, List.of...)\n```\n\n---\n\n## 4. equals/hashCode contract\n\n### Quy tắc bắt buộc\n\n> Nếu `a.equals(b) == true` → `a.hashCode() == b.hashCode()` **(bắt buộc)**\n> Ngược lại: cùng hashCode **chưa chắc** equals true (collision là bình thường)\n\n### HashMap/HashSet hoạt động thế nào?\n\n1. Tính `hashCode()` → xác định **bucket**\n2. Trong bucket, dùng `equals()` để so sánh key\n3. Nếu hashCode đổi sau khi put → object \"mất tích\" trong map (lỗi kinh điển)\n\n### Áp dụng\n\n| Loại object | equals/hashCode dựa trên |\n|---|---|\n| **Entity** | `id` / business key (cẩn thận generated id) |\n| **Value Object** | Tất cả field quan trọng |\n| **DTO** | Thường không cần override |\n\n**Best practice hiện đại (Java 16+):** dùng `record` cho Value Object/DTO, IDE/Lombok `@Value`/`@EqualsAndHashCode` cho entity.\n\n---\n\n## 5. Mindmap tổng hợp — khi thiết kế 1 object, tự hỏi:\n\n```\nObject này có identity không?\n├── Có  → ENTITY\n│        ├── equals/hashCode theo id\n│        ├── có thể mutable\n│        └── KHÔNG expose ra API\n│\n└── Không → so sánh bằng value?\n    ├── Có  → VALUE OBJECT\n    │        ├── equals/hashCode theo tất cả field\n    │        ├── IMMUTABLE\n    │        └── có thể defensive copy nội bộ\n    │\n    └── Không → DTO\n             ├── dùng cho API/Message/Layer boundary\n             ├── KHÔNG chứa business logic\n             └── record class là lựa chọn tốt\n```\n\n---\n\n## 6. Lỗi kinh điển cần tránh (hay hỏi phỏng vấn senior)\n\n| # | Lỗi | Hậu quả |\n|---|---|---|\n| 1 | Trả entity thẳng ra API | Lộ field nhạy cảm, khó evolve schema |\n| 2 | Dùng field thường cho Value Object | Mất ý nghĩa \"giá trị\" |\n| 3 | `final List` mà không defensive copy | Bị mutate từ bên ngoài |\n| 4 | Override `equals` mà quên `hashCode` | Hoạt động sai trong HashMap/HashSet |\n| 5 | Đổi field dùng trong `hashCode` sau khi put vào Map | Object \"biến mất\" |\n| 6 | Entity equals dựa trên toàn bộ field | Trùng user khác id → sai identity |\n| 7 | DTO chứa business logic | Vi phạm SRP, khó test |\n\n---\n\n**Một câu tóm tất cả:**\n> *Trong backend, thiết kế object tốt nghĩa là chọn đúng loại (Entity/Value Object/DTO), so sánh đúng cách (id hay value), giữ đúng tính bất biến (immutable + defensive copy), và đặt đúng chỗ (boundary hay internal).*",
+        "createdAt": "2026-06-20T08:37:58.014Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      }
+    ],
+    "java-001.oop.encapsulation": [
+      {
+        "id": "0cf2858e-ecef-48e9-86ff-83cf5c9b91d2",
+        "parentId": null,
+        "author": "user",
+        "body": "tôi thường sử dụng các hàm setter hoặc sử dụng Lombok trong các object dto/entity/... còn logic xử lý/validate tôi xử lý tại các service. như vậy là đúng hay sai với tính chất đóng gói?",
+        "createdAt": "2026-06-20T09:19:21.390Z"
+      },
+      {
+        "id": "3a32a1b5-0534-4857-9aac-2738c6575bf6",
+        "parentId": "0cf2858e-ecef-48e9-86ff-83cf5c9b91d2",
+        "author": "ai",
+        "body": "<think>\nNgười dùng hỏi: dùng setter/Lombok cho DTO/Entity và để logic validate ở Service thì đúng hay sai với tính đóng gói?\n\nĐây là câu hỏi rất hay và thực tế. Cần trả lời theo context của note đã cung cấp.\n\nTheo note:\n- Encapsulation đúng nghĩa là bảo vệ invariant\n- Với DTO: thường chỉ là object vận chuyển dữ liệu, không nhất thiết phải có method nghiệp vụ, dùng Bean Validation\n- Với domain object: nên giữ invariant chặt, ưu tiên method nghiệp vụ hơn setter\n- Với Entity: dùng constructor rỗng protected, hạn chế setter public\n- Setter có thể nguy hiểm vì thay đổi từng field riêng lẻ, invariant liên quan nhiều field\n\nVậy câu trả lời:\n- Với DTO: việc dùng setter/Lombok là chấp nhận được, không sai encapsulation vì DTO không chứa invariant nghiệp vụ\n- Với Entity: cần cẩn thận hơn, nên hạn chế setter, dùng method nghiệp vụ\n- Với Domain Object (Business Object): sai, nên đưa logic vào trong object\n- Để validate ở Service không sai hoàn toàn nhưng có trade-off: mất tính tự bảo vệ, khó tái sử dụng\n\nTôi nên trả lời có cấu trúc, phân loại rõ theo từng loại object, đưa ra khuyến nghị cụ thể, có ví dụ minh họa.\n\nFormat: dùng markdown, có heading rõ ràng, ví dụ code, tóm tắt cuối.</think>\n\n# Đánh giá: Setter/Lombok cho DTO/Entity + validate ở Service\n\n## Câu trả lời ngắn\n\n**Không hoàn toàn sai, nhưng cũng không phải lúc nào cũng đúng** — phụ thuộc vào **loại object** bạn đang dùng.\n\nTheo note, nguyên tắc cốt lõi của encapsulation không phải \"có setter hay không\", mà là:\n\n> *Object có tự bảo vệ được invariant của chính nó hay không.*\n\nNếu object **không có invariant nghiệp vụ** (ví dụ DTO) thì việc dùng setter/Lombok hoàn toàn OK. Nếu object **có invariant nghiệp vụ** (domain object, entity phức tạp) thì để validate ở Service là chưa đủ chặt.\n\n---\n\n## Phân tích theo từng loại object\n\n### 1. DTO (Data Transfer Object) — Dùng setter/Lombok là **chấp nhận được**\n\nTheo note mục 4.2:\n\n> *\"DTO thường chỉ là object vận chuyển dữ liệu. Không nhất thiết DTO phải có nhiều method nghiệp vụ.\"*\n\nLý do:\n- DTO là \"cục data\" đi từ layer này sang layer khác\n- Nó **không chứa rule nghiệp vụ** → không có invariant cần bảo vệ\n- Validate có thể làm ở Bean Validation (`@NotNull`, `@Size`...) hoặc ở Service\n\nVí dụ OK:\n```java\n@Data // Lombok generate getter/setter\npublic class CreateUserRequest {\n    @NotBlank\n    private String name;\n    \n    @Email\n    private String email;\n}\n```\n\n→ Ở đây setter public không vi phạm gì cả, vì DTO không có invariant nào cần bảo vệ.\n\n---\n\n### 2. Entity (đặc biệt entity nghiệp vụ) — **Cần cẩn thận hơn**\n\nTheo note mục 4.1 và Câu hỏi 7:\n\n> *\"Entity JPA thường cần constructor rỗng `protected`, nhưng public setter cho mọi field là nguy hiểm.\"*\n\nVấn đề của việc để setter mở toang ở Entity:\n\n```java\n@Entity\n@Data // Lombok generate hết setter\npublic class Wallet {\n    private BigDecimal balance;\n    private WalletStatus status;\n}\n\n// Ở một service khác, ai đó gọi:\nwallet.setBalance(BigDecimal.valueOf(-1000)); // âm tiền, nhưng không ai chặn\n```\n\nEntity thường **có invariant** (balance ≥ 0, status hợp lệ, quan hệ giữa các field...). Nếu setter mở toang, bất kỳ service nào cũng có thể phá invariant.\n\nCách tốt hơn (theo note):\n```java\n@Entity\npublic class Wallet {\n    private BigDecimal balance;\n    private WalletStatus status;\n    \n    protected Wallet() {} // cho JPA\n    \n    public void withdraw(BigDecimal amount) {\n        if (amount.signum() <= 0) throw new IllegalArgumentException();\n        if (balance.compareTo(amount) < 0) throw new InsufficientException();\n        this.balance = this.balance.subtract(amount);\n    }\n}\n```\n\n→ Logic validate nằm **ngay trong entity**, không phải chờ Service bên ngoài.\n\n---\n\n### 3. Domain Object (Business Object) — **Sai tư duy nếu để logic ở Service**\n\nĐây là chỗ dễ sai nhất. Ví dụ theo note mục 3.3 và Câu hỏi 4:\n\n**Cách sai (để ở Service):**\n```java\n@Service\npublic class OrderService {\n    public void cancel(Order order, String reason) {\n        if (order.getStatus() == OrderStatus.SHIPPED) {\n            throw new IllegalStateException(\"Cannot cancel\");\n        }\n        order.setStatus(OrderStatus.CANCELLED);\n        order.setCancelReason(reason);\n    }\n}\n```\n\n**Cách đúng (để trong object):**\n```java\npublic class Order {\n    public void cancel(String reason) {\n        if (this.status == OrderStatus.SHIPPED) {\n            throw new IllegalStateException(\"Cannot cancel\");\n        }\n        this.status = OrderStatus.CANCELLED;\n        this.cancelReason = reason;\n    }\n}\n```\n\nVì sao để ở Service là chưa đủ:\n- Rule \"không cancel khi đã SHIPPED\" là **bản chất của Order**, không phải của Service\n- Nếu có Service khác cũng tạo Order, rule sẽ bị **lặp lại** hoặc **quên**\n- Test cho Order phải test qua Service, không test trực tiếp được\n\n---\n\n## Để validate ở Service có sai không?\n\n**Không sai tuyệt đối, nhưng có 3 vấn đề** theo tinh thần note:\n\n| Vấn đề | Giải thích |\n|--------|------------|\n| **Mất khả năng tự bảo vệ** | Object trở thành \"bao chứa dữ liệu\" thụ động, phải nhờ Service bảo vệ |\n| **Rule bị phân tán** | Cùng 1 rule có thể có ở nhiều Service, dễ lặp, dễ quên |\n| **Khó tái sử dụng** | Object không dùng được ở context khác nếu không kèm Service tương ứng |\n\nTheo note mục 3.2:\n\n> *\"Mọi thay đổi balance đều tập trung tại một chỗ. Dễ debug, dễ test, dễ audit.\"*\n\n---\n\n## Khuyến nghị thực tế (phù hợp với note)\n\n| Loại object | Setter/Lombok | Validate ở đâu |\n|-------------|---------------|----------------|\n| **Request/Response DTO** | OK, dùng thoải mái | Bean Validation hoặc Service |\n| **View/Projection DTO** | OK, có thể dùng `record` | Không cần |\n| **Entity chỉ để map DB, không có rule** | Hạn chế setter, dùng `protected` | Có thể ở Service |\n| **Entity/Domain có rule nghiệp vụ** | **Hạn chế setter**, dùng method nghiệp vụ | **Trong object** |\n\n---\n\n## Tóm lại\n\nCách bạn đang làm **không sai** nếu chỉ áp dụng cho DTO và entity \"mỏng\". Nhưng nếu áp dụng **một cách máy móc** cho mọi object, kể cả domain object, thì:\n\n- Đã **hy sinh encapsulation** (object không tự bảo vệ mình)\n- Đã **trộn logic nghiệp vụ vào Service** (mà lẽ ra nó thuộc về object)\n- Đã **tạo ra \"anemic domain model\"** — anti-pattern khá nổi tiếng\n\nCâu châm ngôn từ note:\n\n> *\"Encapsulation tốt là thiết kế object sao cho trạng thái bên trong luôn hợp lệ, thay đổi phải đi qua method có kiểm soát, và method nên thể hiện ý nghĩa nghiệp vụ thay vì chỉ set dữ liệu.\"*\n\n→ Lombok/setter là **công cụ**, không phải bản chất. Dùng cho DTO thì OK, dùng cho domain object thì cần cân nhắc.",
+        "createdAt": "2026-06-20T09:19:21.390Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "febfad06-e6c8-4697-bc8c-fe2898262224",
+        "parentId": null,
+        "author": "user",
+        "body": "object mutable là gì?",
+        "createdAt": "2026-06-20T09:51:51.038Z"
+      },
+      {
+        "id": "b3406599-6aa9-4a15-b43c-4a98b6484eb9",
+        "parentId": "febfad06-e6c8-4697-bc8c-fe2898262224",
+        "author": "ai",
+        "body": "<think>\nThe user is asking about \"object mutable là gì?\" (What is a mutable object?) based on the context of the note about Encapsulation in Java. This is a follow-up question to the discussion.\n\nLooking at the note, mutable objects are mentioned in several places:\n- Section 5, Question 5: \"Đặc biệt khi getter trả về object mutable\" (Especially when getter returns a mutable object)\n- Section 6.3: Example about getter exposing mutable state (`getItems()` returning a List that can be modified externally)\n\nI should answer in Vietnamese, clearly and structured, focusing on the question. I need to:\n1. Define what a mutable object is\n2. Explain why it matters in the context of encapsulation\n3. Reference the note's examples to make it concrete\n4. Mention the contrast with immutable objects (which is also mentioned in the note - Câu 8)\n\nLet me structure the answer:\n1. Định nghĩa mutable object\n2. Đặc điểm nhận biết\n3. Vì sao liên quan đến encapsulation (vì getter có thể trả về mutable object → phá invariant)\n4. Ví dụ cụ thể từ note\n5. So sánh với immutable object\n6. Cách xử lý\n\nI should be clear, use examples, and tie back to the note content.</think>\n\n## Mutable object là gì?\n\n**Mutable object** (đối tượng có thể thay đổi được) là object mà **trạng thái bên trong của nó có thể bị thay đổi sau khi đã được tạo ra**.\n\nNói đơn giản: một khi bạn đã `new` xong, bạn vẫn có thể gọi method trên object đó để sửa dữ liệu bên trong.\n\n### 1. Đặc điểm nhận biết\n\nMột object là mutable khi nó có method làm thay đổi state nội bộ, ví dụ:\n\n- `setter` (ví dụ `setName()`, `setBalance()`)\n- method `add`, `remove`, `clear` trên collection\n- method sửa trực tiếp field (`this.age = age`)\n\nVí dụ điển hình trong Java:\n- Hầu hết các class thường (POJO, entity) → **mutable**\n- `StringBuilder`, `ArrayList`, `HashMap` → **mutable**\n- `String`, `Integer`, `LocalDate`, `List.of(...)` → **immutable** (không thể sửa sau khi tạo)\n\n### 2. Vì sao mutable object liên quan đến encapsulation?\n\nĐây là điểm mà note nhấn mạnh ở **Câu 5 và Ví dụ 6.3**: một object có thể bị \"phá từ bên ngoài\" thông qua getter.\n\nVí dụ từ note:\n\n```java\npublic class Order {\n    private List<Item> items = new ArrayList<>();\n\n    public List<Item> getItems() {\n        return items;   // trả về reference trực tiếp\n    }\n}\n```\n\n`Order` có field `items` được `private`, tưởng như đã đóng gói tốt. Nhưng getter lại trả về chính `List` nội bộ. Vì `ArrayList` là **mutable**, bên ngoài có thể làm:\n\n```java\norder.getItems().add(newItem);   // thêm item trực tiếp\norder.getItems().clear();        // xóa sạch\n```\n\n→ Trạng thái bên trong `Order` bị thay đổi mà `Order` không hề biết, **invariant bị phá**.\n\n### 3. So sánh với immutable object\n\n| Mutable | Immutable |\n|---|---|\n| Có thể đổi state sau khi tạo | Không thể đổi state sau khi tạo |\n| Cần cẩn thận khi share reference | An toàn khi share reference |\n| Khó bảo vệ invariant | Invariant gần như \"tự bảo vệ\" |\n| Ví dụ: `ArrayList`, POJO | Ví dụ: `String`, `LocalDate`, `record`, `List.of(...)` |\n\nNote có đề cập ở **Câu 8**: *immutable object là một dạng encapsulation mạnh*, vì sau khi tạo không ai sửa được → invariant không thể bị phá.\n\n### 4. Cách xử lý khi bắt buộc phải có mutable object bên trong\n\nTheo note, có hai cách phổ biến:\n\n**Cách 1: Trả về bản copy (defensive copy):**\n\n```java\npublic List<Item> getItems() {\n    return new ArrayList<>(items);   // copy, không lộ reference gốc\n}\n```\n\n**Cách 2: Trả về unmodifiable view:**\n\n```java\npublic List<Item> getItems() {\n    return Collections.unmodifiableList(items);\n}\n```\n\nCả hai cách đều biến getter từ \"cửa sổ nhìn thẳng vào bên trong\" thành \"cổng kiểm soát\", đúng tinh thần encapsulation mà note đã nói.\n\n### Tóm lại\n\n> **Mutable object** = object có thể bị thay đổi nội dung sau khi tạo.\n> Trong encapsulation, vấn đề không phải là *có dùng mutable object hay không*, mà là **có để bên ngoài chạm vào được mutable state đó qua getter hay không**. Nếu để lộ → encapsulation vỡ. Nếu copy hoặc đóng băng lại → encapsulation vẫn vững.",
+        "createdAt": "2026-06-20T09:51:51.038Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "8324f40f-8ec1-4e01-afae-e522d24d72cd",
+        "parentId": null,
+        "author": "user",
+        "body": "So sánh Collections.unmodifiableList và List.copyOf",
+        "createdAt": "2026-06-20T10:07:19.027Z"
+      },
+      {
+        "id": "72507d16-0ada-4043-b37d-ac18ccec840d",
+        "parentId": "8324f40f-8ec1-4e01-afae-e522d24d72cd",
+        "author": "ai",
+        "body": "<think>\nThe user is asking about comparing `Collections.unmodifiableList` and `List.copyOf` in the context of the Markdown note about Encapsulation. The note mentions these in section 6.3 about getter exposing mutable state, and the fix involves either using `Collections.unmodifiableList` or `List.copyOf` (though the actual code blocks were truncated, the context is clear).\n\nLet me provide a clear, structured comparison in Vietnamese, focused on the question.\n\nKey differences I know:\n\n1. **Source of input**:\n   - `Collections.unmodifiableList(List<? extends T>)`: Wraps an existing list. It creates a view that delegates to the original list. If the original list changes, the unmodifiable view reflects those changes (but you can't modify through the view).\n   - `List.copyOf(Collection<? extends E>)`: Creates an independent copy. Changes to the original list after copying do NOT affect the new list.\n\n2. **Null handling**:\n   - `Collections.unmodifiableList`: Does NOT allow null elements? Actually, it does allow null elements if the original list contains them. Wait, let me check. `Collections.unmodifiableList` does allow null elements in the underlying list. Actually, looking at the docs: \"The returned list is serializable. Attempts to modify the returned list... result in UnsupportedOperationException. The iterator returned by the iterator method of the returned list is a fail-fast iterator... The returned list allows null elements.\"\n   - `List.copyOf`: Does NOT allow null elements. It throws NullPointerException if any element is null.\n\n3. **Null collection**:\n   - `Collections.unmodifiableList`: Returns null if the input is null (or throws NPE depending on version? Actually it returns null for null input - I think it returns the passed null directly. Let me verify... Actually no, looking at the source, `Collections.unmodifiableList(null)` returns null. Some versions throw NPE. Hmm, let me be careful here.)\n   - `List.copyOf`: Throws NullPointerException if the input collection is null.\n\n4. **Empty list handling**:\n   - Both can return `Collections.emptyList()` for empty input? Actually `List.copyOf` returns `ImmutableCollections.EMPTY_LIST` (or similar) which might be the same as `Collections.emptyList()`.\n   - `Collections.unmodifiableList` on an empty list returns `Collections.emptyList()` (this is an optimization in Java source).\n\n5. **Type**:\n   - `Collections.unmodifiableList` returns a `List<T>` that is a view (wrapper).\n   - `List.copyOf` returns an immutable list, specifically `ImmutableCollections.ListN` or similar internal class.\n\n6. **Performance**:\n   - `Collections.unmodifiableList`: O(1) operation - just wraps.\n   - `List.copyOf`: O(n) operation - copies all elements.\n\n7. **Mutation**:\n   - Both throw `UnsupportedOperationException` on modification attempts.\n   - But `Collections.unmodifiableList` reflects changes in the underlying list (it's a live view).\n   - `List.copyOf` is a snapshot - independent of the original.\n\n8. **Use case**:\n   - `Collections.unmodifiableList`: When you want a read-only view of an existing list, but the original list might still change and you want to see those changes.\n   - `List.copyOf`: When you want a true snapshot/independent immutable copy.\n\n9. **Thread safety**:\n   - Neither is fully thread-safe by itself.\n   - `Collections.unmodifiableList` is NOT thread-safe because the underlying list might be modified by other threads (and the unmodifiable wrapper is just for read-only access, not concurrent access). To get thread safety, you'd need `Collections.unmodifiableList(...)` wrapped around a synchronized list, or similar.\n   - `List.copyOf` creates an immutable copy, so once created, the list itself is safe to read from multiple threads (assuming the elements themselves are immutable or safely published).\n\n10. **Since when available**:\n    - `Collections.unmodifiableList`: Java 1.2 (Collections framework introduction).\n    - `List.copyOf`: Java 10 (part of the varargs and collection factory methods).\n\n11. **Defensive copy semantics**:\n    - In encapsulation context, `List.copyOf` is often preferred for defensive copying because it gives a true independent copy.\n    - `Collections.unmodifiableList` is more lightweight but doesn't protect against the original being mutated externally.\n\n12. **Serialization**:\n    - Both are serializable if the elements are serializable.\n    - The unmodifiable wrapper is serializable, and so is the immutable list returned by List.copyOf.\n\nLet me structure the response clearly. The user is asking specifically to compare these two, in the context of encapsulation where they want to prevent external code from modifying internal list state.\n\nI should:\n1. Briefly explain each\n2. Compare them on key dimensions\n3. Recommend which to use in the encapsulation context from the note\n4. Be honest about any assumptions\n\nThe note's context: getter returns a list, and external code could modify it. Both `Collections.unmodifiableList` and `List.copyOf` are solutions. Let me explain the difference clearly.\n\nLet me formatthis well.</think>\n\n# So sánh `Collections.unmodifiableList` và `List.copyOf`\n\n## 1. Bản chất khác nhau\n\n| Tiêu chí | `Collections.unmodifiableList(list)` | `List.copyOf(collection)` |\n|----------|--------------------------------------|---------------------------|\n| **Loại kết quả** | Trả về **view (lớp bọc)** bao quanh list gốc | Trả về **bản copy độc lập** (snapshot) |\n| **Quan hệ với list gốc** | Vẫn \"nhìn xuyên\" vào list gốc | Hoàn toàn tách biệt khỏi list gốc |\n| **Độ phức tạp tạo** | O(1) – chỉ wrap | O(n) – phải duyệt và copy từng phần tử |\n| **Thay đổi list gốc sau khi tạo** | View phản ánh thay đổi của list gốc | Không bị ảnh hưởng |\n\n## 2. Xử lý null\n\n- **`Collections.unmodifiableList`**: \n  - Cho phép phần tử null bên trong list gốc (nếu list gốc có null thì view vẫn có null).\n  - Với input null: trả về null (một số mô tả cũ nói vậy). **Giả định**: hành vi này có thể khác nhau theo phiên bản JDK; an toàn nhất là không truyền null.\n\n- **`List.copyOf`**: \n  - **Không cho phép phần tử null** – ném `NullPointerException` ngay khi gặp phần tử null.\n  - Input null → ném `NullPointerException`.\n\n## 3. Hành vi khi cố sửa\n\nCả hai đều ném `UnsupportedOperationException` khi gọi `add`, `remove`, `set`, `clear`... Nhưng:\n\n- `unmodifiableList`: nếu list gốc bị sửa từ nơi khác, view sẽ \"thấy\" sự thay đổi đó.\n- `List.copyOf`: list mới là bất biến thực sự – không ai (kể cả code nắm giữ list gốc) sửa được nó sau khi copy.\n\n## 4. Thread-safety\n\n- **`Collections.unmodifiableList`**: KHÔNG đảm bảo thread-safe. Vì list gốc có thể bị thread khác sửa, view chỉ là \"cửa sổ đọc\" chứ không đồng bộ hóa.\n- **`List.copyOf`**: Kết quả là immutable, nên an toàn để **đọc** từ nhiều thread (với điều kiện các phần tử bên trong cũng được publish an toàn).\n\n## 5. Phiên bản Java\n\n- `Collections.unmodifiableList`: từ Java 1.2\n- `List.copyOf`: từ Java 10\n\n## 6. Mapping với bài toán encapsulation trong note\n\nTrong note, vấn đề là getter trả về list nội bộ → bên ngoài sửa trực tiếp, phá trạng thái object. Hai giải pháp:\n\n```java\n// Cách A: trả view read-only\npublic List<Item> getItems() {\n    return Collections.unmodifiableList(items);\n}\n```\n→ Rẻ (O(1)), nhưng **không an toàn nếu `items` còn được nơi khác tham chiếu** và bị sửa ở nơi khác. View sẽ phản ánh sự thay đổi đó.\n\n```java\n// Cách B: trả bản copy\npublic List<Item> getItems() {\n    return List.copyOf(items);\n}\n```\n→ Tốn O(n) mỗi lần gọi getter, nhưng **bên ngoài nhận một snapshot độc lập**, không ai sửa được, và không bị ảnh hưởng bởi thay đổi tương lai của list nội bộ.\n\n## 7. Khuyến nghị theo ngữ cảnh\n\n| Ngữ cảnh | Nên dùng |\n|----------|----------|\n| DTO/response, danh sách nhỏ, muốn chắc chắn bên ngoài không sửa được và không bị \"rò rỉ\" thay đổi tương lai | `List.copyOf` |\n| Performance quan trọng, list rất lớn, list gốc là immutable hoặc được quản lý cẩn thận | `Collections.unmodifiableList` |\n| Muốn một đối tượng immutable hoàn toàn (như value object) | `List.copyOf` + giữ `items` là `final` |\n| Cần list cho thread đọc đồng thời | `List.copyOf` |\n\n## 8. Tóm gọn một câu\n\n> `Collections.unmodifiableList` = **chặn sửa từ bên ngoài**, nhưng vẫn \"nhìn\" vào dữ liệu gốc. `List.copyOf` = **chặn sửa từ mọi phía** và tạo bản sao độc lập.\n\n---\n\n**Giả định đã nêu**: hành vi xử lý input null của `Collections.unmodifiableList` được mô tả dựa trên tài liệu phổ biến; nếu bạn cần chính xác tuyệt đối theo JDK đang dùng, nên kiểm tra trực tiếp vì một số phiên bản có thể khác.",
+        "createdAt": "2026-06-20T10:07:19.027Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "eeefe59d-fe6e-4f44-b1a9-2d20c4f1da03",
+        "parentId": null,
+        "author": "user",
+        "body": "Nếu Entity JPA có không có setter public thì khi ánh xạ dữ liệu từ database vào entity có nhận được dữ liệu không?",
+        "createdAt": "2026-06-20T10:15:39.044Z"
+      },
+      {
+        "id": "ed86d889-a23d-4dac-a0a9-9a58d713796c",
+        "parentId": "eeefe59d-fe6e-4f44-b1a9-2d20c4f1da03",
+        "author": "ai",
+        "body": "<think>\nThe user is asking a specific question about JPA entities: If a JPA Entity doesn't have public setters, will it still be able to receive data when mapping from the database?\n\nThis is a technical Java/JPA question. Let me think about this carefully based on my knowledge.\n\nIn JPA (Java Persistence API), when Hibernate (or other JPA providers) maps data from a database row to an entity object, it uses several mechanisms:\n\n1. **Field access vs Property access**: JPA supports two access types:\n   - **Field access** (default if `@Id` is on a field): JPA uses reflection to directly access fields, even if they are `private`. It bypasses getters/setters.\n   - **Property access** (default if `@Id` is on a getter): JPA uses getters/setters to read and write data.\n\n2. **How field access works**: When using field access, Hibernate uses reflection to set field values directly, so it doesn't need public setters. It can access `private` fields directly.\n\n3. **How property access works**: When using property access, JPA needs getters and setters (or at least the setters) to set values.\n\n4. **Mixed access**: You can mix access types using `@Access(AccessType.FIELD)` or `@Access(AccessType.PROPERTY)` annotations.\n\nSo the answer is: **Yes, it's still possible**. If the entity uses field access (which is common when `@Id` is placed on a field), JPA can set the field values directly via reflection without needing public setters.\n\nLet me also note:\n- The JPA spec requires a no-arg constructor (can be protected or public, but not private in most cases)\n- Hibernate specifically uses reflection to access fields, so private fields are fine\n- You can also use `protected` setters with property access if needed\n\nLet me write a clear answer in Vietnamese, structured well.\n\nThe note provided mentions:\n- Entity JPA often needs an empty constructor `protected`\n- Public setter for every field is dangerous\n- Better way: limit setters, or use `private/protected`, or only open when really needed\n\nSo the note already hints at the answer. I should expand on this with more detail.\n\nKey points to cover:\n1. Yes, JPA can still map data without public setters\n2. Explain field access vs property access\n3. How Hibernate uses reflection\n4. Best practices for JPA entities\n5. Show example code\n\nLet me structure my response:\n\n## Trả lời ngắn\nYes, JPA vẫn có thể ánh xạ dữ liệu vào entity mà không cần setter public.\n\n## Giải thích cơ chế\n- Field access vs Property access\n- Reflection mechanism\n\n## Ví dụ code\n\n## Best practices\n\n## Liên hệ với note\n\nLet me write this out properly.</think>\n\n# Trả lời: JPA Entity không có setter public thì có nhận được dữ liệu không?\n\n## Câu trả lời ngắn\n\n**Có, vẫn nhận được dữ liệu bình thường.** JPA (cụ thể là Hibernate) có thể gán giá trị vào `private field` trực tiếp qua **reflection**, không nhất thiết phải đi qua setter.\n\n---\n\n## Giải thích cơ chế\n\nJPA hỗ trợ **hai kiểu truy cập (access type)**:\n\n| Access Type | Cách JPA đọc/ghi | Cần setter không? |\n|-------------|------------------|-------------------|\n| **Field access** | Truy cập trực tiếp vào field qua reflection | ❌ Không cần setter |\n| **Property access** | Đi qua getter/setter | ✅ Cần setter |\n\n### 1. Field access (phổ biến nhất)\n\nJPA tự quyết định dựa vào vị trí annotation `@Id`:\n\n- Nếu `@Id` đặt trên **field** → mặc định dùng **field access**\n- Nếu `@Id` đặt trên **getter** → mặc định dùng **property access**\n\nVới field access, Hibernate dùng reflection để gọi `Field.setAccessible(true)` rồi gán giá trị thẳng vào field, bất kể field đó `private`, `protected` hay không có setter.\n\n### 2. Property access\n\nNếu vì lý do nào đó bạn buộc dùng property access (`@Access(AccessType.PROPERTY)`), JPA sẽ cần setter. Nhưng setter đó **không nhất thiết phải public** — `protected` hoặc `package-private` cũng được, miễn là Hibernate reflection thấy được.\n\n---\n\n## Ví dụ minh họa\n\n### ✅ Entity không có setter public — vẫn hoạt động\n\n```java\n@Entity\npublic class Account {\n\n    @Id\n    private Long id;\n\n    private BigDecimal balance;\n\n    // Constructor rỗng cho JPA\n    protected Account() {}\n\n    public Account(BigDecimal balance) {\n        if (balance.signum() < 0) {\n            throw new IllegalArgumentException(\"Balance must be >= 0\");\n        }\n        this.balance = balance;\n    }\n\n    // Chỉ có getter, không có setter public\n    public BigDecimal getBalance() {\n        return balance;\n    }\n\n    // Method nghiệp vụ thay cho setter\n    public void deposit(BigDecimal amount) {\n        if (amount.signum() <= 0) {\n            throw new IllegalArgumentException(\"Amount must be > 0\");\n        }\n        this.balance = this.balance.add(amount);\n    }\n}\n```\n\nKhi Hibernate load dữ liệu từ DB:\n\n```\nSELECT id, balance FROM account WHERE id = 1;\n```\n\nHibernate sẽ:\n1. Gọi `new Account()` (constructor rỗng `protected`)\n2. Dùng reflection set `id` và `balance` thẳng vào field\n3. **Không cần** gọi `setId()` hay `setBalance()`\n\n➡️ Kết quả: object được tạo ra với đầy đủ dữ liệu, invariant vẫn được bảo vệ qua constructor.\n\n---\n\n## Vậy khi nào JPA thực sự cần setter?\n\nChỉ khi bạn **ép buộc dùng property access**:\n\n```java\n@Entity\n@Access(AccessType.PROPERTY)  // Bắt buộc dùng getter/setter\npublic class Account {\n\n    private Long id;\n    private BigDecimal balance;\n\n    @Id\n    public Long getId() { return id; }\n\n    public void setId(Long id) { this.id = id; }  // Cần setter\n\n    public BigDecimal getBalance() { return balance; }\n\n    public void setBalance(BigDecimal balance) {  // Có thể để protected\n        if (balance.signum() < 0) {\n            throw new IllegalArgumentException(\"Invalid balance\");\n        }\n        this.balance = balance;\n    }\n}\n```\n\nLúc này setter vẫn có thể validate, nhưng phải tồn tại (dù chỉ `protected`).\n\n---\n\n## Best practices cho JPA Entity\n\n1. **Ưu tiên field access** — không cần setter, code gọn hơn, dễ giữ encapsulation.\n2. **Constructor rỗng nên để `protected`** — đủ cho Hibernate, nhưng không cho client code tạo object rỗng tùy tiện.\n3. **Setter chỉ mở khi thật sự cần** — và nếu có thì nên `private/protected` hoặc validate đầy đủ.\n4. **Dùng method nghiệp vụ** cho mọi thay đổi trạng thái (`deposit`, `withdraw`, `cancel`...) thay vì setter thuần.\n5. **Tránh `set *` cho mọi field** — đó là cách phá encapsulation nhanh nhất, đúng như note đã cảnh báo.\n\n---\n\n## Liên hệ với note\n\nNote đã nói rất đúng ở phần **4.1. Thứ ba** và **Câu 7**:\n\n> *\"Entity JPA thường cần constructor rỗng `protected`, nhưng public setter cho mọi field là nguy hiểm.\"*\n\nCơ chế đằng sau câu này chính là **field access + reflection** mà mình vừa giải thích. Tức là:\n\n> Bạn **không cần hy sinh encapsulation** để làm hài lòng JPA. JPA vốn đã được thiết kế để không phụ thuộc vào setter public.\n\n---\n\n## Tóm lại\n\n| Câu hỏi | Trả lời |\n|---------|---------|\n| Không có setter public thì JPA map được không? | ✅ Được, dùng field access |\n| Cơ chế nào cho phép điều đó? | Reflection — Hibernate gọi `Field.setAccessible(true)` |\n| Khi nào bắt buộc phải có setter? | Khi dùng `@Access(AccessType.PROPERTY)` |\n| Có nên generate setter cho mọi field? | ❌ Không — phá invariant và làm entity thành \"cục data\" |\n\nVậy nên thiết kế entity tốt là: **field private + constructor validate + method nghiệp vụ + (optional) setter/protected chỉ khi cần property access**. JPA hoàn toàn \"chơi được\" với kiểu thiết kế này.",
+        "createdAt": "2026-06-20T10:15:39.044Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "88837297-1013-4006-8240-3abeea642665",
+        "parentId": "ed86d889-a23d-4dac-a0a9-9a58d713796c",
+        "author": "user",
+        "body": "ý nghĩa của @Access(AccessType.PROPERTY)",
+        "createdAt": "2026-06-20T10:22:57.443Z"
+      },
+      {
+        "id": "dad8402a-5171-4207-aef0-19aabe087b81",
+        "parentId": "88837297-1013-4006-8240-3abeea642665",
+        "author": "ai",
+        "body": "<think>\nThe user is asking about the meaning of `@Access(AccessType.PROPERTY)` in JPA. This is a follow-up question from the previous conversation about JPA entities and whether they need public setters.\n\nLet me provide a clear, well-structured answer in Vietnamese, based on the context of the note about encapsulation and JPA entities.\n\nKey points to cover:\n1. What is `@Access` annotation in JPA\n2. What `AccessType.PROPERTY` means\n3. How it differs from `AccessType.FIELD` (the default)\n4. Implications for encapsulation (which is the main theme of the note)\n5. When to use it\n6. Trade-offs\n\nLet me think about the technical details:\n\n**`@Access` annotation:**\n- Specifies the access type used by JPA provider (Hibernate, EclipseLink, etc.) to access entity attributes\n- Can be placed at:\n  - Class level: applies to all attributes\n  - Field/getter level: overrides class-level setting for that specific attribute\n\n**`AccessType.FIELD` (default in many cases):**\n- JPA uses reflection to access fields directly\n- Doesn't need getters/setters to read/write\n- Bypasses encapsulation at the JPA level\n- Default when `@Id` is placed on a field\n\n**`AccessType.PROPERTY`:**\n- JPA uses getter/setter methods to access attributes\n- Requires both getter and setter (or at least setter for write)\n- Respects encapsulation rules\n- Default when `@Id` is placed on a getter method\n- Allows you to put logic in getter/setter\n\n**Why this matters for encapsulation:**\n- With FIELD access: even if you make fields private, JPA can still write to them via reflection\n- With PROPERTY access: JPA must go through getter/setter, so you can add validation logic\n- This is relevant to the note's discussion about not exposing public setters\n\n**When to use PROPERTY access:**\n- When you want to add validation logic in setters\n- When you want to control how data is read/written\n- When you want to expose only getters publicly but keep setters package-private/protected\n\n**Trade-offs:**\n- PROPERTY access adds overhead (method calls)\n- Need to write both getter and setter\n- Can introduce bugs if setter has side effects\n\nLet me structure this nicely. I should also connect it back to the encapsulation theme of the note.\n\nI'll use code examples to illustrate. The format should be clear and structured.</think>\n\n# `@Access(AccessType.PROPERTY)` trong JPA\n\n## 1. Định nghĩa ngắn\n\n`@Access` là annotation của JPA dùng để **chỉ định cách JPA provider (Hibernate, EclipseLink,...) truy cập vào field của entity** khi đọc/ghi dữ liệu.\n\nCó hai giá trị:\n\n| Giá trị | Ý nghĩa |\n|---------|---------|\n| `AccessType.FIELD` | Truy cập **trực tiếp vào field** thông qua reflection |\n| `AccessType.PROPERTY` | Truy cập **qua getter/setter** |\n\n`AccessType.PROPERTY` nghĩa là: **mọi thao tác đọc/ghi dữ liệu phải đi qua cặp getter/setter**, không được đụng trực tiếp vào field.\n\n---\n\n## 2. Cách JPA tự đoán Access Type mặc định\n\nJPA **tự suy ra** access type dựa vào vị trí đặt `@Id`:\n\n```java\n// @Id đặt trên field → FIELD access (mặc định)\n@Id\nprivate Long id;\n\n// @Id đặt trên getter → PROPERTY access (mặc định)\n@Id\npublic Long getId() { return id; }\n```\n\n`@Access` dùng khi bạn muốn **ghi đè** cách suy ra mặc định này.\n\n---\n\n## 3. Ví dụ minh họa\n\n### Trường hợp 1: Field access (mặc định phổ biến)\n\n```java\n@Entity\npublic class Account {\n    @Id\n    private Long id;\n    private BigDecimal balance;\n    \n    // Không cần getter/setter, JPA vẫn map được\n}\n```\n\nJPA dùng reflection ghi thẳng vào `private` field. Setter không cần tồn tại.\n\n### Trường hợp 2: Property access — tường minh\n\n```java\n@Entity\n@Access(AccessType.PROPERTY)   // ép dùng getter/setter\npublic class Account {\n    \n    private Long id;\n    private BigDecimal balance;\n    \n    @Id\n    public Long getId() { return id; }\n    public void setId(Long id) { this.id = id; }\n    \n    public BigDecimal getBalance() { return balance; }\n    public void setBalance(BigDecimal balance) {\n        if (balance.signum() < 0) {\n            throw new IllegalArgumentException(\"balance không được âm\");\n        }\n        this.balance = balance;\n    }\n}\n```\n\nỞ đây JPA **bắt buộc phải gọi setter** để gán giá trị. Bạn có thể chèn validation logic vào setter.\n\n### Trường hợp 3: Mix access\n\n```java\n@Entity\n@Access(AccessType.FIELD)   // mặc định cho class: field access\npublic class Account {\n    \n    @Id\n    private Long id;\n    \n    // Riêng field này dùng property access\n    @Access(AccessType.PROPERTY)\n    private BigDecimal balance;\n    \n    public BigDecimal getBalance() { return balance; }\n    public void setBalance(BigDecimal balance) {\n        if (balance.signum() < 0) {\n            throw new IllegalArgumentException(\"invalid\");\n        }\n        this.balance = balance;\n    }\n}\n```\n\n---\n\n## 4. Liên hệ với Encapsulation (chủ đề chính của note)\n\nĐây là điểm quan trọng nhất trong ngữ cảnh note:\n\n| Access Type | Encapsulation |\n|-------------|---------------|\n| `FIELD` | JPA **phá vỡ encapsulation** bằng reflection — set thẳng vào `private` field, setter không có cũng được |\n| `PROPERTY` | JPA **tôn trọng encapsulation** — phải đi qua setter, nên bạn kiểm soát được dữ liệu vào |\n\nVì vậy, nếu bạn muốn:\n- `balance` không bao giờ âm\n- Có audit log khi field thay đổi\n- Trigger side-effect khi giá trị đổi\n\n→ Dùng `AccessType.PROPERTY` và viết logic trong setter.\n\n---\n\n## 5. Trade-off\n\n### Ưu điểm của PROPERTY\n- Tôn trọng encapsulation đúng nghĩa\n- Có thể validate / log / tính toán derived field trong getter\n- Code rõ ràng về \"dữ liệu được đưa vào object như thế nào\"\n\n### Nhược điểm\n- Phải viết cả getter lẫn setter\n- Hiệu năng kém hơn FIELD một chút (gọi method thay vì reflection thẳng)\n- Setter chứa logic có thể bị gọi lúc Hydrate → dễ sinh bug nếu setter có side-effect không mong muốn\n\n---\n\n## 6. Khi nào nên dùng?\n\n| Tình huống | Nên chọn |\n|------------|----------|\n| Entity đơn giản, chỉ map bảng | `FIELD` (mặc định) |\n| Cần validation / logic khi load dữ liệu | `PROPERTY` |\n| Field là derived (tính từ field khác) | `PROPERTY` (tính trong getter) |\n| Cần giữ encapsulation chặt cho domain entity | `PROPERTY` |\n\n---\n\n## Tóm lại\n\n> `@Access(AccessType.PROPERTY)` = \"JPA hãy đi qua getter/setter để đọc/ghi field, đừng đụng trực tiếp vào field bằng reflection\".\n\nĐây là cách giữ **encapsulation đúng nghĩa** trong JPA entity — kết hợp với việc giữ setter ở mức `protected` hoặc `package-private`, bạn vừa đáp ứng yêu cầu của Hibernate, vừa không để code bên ngoài tùy tiện phá invariant của entity.",
+        "createdAt": "2026-06-20T10:22:57.443Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      }
+    ]
+  },
   "flashcards": {
     "java-001": [
       {
@@ -583,6 +684,195 @@
             "back": "Che giấu state bên trong object, chỉ cho phép thay đổi qua method hợp lệ – giảm rủi ro state sai, dễ bảo trì và test.",
             "hint": "Không cho phép truy cập trực tiếp vào field private.",
             "tag": "OOP"
+          }
+        ]
+      },
+      {
+        "id": "3f247be7-7925-4b63-877b-43e6b9a23ded",
+        "taskId": "java-001",
+        "taskTitle": "Ôn lại OOP, SOLID, immutable object, equals/hashCode và defensive copying",
+        "title": "Bộ flashcard 2",
+        "createdAt": "2026-06-20T07:37:59.808Z",
+        "source": {
+          "noteCharacters": 26222,
+          "commentCount": 0
+        },
+        "cards": [
+          {
+            "id": "1e879aef-f24e-4f8f-a7d8-f873ed2585be",
+            "front": "Khi nào một Value Object nên override equals/hashCode, và hậu quả nếu không override khi dùng trong HashMap?",
+            "back": "Value Object nên override để so sánh bằng giá trị. Nếu không override, HashMap dùng tham chiếu đối tượng (Object.equals), dẫn đến hai đối tượng có cùng giá trị nhưng được coi là khác nhau, gây lỗi logic như key tồn tại nhưng get() trả về null.",
+            "hint": "Nghĩ đến collection hash và contract của Object.equals.",
+            "tag": "EqualsHashCode"
+          },
+          {
+            "id": "a75da470-6ef5-4b45-8732-30e66e3baa31",
+            "front": "Trong JPA, tại sao không nên dùng @EqualsAndHashCode(includes = \"id\") cho Entity?",
+            "back": "Vì id thường null trước khi persist, và được sinh sau khi lưu. Khi id thay đổi, hashcode thay đổi, phá vỡ contract với HashSet/HashMap: đối tượng đã add vẫn tồn tại trong bucket cũ, gây mất đối tượng khi tìm kiếm.",
+            "hint": "Nhớ lifecycle của Entity: transient → managed.",
+            "tag": "Entity"
+          },
+          {
+            "id": "bdd083aa-addb-4943-aafb-3a1519df4e77",
+            "front": "OCP trong SOLID là gì? Cho ví dụ vi phạm trong backend khi thêm loại payment mới.",
+            "back": "OCP: Mở rộng bằng thêm code mới, không sửa code cũ (open for extension, closed for modification). Vi phạm: sử dụng switch/case trong PaymentService để xử lý từng loại (Visa, Master, PayPal). Mỗi lần thêm loại mới phải sửa service. Cách đúng: dùng Strategy pattern với interface PaymentProcessor.",
+            "hint": "Hãy nghĩ đến tính mở rộng mà không thay đổi module có sẵn.",
+            "tag": "SOLID"
+          },
+          {
+            "id": "1f2845e9-e187-4229-875c-e559923b4068",
+            "front": "ISP trong SOLID: ví dụ một interface UserService có cả createUser và deleteUser nhưng client chỉ cần create. Vấn đề gì xảy ra?",
+            "back": "Vi phạm ISP: interface quá lớn, client phải phụ thuộc vào phương thức không dùng. Dẫn đến: khó maintain, khi sửa deleteUser có thể ảnh hưởng đến client create, phải implement cả method thừa. Giải pháp: tách interface thành CreateUserService, DeleteUserService.",
+            "hint": "Nguyên lý interface nhỏ, tập trung (role interface).",
+            "tag": "SOLID"
+          },
+          {
+            "id": "03bb75d1-6b43-408b-ab3f-a1c5f872b2c5",
+            "front": "Khi thiết kế một class immutable chứa List, có cần defensive copy trong constructor nếu List đã là immutable (List.of)?",
+            "back": "Cần, vì tham chiếu từ bên ngoài vẫn có thể trỏ đến cùng một immutable list nhưng nếu sau đó code gọi thay đổi list gốc? Thực tế List immutable (List.of) không thể sửa nội dung, nhưng bên ngoài có thể tạo list mới và gán lại? Không, vì constructor chỉ nhận tham số và gán, nếu list đã immutable thì không cần copy nhưng để an toàn và nhất quán, nên copy phòng khi tham số là mutable ở nơi khác. Tuy nhiên nếu chắc chắn immutable thì copy là thừa. Trade-off: copy có chi phí.",
+            "hint": "Xem xét tính immutable của tham số đầu vào và nguyên tắc phòng thủ.",
+            "tag": "Immutable,DefensiveCopying"
+          },
+          {
+            "id": "5a8e6a33-d8e5-48c3-aa7c-f21b771c4614",
+            "front": "Khi trả về một List từ getter trong class immutable, có cần defensive copy nếu class đã lưu List dưới dạng unmodifiable?",
+            "back": "Cần, vì List trả về có thể bị sửa đổi bởi caller. Mặc dù unmodifiable list sẽ ném exception khi cố sửa, nhưng caller có thể lấy reference đó và sau đó cố gắng sửa. Để đảm bảo invariant, nên trả về bản copy (ví dụ List.copyOf) hoặc unmodifiable view và không bao giờ lưu trữ tham chiếu đến list gốc từ bên ngoài.",
+            "hint": "Nhớ defensive copying cho cả input và output.",
+            "tag": "DefensiveCopying"
+          },
+          {
+            "id": "c0f5c94c-fd5c-48d7-9ee9-e227a3f42c6b",
+            "front": "Tại sao trong backend, không nên dùng Entity trực tiếp làm key trong HashMap?",
+            "back": "Entity được thiết kế có identity và lifecycle, có thể thay đổi state (ví dụ sau khi lưu id được gán). Nếu dùng Entity làm key, hashcode phụ thuộc vào id hoặc business key có thể thay đổi, gây lỗi truy xuất trong HashMap. Ngoài ra, Entity thường liên quan đến ORM proxy, có thể khác kiểu thực tế, gây ra equals sai.",
+            "hint": "Xem xét tính mutable của identity và proxy.",
+            "tag": "Entity,EqualsHashCode"
+          },
+          {
+            "id": "42c82f2a-b977-4afa-a6c5-026b0a06ff7d",
+            "front": "Khi override equals cho Entity, có nên dùng id field ngay cả khi chưa được persist?",
+            "back": "Không nên, vì id null trước persist. Dùng id sẽ làm equals không đối xứng hoặc thất bại. Thay vào đó, dùng business key hoặc kết hợp các field ổn định không null (ví dụ: unique business key) hoặc so sánh bằng tham chiếu mặc định cho đến khi id được gán.",
+            "hint": "Xem xét vòng đời và sự ổn định của field.",
+            "tag": "Entity,EqualsHashCode"
+          },
+          {
+            "id": "05f8069c-0496-4295-9515-4efc5e527c51",
+            "front": "SRP trong SOLID: ví dụ một UserService xử lý validate, lưu database, gửi email, log audit. Vấn đề gì?",
+            "back": "Vi phạm SRP: UserService có nhiều lý do để thay đổi (quy tắc validate, logic lưu, email template, format log). Khó maintain, test, dễ gây lỗi lan truyền. Cần tách thành các service riêng: UserValidator, UserRepository, EmailService, AuditService.",
+            "hint": "Một class chỉ nên có một lý do để thay đổi.",
+            "tag": "SOLID"
+          },
+          {
+            "id": "67b590d3-9024-48a0-af6a-5e049d1bd24c",
+            "front": "Nếu để lộ List<Role> trong class immutable (không copy khi getter), hậu quả gì?",
+            "back": "Bên ngoài có thể lấy reference và thêm/xóa phần tử, làm thay đổi state bên trong class dù đã khai báo final field. Điều này phá vỡ tính bất biến, dẫn đến các lỗi khó phát hiện như dữ liệu sai lệch, thread-safety mất.",
+            "hint": "final chỉ bảo vệ reference, không bảo vệ nội dung.",
+            "tag": "Immutable,DefensiveCopying"
+          },
+          {
+            "id": "7cdbf36f-0d51-4fbc-820d-2825d1538f1c",
+            "front": "Trong context Java Records, class record tự động tạo equals/hashCode dựa trên tất cả fields. Khi nào không nên dùng record cho Entity?",
+            "back": "Record phù hợp cho DTO và Value Object, không phù hợp cho Entity vì: record immutable, không có setter; Entity cần thay đổi state; record không hỗ trợ ORM proxy (vì final class); equals/hashCode mặc định dùng tất cả fields có thể gây nhầm lẫn với identity.",
+            "hint": "Xem xét tính mutable và lifecycle của Entity.",
+            "tag": "Entity,ValueObject"
+          },
+          {
+            "id": "6a922bb6-5bac-4115-b3b9-ca6497219c29",
+            "front": "Khi nào cần override equals/hashCode cho DTO?",
+            "back": "Khi DTO được dùng làm key trong Set hoặc Map (ví dụ: cache Map<String, Dto>, Set<Dto> trong bộ nhớ), hoặc khi cần so sánh hai DTO theo giá trị trong test. Nếu DTO chỉ dùng để chuyển dữ liệu và không nằm trong collection hash, không cần override.",
+            "hint": "Xét mục đích sử dụng collection hash.",
+            "tag": "DTO,EqualsHashCode"
+          }
+        ]
+      }
+    ],
+    "java-001.oop.encapsulation": [
+      {
+        "id": "f4bd55fb-720e-4ae4-bf41-e81411e18beb",
+        "taskId": "java-001.oop.encapsulation",
+        "taskTitle": "Encapsulation: private field, invariant, getter/setter có kiểm soát",
+        "title": "Bộ flashcard 1",
+        "createdAt": "2026-06-20T10:26:51.203Z",
+        "source": {
+          "noteCharacters": 15998,
+          "commentCount": 10
+        },
+        "cards": [
+          {
+            "id": "c0f706bc-2e57-45c1-a16a-d1b7f948de71",
+            "front": "Nếu tôi chỉ dùng private field + getter/setter tự động (ví dụ Lombok) cho một class domain có invariant (ví dụ: start < end), thì đã đúng encapsulation chưa? Vì sao?",
+            "back": "Chưa đúng. Encapsulation không chỉ là che field, mà còn là bảo vệ invariant. Nếu setter public cho phép set từng field riêng lẻ mà không kiểm tra quan hệ giữa các field (ví dụ setStart mà không kiểm tra với end), object có thể rơi vào trạng thái sai (start > end). Thêm nữa, getter trả về mutable reference cũng có thể phá invariant.",
+            "hint": "Hãy nghĩ về invariant (điều kiện luôn đúng) và setter set từng field riêng lẻ.",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "10b1f3c2-8d94-4d71-a711-919c46dc9c2c",
+            "front": "Với class BankAccount có field balance (BigDecimal), tại sao nên dùng method withdraw(BigDecimal amount) thay vì setter setBalance(BigDecimal balance)? Hãy nêu 2 lý do chính.",
+            "back": "1) Setter không thể hiện rõ nghiệp vụ (chỉ set dữ liệu), withdraw() nói rõ ý định. 2) Setter cho phép set balance âm (phá invariant balance >= 0), còn withdraw() có thể validate amount dương, balance đủ,… giúp object tự bảo vệ trạng thái hợp lệ.",
+            "hint": "Đặt vào câu chuyện thực tế: ‘setBalance(-100)’ có hợp lý không?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "a397b0b9-dbaf-4f37-9d68-18c8f7582679",
+            "front": "Trong thiết kế domain object, có nên generate setter public cho mọi field bằng Lombok không? Vì sao?",
+            "back": "Không nên. Lombok tạo setter public vô điều kiện, dễ phá invariant (ví dụ setStart(null), setBalance(-1)). Nên ưu tiên method nghiệp vụ (ví dụ changePeriod, withdraw) kết hợp validate, setter chỉ nên dùng protected/package-private hoặc bỏ hẳn nếu không cần. DTO mới là nơi chấp nhận setter.",
+            "hint": "Lombok sinh setter cho tất cả field – điều đó tốt hay xấu với invariant?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "4fcf8a87-604b-4cd3-b868-0347cc2a8a62",
+            "front": "Khi viết getter trả về List<Item> items (mutable), cách nào an toàn để không phá encapsulation? Đưa ra 2 cách.",
+            "back": "1) Trả về unmodifiable view: `Collections.unmodifiableList(items)` – throw exception nếu cố sửa. 2) Trả về copy phòng thủ: `List.copyOf(items)` hoặc `new ArrayList<>(items)` – bên ngoài sửa bản copy không ảnh hưởng nội bộ.",
+            "hint": "Như giao chìa khoá nhà cho người lạ – có nên đưa chìa chính không?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "86900852-34d5-415c-8b0f-00716ec35ca9",
+            "front": "Constructor không validate có thể gây hậu quả gì cho encapsulation? Cho ví dụ cụ thể.",
+            "back": "Object có thể được tạo ra ở trạng thái sai ngay từ đầu, vi phạm invariant. Ví dụ: `new BookingPeriod(null, someDate)` hoặc `new Order(null, -100)`. Nếu constructor không throw exception, object lỗi tồn tại và lan truyền bug. Constructor là cơ hội đầu tiên và cuối cùng để đảm bảo object hợp lệ ngay khi sinh ra.",
+            "hint": "Nếu một object sinh ra đã sai, sau đó có sửa được không? Nhưng nếu không sửa được thì sao?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "5d3793c0-9b96-47e6-9fa5-32625647d3f7",
+            "front": "Một team dùng setter cho mọi field ở Entity JPA và để logic validate ở Service. Điều này có vi phạm encapsulation không? Tại sao?",
+            "back": "Có vi phạm tinh thần encapsulation, vì entity trở thành ‘anemic domain model’ (chỉ chứa data, không hành vi). Rule nghiệp vụ (ví dụ không cancel order đã shipped) phải ở Service – bị phân tán, khó tái sử dụng, dễ quên khi có Service khác. Entity nên tự bảo vệ invariant thông qua method nghiệp vụ (cancel, withdraw, …) thay vì setter.",
+            "hint": "Ai chịu trách nhiệm bảo vệ tính đúng đắn của Order: Order hay OrderService?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "60d32ee6-b849-4231-ba72-7d613dce575e",
+            "front": "Immutable object có phải là một dạng encapsulation mạnh không? Giải thích ngắn.",
+            "back": "Có. Immutable object đảm bảo trạng thái không thay đổi sau khi tạo (field final, không setter, không expose mutable reference). Invariant được kiểm tra một lần duy nhất ở constructor, sau đó không thể bị phá. Điều này giúp encapsulation chặt chẽ hơn, dễ suy luận và an toàn trong đa luồng.",
+            "hint": "Một khi đã tạo, còn cách nào để sửa được object đó không?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "29eaf15e-4ca5-4b92-9d86-cfe011dc14c6",
+            "front": "Khi nào thì việc dùng setter public là chấp nhận được mặc dù vẫn muốn giữ encapsulation? Đưa ra 2 tình huống.",
+            "back": "1) DTO/Request/Response object – không có invariant nghiệp vụ, chỉ là vận chuyển dữ liệu. 2) Test fixture đơn giản hoặc object nội bộ trong phạm vi rất nhỏ (ví dụ builder pattern). Trong domain object, setter public thường không được khuyến khích.",
+            "hint": "Object nào không cần bảo vệ invariant? Object nào chỉ tồn tại trong 1 method?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "7208dd13-c12a-4eba-b861-53783bd1ca0f",
+            "front": "Trade-off của encapsulation chặt (validate+method nghiệp vụ) là gì? Nêu 2 nhược điểm.",
+            "back": "1) Nhiều code hơn: cần constructor, private method validate, exception message rõ ràng – không thể dùng Lombok tràn lan. 2) Over-engineering cho object đơn giản (DTO, record) – lớp có thể trở nên nặng nề không cần thiết, làm chậm phát triển.",
+            "hint": "Cân bằng giữa “bảo vệ” và “linh hoạt nhanh” – chi phí nào bạn phải trả?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "94f45563-be80-4998-b22e-146379138e0a",
+            "front": "Tại sao nói ‘setter chỉ sửa từng field riêng lẻ, trong khi invariant thường liên quan đến nhiều field’ là một vấn đề? Lấy ví dụ cụ thể từ class BookingPeriod.",
+            "back": "Vì setter không có bối cảnh. Ví dụ BookingPeriod có invariant: start < end. Nếu dùng `setStart(newStart)` và `setEnd(newEnd)` riêng biệt, có thể xảy ra trình tự: setStart(muộn hơn end hiện tại) → object bị sai. Kết quả cuối cùng không hợp lệ, nhưng không có lỗi nào được ném ra. Method phối hợp như `changePeriod(newStart, newEnd)` validate đồng thời cả hai.",
+            "hint": "Hãy thử gọi setStart sau đó setEnd – kết quả có thể bị đứt quãng?",
+            "tag": "java-oop-encapsulation"
+          },
+          {
+            "id": "013bb274-97df-47e7-8fc3-7eae7aca49a0",
+            "front": "Làm thế nào để một class vừa dùng được framework (JPA, Jackson – cần no-args constructor và setter) vừa giữ được encapsulation? Đưa ra giải pháp.",
+            "back": "Dùng protected no-args constructor (JPA dùng reflection, không cần public). Không generate setter public, thay vào đó dùng method nghiệp vụ (ví dụ `withdraw(amount)`, `changePeriod(start,end)`). Nếu framework cần setter để map DB, có thể để setter private/protected hoặc dùng field access (JPA `@Access(AccessType.FIELD)`).",
+            "hint": "JPA cần setter, nhưng có cần public không? Bạn có thể dùng protected setter?",
+            "tag": "java-oop-encapsulation"
           }
         ]
       }
