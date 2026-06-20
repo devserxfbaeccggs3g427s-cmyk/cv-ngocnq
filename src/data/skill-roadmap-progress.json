@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "exportedAt": "2026-06-20T15:01:42.757Z",
+  "exportedAt": "2026-06-20T16:07:46.493Z",
   "progress": {
     "updatedAt": "2026-06-20T07:23:21.763Z",
     "items": {
@@ -585,6 +585,86 @@
         "createdAt": "2026-06-20T10:22:57.443Z",
         "model": "minimax/minimax-m3",
         "provider": "kilo"
+      },
+      {
+        "id": "8766bdeb-c512-4b18-8edd-44eda7798647",
+        "parentId": null,
+        "author": "user",
+        "body": "enitty có giống domain object không?",
+        "createdAt": "2026-06-20T15:08:31.485Z"
+      },
+      {
+        "id": "fead1dee-7cac-405a-9dfb-d6a0113db06d",
+        "parentId": "8766bdeb-c512-4b18-8edd-44eda7798647",
+        "author": "ai",
+        "body": "<think>\nThe user is asking whether \"entity\" is the same as \"domain object\" in the context of the note about Encapsulation. Let me think about this carefully based on the note content and general software design knowledge.\n\nThe note distinguishes between:\n- Domain objects (chứa rule nghiệp vụ) - should be encapsulated carefully\n- DTO (Data Transfer Object) - just carries data, doesn't need strict encapsulation\n- JPA Entities - mentioned separately, need protected constructors, can use private/protected setters\n\nSo in the note's context, entity and domain object are related but not identical. Let me explain this clearly.\n\nKey points to address:\n1. Entity (JPA/Hibernate entity) is a specific technical concept - a class mapped to a database table\n2. Domain object is a broader DDD concept - an object that represents business concepts and rules\n3. They can overlap (a domain entity is both an entity in DDD sense and often a JPA entity)\n4. But they're not always the same - a JPA entity can be a pure data mapper without business rules, while a domain object (especially in DDD) emphasizes behavior and invariants\n5. The note treats them differently - entities are mentioned as needing special handling (protected constructor, restricted setters) because of framework requirements\n\nLet me structure a clear answer in Vietnamese.</think>\n\n# Entity có giống Domain Object không?\n\n**Câu trả lời ngắn: Không hoàn toàn giống, chúng là hai khái niệm ở các tầng khác nhau, nhưng hay bị đánh đồng với nhau.**\n\nTrong note của bạn có 2 chỗ nhắc riêng hai khái niệm này, và cách xử lý encapsulation cũng khác nhau.\n\n---\n\n## 1. Phân biệt theo nghĩa gốc\n\n| | **Domain Object** | **Entity (JPA/Hibernate Entity)** |\n|---|---|---|\n| **Gốc khái niệm** | Domain-Driven Design (DDD) | Framework persistence (JPA, Hibernate) |\n| **Mục đích chính** | Chứa **rule nghiệp vụ** + trạng thái | Mapping 1-1 với **bảng trong database** |\n| **Tiêu chí \"đúng\"** | Giữ được **invariant** nghiệp vụ | Mapping đúng schema, có `@Id`, lifecycle đúng |\n| **Ai quan tâm** | Developer thiết kế business | Framework + developer |\n\n---\n\n## 2. Vì sao hay bị nhầm?\n\nTrong thực tế, **một class vừa là Entity vừa là Domain Object** — đây là cách làm phổ biến nhất trong Spring/JPA thông thường:\n\n```java\n@Entity\n@Table(name = \"orders\")\npublic class Order {\n    @Id private Long id;\n    \n    // Vừa là field mapping DB\n    // Vừa chứa rule nghiệp vụ\n    public void cancel() {\n        if (status == Status.SHIPPED) {\n            throw new IllegalStateException(\"...\");\n        }\n        this.status = Status.CANCELLED;\n    }\n}\n```\n\nClass này vừa là **JPA Entity** (vì có `@Entity`), vừa mang logic nghiệp vụ nên được gọi là **Domain Object** (hay cụ thể hơn là **Domain Entity** trong DDD).\n\n> Vì vậy nên người ta hay nói \"Entity\" cho cả hai, gây nhầm lẫn.\n\n---\n\n## 3. Khi nào chúng KHÁC nhau?\n\n### Trường hợp 1: Entity thuần \"data mapper\", không phải domain object\nMột số team tách riêng:\n- **Entity (JPA)**: chỉ lo mapping DB\n- **Domain Object**: chứa rule nghiệp vụ thuần túy, không phụ thuộc framework\n\n```java\n// Chỉ lo DB\n@Entity\npublic class OrderEntity {\n    @Id Long id;\n    String status;\n    // không có logic nghiệp vụ\n}\n\n// Chứa rule\npublic class Order {\n    public void cancel() { /* validate */ }\n}\n```\n\nĐây là kiểu **Anemic Domain Model ngược** — entity bị \"rỗng\", domain object mới có hành vi.\n\n### Trường hợp 2: Domain object không phải là Entity\nMột số object trong domain **không có identity lâu dài** và không map với bảng nào:\n- `Money`, `Address`, `DateRange` — **Value Object** trong DDD\n- `BookingPeriod` trong note của bạn (có invariant `start < end`) cũng là Value Object, **không phải Entity**\n\n```java\n// Đây là Value Object, không phải Entity\npublic class BookingPeriod {\n    private final LocalDate start;\n    private final LocalDate end;\n    \n    public BookingPeriod(LocalDate start, LocalDate end) {\n        if (!start.isBefore(end)) throw ...;\n        this.start = start;\n        this.end = end;\n    }\n}\n```\n\n---\n\n## 4. Liên hệ với Encapsulation trong note\n\nNote của bạn đã ngầm tách hai khái niệm này khi nói về cách xử lý:\n\n> **Mục 4.3 — Domain object**: nên giữ invariant chặt, ưu tiên method nghiệp vụ.\n>\n> **Câu 7 — JPA Entity**: cần constructor rỗng `protected`, setter nên hạn chế, không nên public setter cho mọi field.\n\nĐiểm khác biệt quan trọng:\n\n- **Domain Object**: encapsulation phục vụ **logic nghiệp vụ** → setter thường bị loại bỏ, thay bằng method nghiệp vụ.\n- **JPA Entity**: encapsulation bị **framework ép phải nới** (cần no-arg constructor, reflection setter), nên phải chấp nhận \"rò rỉ\" có kiểm soát.\n\n---\n\n## 5. Tóm lại\n\n> **Entity** = khái niệm kỹ thuật persistence (mapping DB).\n> **Domain Object** = khái niệm thiết kế nghiệp vụ (chứa rule + invariant).\n>\n> Chúng **giao nhau** ở \"Domain Entity\", nhưng **không phải lúc nào cũng trùng**. Có những entity không có logic, và có những domain object (Value Object) không phải entity.\n\nKhi áp dụng encapsulation, cần biết mình đang thiết kế cái nào để chọn mức độ \"chặt\" phù hợp — note của bạn đã đúng khi tách bạch hai hướng dẫn này.",
+        "createdAt": "2026-06-20T15:08:31.485Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "76fb6fee-4657-45ca-814a-e7587937f9db",
+        "parentId": "fead1dee-7cac-405a-9dfb-d6a0113db06d",
+        "author": "user",
+        "body": "vậy domain object có giống 1 service chuyên xử lý nghiệp vụ không nhỉ",
+        "createdAt": "2026-06-20T15:17:22.486Z"
+      },
+      {
+        "id": "1b15f684-6b1e-42aa-a03d-ef21d028d75b",
+        "parentId": "76fb6fee-4657-45ca-814a-e7587937f9db",
+        "author": "ai",
+        "body": "<think>\nThe user is asking a follow-up question in a discussion thread. Looking at the context:\n\n1. First question: \"enitty có giống domain object không?\" (Is entity the same as domain object?)\n2. AI answered: started explaining differences between entity and domain object (cut off but clear it explained they're related but not identical)\n3. New question: \"vậy domain object có giống 1 service chuyên xử lý nghiệp vụ không nhỉ\" (So is a domain object similar to a service that specializes in processing business logic?)\n\nThis is a common confusion for people learning DDD/OOP. The user is conflating two different concepts:\n- **Domain Object** (Domain Model): Objects that represent business concepts with both state (data) AND behavior (methods). They are NOT services. Examples: Order, BookingPeriod, Account - these have fields and methods.\n- **Service** (Domain Service / Application Service): Stateless components that orchestrate operations, often coordinating multiple domain objects. They typically don't hold state themselves.\n\nKey distinctions to make:\n1. **State vs Stateless**: Domain object has state (fields). Service typically doesn't.\n2. **Identity**: Domain object has identity (an Order is a specific Order). Service is identified by what it does, not by identity.\n3. **Responsibility**: \n   - Domain object = \"Who I am\" + \"What I can do\" (data + behavior tied to that data)\n   - Service = \"What operation can be performed\" (often across multiple objects)\n4. **When to use what**:\n   - If behavior naturally belongs to one object → put it in the domain object (e.g., Order.cancel())\n   - If behavior spans multiple objects or doesn't fit any single object → use a service (e.g., TransferService.transferBetweenAccounts())\n\nBased on the note:\n- The note emphasizes that domain objects should have business methods (cancel(), deposit(), etc.) instead of just setters\n- This is about adding behavior TO the object, not creating a separate service\n\nLet me structure a clear answer in Vietnamese that:\n1. Gives a clear \"no, they're different\" answer\n2. Explains the key difference (state vs stateless, identity, responsibility)\n3. Gives concrete examples\n4. Shows when to use which\n5. Ties back to the encapsulation note\n\nI should use the thinking tag as required by the system prompt, and respond in Vietnamese with clear structure.\n\nLet me also consider: the AI's previous answer was cut off at \"**Câu trả lời ngắn: Kh\" - so the user is continuing the discussion. I should build on that context naturally.\n\nLet me draft the answer:\n\n# Domain Object KHÔNG giống Service\n\n**Câu trả lời ngắn: Không.** Hai khái niệm này khác nhau về bản chất, dù cả hai đều liên quan đến nghiệp vụ.\n\n## So sánh nhanh\n\n| Tiêu chí | Domain Object | Service |\n|----------|---------------|---------|\n| Có trạng thái (field)? | Có | Thường không (stateless) |\n| Có danh tính (identity)? | Có (mỗi Order là một Order cụ thể) | Không (Service là tập hợp hành vi) |\n| Hỏi \"Cái gì?\" | \"Tôi là Order, tôi có id, items, total...\" | \"Tôi làm gì?\" |\n| Hỏi \"Làm gì?\" | Method gắn liền với dữ liệu của nó | Điều phối nhiều object |\n| Vòng đời | Được tạo, sửa, xóa | Thường là singleton/bean |\n\n## Ví dụ cụ thể\n\n**Domain Object (có trạng thái + hành vi):**\n```java\npublic class Order {\n    private String id;\n    private List<Item> items;\n    private OrderStatus status;\n    \n    public void cancel() {  // hành vi gắn với Order\n        if (status == OrderStatus.SHIPPED) {\n            throw new IllegalStateException(\"Không thể huỷ đơn đã ship\");\n        }\n        this.status = OrderStatus.CANCELLED;\n    }\n}\n```\n\n**Service (điều phối, không giữ trạng thái):**\n```java\npublic class OrderService {\n    public void placeOrder(Order order, PaymentInfo payment) {\n        // phối hợp nhiều thứ: validate, thanh toán, lưu DB, gửi mail...\n        paymentGateway.charge(payment);\n        order.confirm();\n        orderRepository.save(order);\n        notificationService.send(order);\n    }\n}\n```\n\n## Phân biệt rõ hơn\n\n### Domain Object trả lời: \"Tôi LÀ gì và TÔI TỰ làm được gì\"\n- Order biết cách tự cancel chính nó\n- Account biết cách tự rút tiền\n- BookingPeriod biết cách tự check hợp lệ\n\nHành vi nằm TRONG object vì nó liên quan đến dữ liệu của object đó.\n\n### Service trả lời: \"Tôi GIÚP điều phối việc gì đó\"\n- TransferService chuyển tiền giữa 2 Account (vì 1 Account không tự làm được với chính mình)\n- OrderService đặt đơn hàng (cần phối hợp payment, kho, notification...)\n- ReportService tổng hợp dữ liệu từ nhiều nguồn\n\n## Khi nào dùng cái nào?\n\n**Dùng method trong domain object khi:**\n- Hành vi chỉ liên quan đến 1 object\n- Có thể diễn tả: \"object này tự làm được\"\n- Ví dụ: `order.cancel()`, `account.deposit(amount)`\n\n**Dùng service khi:**\n- Hành vi cần phối hợp nhiều object\n- Không có object nào \"sở hữu\" hành vi đó một cách tự nhiên\n- Ví dụ: chuyển tiền giữa 2 tài khoản, đặt đơn hàng (cần payment + kho + email)\n\n## Tóm lại\n\n- **Domain Object** = \"Một thứ cụ thể có dữ liệu + biết tự xử lý việc của mình\"\n- **Service** = \"Một kênh điều phối, không có dữ liệu riêng, chỉ biết làm việc\"\n\nTrong note về Encapsulation, khi nói \"nên dùng method nghiệp vụ thay vì setter\" là đang nói về việc **thêm hành vi vào domain object**, KHÔNG phải tạo service riêng. Hai concept bổ sung cho nhau, không thay thế nhau.\n\nI think this is a good, clear answer. Let me format it nicely.</think>\n\n# Domain Object KHÔNG giống Service\n\n**Câu trả lời ngắn: Không.** Hai khái niệm này khác nhau về bản chất, dù cả hai đều liên quan đến nghiệp vụ.\n\n## So sánh nhanh\n\n| Tiêu chí | Domain Object | Service |\n|----------|---------------|---------|\n| Có trạng thái (field)? | **Có** | Thường không (stateless) |\n| Có danh tính? | **Có** (mỗi Order là 1 Order cụ thể) | Không (Service = tập hợp hành vi) |\n| Trả lời câu hỏi | *\"Tôi là gì?\" + \"Tôi tự làm được gì?\"* | *\"Tôi giúp điều phối cái gì?\"* |\n| Vòng đời | Được tạo, sửa, xóa | Thường là singleton/bean tồn tại lâu dài |\n\n## Ví dụ để thấy sự khác biệt\n\n**Domain Object** — có dữ liệu + hành vi gắn liền với dữ liệu đó:\n```java\npublic class Order {\n    private String id;\n    private List<Item> items;\n    private OrderStatus status;\n\n    public void cancel() {  // hành vi GẮN với Order\n        if (status == OrderStatus.SHIPPED) {\n            throw new IllegalStateException(\"Không thể huỷ đơn đã ship\");\n        }\n        this.status = OrderStatus.CANCELLED;\n    }\n}\n```\n\n**Service** — không giữ dữ liệu, chỉ điều phối:\n```java\npublic class OrderService {\n    public void placeOrder(Order order, PaymentInfo payment) {\n        // phối hợp nhiều thứ: validate → thanh toán → lưu DB → gửi mail\n        paymentGateway.charge(payment);\n        order.confirm();\n        orderRepository.save(order);\n        notificationService.send(order);\n    }\n}\n```\n\n## Phân biệt rõ bằng câu hỏi\n\n### Domain Object trả lời: *\"Tôi tự làm được việc này\"*\n- `order.cancel()` — Order tự huỷ chính nó\n- `account.withdraw(amount)` — Account tự rút tiền của mình\n- `bookingPeriod.extendDays(5)` — BookingPeriod tự mở rộng\n\n→ Hành vi nằm **trong** object vì nó chỉ chạm vào dữ liệu của object đó.\n\n### Service trả lời: *\"Tôi điều phối nhiều thứ\"*\n- `TransferService.transfer(from, to, amount)` — cần chạm cả 2 account\n- `CheckoutService.checkout(cart, user, payment)` — gồm cart + user + payment + kho\n- `ReportService.generateMonthlyReport()` — tổng hợp từ nhiều nguồn\n\n→ Không có object nào \"sở hữu\" hành vi này một cách tự nhiên, nên tách ra service.\n\n## Khi nào dùng cái nào?\n\n**Đưa vào domain object khi:**\n- Hành vi chỉ liên quan đến 1 object\n- Có thể nói: *\"object này tự xử lý được\"*\n- Cần bảo vệ invariant (như note đã nói: `Order.cancel()` check `status` trước khi đổi)\n\n**Tách ra service khi:**\n- Hành vi cần phối hợp nhiều object\n- Không object nào tự xử lý được một mình\n- Liên quan đến tác vụ bên ngoài (DB, API, message queue, transaction...)\n\n## Liên hệ với note Encapsulation\n\nKhi note nói *\"nên dùng method nghiệp vụ thay vì setter\"* (ví dụ `cancel()` thay vì `setStatus(CANCELLED)`), nghĩa là **đẩy hành vi vào domain object**, không phải tạo service riêng.\n\nTóm lại:\n- **Domain Object** = *\"Một thứ cụ thể, có dữ liệu, tự biết làm việc của mình\"*\n- **Service** = *\"Kênh điều phối, không có dữ liệu riêng, chỉ biết phối hợp\"*\n\nHai cái **bổ sung cho nhau**, không thay thế nhau. Domain object giữ state + hành vi vi mô, service điều phối ở tầng lớn hơn.",
+        "createdAt": "2026-06-20T15:17:22.487Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "53849ce7-997d-4064-a9a9-77f95e79fb38",
+        "parentId": "fead1dee-7cac-405a-9dfb-d6a0113db06d",
+        "author": "user",
+        "body": "vậy với chương trình Spring boot mà sử dụng entity thì sẽ không cần domain object đúng không vì tôi thường sử dụng Controller gọi tới service và service thao tác với entity",
+        "createdAt": "2026-06-20T15:20:16.101Z"
+      },
+      {
+        "id": "0bc3fabe-2e4a-4399-94e3-be2a19d0cc92",
+        "parentId": "53849ce7-997d-4064-a9a9-77f95e79fb38",
+        "author": "ai",
+        "body": "<think>\nThe user is asking a follow-up question based on the previous discussion about Entity vs Domain Object. The context is:\n\n1. User asked: \"entity có giống domain object không?\"\n2. AI answered: \"Không hẳn giống nhau\" (They are not exactly the same)\n3. Now user asks: \"Vậy với chương trình Spring Boot mà sử dụng entity thì sẽ không cần domain object đúng không, vì tôi thường sử dụng Controller gọi tới service và service thao tác với entity?\"\n\nThis is a common question in Spring Boot architecture. Let me think about this carefully.\n\nThe note's position:\n- Domain objects contain business rules and should have strong encapsulation\n- Entities (JPA) have framework requirements (no-arg constructor, setters for Hibernate)\n- DTOs are for data transport\n- The note suggests separating concerns\n\nThe user's question implies they're using the \"anemic domain model\" or \"transaction script\" pattern where:\n- Controller → Service → Repository (Entity)\n- Business logic is in Service\n- Entity is just a data holder with getters/setters\n\nThis is actually a very common pattern in Spring Boot applications, and many tutorials teach this way. But is it the best practice?\n\nLet me think about the trade-offs:\n\n**When you DON'T need separate domain objects:**\n- Simple CRUD applications\n- Small to medium projects\n- When business logic is straightforward\n- When using Spring Boot's defaults\n- Team is not familiar with DDD\n- The \"anemic domain model\" approach is acceptable here\n\n**When you SHOULD consider separate domain objects (rich domain model):**\n- Complex business rules\n- Multiple invariants across fields\n- Domain logic that needs to be reused\n- Large teams / long-term maintenance\n- When you want to test business logic without database\n- When service layer becomes too fat (god service)\n\n**Practical middle ground in Spring Boot:**\n1. Use entity + service with business logic in service (anemic domain model) - common but has issues\n2. Use entity as pure data, create domain services - separates persistence from business\n3. Use rich entities where business logic lives in the entity itself (DDD-lite)\n4. Full DDD: Aggregate Root, Entity, Value Object, Domain Service, Repository\n\nThe note emphasizes:\n- \"Với domain object thì nên rất cẩn thận\" - keep invariants tight\n- Method nghiệp vụ better than setter\n- Encapsulation tốt không phải là \"ẩn field rồi generate getter/setter\"\n\nBased on the note's perspective, the answer should be:\n- It's not \"không cần\" (don't need) - it's a design choice\n- For simple cases, entity + service is fine\n- For complex business rules, you should have domain objects separate from entities\n- The note doesn't explicitly say \"always separate\", but it implies domain objects should contain business rules\n\nLet me structure a clear, helpful answer:\n\n1. Direct answer: Không hẳn - depends on complexity\n2. Explain the anemic domain model pattern (which user is using)\n3. Show when current approach is fine\n4. Show when it becomes problematic\n5. Suggest middle ground\n\nI should answer in Vietnamese, clear and structured, following the assistant's guidelines.\n\nLet me draft the answer:\n\n# Có cần Domain Object riêng khi dùng Entity không?\n\n**Câu trả lời ngắn:** Không nhất thiết, nhưng tùy thuộc vào độ phức tạp của business logic. Cách bạn đang làm (Controller → Service → Entity) là pattern phổ biến trong Spring Boot và hoàn toàn chấp nhận được trong nhiều trường hợp.\n\n## 1. Cách bạn đang làm có tên gọi là gì?\n\nPattern của bạn là **Transaction Script** hoặc **Anemic Domain Model**:\n- Entity chỉ chứa data + getter/setter\n- Business logic nằm hết trong Service\n- Service điều phối mọi thứ\n\nĐây là cách Spring Boot default tutorials hay dạy, và hoạt động tốt trong nhiều project.\n\n## 2. Khi nào cách này OK?\n\n- CRUD đơn giản: tạo user, lấy danh sách sản phẩm, update profile...\n- Business logic không phức tạp\n- Service không quá \"béo\" (chỉ vài method)\n- Team chưa quen DDD\n- Dự án nhỏ đến vừa\n\nTrong những case này, tách Domain Object riêng là **over-engineering**.\n\n## 3. Khi nào cách này bắt đầu có vấn đề?\n\nKhi bạn gặp các dấu hiệu sau:\n\n### 3.1. Service bắt đầu phình to\n```java\n@Service\npublic class OrderService {\n    public Order createOrder(...) { /* 50 dòng validate */ }\n    public void cancelOrder(...) { /* check status, refund, notify */ }\n    public void updateStatus(...) { /* 30 dòng business rule */ }\n    // ... ngày càng nhiều method\n}\n```\n\n### 3.2. Logic nghiệp vụ bị lặp lại ở nhiều service\nVí dụ rule \"đơn hàng chỉ hủy được khi status = PENDING\" xuất hiện ở:\n- OrderService.cancel()\n- ReportService.exportOrder()\n- AdminService.forceCancel()\n\n### 3.3. Invariant khó giữ\nGiống ví dụ trong note: setter set `start` và `end` riêng, không ai kiểm tra quan hệ giữa chúng → dễ sinh bug.\n\n### 3.4. Khó test business logic\nMỗi lần test phải mock cả Entity + Repository, trong khi logic thuần túy có thể test không cần DB.\n\n## 4. Ba cách tổ chức code phổ biến trong Spring Boot\n\n### Cách 1: Entity + Service (bạn đang dùng)\n```\nController → Service → Entity (anemic) → Repository\n```\n- **Ưu**: Đơn giản, quen thuộc, ít class\n- **Nhược**: Khi logic phức tạp, service phình to, entity chỉ là data bag\n\n### Cách 2: Entity giữ logic nghiệp vụ (DDD-lite)\n```\nController → Service → Entity (rich) → Repository\n```\n- Entity có thêm method nghiệp vụ: `order.cancel()`, `booking.extend()`\n- Service chỉ điều phối transaction, không chứa rule\n- **Ưu**: Logic tập trung, dễ test, entity có ý nghĩa\n- **Nhược**: JPA entity đôi khi khó giữ encapsulation chặt (đã nói ở note)\n\n### Cách 3: Tách Domain Object riêng (DDD đầy đủ)\n```\nController → Service → Domain Object → Repository (chỉ là persistence)\n                ↓\n            Domain Service (rule phức tạp liên aggregate)\n```\n- Entity chỉ là persistence layer\n- Domain Object chứa toàn bộ business rule\n- **Ưu**: Rõ ràng nhất, dễ maintain dài hạn\n- **Nhược**: Nhiều class, phức tạp hơn, chỉ đáng khi logic thật sự phức tạp\n\n## 5. Gợi ý cho bạn\n\nVì bạn đang dùng Spring Boot với pattern Controller → Service → Entity, mình gợi ý:\n\n### Bước 1: Vẫn giữ pattern hiện tại\nĐừng tách Domain Object chỉ vì \"DDD bảo thế\". Với CRUD đơn giản thì over-engineering.\n\n### Bước 2: Khi nào thấy service \"béo\" thì cân nhắc\n- Nếu service có 1-2 method logic đơn giản → giữ nguyên\n- Nếu service có 5-10 method với rule phức tạp → tách Domain Object hoặc đẩy logic xuống Entity\n\n### Bước 3: Đẩy logic xuống Entity trước khi tách Domain Object\nĐây là bước trung gian dễ làm nhất:\n\n```java\n@Entity\npublic class Order {\n    // ... fields\n    \n    public void cancel() {\n        if (this.status != OrderStatus.PENDING) {\n            throw new InvalidOrderException(...);\n        }\n        this.status = OrderStatus.CANCELLED;\n        // logic liên quan\n    }\n}\n\n@Service\npublic class OrderService {\n    @Transactional\n    public void cancel(Long orderId) {\n        Order order = orderRepository.findById(orderId).orElseThrow();\n        order.cancel(); // ← gọi vào entity\n        // không cần viết logic ở đây\n    }\n}\n```\n\nCách này vừa cải thiện encapsulation, vừa không phải tạo thêm class.\n\n## 6. Tóm lại\n\n| Câu hỏi | Trả lời |\n|----------|---------|\n| Entity có thay thế Domain Object? | Không hoàn toàn - entity thiên về persistence, domain object thiên về business |\n| Có cần Domain Object riêng? | Không nhất thiết - tùy độ phức tạp |\n| Pattern Controller → Service → Entity có sai? | Không sai, rất phổ biến và hoạt động tốt |\n| Khi nào cần thay đổi? | Khi service phình to, logic bị lặp, invariant khó giữ |\n| Cách trung gian dễ áp dụng? | Đẩy logic xuống Entity (rich entity), service chỉ điều phối |\n\nQuan trọng nhất theo note: **dù dùng pattern nào, hãy giữ invariant của object và để business rule được thể hiện rõ ràng trong code**.\n\n---\n\nLet me review this answer:\n- It's clear and structured\n- It answers the question directly\n- It acknowledges the user's current approach is valid\n- It provides options based on complexity\n- It gives practical advice (the \"rich entity\" middle ground)\n- It ties back to the note's main themes (invariant, encapsulation)\n- It's in Vietnamese as required\n- It doesn't fabricate info outside the context\n\nI think this is a good answer. Let me finalize it.</think>\n\n# Có cần Domain Object riêng khi Spring Boot dùng Entity không?\n\n**Câu trả lời ngắn:** Không nhất thiết. Pattern bạn đang dùng (Controller → Service → Entity) hoàn toàn hợp lệ và phù hợp với phần lớn dự án Spring Boot. Việc có cần tách Domain Object riêng hay không **phụ thuộc vào độ phức tạp của business logic**, không phải quy tắc bắt buộc.\n\n---\n\n## 1. Pattern bạn đang dùng có tên là gì?\n\nPattern của bạn là **Transaction Script** hoặc **Anemic Domain Model**:\n\n- Entity chỉ chứa data + getter/setter\n- Business logic nằm hết trong Service\n- Service điều phối toàn bộ rule\n\nĐây là cách Spring Boot tutorial hay dạy, và hoạt động tốt trong thực tế.\n\n---\n\n## 2. Khi nào cách này hoàn toàn OK?\n\n- CRUD đơn giản: tạo user, lấy danh sách sản phẩm, update profile\n- Business logic không phức tạp, ít rule liên quan nhiều field\n- Service không quá \"béo\" (vài method, vài chục dòng)\n- Dự án nhỏ đến vừa\n- Team chưa quen DDD\n\nTrong những trường hợp này, tách Domain Object riêng là **over-engineering** — chỉ thêm class mà không giải quyết vấn đề gì.\n\n---\n\n## 3. Khi nào cách này bắt đầu có vấn đề?\n\n### 3.1. Service bắt đầu phình to\n```java\n@Service\npublic class OrderService {\n    public Order createOrder(...) { /* 50 dòng validate */ }\n    public void cancelOrder(...) { /* check status + refund + notify */ }\n    public void updateStatus(...) { /* 30 dòng rule nghiệp vụ */ }\n    // ngày càng nhiều method...\n}\n```\n\n### 3.2. Logic bị lặp lại ở nhiều nơi\nRule \"đơn chỉ hủy được khi status = PENDING\" xuất hiện ở:\n- `OrderService.cancel()`\n- `ReportService.exportOrder()`\n- `AdminService.forceCancel()`\n\nSửa rule → phải tìm và sửa nhiều chỗ → dễ sót bug.\n\n### 3.3. Invariant khó giữ\nĐúng bài toán trong note: setter set `start` và `end` riêng lẻ, không ai kiểm tra quan hệ giữa hai field → object dễ rơi vào trạng thái sai.\n\n### 3.4. Khó test business logic\nMỗi lần test rule phải mock cả Entity + Repository, trong khi logic thuần túy có thể test không cần DB.\n\n---\n\n## 4. Ba cách tổ chức code phổ biến trong Spring Boot\n\n### Cách 1: Entity + Service (bạn đang dùng)\n```\nController → Service → Entity (anemic) → Repository\n```\n- **Ưu**: Đơn giản, ít class, dễ hiểu\n- **Nhược**: Service phình to khi logic phức tạp, entity chỉ là data bag\n\n### Cách 2: Entity giữ logic nghiệp vụ (DDD-lite) — gợi ý trung gian\n```\nController → Service → Entity (rich) → Repository\n```\nEntity có thêm method nghiệp vụ như `order.cancel()`, `booking.extend()`. Service chỉ điều phối transaction.\n\n- **Ưu**: Logic tập trung trong entity, service gọn, dễ test\n- **Nhược**: JPA entity đôi khi khó giữ encapsulation chặt (đã đề cập trong note)\n\n### Cách 3: Tách Domain Object riêng (DDD đầy đủ)\n```\nController → Service → Domain Object → Repository (chỉ persistence)\n                ↓\n            Domain Service (rule phức tạp liên aggregate)\n```\n- **Ưu**: Rõ ràng nhất, dễ maintain dài hạn\n- **Nhược**: Nhiều class, phức tạp — chỉ đáng khi logic thật sự phức tạp\n\n---\n\n## 5. Gợi ý thực tế cho bạn\n\n### Bước 1: Vẫn giữ pattern hiện tại\nĐừng tách Domain Object chỉ vì \"DDD bảo thế\". Với CRUD đơn giản thì over-engineering.\n\n### Bước 2: Khi nào thấy service \"béo\" thì cân nhắc\n- Service có 1–2 method logic đơn giản → giữ nguyên\n- Service có 5–10 method với rule phức tạp, logic bị lặp → chuyển sang Cách 2 hoặc 3\n\n### Bước 3: Ưu tiên đẩy logic xuống Entity trước khi tách Domain Object\nĐây là bước trung gian dễ áp dụng nhất, đúng tinh thần note:\n\n```java\n@Entity\npublic class Order {\n    // ... fields\n\n    public void cancel() {\n        if (this.status != OrderStatus.PENDING) {\n            throw new InvalidOrderException(\"...\");\n        }\n        this.status = OrderStatus.CANCELLED;\n        // các logic liên quan đặt ở đây\n    }\n}\n\n@Service\npublic class OrderService {\n    @Transactional\n    public void cancel(Long orderId) {\n        Order order = orderRepository.findById(orderId).orElseThrow();\n        order.cancel();   // ← gọi vào entity, không viết logic ở đây\n    }\n}\n```\n\nCách này vừa cải thiện encapsulation (entity tự bảo vệ invariant), vừa không phải tạo thêm class.\n\n---\n\n## 6. Tóm lại\n\n| Câu hỏi | Trả lời |\n|----------|---------|\n| Entity có thay thế Domain Object? | Không hoàn toàn — entity thiên về persistence, domain object thiên về business |\n| Có cần Domain Object riêng? | Không nhất thiết — tùy độ phức tạp |\n| Pattern Controller → Service → Entity có sai? | Không sai, rất phổ biến và hoạt động tốt |\n| Khi nào nên thay đổi? | Khi service phình to, logic bị lặp, invariant khó giữ |\n| Bước trung gian dễ áp dụng? | Đẩy logic xuống Entity (rich entity), service chỉ điều phối |\n\n**Điểm cốt lõi theo note:** dù dùng pattern nào, điều quan trọng là **giữ được invariant của object** và **để business rule được thể hiện rõ ràng trong code** — chứ không phải cứ phải tách Domain Object mới gọi là đúng.",
+        "createdAt": "2026-06-20T15:20:16.102Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "1c2d0e13-ca60-40bd-9b26-af446a2c7bd0",
+        "parentId": null,
+        "author": "user",
+        "body": "Date là mutable còn localdate là immutable, vậy làm sao để tôi biết được những object khác object nào là mutable còn object nào là immutable",
+        "createdAt": "2026-06-20T15:37:15.658Z"
+      },
+      {
+        "id": "b95cb161-e286-4027-a9e3-d6b015d55fd4",
+        "parentId": "1c2d0e13-ca60-40bd-9b26-af446a2c7bd0",
+        "author": "ai",
+        "body": "<think>\nThe user is asking a follow-up question based on the note about Encapsulation. The context comment is from a previous discussion, and the new question is: \"Date là mutable còn LocalDate là immutable, vậy làm sao để tôi biết được những object khác object nào là mutable còn object nào là immutable\" (Date is mutable while LocalDate is immutable, so how do I know which other objects are mutable and which are immutable?)\n\nThis is a great question that's directly related to the note's content, especially section 5.8 (immutable object) and 5.5 (getter can break encapsulation when returning mutable objects).\n\nLet me think about how to answer this comprehensively:\n\n1. **Definition recap**: Mutable = state can change after creation. Immutable = state cannot change after creation.\n\n2. **How to identify if a class is mutable or immutable in Java**:\n\n**a) Check if the class is declared `final`**\n- Immutable classes are typically declared `final` to prevent subclassing that could add mutability\n- Example: `String`, `LocalDate`, `Integer` are all `final`\n- `Date` is NOT final (legacy class)\n\n**b) Check if all fields are `private final`**\n- Immutable classes usually have all fields as `private final`\n- Note: `final` field means reference can't change, but the object it points to could still be mutable\n\n**c) Check if there are setter methods (mutators)**\n- If there are setters, the class is likely mutable\n- Immutable classes don't have setters\n\n**d) Check the constructor(s)**\n- Immutable classes often have full constructors that set all fields\n- They may not have no-arg constructors (or use it differently)\n\n**e) Check the JavaDoc / class documentation**\n- Most well-designed classes document whether they are immutable\n\n**f) Check the method names and behavior**\n- Methods that return the same type often indicate mutability (e.g., `addDays()` in LocalDate returns a new LocalDate, doesn't modify the current one)\n- Methods starting with `set` usually indicate mutation\n- Methods like `append`, `insert` in StringBuilder indicate mutation\n\n**g) Look at inheritance hierarchy**\n- If a class extends a mutable class, it's likely mutable\n- Example: `java.sql.Date` extends `Date`, so it's mutable\n\n3. **Practical checklist**:\n\n| Dấu hiệu | Mutable | Immutable |\n|----------|---------|-----------|\n| Từ khóa `final` trên class | Không bắt buộc | Thường có |\n| `final` fields | Không bắt buộc | Bắt buộc (nếu có field) |\n| Setter methods | Có | Không |\n| Method `add/remove/set` | Có thể thay đổi object hiện tại | Phải trả về object mới |\n| Constructor | Thường có no-arg | Thường chỉ có full constructor |\n| Kế thừa từ class mutable | Có thể | Hiếm |\n\n4. **Common Java classes**:\n\n**Immutable**:\n- `String`\n- All wrapper classes: `Integer`, `Long`, `Double`, `Boolean`, etc.\n- `LocalDate`, `LocalTime`, `LocalDateTime`, `ZonedDateTime`, `Instant`\n- `Duration`, `Period`\n- `UUID`\n- `BigInteger`, `BigDecimal` (kind of - BigDecimal is technically mutable but the values can be changed, but it's considered immutable in practice)\n- Actually `BigDecimal` IS immutable\n- `Path`, `URI`, `URL` (URL is technically mutable but...)\n- `Optional`\n\n**Mutable**:\n- `Date` (java.util.Date)\n- `Calendar`\n- `StringBuilder`, `StringBuffer`\n- `ArrayList`, `LinkedList`, `HashMap`, `HashSet`, etc. (Collections framework)\n- All arrays (e.g., `int[]`, `String[]`)\n- `StringTokenizer`\n- `java.sql.Date`, `java.sql.Time`, `java.sql.Timestamp`\n\n5. **Tricks to remember**:\n- If a class name contains \"Builder\", \"Buffer\", \"Mutable\" - it's likely mutable\n- If it's in `java.time` package - it's almost always immutable\n- If it's a collection - it's mutable by default (unless wrapped with `Collections.unmodifiableXxx()`)\n- Wrapper classes (Integer, Long, etc.) - all immutable\n\n6. **How to verify in code**:\n- Try to find a setter\n- Try to find methods that return `void` and modify state\n- Check if methods like `addXxx`, `setXxx` return the same instance (this) or a new instance\n- Read the class's JavaDoc\n\n7. **Connection to the note**:\n- This relates to Câu 5 in the note: Getter có thể làm hỏng encapsulation không\n- If a getter returns a mutable object, the caller can modify the internal state\n- Example: `getItems()` returning a `List` - the caller can call `items.add()` or `items.clear()`\n\nLet me structure the answer clearly in Vietnamese:\n\n1. Quick recap of mutable vs immutable\n2. 6-7 concrete ways to identify\n3. Table of common Java classes\n4. Practical tips\n5. Connection back to the note (getter and encapsulation)\n\nI'll make this detailed but well-structured.</think>\n\n# Cách phân biệt Mutable và Immutable trong Java\n\nCâu hỏi này rất hay và liên quan trực tiếp đến **Câu 5 trong note** (Getter có thể làm hỏng encapsulation). Mình sẽ hệ thống lại các cách nhận biết.\n\n---\n\n## 1. Định nghĩa nhanh (từ note)\n\n- **Mutable**: trạng thái có thể thay đổi **sau khi tạo** (vd: `Date`, `StringBuilder`).\n- **Immutable**: trạng thái **không thể thay đổi** sau khi tạo (vd: `String`, `LocalDate`).\n\nVậy làm sao biết một class bất kỳ là mutable hay immutable?\n\n---\n\n## 2. 6 dấu hiệu nhận biết\n\n### Dấu hiệu 1: Class có được khai báo `final` không?\n\nImmutable class **thường** được khai báo `final` để chặn việc kế thừa thêm mutability.\n\n| Class | `final`? | Ghi chú |\n|---|---|---|\n| `String` | Có | Immutable |\n| `LocalDate` | Có | Immutable |\n| `Integer`, `Long` | Có | Immutable |\n| `Date` | **Không** | Mutable (đây là lý do nó kém an toàn) |\n\n> ⚠️ Đây là dấu hiệu, **không phải tuyệt đối**. Một số class mutable cũng có thể `final` (vd: `StringBuilder` là `final` nhưng vẫn mutable).\n\n---\n\n### Dấu hiệu 2: Có **setter method** hay không?\n\nĐây là cách **dễ và chính xác nhất**.\n\n- Có setter (`setXxx(...)`) → gần như chắc chắn **mutable**.\n- Không có setter → có khả năng cao là **immutable**.\n\n```java\n// Mutable: có setTime\ndate.setTime(System.currentTimeMillis());\n\n// Immutable: không có setHour, chỉ có plusHours trả về LocalDate mới\nlocalDate.plusHours(3);\n```\n\n---\n\n### Dấu hiệu 3: Method trả về `this` hay trả về object mới?\n\nQuy tắc vàng:\n\n| Kiểu method | Mutable | Immutable |\n|---|---|---|\n| Trả về `this` (chain) | ✅ | ❌ |\n| Trả về `void` (chỉ đổi trạng thái nội tại) | ✅ | ❌ |\n| Trả về object **mới** cùng kiểu | ❌ (hiếm) | ✅ |\n\n```java\n// Mutable - StringBuilder: append đổi chính nó, trả về this\nStringBuilder sb = new StringBuilder(\"a\");\nsb.append(\"b\"); // sb giờ là \"ab\"\n\n// Immutable - LocalDate: plusDays trả về LocalDate MỚI\nLocalDate d1 = LocalDate.of(2024, 1, 1);\nLocalDate d2 = d1.plusDays(1);\n// d1 vẫn là 2024-01-01, d2 mới là 2024-01-02\n```\n\n---\n\n### Dấu hiệu 4: Các field có `final` không?\n\nClass immutable thường có **mọi field đều `private final`**:\n\n```java\npublic final class LocalDate {\n    private final int year;     // final\n    private final short month;  // final\n    private final short day;    // final\n    // ...\n}\n```\n\nVì field `final` nên sau constructor, **reference** không thể bị gán lại. (Lưu ý: object mà reference trỏ tới vẫn có thể bị đổi nếu nó là mutable — đây là lý do cần **defensive copy**.)\n\n---\n\n### Dấu hiệu 5: Tên class có chứa \"Builder\", \"Buffer\", \"Mutable\" không?\n\nĐây là **quy ước đặt tên** trong Java:\n\n| Tên gợi ý | Khả năng cao là |\n|---|---|\n| `StringBuilder`, `StringBuffer` | Mutable |\n| `DateBuilder`, `LocalDate.Mutable` | Mutable |\n| `LocalDate`, `String`, `Integer` | Immutable |\n| `XxxWrapper`, `XxxSnapshot` | Thường immutable |\n\n---\n\n### Dấu hiệu 6: Đọc JavaDoc\n\nĐây là cách **chính thống nhất**. Class được thiết kế tốt luôn ghi rõ trong JavaDoc:\n\n> `LocalDate` (JavaDoc): *\"This class is immutable and thread-safe.\"*\n> `StringBuilder` (JavaDoc): *\"A mutable sequence of characters.\"*\n> `Date` (JavaDoc): *\"The class Date represents a specific instant in time, with millisecond precision... The Date class is intended to reflect coordinated universal time (UTC)... **but is not required to do so**.\"* → không nói immutable = mutable.\n\n---\n\n## 3. Bảng tra nhanh các class thường gặp\n\n| Package / Quy ước | Immutable ✅ | Mutable ❌ |\n|---|---|---|\n| Wrapper | `Integer`, `Long`, `Double`, `Boolean`, `BigDecimal`, `BigInteger` | — |\n| Chuỗi | `String` | `StringBuilder`, `StringBuffer` |\n| `java.time` | `LocalDate`, `LocalTime`, `LocalDateTime`, `ZonedDateTime`, `Instant`, `Duration`, `Period` | — |\n| SQL / Legacy | — | `java.util.Date`, `java.sql.Date`, `java.sql.Timestamp`, `Calendar` |\n| Collection | `List.of(...)`, `Collections.unmodifiableList(...)` | `ArrayList`, `HashMap`, `HashSet`, `LinkedList` |\n| Mảng | — | Mọi mảng (`int[]`, `String[]`...) |\n| Khác | `UUID`, `Path`, `Optional`, `URI` | `URL` (mutable!), `Iterator` |\n\n> 💡 Mẹo nhớ: **Mọi thứ trong `java.time` đều immutable**. Đó là lý do `LocalDate` ra đời thay thế `Date`.\n\n---\n\n## 4. Cách kiểm chứng nhanh bằng thử code\n\nNếu không chắc, cứ thử gọi một method \"nghi ngờ\" mutate:\n\n```java\nString s = \"hello\";\ns.toUpperCase();   // không đổi s\nSystem.out.println(s); // vẫn \"hello\" → String immutable\n\nStringBuilder sb = new StringBuilder(\"hello\");\nsb.append(\" world\"); // đổi chính sb\nSystem.out.println(sb); // \"hello world\" → mutable\n```\n\n---\n\n## 5. Liên hệ ngược lại với note (quan trọng!)\n\nCâu 5 trong note cảnh báo: **Getter trả về mutable object có thể phá encapsulation**.\n\nVì vậy, khi thiết kế class, nếu field là mutable (vd: `List`, `Date`), bạn phải:\n\n```java\n// ❌ Sai: getter trả về list gốc, bên ngoài thoải mái sửa\npublic List<Item> getItems() {\n    return items;\n}\n\n// ✅ Đúng: trả về bản unmodifiable hoặc copy\npublic List<Item> getItems() {\n    return Collections.unmodifiableList(items);\n}\n\n// ✅ Đúng: dùng kiểu immutable\npublic ImmutableList<Item> getItems() {\n    return ImmutableList.copyOf(items);\n}\n```\n\nTương tự với `Date`:\n\n```java\n// ❌ Lộ Date mutable\npublic Date getBirthday() { return birthday; }\n\n// ✅ Trả về LocalDate immutable\npublic LocalDate getBirthday() { return birthday; }\n```\n\n---\n\n## 6. Tóm tắt thành checklist nhanh\n\nKhi gặp một class lạ, hỏi theo thứ tự:\n\n1. Có setter không? → Có = mutable.\n2. Method trả về `this` không? → Có = mutable.\n3. Field có `final` hết không? → Có = gợi ý immutable.\n4. Tên class có \"Builder/Buffer\" không? → Có = mutable.\n5. Có trong `java.time` không? → Có = immutable.\n6. JavaDoc có ghi \"immutable\" không? → Đọc là biết.\n\nNếu trả lời được **3/6 câu trên**, bạn đã đủ tự tin để xử lý. Trong phỏng vấn Java backend, kiến thức này rất hay được hỏi kèm với câu *\"Làm sao thiết kế class an toàn trong môi trường multi-thread?\"* — immutable chính là câu trả lời.",
+        "createdAt": "2026-06-20T15:37:15.658Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
+      },
+      {
+        "id": "5ca8992e-fd0c-47d9-8607-f9e3782047d1",
+        "parentId": null,
+        "author": "user",
+        "body": "demo sử dụng builder vi phạm encapsulation và builder không vi phạm encapsulation",
+        "createdAt": "2026-06-20T15:47:35.041Z"
+      },
+      {
+        "id": "f5c2bc49-12dc-44a2-84fe-6f834f31d36b",
+        "parentId": "5ca8992e-fd0c-47d9-8607-f9e3782047d1",
+        "author": "ai",
+        "body": "<think>\nNgười dùng muốn tôi demo 2 ví dụ về Builder pattern:\n1. Builder vi phạm encapsulation\n2. Builder không vi phạm encapsulation\n\nTôi cần dựa trên context của note về Encapsulation để tạo ra các ví dụ phù hợp. Tôi sẽ giả định ngôn ngữ Java vì note nói về Java (có nhắc đến private field, getter/setter, record, JPA, etc.).\n\nBuilder pattern thường được dùng để tạo object phức tạp. Vấn đề về encapsulation với builder thường liên quan đến:\n- Builder cho phép set từng field một cách thoải mái → có thể vi phạm invariant\n- Builder \"xấu\" tạo ra object ở trạng thái không hợp lệ\n- Builder \"tốt\" validate trước khi build, giữ invariant\n\nTôi sẽ demo với ví dụ `BookingPeriod` (start, end) vì note đã dùng ví dụ này.\n\n**Builder vi phạm encapsulation:**\n- Builder chỉ lưu field, set từng cái, không validate khi set, validate yếu ở build()\n- Có thể tạo object với start > end\n- Setter của builder không kiểm tra\n\n**Builder không vi phạm encapsulation:**\n- Builder có validation ở mỗi method set (ví dụ setStart kiểm tra nếu đã có end)\n- Hoặc builder có method build() validate chặt\n- Hoặc builder dùng method nghiệp vụ thay vì setter (ví dụ withPeriod, extendEnd...)\n\nTôi sẽ viết code Java rõ ràng, giải thích từng phần.\n\nLưu ý: Câu hỏi này có vẻ đơn giản, người dùng chỉ cần demo code. Tôi nên cung cấp code rõ ràng, mỗi ví dụ có giải thích ngắn tại sao vi phạm/không vi phạm.</think>\n\n# Demo: Builder vi phạm vs không vi phạm Encapsulation\n\nDùng lại ví dụ `BookingPeriod` (start, end) trong note để dễ liên hệ.\n\n---\n\n## 1. Builder vi phạm encapsulation\n\n```java\npublic class BookingPeriod {\n    private final LocalDateTime start;\n    private final LocalDateTime end;\n\n    public BookingPeriod(LocalDateTime start, LocalDateTime end) {\n        this.start = start;\n        this.end = end;\n    }\n\n    public LocalDateTime getStart() { return start; }\n    public LocalDateTime getEnd()   { return end; }\n\n    // ===== Builder \"xấu\" =====\n    public static class Builder {\n        private LocalDateTime start;\n        private LocalDateTime end;\n\n        public Builder start(LocalDateTime start) {\n            this.start = start;   // <-- set thẳng, không kiểm tra gì\n            return this;\n        }\n\n        public Builder end(LocalDateTime end) {\n            this.end = end;       // <-- set thẳng, không kiểm tra gì\n            return this;\n        }\n\n        public BookingPeriod build() {\n            // Validate quá muộn, chỉ ném exception khi build\n            if (start == null || end == null) {\n                throw new IllegalStateException(\"start/end required\");\n            }\n            return new BookingPeriod(start, end);\n        }\n    }\n}\n```\n\n**Cách dùng sai:**\n\n```java\n// Vi phạm invariant: start > end\nBookingPeriod p = new BookingPeriod.Builder()\n        .start(LocalDateTime.of(2025, 1, 10, 10, 0))\n        .end(LocalDateTime.of(2025, 1, 5, 10, 0))   // end trước start\n        .build();\n```\n\n**Vì sao vi phạm encapsulation:**\n\n- Mỗi method của builder cho phép set field riêng lẻ, **không kiểm tra quan hệ giữa các field** → đúng bài sai trong note mục 2.3 và Câu 3.\n- Builder để lộ trạng thái nửa vời (`start` có mà `end` chưa có) và không ngăn cảnh huống object xấu được dựng lên.\n- Tên `start()` / `end()` chỉ là \"set dữ liệu\", không thể hiện ý nghĩa nghiệp vụ → sai tinh thần mục 3.3 của note.\n- Validate chỉ ở `build()` → invariant không được giữ ở **mọi thời điểm** như mục 2.3 yêu cầu.\n\n---\n\n## 2. Builder không vi phạm encapsulation\n\n```java\npublic class BookingPeriod {\n    private final LocalDateTime start;\n    private final LocalDateTime end;\n\n    private BookingPeriod(LocalDateTime start, LocalDateTime end) {\n        // Constructor private, chỉ tạo qua Builder\n        this.start = start;\n        this.end = end;\n    }\n\n    public LocalDateTime getStart() { return start; }\n    public LocalDateTime getEnd()   { return end; }\n\n    // ===== Builder \"tốt\" =====\n    public static class Builder {\n        private LocalDateTime start;\n        private LocalDateTime end;\n\n        public Builder() { }\n\n        public Builder from(LocalDateTime start) {\n            this.start = start;\n            return this;\n        }\n\n        public Builder to(LocalDateTime end) {\n            // Set end mà biết start rồi → kiểm tra ngay\n            if (this.start != null && end.isBefore(this.start)) {\n                throw new IllegalArgumentException(\"end phải >= start\");\n            }\n            this.end = end;\n            return this;\n        }\n\n        public Builder period(LocalDateTime start, LocalDateTime end) {\n            // Method nghiệp vụ: set cả 2, kiểm tra 1 lần, atomic\n            if (start == null || end == null) {\n                throw new IllegalArgumentException(\"start/end required\");\n            }\n            if (end.isBefore(start)) {\n                throw new IllegalArgumentException(\"end phải >= start\");\n            }\n            this.start = start;\n            this.end = end;\n            return this;\n        }\n\n        public BookingPeriod build() {\n            // Build() không cần validate nữa vì các method đã giữ invariant\n            return new BookingPeriod(start, end);\n        }\n    }\n}\n```\n\n**Cách dùng đúng:**\n\n```java\n// Cách 1: set tuần tự nhưng có kiểm tra\nBookingPeriod p1 = new BookingPeriod.Builder()\n        .from(LocalDateTime.of(2025, 1, 5, 10, 0))\n        .to(LocalDateTime.of(2025, 1, 10, 10, 0))\n        .build();\n\n// Cách 2: dùng method nghiệp vụ \"period\" — atomic, 1 lần validate\nBookingPeriod p2 = new BookingPeriod.Builder()\n        .period(LocalDateTime.of(2025, 1, 5, 10, 0),\n                LocalDateTime.of(2025, 1, 10, 10, 0))\n        .build();\n\n// Trường hợp sai bị chặn NGAY từ lúc gọi method\nnew BookingPeriod.Builder()\n        .from(LocalDateTime.of(2025, 1, 10, 10, 0))\n        .to(LocalDateTime.of(2025, 1, 5, 10, 0));   // <-- ném exception tại đây\n```\n\n**Vì sao không vi phạm encapsulation:**\n\n- **Validate ngay tại thời điểm set**, không đợi tới `build()` → invariant được giữ ở mọi thời điểm (đúng mục 2.3).\n- Có method `period(...)` thể hiện **ý nghĩa nghiệp vụ** thay vì chỉ \"set field\" → đúng mục 3.3 và Câu 4.\n- Constructor `private`, bên ngoài bắt buộc đi qua builder → không có \"lỗ hổng\" tạo object sai (đúng Câu 6 trong note).\n- Không thay đổi từng field một cách độc lập ở cấp object, tránh được bài học \"setter nguy hiểm\" ở Câu 3.\n\n---\n\n## 3. So sánh nhanh\n\n| Tiêu chí | Builder vi phạm | Builder không vi phạm |\n|---|---|---|\n| Thời điểm validate | Ở `build()` (muộn) | Ngay tại method set hoặc method nghiệp vụ |\n| Method nghiệp vụ | Không có (`start()`, `end()` thuần setter) | Có (`period(from, to)`) |\n| Object tạm thời | Có thể ở trạng thái sai | Luôn hợp lệ sau mỗi bước |\n| Tên method | Trùng tên field | Mang ý nghĩa (`from`, `to`, `period`) |\n| Constructor | Public | Private, ép đi qua builder |\n\n---\n\n**Điểm cốt lõi khi rút ra từ note:** Builder cũng chỉ là một dạng \"cổng kiểm soát\". Nếu builder cho set từng field tự do như setter rời rạc, nó sẽ lặp lại đúng lỗi mà note cảnh báo ở mục 2.3 và Câu 3. Builder tốt phải **giữ invariant ở mọi thời điểm** và **đặt tên method theo nghiệp vụ**, không theo field.",
+        "createdAt": "2026-06-20T15:47:35.041Z",
+        "model": "minimax/minimax-m3",
+        "provider": "kilo"
       }
     ]
   },
@@ -873,6 +953,89 @@
             "back": "Dùng protected no-args constructor (JPA dùng reflection, không cần public). Không generate setter public, thay vào đó dùng method nghiệp vụ (ví dụ `withdraw(amount)`, `changePeriod(start,end)`). Nếu framework cần setter để map DB, có thể để setter private/protected hoặc dùng field access (JPA `@Access(AccessType.FIELD)`).",
             "hint": "JPA cần setter, nhưng có cần public không? Bạn có thể dùng protected setter?",
             "tag": "java-oop-encapsulation"
+          }
+        ]
+      },
+      {
+        "id": "be63e0a4-3b5d-42ba-99b3-7d6902f4ba88",
+        "taskId": "java-001.oop.encapsulation",
+        "taskTitle": "Encapsulation: private field, invariant, getter/setter có kiểm soát",
+        "title": "Bộ flashcard 2",
+        "createdAt": "2026-06-20T15:34:44.340Z",
+        "source": {
+          "noteCharacters": 15998,
+          "commentCount": 10
+        },
+        "cards": [
+          {
+            "id": "05d1484d-c3c0-440d-85a9-27dcddcc6bd6",
+            "front": "Một class có getStart() trả về LocalDate (immutable) và getEnd() trả về Date (mutable). Getter nào dễ gây rò rỉ trạng thái nội bộ hơn? Vì sao?",
+            "back": "getEnd() dễ gây rò rỉ hơn vì Date là mutable. Bên ngoài có thể thay đổi đối tượng Date tham chiếu đến field nội bộ (gọi setTime…), từ đó phá invariant. LocalDate là immutable nên chỉ trả về copy an toàn, không thể sửa.",
+            "hint": "Xem xét khả năng sửa đổi đối tượng trả về sau khi getter chạy.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "5267afd5-a2aa-4d86-9fc6-f9547e166ee1",
+            "front": "Một class BankAccount có setter setBalance(BigDecimal balance) kiểm tra balance >= 0. Tại sao đây vẫn là encapsulation kém?",
+            "back": "Vì: (1) tên method không thể hiện hành vi nghiệp vụ (như withdraw/deposit), (2) cho phép đặt balance tùy ý miễn không âm – không phản ánh đúng nghiệp vụ, (3) không kiểm soát ai gọi và trong ngữ cảnh nào. Encapsulation không chỉ validate mà còn phải thể hiện ý định và giới hạn thay đổi qua method nghiệp vụ.",
+            "hint": "Nghĩ về ý nghĩa nghiệp vụ hơn là giá trị hợp lệ.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "7b2e4661-7e0f-4430-b1c8-01241ebef237",
+            "front": "Trong hệ thống yêu cầu hàng triệu thao tác/giây, việc dùng immutable object và defensive copy có nhược điểm gì?",
+            "back": "Tốn bộ nhớ và CPU do phải tạo nhiều object mới, copy collection mỗi lần get. Điều này ảnh hưởng đến throughput và GC. Có thể cần dung hòa: dùng mutable object với access control chặt (package-private) hoặc dùng primitive array + copy thông minh.",
+            "hint": "Cân nhắc chi phí tạo object, copy dữ liệu, áp lực garbage collection.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "c7e94149-66e7-4dde-b845-db038d3c0f8e",
+            "front": "Ngoài private field, encapsulation còn thể hiện qua access modifier nào khác? Cho ví dụ cụ thể.",
+            "back": "package-private (default) giúp ẩn nội bộ trong cùng một package, cho phép các class trong package cùng truy cập nhưng không lộ ra ngoài. Ví dụ: một helper class internal nên để package-private, không public. protected cũng dùng khi muốn chỉ subclass và cùng package được truy cập.",
+            "hint": "Nghĩ về các mức độ truy cập ngoài private (default, protected).",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "3813e752-540b-4aa3-8a49-283f9819ced9",
+            "front": "Có 2 cách getItems(): (1) Collections.unmodifiableList(items), (2) new ArrayList<>(items). Cách nào bảo vệ invariant tốt hơn nếu items là trường private và chỉ được thay đổi từ bên trong class?",
+            "back": "Cả hai đều bảo vệ, nhưng khác nhau về chi phí. (1) không copy, chỉ wrap, an toàn nếu items không bị thay đổi từ bên ngoài (vì unmodifiableList throw exception khi sửa). (2) copy tạo bản sao độc lập, an toàn hơn nếu có nguy cơ giữ reference (dù private), nhưng tốn bộ nhớ. Tốt nhất: nếu items là immutable (List.copyOf) thì (1) là đủ.",
+            "hint": "Phân biệt giữa ‘chặn sửa’ và ‘tách biệt hoàn toàn tham chiếu’.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "f9de93da-2b93-4740-b603-f1e1ea9dc119",
+            "front": "Có ý kiến: ‘Encapsulation là ẩn dữ liệu, không phải ẩn logic.’ Nếu một class có public method tính toán phức tạp, điều này có vi phạm encapsulation không?",
+            "back": "Không vi phạm nguyên tắc cốt lõi, nhưng có thể gây phụ thuộc vào implementation nếu method quá chi tiết. Encapsulation che giấu cả cách thức hoạt động, không chỉ dữ liệu. Tuy nhiên, một public method được phép expose hành vi; nếu logic thay đổi nhưng API không đổi thì vẫn ổn. Vấn đề là khi logic phức tạp lộ ra, khó đổi implementation mà không ảnh hưởng caller.",
+            "hint": "Phân biệt che giấu chi tiết vs expose hành vi.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "7c44cfb9-c450-4c36-ab80-f646e547c976",
+            "front": "Dùng Builder pattern để tạo class có invariant (ví dụ BookingPeriod) có vi phạm encapsulation không? Tại sao?",
+            "back": "Không, nếu Builder là inner static class và chỉ gọi constructor private có validate. Builder cho phép set từng field riêng lẻ nhưng chưa tạo object, chỉ khi build() được gọi mới tạo object với constructor validate. Nhờ đó vẫn giữ invariant và dễ đọc. Nếu Builder trực tiếp set field sau khi tạo object thì vi phạm.",
+            "hint": "Nhớ rằng Builder build() gọi constructor chứ không tạo object trước.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "e48e8a3a-5b6d-47b3-8c36-fdbc0a81d5e6",
+            "front": "Một Service có đoạn code: user.setEmail(newEmail); nhưng không validate email format. Điều này vi phạm encapsulation như thế nào?",
+            "back": "Bên ngoài (Service) đang thay đổi trạng thái nội bộ của User mà không qua kiểm soát. User không tự bảo vệ invariant (email format). Đúng ra User nên có method changeEmail(String newEmail) tự validate (kiểm tra null, pattern…). Nếu setter public tồn tại, lớp User mất quyền kiểm soát trạng thái.",
+            "hint": "Hỏi: Ai chịu trách nhiệm đảm bảo email hợp lệ?",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "04880148-6bda-4115-975d-f2de1f058dab",
+            "front": "Tại sao method nghiệp vụ (ví dụ withdraw) thường trả về boolean hoặc throw exception, còn setter chỉ trả về void? Sự khác biệt liên quan đến encapsulation?",
+            "back": "Method nghiệp vụ trả về boolean/throw exception thể hiện kết quả hành vi (thành công hay thất bại, lý do). Setter void không có khả năng báo kết quả kiểm soát; nếu validate trong setter thì chỉ có thể throw exception. Encapsulation yêu cầu method không chỉ thay đổi state mà còn thể hiện rõ ý định và kết quả, giúp caller hiểu và xử lý đúng.",
+            "hint": "Nghĩ về khả năng giao tiếp trạng thái sau khi gọi method.",
+            "tag": "Encapsulation"
+          },
+          {
+            "id": "a71e1b3b-6a47-40b3-bcc7-22f84e79e344",
+            "front": "Thiết kế 'domain object chỉ có getter/setter (anemic) và toàn bộ logic nghiệp vụ để ở Service' có vi phạm encapsulation không? Giải thích.",
+            "back": "Có, đây là Anemic Domain Model anti-pattern. Domain object trở thành cục dữ liệu, không có hành vi, không tự bảo vệ invariant. Mọi logic phải trùng lặp ở nhiều Service, khó bảo trì và dễ gây lỗi khi quên validate. Encapsulation yêu cầu object phải chịu trách nhiệm về trạng thái của nó, không phải Service.",
+            "hint": "Liên hệ nguyên tắc: object phải tự bảo vệ invariant.",
+            "tag": "Encapsulation"
           }
         ]
       }
@@ -1495,7 +1658,196 @@
             "tag": "java-001.oop.encapsulation"
           }
         ],
-        "attempts": []
+        "attempts": [
+          {
+            "id": "ac3d2801-15b2-4e32-a953-461247ba5c22",
+            "startedAt": "2026-06-20T15:52:52.337Z",
+            "submittedAt": "2026-06-20T15:57:13.762Z",
+            "durationSeconds": 1200,
+            "answers": {
+              "c3154584-10e5-465a-8bcd-8fecd08a6c96": 1,
+              "62bdfc42-1e99-4db2-a37c-8e992eec4446": 1,
+              "922321d9-32e9-4a02-97c6-1e0954c726d5": 1,
+              "a8231fad-e805-4734-b83a-79af0d6e4d25": 1,
+              "d3c4c597-21a5-495f-97b0-da7e91508e6e": 1,
+              "ba0bde2e-424a-47a0-81cc-b6cec2a0539d": 1,
+              "23adf030-182d-4855-8481-bb725160e65b": 0,
+              "88bb294b-5a78-47b3-ad26-eb3742453d34": 1,
+              "a4a4da72-ce10-4cc3-98e9-0f9d6741fbc7": 1,
+              "c40e9c33-7d93-4f5c-929c-121f3755bd85": 1
+            },
+            "score": 10,
+            "total": 10,
+            "submittedBy": "user"
+          }
+        ]
+      },
+      {
+        "id": "6a10ac63-139d-415b-98df-e36871c0f635",
+        "taskId": "java-001.oop.encapsulation",
+        "taskTitle": "Encapsulation: private field, invariant, getter/setter có kiểm soát",
+        "title": "Bài trắc nghiệm 2",
+        "durationMinutes": 20,
+        "createdAt": "2026-06-20T15:58:29.654Z",
+        "source": {
+          "noteCharacters": 15998,
+          "commentCount": 20
+        },
+        "questions": [
+          {
+            "id": "069d79b1-7d52-45c7-ba35-8ae866b4fb62",
+            "question": "Một class `PaymentService` có field `private PaymentGateway gateway;`. Ban đầu gateway là `PayPalGateway`, sau đổi thành `StripeGateway` mà không sửa code client. Điều này thể hiện đặc điểm nào của encapsulation?",
+            "options": [
+              "Bảo vệ invariant",
+              "Che giấu implementation detail",
+              "Kiểm soát truy cập qua setter",
+              "Giảm coupling"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Encapsulation che giấu chi tiết cài đặt bên trong (implementation detail). Client chỉ biết API, không biết gateway cụ thể nào đang được dùng, do đó có thể thay đổi mà không ảnh hưởng client.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "d29acc68-1f52-4c5a-afec-47d6db7faf4f",
+            "question": "Một class `User` immutable (final fields, không setter) có constructor `public User(String name, String email) { this.name = name; this.email = email; }`. Vấn đề gì tồn tại?",
+            "options": [
+              "Không có getter nên không đọc được dữ liệu",
+              "Constructor không validate invariant, có thể tạo User với email null hoặc sai format",
+              "Field final không cho phép thay đổi, vi phạm encapsulation",
+              "Class immutable không thể dùng trong các framework"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Immutable không đồng nghĩa với encapsulation tốt. Nếu constructor không validate, object có thể được tạo ra ở trạng thái sai (email null/blank), phá vỡ invariant. Constructor phải kiểm tra điều kiện hợp lệ trước khi gán giá trị.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "cd77c16a-8b72-4b61-96d4-af96c7265dd0",
+            "question": "Framework JPA/Hibernate thường yêu cầu entity có constructor không tham số và các setter. Cách nào sau đây giúp vừa đáp ứng yêu cầu kỹ thuật vừa giữ encapsulation tốt nhất?",
+            "options": [
+              "Để tất cả setter và constructor là public",
+              "Dùng Lombok @Data cho entity",
+              "Constructor không tham số để protected, setter private/protected, và cung cấp method nghiệp vụ public",
+              "Không dùng JPA, chuyển sang JDBC thuần"
+            ],
+            "correctOptionIndex": 2,
+            "explanation": "JPA cần no-arg constructor (thường để protected) và setter để mapping, nhưng không bắt buộc setter phải public. Đặt setter ở mức private/protected và chỉ thay đổi trạng thái qua method nghiệp vụ (ví dụ `cancel()`) vẫn đáp ứng kỹ thuật và bảo vệ invariant.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "0524f15e-780b-4c53-8a17-20707d7bb0d2",
+            "question": "Một class `StudentGrades` có field `private Map<String, Integer> grades = new HashMap<>();` và getter `public Map<String, Integer> getGrades() { return new HashMap<>(grades); }`. Nhận xét nào đúng?",
+            "options": [
+              "Getter làm lộ reference, bên ngoài có thể sửa grades trực tiếp",
+              "Getter tạo bản sao phòng thủ, bảo vệ trạng thái nội bộ nhưng tiêu tốn bộ nhớ và thời gian mỗi lần gọi",
+              "Nên dùng `Collections.unmodifiableMap(grades)` thay vì copy để tránh performance impact",
+              "Phải để field là `private final` mới bảo vệ được encapsulation"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Defensive copy trong getter ngăn client sửa trực tiếp Map nội bộ, nhưng mỗi lần gọi đều tạo object mới – trade-off giữa bảo mật trạng thái và hiệu năng. Dùng unmodifiable có thể nhanh hơn nhưng vẫn cho phép sửa Map gốc nếu có setter hoặc method khác.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "2e21b2f2-7578-41a7-97e3-b5416c6abdc3",
+            "question": "Cho class `BankAccount` có method `withdraw(amount)` kiểm tra số dư và log giao dịch. Một lập trình viên viết:\n`account.setBalance(account.getBalance().subtract(amount));`\n`otherAccount.setBalance(otherAccount.getBalance().add(amount));`\nThay vì dùng `withdraw` và `deposit`. Vấn đề nào KHÔNG phải là hậu quả?",
+            "options": [
+              "Không kiểm tra số dư đủ trước khi trừ",
+              "Không ghi lại lịch sử giao dịch",
+              "Có thể dẫn đến số dư âm",
+              "Tăng hiệu năng vì không có validate"
+            ],
+            "correctOptionIndex": 3,
+            "explanation": "Bỏ qua method nghiệp vụ (withdraw/deposit) dẫn đến mất kiểm soát invariant: không kiểm tra số dư, không ghi log, có thể tạo số dư âm. 'Tăng hiệu năng' không phải hậu quả mà là một lý do biện minh sai, thực tế validate rất nhẹ và việc mất kiểm soát còn nguy hiểm hơn nhiều.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "8564d66e-4cdf-46c3-9b2b-e80ec874994b",
+            "question": "Class `Invoice` có các field `BigDecimal amount`, `BigDecimal taxRate`, `BigDecimal total`. Invariant là `total = amount * (1 + taxRate)`. Nếu dùng setter riêng cho từng field (setAmount, setTaxRate, setTotal), điều gì có thể xảy ra?",
+            "options": [
+              "Invariant luôn được đảm bảo vì mỗi setter chỉ sửa một field",
+              "Khi setAmount được gọi, total không được cập nhật, dẫn đến sai invariant",
+              "Setter không thể sửa total vì nó phụ thuộc vào amount và taxRate",
+              "B và C đều đúng"
+            ],
+            "correctOptionIndex": 3,
+            "explanation": "Với setter riêng, khi `setAmount` thay đổi amount, total không tự động tính lại → invariant bị phá. Ngoài ra, `setTotal` là vô nghĩa vì total là field phụ thuộc; không nên cho phép setter độc lập. Cách đúng là không có setTotal và tính total trong method nghiệp vụ hoặc getter.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "6468ba65-b0c4-4b68-96cf-7003d8b1a4e3",
+            "question": "Một hệ thống có class `Order` chỉ bao gồm các getter/setter cho status, items, total. Toàn bộ logic nghiệp vụ (validate, tính tổng, kiểm tra trạng thái) đặt ở `OrderService`. Đây được gọi là:",
+            "options": [
+              "Rich domain model",
+              "Anemic domain model, vi phạm encapsulation vì Order không tự bảo vệ invariant",
+              "Service layer pattern, hoàn toàn đúng đắn",
+              "DTO pattern, phù hợp cho entity"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Anemic domain model là anti-pattern: domain object chỉ là data container, logic nằm bên ngoài. Điều này vi phạm encapsulation vì object không tự bảo vệ invariant, rule nghiệp vụ bị phân tán, khó tái sử dụng và dễ sinh bug.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "b34ec1f5-90f7-4cb6-8c54-26facbb69f24",
+            "question": "Lombok cung cấp `@Data` (tạo getter, setter, toString, equals, hashCode) và `@Value` (tạo getter, field final, không setter, class final). Trong ngữ cảnh encapsulation, nhận xét nào đúng?",
+            "options": [
+              "@Data phù hợp cho domain object vì nó tạo đầy đủ setter",
+              "@Value không có setter nên không thể thay đổi trạng thái, thích hợp cho DTO và value object có invariant cần bảo vệ",
+              "@Data và @Value đều không ảnh hưởng đến encapsulation",
+              "@Value tạo setter nhưng là private"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "@Value tạo class immutable (final fields, không setter), giúp bảo vệ invariant tốt hơn @Data vì không cho phép thay đổi trạng thái sau khi tạo. @Data tạo setter public cho mọi field, dễ phá vỡ invariant nếu không có validate.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "c9ff4df2-650c-4585-9d87-97e1b91d8f89",
+            "question": "Một class `Team` có constructor `public Team(List<String> members) { this.members = members; }` và getter `public List<String> getMembers() { return members; }`. Cả hai đều không copy. Điều gì xảy ra khi client code sửa danh sách sau khi tạo Team?",
+            "options": [
+              "Không ảnh hưởng vì field là private",
+              "Client có thể sửa danh sách gốc từ bên ngoài, phá invariant của Team",
+              "Java sẽ tự động copy list",
+              "Chỉ getter mới cần defensive copy"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Cả constructor và getter đều không copy, nên danh sách được truyền vào từ bên ngoài vẫn là cùng một tham chiếu. Client có thể thêm/xóa phần tử từ tham chiếu đó, làm thay đổi trạng thái nội bộ của Team mà không qua method kiểm soát, phá vỡ invariant.",
+            "tag": "encapsulation"
+          },
+          {
+            "id": "b7c5999a-b29c-4385-8fb4-53a2cc36f4a9",
+            "question": "Một class `Temperature` ban đầu lưu celsius, có getter `getCelsius()`. Sau đó class được thay đổi để lưu kelvin nhưng vẫn giữ nguyên API `getCelsius()`. Điều này thể hiện lợi ích nào của encapsulation?",
+            "options": [
+              "Bảo vệ invariant",
+              "Che giấu implementation detail, cho phép thay đổi cách lưu trữ mà không ảnh hưởng client",
+              "Giảm code",
+              "Tăng tốc độ xử lý"
+            ],
+            "correctOptionIndex": 1,
+            "explanation": "Encapsulation cho phép thay đổi chi tiết cài đặt bên trong (ví dụ từ celsius sang kelvin) mà không ảnh hưởng đến client, miễn là API (getCelsius()) vẫn hoạt động đúng. Client không biết dữ liệu được lưu thế nào, chỉ biết kết quả trả về.",
+            "tag": "encapsulation"
+          }
+        ],
+        "attempts": [
+          {
+            "id": "6ff5ee51-0b45-4422-8773-94cd95e15bb1",
+            "startedAt": "2026-06-20T15:58:37.906Z",
+            "submittedAt": "2026-06-20T16:06:19.077Z",
+            "durationSeconds": 1200,
+            "answers": {
+              "069d79b1-7d52-45c7-ba35-8ae866b4fb62": 1,
+              "d29acc68-1f52-4c5a-afec-47d6db7faf4f": 1,
+              "cd77c16a-8b72-4b61-96d4-af96c7265dd0": 2,
+              "0524f15e-780b-4c53-8a17-20707d7bb0d2": 1,
+              "2e21b2f2-7578-41a7-97e3-b5416c6abdc3": 2,
+              "8564d66e-4cdf-46c3-9b2b-e80ec874994b": 3,
+              "6468ba65-b0c4-4b68-96cf-7003d8b1a4e3": 2,
+              "b34ec1f5-90f7-4cb6-8c54-26facbb69f24": 2,
+              "c9ff4df2-650c-4585-9d87-97e1b91d8f89": 1,
+              "b7c5999a-b29c-4385-8fb4-53a2cc36f4a9": 1
+            },
+            "score": 7,
+            "total": 10,
+            "submittedBy": "user"
+          }
+        ]
       }
     ]
   }
