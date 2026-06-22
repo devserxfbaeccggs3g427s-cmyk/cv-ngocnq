@@ -1,77 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import type { QuizDeck } from '@/types';
 import { readStoredQuizzes, storeQuizzes } from '@/lib/roadmap';
+import { useDataDecks } from './useDataDecks';
 
-/**
- * Quizzes localStorage state hook.
- * Manages quiz decks per task, persisting to localStorage.
- */
 export function useQuizDecks() {
-  const [quizzesByTask, setQuizzesByTask] = useState<Record<string, QuizDeck[]>>({});
-
-  useEffect(() => {
-    const stored = readStoredQuizzes();
-    window.queueMicrotask(() => setQuizzesByTask(stored));
-  }, []);
-
-  const getDecksForTask = useCallback(
-    (taskId: string): QuizDeck[] => {
-      return quizzesByTask[taskId] ?? [];
-    },
-    [quizzesByTask]
-  );
-
-  const setDecksForTask = useCallback(
-    (taskId: string, decks: QuizDeck[]) => {
-      setQuizzesByTask((current) => {
-        const next = { ...current, [taskId]: decks };
-        storeQuizzes(next);
-        return next;
-      });
-    },
-    []
-  );
-
-  const addDeck = useCallback(
-    (taskId: string, deck: QuizDeck) => {
-      setQuizzesByTask((current) => {
-        const existing = current[taskId] ?? [];
-        const next = { ...current, [taskId]: [...existing, deck] };
-        storeQuizzes(next);
-        return next;
-      });
-    },
-    []
-  );
-
-  const removeDeck = useCallback(
-    (taskId: string, deckId: string) => {
-      setQuizzesByTask((current) => {
-        const existing = current[taskId] ?? [];
-        const next = { ...current, [taskId]: existing.filter((d) => d.id !== deckId) };
-        storeQuizzes(next);
-        return next;
-      });
-    },
-    []
-  );
-
-  const replaceAllQuizzes = useCallback(
-    (quizzes: Record<string, QuizDeck[]>) => {
-      setQuizzesByTask(quizzes);
-      storeQuizzes(quizzes);
-    },
-    []
-  );
-
+  const { dataByTask, getForTask, setForTask, add, remove, replaceAll } =
+    useDataDecks<QuizDeck>(readStoredQuizzes, storeQuizzes);
   return {
-    quizzesByTask,
-    getDecksForTask,
-    setDecksForTask,
-    addDeck,
-    removeDeck,
-    replaceAllQuizzes,
+    quizzesByTask: dataByTask, getDecksForTask: getForTask, setDecksForTask: setForTask,
+    addDeck: add, removeDeck: remove, replaceAllQuizzes: replaceAll,
   };
 }

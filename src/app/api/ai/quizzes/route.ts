@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { validateEnvAiPassword } from '../env-confirmation';
-import type { QuizQuestion } from '@/types';
+import {
+  compactText,
+  hasTooMuchOverlap,
+  isNonEmptyString,
+  jsonError,
+  normalizeBaseUrl,
+  readComments,
+  readTask,
+} from '@/lib/api';
+import type { ChatCompletionResponse } from '@/lib/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,19 +22,6 @@ type QuizRequest = {
   existingQuestions?: unknown;
 };
 
-type QuizTask = {
-  id: string;
-  title: string;
-  level: string;
-  deliverable: string;
-};
-
-type QuizComment = {
-  author?: string;
-  body?: string;
-  createdAt?: string;
-};
-
 type AiQuizQuestion = {
   question?: unknown;
   options?: unknown;
@@ -33,96 +29,6 @@ type AiQuizQuestion = {
   explanation?: unknown;
   tag?: unknown;
 };
-
-type ChatCompletionResponse = {
-  choices?: Array<{
-    message?: {
-      content?: string;
-    };
-  }>;
-  error?: {
-    message?: string;
-  };
-};
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function normalizeBaseUrl(value: string) {
-  return value.trim().replace(/\/+$/, '');
-}
-
-function compactText(value: string, maxLength: number) {
-  const compacted = value
-    .replace(/\r\n/g, '\n')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  if (compacted.length <= maxLength) {
-    return compacted;
-  }
-
-  return `${compacted.slice(0, maxLength).trim()}\n\n[Context đã được rút gọn để giới hạn payload.]`;
-}
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
-
-function readTask(value: unknown): QuizTask | null {
-  if (!value || typeof value !== 'object') {
-    return null;
-  }
-
-  const task = value as Record<string, unknown>;
-
-  if (
-    !isNonEmptyString(task.id) ||
-    !isNonEmptyString(task.title) ||
-    !isNonEmptyString(task.level) ||
-    !isNonEmptyString(task.deliverable)
-  ) {
-    return null;
-  }
-
-  return {
-    id: task.id.trim(),
-    title: task.title.trim(),
-    level: task.level.trim(),
-    deliverable: task.deliverable.trim(),
-  };
-}
-
-function readComments(value: unknown): QuizComment[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  const comments: QuizComment[] = [];
-
-  for (const comment of value) {
-    if (!comment || typeof comment !== 'object') {
-      continue;
-    }
-
-    const item = comment as Record<string, unknown>;
-    const body = isNonEmptyString(item.body) ? item.body.trim() : '';
-
-    if (!body) {
-      continue;
-    }
-
-    comments.push({
-      author: isNonEmptyString(item.author) ? item.author.trim() : 'user',
-      body,
-      createdAt: isNonEmptyString(item.createdAt) ? item.createdAt.trim() : undefined,
-    });
-  }
-
-  return comments;
-}
 
 function readExistingQuestions(value: unknown): string[] {
   if (!Array.isArray(value)) {
@@ -208,59 +114,6 @@ function normalizeQuestions(value: unknown) {
       } => Boolean(question)
     )
     .slice(0, 12);
-}
-
-function normalizeForSimilarity(value: string) {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function tokenSet(value: string) {
-  return new Set(
-    normalizeForSimilarity(value)
-      .split(' ')
-      .filter((token) => token.length > 2)
-  );
-}
-
-function jaccardSimilarity(left: string, right: string) {
-  const leftTokens = tokenSet(left);
-  const rightTokens = tokenSet(right);
-
-  if (leftTokens.size === 0 || rightTokens.size === 0) {
-    return 0;
-  }
-
-  let intersection = 0;
-
-  for (const token of leftTokens) {
-    if (rightTokens.has(token)) {
-      intersection += 1;
-    }
-  }
-
-  return intersection / (leftTokens.size + rightTokens.size - intersection);
-}
-
-function isSimilarToExisting(question: string, existingQuestions: string[]) {
-  return existingQuestions.some((existingQuestion) => jaccardSimilarity(question, existingQuestion) >= 0.5);
-}
-
-function hasTooMuchOverlap(questions: QuizQuestion[], existingQuestions: string[]) {
-  if (questions.length === 0 || existingQuestions.length === 0) {
-    return false;
-  }
-
-  const similarCount = questions.filter((question) =>
-    isSimilarToExisting(question.question, existingQuestions)
-  ).length;
-
-  return similarCount / questions.length > 0.5;
 }
 
 export async function POST(request: Request) {
@@ -387,7 +240,7 @@ export async function POST(request: Request) {
       return jsonError('AI không trả về câu trắc nghiệm hợp lệ. Hãy thử model khác hoặc kiểm tra note.', 502);
     }
 
-    if (hasTooMuchOverlap(questions, existingQuestions)) {
+    if (hasTooMuchOverlap(questions, (question) => question.question, existingQuestions)) {
       return jsonError('Bài trắc nghiệm mới quá giống các bài đã có trên 50%. Hãy tạo lại để AI đổi góc hỏi.', 409);
     }
 

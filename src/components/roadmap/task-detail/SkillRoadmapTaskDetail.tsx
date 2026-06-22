@@ -20,14 +20,13 @@ import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { TaskContext, ProgressFile, NoteComment } from '@/types';
 import {
-  progressStorageKey,
-  commentsStorageKey,
   shouldSyncProgressFile,
   flattenTasks,
   storeProgress,
-  storeComments,
   buildLearningPrompt,
   getAdjacentLeafTasks,
+  hydrateFromStorage,
+  levelStyles,
   type RoadmapNavigationTask,
 } from '@/lib/roadmap';
 import { NoteLessonNavigation } from '@/components/roadmap/note-preview/NoteLessonNavigation';
@@ -40,16 +39,7 @@ import {
   FlashcardCard,
   LearningPromptCard,
   NoteCard,
-  normalizeSeedProgress,
-  readSeedComments,
 } from './TaskDetailInfo';
-
-const levelStyles: Record<string, string> = {
-  'Cơ bản': 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
-  'Trung cấp': 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  'Nâng cao': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-  'Chuyên sâu': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
-};
 
 export function SkillRoadmapTaskDetail({
   task,
@@ -68,50 +58,11 @@ export function SkillRoadmapTaskDetail({
   const [noteComments, setNoteComments] = useState<NoteComment[]>([]);
 
   useEffect(() => {
-    let cancelled = false;
-    let hasLocalProgress = false;
-    let hasLocalComments = false;
-
-    try {
-      const raw = window.localStorage.getItem(progressStorageKey);
-      hasLocalProgress = raw !== null;
-      const storedProgress = raw ? (JSON.parse(raw) as ProgressFile) : null;
-      window.queueMicrotask(() => setProgress(storedProgress));
-    } catch {
-      window.queueMicrotask(() => setProgress(null));
-    }
-
-    try {
-      const raw = window.localStorage.getItem(commentsStorageKey);
-      hasLocalComments = raw !== null;
-      const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
-      window.queueMicrotask(() => setNoteComments(Array.isArray(parsed[task.id]) ? parsed[task.id] : []));
-    } catch {
-      window.queueMicrotask(() => setNoteComments([]));
-    }
-
-    async function hydrateMissingSeedData() {
-      if (hasLocalProgress && hasLocalComments) return;
-      try {
-        const response = await fetch('/api/skill-roadmap/progress', { cache: 'no-store' });
-        if (!response.ok) return;
-        const seed = await response.json();
-        if (cancelled) return;
-
-        if (!hasLocalProgress) {
-          const seedProgress = normalizeSeedProgress(seed);
-          if (seedProgress) { setProgress(seedProgress); storeProgress(seedProgress); }
-        }
-        if (!hasLocalComments) {
-          const seedComments = readSeedComments(seed);
-          storeComments(seedComments);
-          setNoteComments(seedComments[task.id] ?? []);
-        }
-      } catch { /* browser-local data only */ }
-    }
-
-    hydrateMissingSeedData();
-    return () => { cancelled = true; };
+    return hydrateFromStorage({
+      taskId: task.id,
+      progressSetter: setProgress,
+      commentsSetter: (_taskId, comments) => setNoteComments(comments),
+    });
   }, [task.id]);
 
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
@@ -231,10 +182,10 @@ export function SkillRoadmapTaskDetail({
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Metric icon={effectivelyCompleted ? CheckCircle2 : childProgressing ? GitBranch : Circle} label="Trạng thái" value={effectivelyCompleted ? 'Đã học' : childProgressing ? 'Đang học' : 'Chưa học'} />
-        <Metric icon={Clock3} label="Thời lượng" value={`${task.estimateHours}h`} />
-        <Metric icon={Layers} label="Task con" value={`${completedDescendants}/${descendants.length}`} />
-        <Metric icon={StickyNote} label="Note" value={hasNote ? 'Đã có' : 'Chưa có'} />
+        <Metric variant="card" icon={effectivelyCompleted ? CheckCircle2 : childProgressing ? GitBranch : Circle} label="Trạng thái" value={effectivelyCompleted ? 'Đã học' : childProgressing ? 'Đang học' : 'Chưa học'} />
+        <Metric variant="card" icon={Clock3} label="Thời lượng" value={`${task.estimateHours}h`} />
+        <Metric variant="card" icon={Layers} label="Task con" value={`${completedDescendants}/${descendants.length}`} />
+        <Metric variant="card" icon={StickyNote} label="Note" value={hasNote ? 'Đã có' : 'Chưa có'} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">

@@ -4,13 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui';
 import type { TaskContext, ProgressFile, NoteComment, QuizAttempt, QuizDeck } from '@/types';
 import {
-  progressStorageKey,
-  commentsStorageKey,
-  quizzesStorageKey,
   flattenTasks,
-  storeProgress,
-  storeComments,
-  storeQuizzes,
+  hydrateFromStorage,
   readStoredDuplicateDetectionConfig,
   storeDuplicateDetectionConfig,
 } from '@/lib/roadmap';
@@ -20,8 +15,6 @@ import { QuizHistoryPanel } from './QuizHistoryPanel';
 import { QuizHeader, QuizCreationCard } from './QuizCreationCard';
 import {
   storeTaskQuizzes,
-  normalizeSeedProgress,
-  readSeedComments,
   readSeedQuizzes,
   normalizeQuizzesByTask,
   getQuizRequirement,
@@ -45,76 +38,19 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
   const [duplicateDetectionEnabled, setDuplicateDetectionEnabledState] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
-    let hasLocalProgress = false;
-    let hasLocalComments = false;
-    let hasLocalQuizzes = false;
-
-    try {
-      const raw = window.localStorage.getItem(progressStorageKey);
-      hasLocalProgress = raw !== null;
-      const storedProgress = raw ? (JSON.parse(raw) as ProgressFile) : null;
-      window.queueMicrotask(() => setProgress(storedProgress));
-    } catch {
-      window.queueMicrotask(() => setProgress(null));
-    }
-
     window.queueMicrotask(() => setDuplicateDetectionEnabledState(readStoredDuplicateDetectionConfig().quizzes));
 
-    try {
-      const raw = window.localStorage.getItem(commentsStorageKey);
-      hasLocalComments = raw !== null;
-      const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
-      window.queueMicrotask(() => setNoteComments(Array.isArray(parsed[task.id]) ? parsed[task.id] : []));
-    } catch {
-      window.queueMicrotask(() => setNoteComments([]));
-    }
-
-    try {
-      const raw = window.localStorage.getItem(quizzesStorageKey);
-      hasLocalQuizzes = raw !== null;
-      const parsed = raw ? normalizeQuizzesByTask(JSON.parse(raw)) : {};
-      const taskQuizzes = parsed[task.id] ?? [];
-      window.queueMicrotask(() => {
-        setQuizDecks(taskQuizzes);
-        setActiveQuizId(taskQuizzes[0]?.id ?? null);
-      });
-    } catch {
-      window.queueMicrotask(() => {
-        setQuizDecks([]);
-        setActiveQuizId(null);
-      });
-    }
-
-    async function hydrateMissingSeedData() {
-      if (hasLocalProgress && hasLocalComments && hasLocalQuizzes) return;
-      try {
-        const response = await fetch('/api/skill-roadmap/progress', { cache: 'no-store' });
-        if (!response.ok) return;
-        const seed = await response.json();
-        if (cancelled) return;
-
-        if (!hasLocalProgress) {
-          const seedProgress = normalizeSeedProgress(seed);
-          if (seedProgress) { setProgress(seedProgress); storeProgress(seedProgress); }
-        }
-        if (!hasLocalComments) {
-          const seedComments = readSeedComments(seed);
-          storeComments(seedComments);
-          setNoteComments(seedComments[task.id] ?? []);
-        }
-        if (!hasLocalQuizzes) {
-          const seedQuizzes = readSeedQuizzes(seed);
-          storeQuizzes(seedQuizzes);
-          const taskQuizzes = seedQuizzes[task.id] ?? [];
-          setQuizDecks(taskQuizzes);
-          setActiveQuizId(taskQuizzes[0]?.id ?? null);
-        }
-      } catch { /* Browser-local data is enough */ }
-    }
-
-    hydrateMissingSeedData();
-    return () => { cancelled = true; };
+    return hydrateFromStorage({
+      taskId: task.id,
+      progressSetter: setProgress,
+      commentsSetter: (_taskId, comments) => setNoteComments(comments),
+      quizzesSetter: (_taskId, quizzes) => {
+        setQuizDecks(quizzes);
+        setActiveQuizId(quizzes[0]?.id ?? null);
+      },
+      normalizeQuizzes: normalizeQuizzesByTask,
+      readSeedQuizzes,
+    });
   }, [task.id]);
 
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);

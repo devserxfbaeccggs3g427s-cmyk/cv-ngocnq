@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { NoteComment } from '@/types';
 import { CommentBubble } from './CommentBubble';
+import { streamAiComment } from './ai-stream';
 import { readSeedComments, readSeedProgress, saveCommentsByTask, saveSeedProgress } from './seed';
 import {
   buildCommentTree,
@@ -144,65 +145,30 @@ export function MarkdownCommentThreadDetail({
       return;
     }
 
-    let streamingReplyId: string | null = null;
-    let rollbackComments: NoteComment[] | null = null;
-    try {
-      const questionComment = createComment({ parentId, author: 'user', body });
-      const nextBeforeAi = [...comments, questionComment];
-      rollbackComments = nextBeforeAi;
-      saveComments(nextBeforeAi);
-      resetDraft(draftKey);
-      setReplyingTo(null);
-
-      const aiReply = createComment({ parentId: questionComment.id, author: 'ai', body: '', model: draft.model, provider: draft.provider });
-      const nextWithPlaceholder = [...nextBeforeAi, aiReply];
-      let streamedAnswer = '';
-      streamingReplyId = aiReply.id;
-      setStreamingCommentIds((current) => new Set(current).add(aiReply.id));
-      saveComments(nextWithPlaceholder);
-
-      const response = await fetch('/api/ai/comment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          provider: draft.provider,
-          apiKey: draft.provider === 'kilo' ? undefined : draft.apiKey,
-          confirmPassword: draft.provider === 'kilo' ? draft.confirmPassword : undefined,
-          model: draft.model,
-          baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
-          question: body,
-          markdownContext,
-          threadContext: summarizeThread(nextBeforeAi, questionComment.id),
-        }),
-      });
-
-      if (!response.ok) {
-        const responseBody = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(responseBody.error ?? 'Không nhận được câu trả lời từ AI.');
+    resetDraft(draftKey);
+    setReplyingTo(null);
+    await streamAiComment(
+      {
+        taskId,
+        question: body,
+        parentId,
+        provider: draft.provider,
+        apiKey: draft.provider === 'kilo' ? '' : draft.apiKey,
+        confirmPassword: draft.provider === 'kilo' ? draft.confirmPassword : '',
+        model: draft.model,
+        baseUrl: draft.provider === 'custom' ? draft.baseUrl : '',
+        markdownContext,
+        threadContext: (nextComments, userComment) => summarizeThread(nextComments, userComment.id),
+      },
+      {
+        persistComments: (_taskId, nextComments) => saveComments(nextComments),
+        addStreamingId: (id) => setStreamingCommentIds((current) => new Set(current).add(id)),
+        removeStreamingId: (id) => setStreamingCommentIds((current) => { const next = new Set(current); next.delete(id); return next; }),
+        onError: (message) => setError(message),
+        getComments: () => comments,
       }
-      if (!response.body) throw new Error('Không đọc được stream trả lời từ AI.');
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        streamedAnswer += decoder.decode(value, { stream: true });
-        saveComments([...nextBeforeAi, { ...aiReply, body: streamedAnswer }]);
-      }
-      streamedAnswer += decoder.decode();
-      if (!streamedAnswer.trim()) throw new Error('AI provider không trả về nội dung trả lời.');
-      saveComments([...nextBeforeAi, { ...aiReply, body: streamedAnswer.trim() }]);
-    } catch (submitError) {
-      if (rollbackComments) saveComments(rollbackComments);
-      setError(submitError instanceof Error ? submitError.message : 'Không gửi được câu hỏi tới AI.');
-    } finally {
-      if (streamingReplyId) {
-        const id = streamingReplyId;
-        setStreamingCommentIds((current) => { const next = new Set(current); next.delete(id); return next; });
-      }
-      setSubmittingKey(null);
-    }
+    );
+    setSubmittingKey(null);
   };
 
   return (

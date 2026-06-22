@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { validateEnvAiPassword } from '../env-confirmation';
+import {
+  isNonEmptyString,
+  resolveApiKey,
+  resolveBaseUrl,
+  usesEnvApiKey,
+} from '@/lib/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,52 +29,6 @@ type ModelsResponse = {
     message?: string;
   };
 };
-
-const providerBaseUrls: Record<string, string> = {
-  kilo: 'https://api.kilo.ai/api/gateway',
-  openrouter: 'https://openrouter.ai/api/v1',
-};
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function normalizeBaseUrl(value: string) {
-  return value.trim().replace(/\/+$/, '');
-}
-
-function resolveBaseUrl(provider: string, baseUrl: unknown) {
-  if (provider === 'custom') {
-    return isNonEmptyString(baseUrl) ? normalizeBaseUrl(baseUrl) : null;
-  }
-
-  if (provider === 'kilo') {
-    return normalizeBaseUrl(process.env.AI_COMMENT_KILO_BASE_URL ?? providerBaseUrls.kilo);
-  }
-
-  return providerBaseUrls[provider] ?? null;
-}
-
-function resolveApiKey(provider: string, apiKey: unknown) {
-  if (isNonEmptyString(apiKey)) {
-    return apiKey.trim();
-  }
-
-  if (provider === 'kilo') {
-    return (
-      process.env.AI_COMMENT_KILO_API_KEY?.trim() ??
-      process.env.AI_COMMENT_API_KEY?.trim() ??
-      process.env.AI_FLASHCARD_API_KEY?.trim() ??
-      ''
-    );
-  }
-
-  return '';
-}
-
-function usesEnvApiKey(provider: string, apiKey: unknown) {
-  return provider === 'kilo' && !isNonEmptyString(apiKey);
-}
 
 function resolveDefaultModel(provider: string) {
   if (provider === 'kilo') {

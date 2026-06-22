@@ -1,5 +1,15 @@
 import { NextResponse } from 'next/server';
 import { validateEnvAiPassword } from '../env-confirmation';
+import {
+  compactText,
+  hasTooMuchOverlap,
+  isNonEmptyString,
+  jsonError,
+  normalizeBaseUrl,
+  readComments,
+  readTask,
+} from '@/lib/api';
+import type { ChatCompletionResponse } from '@/lib/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,19 +20,6 @@ type FlashcardRequest = {
   note?: unknown;
   comments?: unknown;
   existingCards?: unknown;
-};
-
-type FlashcardTask = {
-  id: string;
-  title: string;
-  level: string;
-  deliverable: string;
-};
-
-type FlashcardComment = {
-  author?: string;
-  body?: string;
-  createdAt?: string;
 };
 
 type AiFlashcard = {
@@ -39,96 +36,6 @@ type NormalizedFlashcard = {
   hint: string;
   tag: string;
 };
-
-type ChatCompletionResponse = {
-  choices?: Array<{
-    message?: {
-      content?: string;
-    };
-  }>;
-  error?: {
-    message?: string;
-  };
-};
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function normalizeBaseUrl(value: string) {
-  return value.trim().replace(/\/+$/, '');
-}
-
-function compactText(value: string, maxLength: number) {
-  const compacted = value
-    .replace(/\r\n/g, '\n')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  if (compacted.length <= maxLength) {
-    return compacted;
-  }
-
-  return `${compacted.slice(0, maxLength).trim()}\n\n[Context đã được rút gọn để giới hạn payload.]`;
-}
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
-
-function readTask(value: unknown): FlashcardTask | null {
-  if (!value || typeof value !== 'object') {
-    return null;
-  }
-
-  const task = value as Record<string, unknown>;
-
-  if (
-    !isNonEmptyString(task.id) ||
-    !isNonEmptyString(task.title) ||
-    !isNonEmptyString(task.level) ||
-    !isNonEmptyString(task.deliverable)
-  ) {
-    return null;
-  }
-
-  return {
-    id: task.id.trim(),
-    title: task.title.trim(),
-    level: task.level.trim(),
-    deliverable: task.deliverable.trim(),
-  };
-}
-
-function readComments(value: unknown): FlashcardComment[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  const comments: FlashcardComment[] = [];
-
-  for (const comment of value) {
-    if (!comment || typeof comment !== 'object') {
-      continue;
-    }
-
-    const item = comment as Record<string, unknown>;
-    const body = isNonEmptyString(item.body) ? item.body.trim() : '';
-
-    if (!body) {
-      continue;
-    }
-
-    comments.push({
-      author: isNonEmptyString(item.author) ? item.author.trim() : 'user',
-      body,
-      createdAt: isNonEmptyString(item.createdAt) ? item.createdAt.trim() : undefined,
-    });
-  }
-
-  return comments;
-}
 
 function readExistingCards(value: unknown): string[] {
   if (!Array.isArray(value)) {
@@ -195,57 +102,6 @@ function normalizeFlashcards(value: unknown): NormalizedFlashcard[] {
     })
     .filter((card): card is { id: string; front: string; back: string; hint: string; tag: string } => Boolean(card))
     .slice(0, 18);
-}
-
-function normalizeForSimilarity(value: string) {
-  return value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function tokenSet(value: string) {
-  return new Set(
-    normalizeForSimilarity(value)
-      .split(' ')
-      .filter((token) => token.length > 2)
-  );
-}
-
-function jaccardSimilarity(left: string, right: string) {
-  const leftTokens = tokenSet(left);
-  const rightTokens = tokenSet(right);
-
-  if (leftTokens.size === 0 || rightTokens.size === 0) {
-    return 0;
-  }
-
-  let intersection = 0;
-
-  for (const token of leftTokens) {
-    if (rightTokens.has(token)) {
-      intersection += 1;
-    }
-  }
-
-  return intersection / (leftTokens.size + rightTokens.size - intersection);
-}
-
-function isSimilarToExisting(cardFront: string, existingCards: string[]) {
-  return existingCards.some((existingCard) => jaccardSimilarity(cardFront, existingCard) >= 0.5);
-}
-
-function hasTooMuchOverlap(cards: NormalizedFlashcard[], existingCards: string[]) {
-  if (cards.length === 0 || existingCards.length === 0) {
-    return false;
-  }
-
-  const similarCount = cards.filter((card) => isSimilarToExisting(card.front, existingCards)).length;
-
-  return similarCount / cards.length > 0.5;
 }
 
 export async function POST(request: Request) {
@@ -367,7 +223,7 @@ export async function POST(request: Request) {
       return jsonError('AI không trả về flashcard hợp lệ. Hãy thử model khác hoặc kiểm tra note.', 502);
     }
 
-    if (hasTooMuchOverlap(cards, existingCards)) {
+    if (hasTooMuchOverlap(cards, (card) => card.front, existingCards)) {
       return jsonError('Bộ flashcard mới quá giống các bộ đã có trên 50%. Hãy tạo lại để AI đổi góc hỏi.', 409);
     }
 

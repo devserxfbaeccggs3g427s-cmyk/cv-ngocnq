@@ -13,27 +13,11 @@ import {
   StickyNote,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
+import { Metric } from '@/components/roadmap/client/Metric';
+import { formatDate, normalizeSeedProgress, readSeedComments } from '@/lib/roadmap';
 import { cn } from '@/lib/utils';
 
-export function Metric({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-}) {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <Icon className="mb-3 h-5 w-5 text-blue-600 dark:text-blue-400" />
-        <div className="text-xl font-bold text-gray-950 dark:text-white">{value}</div>
-        <div className="mt-1 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{label}</div>
-      </CardContent>
-    </Card>
-  );
-}
+export { Metric, formatDate, normalizeSeedProgress, readSeedComments };
 
 export function DetailItem({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
@@ -158,55 +142,4 @@ export function NoteCard({ note, hasNote, updatedAt, savingNote, saveError, onNo
       </CardContent>
     </Card>
   );
-}
-
-export function formatDate(value: string | null): string {
-  if (!value) return 'Chưa có dữ liệu';
-  return new Date(value).toLocaleString('vi-VN');
-}
-
-function isRecord(input: unknown): input is Record<string, unknown> {
-  return Boolean(input) && typeof input === 'object' && !Array.isArray(input);
-}
-
-export function normalizeSeedProgress(input: unknown): import('@/types').ProgressFile | null {
-  if (!isRecord(input)) return null;
-  const value = isRecord(input.progress) ? input.progress : input;
-  const rawItems = isRecord(value.items) ? value.items : null;
-  if (!rawItems) return null;
-
-  const items: Record<string, import('@/types').ProgressItem> = {};
-  for (const [taskId, rawItem] of Object.entries(rawItems)) {
-    if (!isRecord(rawItem)) return null;
-    items[taskId] = {
-      completed: Boolean(rawItem.completed),
-      note: typeof rawItem.note === 'string' ? rawItem.note : '',
-      completedAt: typeof rawItem.completedAt === 'string' ? rawItem.completedAt : null,
-      updatedAt: typeof rawItem.updatedAt === 'string' ? rawItem.updatedAt : new Date().toISOString(),
-    };
-  }
-  return { updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : null, items };
-}
-
-export function readSeedComments(input: unknown): Record<string, import('@/types').NoteComment[]> {
-  if (!isRecord(input) || !isRecord(input.comments)) return {};
-  const comments: Record<string, import('@/types').NoteComment[]> = {};
-  for (const [taskId, rawComments] of Object.entries(input.comments)) {
-    if (!Array.isArray(rawComments)) continue;
-    const taskComments: import('@/types').NoteComment[] = [];
-    for (const comment of rawComments) {
-      if (!isRecord(comment) || typeof comment.id !== 'string' || typeof comment.body !== 'string') continue;
-      taskComments.push({
-        id: comment.id,
-        parentId: typeof comment.parentId === 'string' ? comment.parentId : null,
-        author: comment.author === 'ai' ? 'ai' : 'user',
-        body: comment.body,
-        createdAt: typeof comment.createdAt === 'string' ? comment.createdAt : new Date().toISOString(),
-        model: typeof comment.model === 'string' ? comment.model : undefined,
-        provider: typeof comment.provider === 'string' ? comment.provider : undefined,
-      });
-    }
-    comments[taskId] = taskComments;
-  }
-  return comments;
 }

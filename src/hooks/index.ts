@@ -1,4 +1,5 @@
 export { useLocalStorage } from './useLocalStorage';
+export { useDataDecks } from './useDataDecks';
 export { useProgress } from './useProgress';
 export { useNoteComments } from './useNoteComments';
 export { useFlashcardDecks } from './useFlashcardDecks';

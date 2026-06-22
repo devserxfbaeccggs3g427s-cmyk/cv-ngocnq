@@ -66,3 +66,16 @@ export { buildRoadmapBackup } from './backup';
 
 export { getAdjacentLeafTasks } from './navigation';
 export type { RoadmapNavigationTask } from './navigation';
+
+export {
+  getContentRequirement,
+  isRecord,
+  normalizeSeedProgress,
+  readSeedComments,
+} from './seed-helpers';
+export type { ContentType } from './seed-helpers';
+
+export { formatDate } from './format';
+
+export { hydrateFromStorage } from './hydration';
+export type { HydrationConfig } from './hydration';

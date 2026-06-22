@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
 import { validateEnvAiPassword } from '../env-confirmation';
+import {
+  compactText,
+  isNonEmptyString,
+  jsonError,
+  resolveApiKey,
+  resolveBaseUrl,
+  usesEnvApiKey,
+} from '@/lib/api';
+import type { ChatCompletionChunk, ChatCompletionResponse } from '@/lib/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,95 +24,6 @@ type AiCommentRequest = {
   studyContext?: unknown;
   threadContext?: unknown;
 };
-
-type ChatCompletionResponse = {
-  choices?: Array<{
-    message?: {
-      content?: string;
-    };
-  }>;
-  error?: {
-    message?: string;
-  };
-};
-
-type ChatCompletionChunk = {
-  choices?: Array<{
-    delta?: {
-      content?: string;
-    };
-    message?: {
-      content?: string;
-    };
-  }>;
-  error?: {
-    message?: string;
-  };
-};
-
-const providerBaseUrls: Record<string, string> = {
-  kilo: 'https://api.kilo.ai/api/gateway',
-  openrouter: 'https://openrouter.ai/api/v1',
-};
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function normalizeBaseUrl(value: string) {
-  return value.trim().replace(/\/+$/, '');
-}
-
-function resolveBaseUrl(provider: string, baseUrl: unknown) {
-  if (provider === 'custom') {
-    return isNonEmptyString(baseUrl) ? normalizeBaseUrl(baseUrl) : null;
-  }
-
-  if (provider === 'kilo') {
-    return normalizeBaseUrl(process.env.AI_COMMENT_KILO_BASE_URL ?? providerBaseUrls.kilo);
-  }
-
-  return providerBaseUrls[provider] ?? null;
-}
-
-function resolveApiKey(provider: string, apiKey: unknown) {
-  if (isNonEmptyString(apiKey)) {
-    return apiKey.trim();
-  }
-
-  if (provider === 'kilo') {
-    return (
-      process.env.AI_COMMENT_KILO_API_KEY?.trim() ??
-      process.env.AI_COMMENT_API_KEY?.trim() ??
-      process.env.AI_FLASHCARD_API_KEY?.trim() ??
-      ''
-    );
-  }
-
-  return '';
-}
-
-function usesEnvApiKey(provider: string, apiKey: unknown) {
-  return provider === 'kilo' && !isNonEmptyString(apiKey);
-}
-
-function compactText(value: string, maxLength: number) {
-  const compacted = value
-    .replace(/\r\n/g, '\n')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  if (compacted.length <= maxLength) {
-    return compacted;
-  }
-
-  return `${compacted.slice(0, maxLength).trim()}\n\n[Context đã được rút gọn để giới hạn payload.]`;
-}
-
-function jsonError(message: string, status: number) {
-  return NextResponse.json({ error: message }, { status });
-}
 
 export async function POST(request: Request) {
   let body: AiCommentRequest;

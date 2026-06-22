@@ -1,4 +1,5 @@
 import type { NoteComment, CommentNode } from '@/types';
+import { formatDate as sharedFormatDate } from '@/lib/roadmap';
 
 export type CommentMode = 'comment' | 'ai';
 export type AiProvider = 'openrouter' | 'kilo' | 'custom';
@@ -126,12 +127,7 @@ export function createComment({
   };
 }
 
-export function formatDate(value: string) {
-  return new Intl.DateTimeFormat('vi-VN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
-}
+export const formatDate = sharedFormatDate;
 
 export function summarizeMarkdown(markdown: string) {
   const normalized = markdown.trim();

@@ -1,25 +1,20 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { ComponentType } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Brain, CheckCircle2, Circle, Clock3, Layers, Loader2, FileText, Sparkles, StickyNote } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
+import { Metric } from '@/components/roadmap/client/Metric';
 import { cn } from '@/lib/utils';
 import type { TaskContext, ProgressFile, NoteComment, Flashcard, FlashcardDeck } from '@/types';
 import {
-  progressStorageKey,
-  commentsStorageKey,
-  flashcardsStorageKey,
   flattenTasks,
-  storeProgress,
-  storeComments,
-  storeFlashcards,
+  hydrateFromStorage,
   readStoredDuplicateDetectionConfig,
   storeDuplicateDetectionConfig,
 } from '@/lib/roadmap';
 import { FlashcardStudyPanel } from './FlashcardStudyPanel';
-import { normalizeFlashcardsByTask, normalizeSeedProgress, readSeedComments, readSeedFlashcards, storeTaskFlashcards, getFlashcardRequirement, formatDate } from './helpers';
+import { normalizeFlashcardsByTask, readSeedFlashcards, storeTaskFlashcards, getFlashcardRequirement, formatDate } from './helpers';
 
 export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
   const [progress, setProgress] = useState<ProgressFile | null>(null);
@@ -35,45 +30,20 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
   const [duplicateDetectionEnabled, setDuplicateDetectionEnabled] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
-    let hasLocalProgress = false;
-    let hasLocalComments = false;
-    let hasLocalFlashcards = false;
-    try {
-      const raw = window.localStorage.getItem(progressStorageKey);
-      hasLocalProgress = raw !== null;
-      const storedProgress = raw ? (JSON.parse(raw) as ProgressFile) : null;
-      window.queueMicrotask(() => setProgress(storedProgress));
-    } catch { window.queueMicrotask(() => setProgress(null)); }
-    try {
-      const raw = window.localStorage.getItem(commentsStorageKey);
-      hasLocalComments = raw !== null;
-      const parsed = raw ? (JSON.parse(raw) as Record<string, NoteComment[]>) : {};
-      window.queueMicrotask(() => setNoteComments(Array.isArray(parsed[task.id]) ? parsed[task.id] : []));
-    } catch { window.queueMicrotask(() => setNoteComments([])); }
-    try {
-      const raw = window.localStorage.getItem(flashcardsStorageKey);
-      hasLocalFlashcards = raw !== null;
-      const parsed = raw ? normalizeFlashcardsByTask(JSON.parse(raw)) : {};
-      const taskDecks = parsed[task.id] ?? [];
-      window.queueMicrotask(() => { setFlashcardDecks(taskDecks); setActiveDeckId(taskDecks[0]?.id ?? null); resetStudyState(); });
-    } catch { window.queueMicrotask(() => { setFlashcardDecks([]); setActiveDeckId(null); resetStudyState(); }); }
     window.queueMicrotask(() => setDuplicateDetectionEnabled(readStoredDuplicateDetectionConfig().flashcards));
 
-    async function hydrateMissingSeedData() {
-      if (hasLocalProgress && hasLocalComments && hasLocalFlashcards) return;
-      try {
-        const response = await fetch('/api/skill-roadmap/progress', { cache: 'no-store' });
-        if (!response.ok) return;
-        const seed = await response.json();
-        if (cancelled) return;
-        if (!hasLocalProgress) { const p = normalizeSeedProgress(seed); if (p) { setProgress(p); storeProgress(p); } }
-        if (!hasLocalComments) { const c = readSeedComments(seed); storeComments(c); setNoteComments(c[task.id] ?? []); }
-        if (!hasLocalFlashcards) { const f = readSeedFlashcards(seed); storeFlashcards(f); const d = f[task.id] ?? []; setFlashcardDecks(d); setActiveDeckId(d[0]?.id ?? null); }
-      } catch { /* Browser-local data is enough */ }
-    }
-    hydrateMissingSeedData();
-    return () => { cancelled = true; };
+    return hydrateFromStorage({
+      taskId: task.id,
+      progressSetter: setProgress,
+      commentsSetter: (_taskId, comments) => setNoteComments(comments),
+      flashcardsSetter: (_taskId, decks) => {
+        setFlashcardDecks(decks);
+        setActiveDeckId(decks[0]?.id ?? null);
+        resetStudyState();
+      },
+      normalizeFlashcards: normalizeFlashcardsByTask,
+      readSeedFlashcards,
+    });
   }, [task.id]);
 
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
@@ -149,10 +119,10 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Metric icon={effectivelyCompleted ? CheckCircle2 : Circle} label="Trạng thái" value={effectivelyCompleted ? 'Đã học' : 'Chưa học'} />
-        <Metric icon={StickyNote} label="Note" value={hasNote ? 'Đã có' : 'Chưa có'} />
-        <Metric icon={Layers} label="Bộ thẻ" value={String(flashcardDecks.length)} />
-        <Metric icon={Clock3} label="Nguồn comment" value={String(noteComments.length)} />
+        <Metric variant="card" icon={effectivelyCompleted ? CheckCircle2 : Circle} label="Trạng thái" value={effectivelyCompleted ? 'Đã học' : 'Chưa học'} />
+        <Metric variant="card" icon={StickyNote} label="Note" value={hasNote ? 'Đã có' : 'Chưa có'} />
+        <Metric variant="card" icon={Layers} label="Bộ thẻ" value={String(flashcardDecks.length)} />
+        <Metric variant="card" icon={Clock3} label="Nguồn comment" value={String(noteComments.length)} />
       </div>
 
       <Card>
@@ -227,19 +197,5 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
         />
       )}
     </div>
-  );
-}
-
-function Metric({ icon: Icon, label, value }: { icon: ComponentType<{ className?: string }>; label: string; value: string }) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-3 p-4">
-        <div className="rounded-lg bg-blue-50 p-2 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300"><Icon className="h-5 w-5" /></div>
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{label}</div>
-          <div className="mt-0.5 font-bold text-gray-950 dark:text-white">{value}</div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
