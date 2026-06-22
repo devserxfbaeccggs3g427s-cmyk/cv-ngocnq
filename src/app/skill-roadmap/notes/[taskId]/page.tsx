@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { SkillRoadmapNotePreview } from '@/components/roadmap/note-preview';
 import { Container } from '@/components/ui';
 import roadmap from '@/data/skill-roadmap.json';
-import { flattenTasksWithContext, getTaskContexts } from '@/lib/roadmap/flatten-tasks';
+import { getLeafTaskContexts, getTaskContexts } from '@/lib/roadmap/flatten-tasks';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,16 +21,12 @@ export async function generateMetadata({
 }
 
 function getTaskNavigationItems() {
-  return roadmap.tracks.flatMap((track) =>
-    track.modules.flatMap((module) =>
-      flattenTasksWithContext(module.tasks, track.title, module.title).map((task) => ({
-        id: task.id,
-        title: task.title,
-        trackTitle: task.trackTitle,
-        moduleTitle: task.moduleTitle,
-      }))
-    )
-  );
+  return getLeafTaskContexts(roadmap.tracks).map((task) => ({
+    id: task.id,
+    title: task.title,
+    trackTitle: task.trackTitle,
+    moduleTitle: task.moduleTitle,
+  }));
 }
 
 export default async function TaskNotePreviewPage({

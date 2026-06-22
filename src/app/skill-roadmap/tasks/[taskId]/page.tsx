@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { SkillRoadmapTaskDetail } from '@/components/roadmap/task-detail';
 import { Container } from '@/components/ui';
 import roadmap from '@/data/skill-roadmap.json';
-import { getTaskContexts } from '@/lib/roadmap/flatten-tasks';
+import { getLeafTaskContexts, getTaskContexts } from '@/lib/roadmap/flatten-tasks';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +30,12 @@ export default async function SkillRoadmapTaskDetailPage({
   const { taskId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
   const task = getTaskContexts(roadmap.tracks).get(decodedTaskId);
+  const navigationTasks = getLeafTaskContexts(roadmap.tracks).map((leafTask) => ({
+    id: leafTask.id,
+    title: leafTask.title,
+    trackTitle: leafTask.trackTitle,
+    moduleTitle: leafTask.moduleTitle,
+  }));
 
   if (!task) {
     notFound();
@@ -37,7 +43,7 @@ export default async function SkillRoadmapTaskDetailPage({
 
   return (
     <Container size="lg" className="py-10 md:py-12">
-      <SkillRoadmapTaskDetail task={task} />
+      <SkillRoadmapTaskDetail task={task} navigationTasks={navigationTasks} />
     </Container>
   );
 }

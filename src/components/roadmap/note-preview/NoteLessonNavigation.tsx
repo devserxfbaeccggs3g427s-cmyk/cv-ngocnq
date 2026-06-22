@@ -10,17 +10,21 @@ type NavigationTask = Pick<TaskContext, 'id' | 'title' | 'trackTitle' | 'moduleT
 export function NoteLessonNavigation({
   previous,
   next,
+  hrefBuilder = (taskId) => `/skill-roadmap/notes/${encodeURIComponent(taskId)}`,
+  ariaLabel = 'Điều hướng task con thấp nhất',
 }: {
   previous: NavigationTask | null;
   next: NavigationTask | null;
+  hrefBuilder?: (taskId: string) => string;
+  ariaLabel?: string;
 }) {
   return (
     <nav
       className="fixed inset-x-3 bottom-4 z-40 grid min-w-0 grid-cols-2 overflow-hidden rounded-2xl border border-gray-200 bg-white/95 shadow-2xl shadow-gray-950/20 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95 sm:static sm:gap-3 sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:shadow-none sm:backdrop-blur-none"
-      aria-label="Điều hướng bài học đã hoàn thành"
+      aria-label={ariaLabel}
     >
-      <LessonNavigationButton direction="previous" task={previous} />
-      <LessonNavigationButton direction="next" task={next} />
+      <LessonNavigationButton direction="previous" task={previous} hrefBuilder={hrefBuilder} />
+      <LessonNavigationButton direction="next" task={next} hrefBuilder={hrefBuilder} />
     </nav>
   );
 }
@@ -28,13 +32,15 @@ export function NoteLessonNavigation({
 function LessonNavigationButton({
   direction,
   task,
+  hrefBuilder,
 }: {
   direction: 'previous' | 'next';
   task: NavigationTask | null;
+  hrefBuilder: (taskId: string) => string;
 }) {
   const isPrevious = direction === 'previous';
-  const label = isPrevious ? 'Bài trước' : 'Bài tiếp theo';
-  const unavailableLabel = isPrevious ? 'Không có bài trước' : 'Không có bài sau';
+  const label = isPrevious ? 'Task trước' : 'Task tiếp theo';
+  const unavailableLabel = isPrevious ? 'Không có task trước' : 'Không có task sau';
   const icon = isPrevious ? (
     <ChevronLeft className="h-4 w-4" aria-hidden="true" />
   ) : (
@@ -83,7 +89,7 @@ function LessonNavigationButton({
   }
 
   return (
-    <Link href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`} className={className}>
+    <Link href={hrefBuilder(task.id)} className={className}>
       {content}
     </Link>
   );

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import type { ProgressFile, TaskContext } from '@/types';
+import { useState, useEffect } from 'react';
+import type { ProgressFile } from '@/types';
 import {
   progressStorageKey,
   commentsStorageKey,
@@ -10,12 +10,7 @@ import {
 } from '@/lib/roadmap';
 import { normalizeProgress } from '@/lib/roadmap/normalize';
 
-type NavigationTask = Pick<TaskContext, 'id' | 'title' | 'trackTitle' | 'moduleTitle'>;
-
-export function useNotePreviewData(
-  taskId: string,
-  navigationTasks: NavigationTask[]
-) {
+export function useNotePreviewData(taskId: string) {
   const [progress, setProgress] = useState<ProgressFile | null>(null);
 
   useEffect(() => {
@@ -82,29 +77,7 @@ export function useNotePreviewData(
   const item = progress?.items?.[taskId] ?? null;
   const note = item?.note?.trim() ?? '';
 
-  const learnedNavigation = useMemo(() => {
-    const currentIndex = navigationTasks.findIndex(
-      (navigationTask) => navigationTask.id === taskId
-    );
-
-    if (!progress || currentIndex < 0) {
-      return { previous: null, next: null };
-    }
-
-    return {
-      previous:
-        navigationTasks
-          .slice(0, currentIndex)
-          .reverse()
-          .find((t) => progress.items[t.id]?.completed) ?? null,
-      next:
-        navigationTasks
-          .slice(currentIndex + 1)
-          .find((t) => progress.items[t.id]?.completed) ?? null,
-    };
-  }, [navigationTasks, progress, taskId]);
-
-  return { item, note, learnedNavigation };
+  return { item, note };
 }
 
 function isRecord(input: unknown): input is Record<string, unknown> {

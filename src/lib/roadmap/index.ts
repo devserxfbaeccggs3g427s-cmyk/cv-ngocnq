@@ -15,6 +15,7 @@ export {
   flattenTasks,
   flattenTasksWithContext,
   getLeafTasks,
+  getLeafTaskContexts,
   getTaskContexts,
 } from './flatten-tasks';
 
@@ -62,3 +63,6 @@ export {
 export { buildLearningPrompt } from './prompts';
 
 export { buildRoadmapBackup } from './backup';
+
+export { getAdjacentLeafTasks } from './navigation';
+export type { RoadmapNavigationTask } from './navigation';

@@ -67,3 +67,12 @@ export function getTaskContexts(tracks: RoadmapTrack[]): Map<string, TaskContext
 
   return new Map(entries.map((task) => [task.id, task]));
 }
+
+export function getLeafTaskContexts(tracks: RoadmapTrack[]): TaskContext[] {
+  return tracks.flatMap((track) =>
+    track.modules.flatMap((roadmapModule) =>
+      flattenTasksWithContext(roadmapModule.tasks, track.title, roadmapModule.title)
+        .filter((task) => (task.children ?? []).length === 0)
+    )
+  );
+}

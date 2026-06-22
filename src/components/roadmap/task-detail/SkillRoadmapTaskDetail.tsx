@@ -27,7 +27,10 @@ import {
   storeProgress,
   storeComments,
   buildLearningPrompt,
+  getAdjacentLeafTasks,
+  type RoadmapNavigationTask,
 } from '@/lib/roadmap';
+import { NoteLessonNavigation } from '@/components/roadmap/note-preview/NoteLessonNavigation';
 import { ChildTaskRow } from './ChildTaskRow';
 import {
   Metric,
@@ -48,7 +51,13 @@ const levelStyles: Record<string, string> = {
   'Chuyên sâu': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
 };
 
-export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
+export function SkillRoadmapTaskDetail({
+  task,
+  navigationTasks = [],
+}: {
+  task: TaskContext;
+  navigationTasks?: RoadmapNavigationTask[];
+}) {
   const [progress, setProgress] = useState<ProgressFile | null>(null);
   const [savingNote, setSavingNote] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -115,6 +124,10 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
   const childProgressing = !effectivelyCompleted && completedDescendants > 0;
   const totalChildHours = descendants.reduce((sum, child) => sum + child.estimateHours, 0);
   const learningPrompt = useMemo(() => buildLearningPrompt(task), [task]);
+  const leafNavigation = useMemo(
+    () => getAdjacentLeafTasks(task.id, navigationTasks),
+    [navigationTasks, task.id]
+  );
 
   function updateNote(note: string) {
     setProgress((current) => {
@@ -182,7 +195,7 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24 sm:pb-0">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           <Link href="/skill-roadmap" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
@@ -209,6 +222,13 @@ export function SkillRoadmapTaskDetail({ task }: { task: TaskContext }) {
           </Link>
         </div>
       </div>
+
+      <NoteLessonNavigation
+        previous={leafNavigation.previous}
+        next={leafNavigation.next}
+        hrefBuilder={(taskId) => `/skill-roadmap/tasks/${encodeURIComponent(taskId)}`}
+        ariaLabel="Điều hướng chi tiết task con thấp nhất"
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Metric icon={effectivelyCompleted ? CheckCircle2 : childProgressing ? GitBranch : Circle} label="Trạng thái" value={effectivelyCompleted ? 'Đã học' : childProgressing ? 'Đang học' : 'Chưa học'} />

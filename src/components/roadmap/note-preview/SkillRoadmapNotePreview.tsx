@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react';
 import { extractMarkdownHeadings, MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import { MarkdownCommentThreads } from '@/components/roadmap/comments';
 import type { TaskContext } from '@/types';
+import { getAdjacentLeafTasks } from '@/lib/roadmap';
 import { useNotePreviewData } from './useNotePreviewData';
 import { useActiveHeading } from './useActiveHeading';
 import { AppendixLinks, MobileAppendixDrawer } from './NotePreviewAppendix';
@@ -22,7 +23,11 @@ export function SkillRoadmapNotePreview({
   navigationTasks?: NavigationTask[];
 }) {
   const markdownArticleRef = useRef<HTMLElement | null>(null);
-  const { item, note, learnedNavigation } = useNotePreviewData(taskId, navigationTasks);
+  const { item, note } = useNotePreviewData(taskId);
+  const leafNavigation = useMemo(
+    () => getAdjacentLeafTasks(taskId, navigationTasks),
+    [navigationTasks, taskId]
+  );
   const headings = useMemo(() => extractMarkdownHeadings(note), [note]);
   const activeHeadingId = useActiveHeading(headings);
 
@@ -93,8 +98,9 @@ export function SkillRoadmapNotePreview({
       {/* Main content */}
       <div className="min-w-0 space-y-4">
         <NoteLessonNavigation
-          previous={learnedNavigation.previous}
-          next={learnedNavigation.next}
+          previous={leafNavigation.previous}
+          next={leafNavigation.next}
+          ariaLabel="Điều hướng note task con thấp nhất"
         />
 
         <article
