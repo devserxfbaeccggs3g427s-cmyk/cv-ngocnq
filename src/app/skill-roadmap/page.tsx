@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Container } from '@/components/ui';
-import { SkillRoadmapClient } from '@/components/roadmap/SkillRoadmapClient';
+import { SkillRoadmapClient } from '@/components/roadmap/client';
 import roadmap from '@/data/skill-roadmap.json';
 
 export const metadata: Metadata = {

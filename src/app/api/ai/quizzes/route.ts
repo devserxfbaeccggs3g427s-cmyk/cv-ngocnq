@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { validateEnvAiPassword } from '../env-confirmation';
+import type { QuizQuestion } from '@/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,15 +32,6 @@ type AiQuizQuestion = {
   correctOptionIndex?: unknown;
   explanation?: unknown;
   tag?: unknown;
-};
-
-type QuizQuestion = {
-  id: string;
-  question: string;
-  options: string[];
-  correctOptionIndex: number;
-  explanation: string;
-  tag: string;
 };
 
 type ChatCompletionResponse = {

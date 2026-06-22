@@ -1,25 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { SkillRoadmapNotePreview } from '@/components/roadmap/SkillRoadmapNotePreview';
+import { SkillRoadmapNotePreview } from '@/components/roadmap/note-preview';
 import { Container } from '@/components/ui';
 import roadmap from '@/data/skill-roadmap.json';
+import { flattenTasksWithContext, getTaskContexts } from '@/lib/roadmap/flatten-tasks';
 
 export const dynamic = 'force-dynamic';
-
-type RoadmapTask = {
-  id: string;
-  title: string;
-  level: string;
-  estimateHours: number;
-  deliverable: string;
-  children?: RoadmapTask[];
-};
-
-type TaskContext = RoadmapTask & {
-  trackTitle: string;
-  moduleTitle: string;
-  depth: number;
-};
 
 export async function generateMetadata({
   params,
@@ -34,37 +20,10 @@ export async function generateMetadata({
   };
 }
 
-function flattenTasks(
-  tasks: RoadmapTask[],
-  trackTitle: string,
-  moduleTitle: string,
-  depth = 0
-): TaskContext[] {
-  return tasks.flatMap((task) => [
-    {
-      ...task,
-      trackTitle,
-      moduleTitle,
-      depth,
-    },
-    ...flattenTasks(task.children ?? [], trackTitle, moduleTitle, depth + 1),
-  ]);
-}
-
-function getTaskContexts(): Map<string, TaskContext> {
-  const entries = roadmap.tracks.flatMap((track) =>
-    track.modules.flatMap((module) =>
-      flattenTasks(module.tasks, track.title, module.title)
-    )
-  );
-
-  return new Map(entries.map((task) => [task.id, task]));
-}
-
 function getTaskNavigationItems() {
   return roadmap.tracks.flatMap((track) =>
     track.modules.flatMap((module) =>
-      flattenTasks(module.tasks, track.title, module.title).map((task) => ({
+      flattenTasksWithContext(module.tasks, track.title, module.title).map((task) => ({
         id: task.id,
         title: task.title,
         trackTitle: task.trackTitle,
@@ -81,7 +40,7 @@ export default async function TaskNotePreviewPage({
 }) {
   const { taskId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
-  const task = getTaskContexts().get(decodedTaskId);
+  const task = getTaskContexts(roadmap.tracks).get(decodedTaskId);
   const navigationTasks = getTaskNavigationItems();
 
   return (

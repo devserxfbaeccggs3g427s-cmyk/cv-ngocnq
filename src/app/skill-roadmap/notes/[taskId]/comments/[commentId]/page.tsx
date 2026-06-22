@@ -1,25 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { MarkdownCommentThreadDetail } from '@/components/roadmap/MarkdownCommentThreads';
+import { MarkdownCommentThreadDetail } from '@/components/roadmap/comments';
 import { Container } from '@/components/ui';
 import roadmap from '@/data/skill-roadmap.json';
+import { getTaskContexts } from '@/lib/roadmap/flatten-tasks';
 
 export const dynamic = 'force-dynamic';
-
-type RoadmapTask = {
-  id: string;
-  title: string;
-  level: string;
-  estimateHours: number;
-  deliverable: string;
-  children?: RoadmapTask[];
-};
-
-type TaskContext = RoadmapTask & {
-  trackTitle: string;
-  moduleTitle: string;
-  depth: number;
-};
 
 export async function generateMetadata({
   params,
@@ -34,33 +20,6 @@ export async function generateMetadata({
   };
 }
 
-function flattenTasks(
-  tasks: RoadmapTask[],
-  trackTitle: string,
-  moduleTitle: string,
-  depth = 0
-): TaskContext[] {
-  return tasks.flatMap((task) => [
-    {
-      ...task,
-      trackTitle,
-      moduleTitle,
-      depth,
-    },
-    ...flattenTasks(task.children ?? [], trackTitle, moduleTitle, depth + 1),
-  ]);
-}
-
-function getTaskContexts(): Map<string, TaskContext> {
-  const entries = roadmap.tracks.flatMap((track) =>
-    track.modules.flatMap((module) =>
-      flattenTasks(module.tasks, track.title, module.title)
-    )
-  );
-
-  return new Map(entries.map((task) => [task.id, task]));
-}
-
 export default async function MarkdownCommentThreadPage({
   params,
 }: {
@@ -69,7 +28,7 @@ export default async function MarkdownCommentThreadPage({
   const { taskId, commentId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
   const decodedCommentId = decodeURIComponent(commentId);
-  const task = getTaskContexts().get(decodedTaskId);
+  const task = getTaskContexts(roadmap.tracks).get(decodedTaskId);
   const noteHref = `/skill-roadmap/notes/${encodeURIComponent(decodedTaskId)}`;
 
   return (

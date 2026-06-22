@@ -1,26 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { SkillRoadmapTaskQuiz } from '@/components/roadmap/SkillRoadmapTaskQuiz';
+import { SkillRoadmapTaskQuiz } from '@/components/roadmap/quiz';
 import { Container } from '@/components/ui';
 import roadmap from '@/data/skill-roadmap.json';
+import { getTaskContexts } from '@/lib/roadmap/flatten-tasks';
 
 export const dynamic = 'force-dynamic';
-
-type RoadmapTask = {
-  id: string;
-  title: string;
-  level: string;
-  estimateHours: number;
-  deliverable: string;
-  children?: RoadmapTask[];
-};
-
-type TaskContext = RoadmapTask & {
-  trackTitle: string;
-  moduleTitle: string;
-  depth: number;
-  parentTasks: Array<Pick<RoadmapTask, 'id' | 'title'>>;
-};
 
 export async function generateMetadata({
   params,
@@ -29,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { taskId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
-  const task = getTaskContexts().get(decodedTaskId);
+  const task = getTaskContexts(roadmap.tracks).get(decodedTaskId);
 
   return {
     title: `${task?.title ?? decodedTaskId} | Trắc nghiệm`,
@@ -44,7 +29,7 @@ export default async function SkillRoadmapTaskQuizPage({
 }) {
   const { taskId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
-  const task = getTaskContexts().get(decodedTaskId);
+  const task = getTaskContexts(roadmap.tracks).get(decodedTaskId);
 
   if (!task) {
     notFound();
@@ -55,43 +40,4 @@ export default async function SkillRoadmapTaskQuizPage({
       <SkillRoadmapTaskQuiz task={task} />
     </Container>
   );
-}
-
-function getTaskContexts(): Map<string, TaskContext> {
-  const entries = roadmap.tracks.flatMap((track) =>
-    track.modules.flatMap((roadmapModule) =>
-      flattenTasks(roadmapModule.tasks, track.title, roadmapModule.title)
-    )
-  );
-
-  return new Map(entries.map((task) => [task.id, task]));
-}
-
-function flattenTasks(
-  tasks: RoadmapTask[],
-  trackTitle: string,
-  moduleTitle: string,
-  depth = 0,
-  parentTasks: Array<Pick<RoadmapTask, 'id' | 'title'>> = []
-): TaskContext[] {
-  return tasks.flatMap((task) => {
-    const current = {
-      ...task,
-      trackTitle,
-      moduleTitle,
-      depth,
-      parentTasks,
-    };
-
-    return [
-      current,
-      ...flattenTasks(
-        task.children ?? [],
-        trackTitle,
-        moduleTitle,
-        depth + 1,
-        [...parentTasks, { id: task.id, title: task.title }]
-      ),
-    ];
-  });
 }

@@ -1,21 +1,10 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
+import type { ProgressItem, ProgressFile } from '@/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-type ProgressItem = {
-  completed: boolean;
-  note: string;
-  completedAt: string | null;
-  updatedAt: string;
-};
-
-type ProgressFile = {
-  updatedAt: string | null;
-  items: Record<string, ProgressItem>;
-};
 
 type RoadmapBackupFile = {
   version: number;
