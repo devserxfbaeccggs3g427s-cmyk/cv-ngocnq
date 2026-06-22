@@ -1,12 +1,24 @@
-import type { NoteComment, FlashcardDeck, QuizDeck, ProgressFile } from '@/types';
+import type { NoteComment, FlashcardDeck, QuizDeck, ProgressFile, StudyComment } from '@/types';
 
 import {
   progressStorageKey,
   commentsStorageKey,
   flashcardsStorageKey,
   quizzesStorageKey,
+  studyCommentsStorageKey,
+  duplicateDetectionStorageKey,
 } from './constants';
 import { normalizeProgress, normalizeCommentsByTask, normalizeFlashcardsByTask, normalizeQuizzesByTask } from './normalize';
+
+export type DuplicateDetectionConfig = {
+  flashcards: boolean;
+  quizzes: boolean;
+};
+
+const defaultDuplicateDetectionConfig: DuplicateDetectionConfig = {
+  flashcards: true,
+  quizzes: true,
+};
 
 export function readStoredProgress(): ProgressFile | null {
   if (typeof window === 'undefined') {
@@ -76,6 +88,18 @@ export function removeStoredQuizzes() {
 
   try {
     window.localStorage.removeItem(quizzesStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
+export function removeStoredStudyComments() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(studyCommentsStorageKey);
   } catch {
     // localStorage can fail in locked-down browsers. Progress reset still proceeds.
   }
@@ -156,6 +180,51 @@ export function readStoredQuizzes(): Record<string, QuizDeck[]> {
   }
 }
 
+export function readStoredStudyComments(): StudyComment[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(studyCommentsStorageKey);
+    const parsed = raw ? JSON.parse(raw) : [];
+
+    return Array.isArray(parsed)
+      ? parsed.filter((comment): comment is StudyComment =>
+          Boolean(
+            comment &&
+              typeof comment.id === 'string' &&
+              typeof comment.taskId === 'string' &&
+              typeof comment.body === 'string' &&
+              (comment.author === 'user' || comment.author === 'ai') &&
+              comment.context &&
+              (comment.context.type === 'flashcard' || comment.context.type === 'quiz')
+          )
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+export function readStoredDuplicateDetectionConfig(): DuplicateDetectionConfig {
+  if (typeof window === 'undefined') {
+    return defaultDuplicateDetectionConfig;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(duplicateDetectionStorageKey);
+    const parsed = raw ? JSON.parse(raw) : {};
+
+    return {
+      flashcards: typeof parsed?.flashcards === 'boolean' ? parsed.flashcards : true,
+      quizzes: typeof parsed?.quizzes === 'boolean' ? parsed.quizzes : true,
+    };
+  } catch {
+    return defaultDuplicateDetectionConfig;
+  }
+}
+
 export function storeComments(comments: Record<string, NoteComment[]>) {
   if (typeof window === 'undefined') {
     return;
@@ -189,5 +258,29 @@ export function storeQuizzes(quizzes: Record<string, QuizDeck[]>) {
     window.localStorage.setItem(quizzesStorageKey, JSON.stringify(quizzes));
   } catch {
     // localStorage can fail in private browsing or full quota. Import still keeps progress in memory.
+  }
+}
+
+export function storeStudyComments(comments: StudyComment[]) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(studyCommentsStorageKey, JSON.stringify(comments));
+  } catch {
+    // localStorage can fail in private browsing or full quota. UI state still remains in memory.
+  }
+}
+
+export function storeDuplicateDetectionConfig(config: DuplicateDetectionConfig) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(duplicateDetectionStorageKey, JSON.stringify(config));
+  } catch {
+    // localStorage can fail in private browsing or full quota. UI state still remains in memory.
   }
 }

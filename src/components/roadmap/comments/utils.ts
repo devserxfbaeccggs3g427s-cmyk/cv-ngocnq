@@ -29,6 +29,7 @@ export const progressStorageKey = 'skill-roadmap-progress:v1';
 export const longCommentLength = 900;
 export const longCommentLineCount = 14;
 export const initialVisibleRootThreads = 6;
+export const defaultVisibleCommentBatchSize = 5;
 export const visibleReplyPreviewCount = 2;
 
 export const defaultDraft: CommentDraft = {
@@ -83,6 +84,22 @@ export function buildCommentTree(comments: NoteComment[]): CommentNode[] {
 
   sortByCreatedAt(roots);
   return roots;
+}
+
+export function getVisibleCommentBatchSize() {
+  const configured =
+    Number(process.env.NEXT_PUBLIC_COMMENT_VISIBLE_COUNT) ||
+    Number(process.env.NEXT_PUBLIC_STUDY_COMMENT_VISIBLE_COUNT);
+
+  return Number.isFinite(configured) && configured > 0
+    ? Math.floor(configured)
+    : defaultVisibleCommentBatchSize;
+}
+
+export function sortCommentNodesNewestFirst<T extends { createdAt: string; children: T[] }>(comments: T[]): T[] {
+  return [...comments]
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+    .map((comment) => ({ ...comment, children: sortCommentNodesNewestFirst(comment.children) }));
 }
 
 export function createComment({
@@ -178,7 +195,7 @@ export function hasStreamingComment(comment: CommentNode, streamingCommentIds: S
 }
 
 export function plainTextPreview(markdown: string) {
-  return markdown
+  return stripAiReasoning(markdown)
     .replace(/```[\s\S]*?```/g, ' [code] ')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/!\[[^\]]*]\([^)]+\)/g, ' ')
@@ -187,6 +204,43 @@ export function plainTextPreview(markdown: string) {
     .replace(/[*_~>#-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+export function splitAiReasoning(markdown: string) {
+  const openMatch = markdown.match(/<think(?:ing)?>/i);
+
+  if (!openMatch || openMatch.index === undefined) {
+    return {
+      reasoning: '',
+      answer: markdown,
+      hasOpenReasoning: false,
+    };
+  }
+
+  const before = markdown.slice(0, openMatch.index);
+  const afterOpen = markdown.slice(openMatch.index + openMatch[0].length);
+  const closeMatch = afterOpen.match(/<\/think(?:ing)?>/i);
+
+  if (!closeMatch || closeMatch.index === undefined) {
+    return {
+      reasoning: afterOpen.trim(),
+      answer: before.trim(),
+      hasOpenReasoning: true,
+    };
+  }
+
+  const reasoning = afterOpen.slice(0, closeMatch.index).trim();
+  const afterClose = afterOpen.slice(closeMatch.index + closeMatch[0].length);
+
+  return {
+    reasoning,
+    answer: [before, afterClose].filter((part) => part.trim()).join('\n\n').trim(),
+    hasOpenReasoning: false,
+  };
+}
+
+export function stripAiReasoning(markdown: string) {
+  return splitAiReasoning(markdown).answer || markdown.replace(/<\/?think(?:ing)?>/gi, '').trim();
 }
 
 export function isLongComment(body: string) {

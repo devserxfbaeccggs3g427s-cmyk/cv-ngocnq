@@ -1,14 +1,11 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ChevronUp, MessageSquarePlus, X } from 'lucide-react';
+import { ChevronDown, MessageSquarePlus } from 'lucide-react';
 import type { NoteComment } from '@/types';
 import { CommentForm } from './CommentForm';
 import { CommentThread } from './CommentThread';
-import { CommentBubble } from './CommentBubble';
-import { readSeedComments, readSeedProgress, saveCommentsByTask, saveSeedProgress } from './seed';
+import { readSeedComments, saveCommentsByTask } from './seed';
 import {
   buildCommentTree,
   collectCommentBranchIds,
@@ -16,9 +13,8 @@ import {
   type CommentDraft,
   createComment,
   defaultDraft,
-  findCommentNode,
-  initialVisibleRootThreads,
-  progressStorageKey,
+  getVisibleCommentBatchSize,
+  sortCommentNodesNewestFirst,
   summarizeMarkdown,
   summarizeThread,
 } from './utils';
@@ -34,8 +30,7 @@ export function MarkdownCommentThreads({
   const [drafts, setDrafts] = useState<Record<string, CommentDraft>>({});
   const [submittingKey, setSubmittingKey] = useState<string | null>(null);
   const [streamingCommentIds, setStreamingCommentIds] = useState<Set<string>>(() => new Set());
-  const [visibleRootThreadCount, setVisibleRootThreadCount] = useState(initialVisibleRootThreads);
-  const [rootComposerOpen, setRootComposerOpen] = useState(false);
+  const [visibleRootThreadCount, setVisibleRootThreadCount] = useState(getVisibleCommentBatchSize);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,9 +63,10 @@ export function MarkdownCommentThreads({
     return () => { cancelled = true; };
   }, [taskId]);
 
-  const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
+  const commentTree = useMemo(() => sortCommentNodesNewestFirst(buildCommentTree(comments)), [comments]);
   const commentCount = comments.length;
-  const visibleRootThreads = commentTree.slice(Math.max(commentTree.length - visibleRootThreadCount, 0));
+  const visibleCommentStep = getVisibleCommentBatchSize();
+  const visibleRootThreads = commentTree.slice(0, visibleRootThreadCount);
   const hiddenRootThreadCount = Math.max(commentTree.length - visibleRootThreads.length, 0);
   const markdownContext = useMemo(() => summarizeMarkdown(markdown), [markdown]);
 
@@ -118,7 +114,6 @@ export function MarkdownCommentThreads({
       const nextComment = createComment({ parentId, author: 'user', body });
       saveComments([...comments, nextComment]);
       resetDraft(draftKey);
-      setRootComposerOpen(false);
       setSubmittingKey(null);
       return;
     }
@@ -131,7 +126,6 @@ export function MarkdownCommentThreads({
       rollbackComments = nextBeforeAi;
       saveComments(nextBeforeAi);
       resetDraft(draftKey);
-      setRootComposerOpen(false);
 
       const aiReply = createComment({ parentId: questionComment.id, author: 'ai', body: '', model: draft.model, provider: draft.provider });
       const nextWithPlaceholder = [...nextBeforeAi, aiReply];
@@ -196,29 +190,17 @@ export function MarkdownCommentThreads({
             <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
             {commentCount} comment
           </div>
-          <button
-            type="button"
-            onClick={() => setRootComposerOpen((current) => !current)}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-gray-950 px-3 text-sm font-semibold text-white transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
-            aria-expanded={rootComposerOpen}
-          >
-            {rootComposerOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />}
-            {rootComposerOpen ? 'Đóng form' : 'Thêm comment'}
-          </button>
         </div>
       </div>
 
       <div className="space-y-5 p-4 sm:p-5">
-        {rootComposerOpen && (
-          <CommentForm
-            draft={getDraft('root')}
-            isSubmitting={submittingKey === 'root'}
-            submitLabel="Gửi"
-            onSubmit={(event) => submitDraft(event, null)}
-            onChange={(update) => updateDraft('root', update)}
-            onCancel={() => { setRootComposerOpen(false); resetDraft('root'); }}
-          />
-        )}
+        <CommentForm
+          draft={getDraft('root')}
+          isSubmitting={submittingKey === 'root'}
+          submitLabel="Gửi"
+          onSubmit={(event) => submitDraft(event, null)}
+          onChange={(update) => updateDraft('root', update)}
+        />
 
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
@@ -233,22 +215,26 @@ export function MarkdownCommentThreads({
             </div>
           ) : (
             <>
-              {hiddenRootThreadCount > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setVisibleRootThreadCount((current) => current + initialVisibleRootThreads)}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-300 dark:hover:border-blue-900 dark:hover:bg-blue-950/30 dark:hover:text-blue-200"
-                >
-                  <ChevronUp className="h-4 w-4" aria-hidden="true" />
-                  Xem thêm {Math.min(hiddenRootThreadCount, initialVisibleRootThreads)} thread cũ hơn
-                </button>
-              )}
               {visibleRootThreads.map((comment) => (
                 <CommentThread key={comment.id} taskId={taskId} comment={comment} streamingCommentIds={streamingCommentIds} onDelete={deleteCommentBranch} />
               ))}
             </>
           )}
         </div>
+
+        {hiddenRootThreadCount > 0 && (
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => setVisibleRootThreadCount((current) => current + visibleCommentStep)}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+            >
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+              Xem thêm {Math.min(hiddenRootThreadCount, visibleCommentStep)} thread cũ hơn
+            </button>
+          </div>
+        )}
+
       </div>
     </section>
   );

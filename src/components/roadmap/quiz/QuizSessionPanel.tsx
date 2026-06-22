@@ -9,11 +9,13 @@ import {
   XCircle,
 } from 'lucide-react';
 import { MarkdownPreview } from '@/components/markdown/MarkdownPreview';
+import { StudyCommentThread } from '@/components/roadmap/comments';
 import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { QuizQuestion, QuizAttempt, QuizDeck } from '@/types';
 
 interface QuizSessionPanelProps {
+  taskId: string;
   activeQuiz: QuizDeck;
   questions: QuizQuestion[];
   activeQuestionIndex: number;
@@ -32,6 +34,7 @@ interface QuizSessionPanelProps {
 }
 
 export function QuizSessionPanel({
+  taskId,
   activeQuiz,
   questions,
   activeQuestionIndex,
@@ -232,6 +235,22 @@ export function QuizSessionPanel({
                 </button>
               </div>
             </div>
+
+            <StudyCommentThread
+              taskId={taskId}
+              deckId={activeQuiz.id}
+              contextType="quiz"
+              contextId={activeQuestion.id}
+              attemptId={activeAttempt?.id ?? null}
+              contextContent={[
+                `Câu hỏi: ${activeQuestion.question}`,
+                'Phương án:',
+                ...activeQuestion.options.map((option, index) => `${String.fromCharCode(65 + index)}. ${option}`),
+                `Đáp án đúng: ${String.fromCharCode(65 + activeQuestion.correctOptionIndex)}`,
+                activeQuestion.explanation ? `Giải thích: ${activeQuestion.explanation}` : '',
+                `Tag: ${activeQuestion.tag}`,
+              ].filter(Boolean).join('\n')}
+            />
           </div>
         )}
       </CardContent>

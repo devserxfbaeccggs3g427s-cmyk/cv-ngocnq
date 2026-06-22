@@ -7,7 +7,17 @@ import { ArrowLeft, Brain, CheckCircle2, Circle, Clock3, Layers, Loader2, FileTe
 import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { TaskContext, ProgressFile, NoteComment, Flashcard, FlashcardDeck } from '@/types';
-import { progressStorageKey, commentsStorageKey, flashcardsStorageKey, flattenTasks, storeProgress, storeComments, storeFlashcards } from '@/lib/roadmap';
+import {
+  progressStorageKey,
+  commentsStorageKey,
+  flashcardsStorageKey,
+  flattenTasks,
+  storeProgress,
+  storeComments,
+  storeFlashcards,
+  readStoredDuplicateDetectionConfig,
+  storeDuplicateDetectionConfig,
+} from '@/lib/roadmap';
 import { FlashcardStudyPanel } from './FlashcardStudyPanel';
 import { normalizeFlashcardsByTask, normalizeSeedProgress, readSeedComments, readSeedFlashcards, storeTaskFlashcards, getFlashcardRequirement, formatDate } from './helpers';
 
@@ -22,6 +32,7 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
   const [activeFlashcardIndex, setActiveFlashcardIndex] = useState(0);
   const [flashcardFlipped, setFlashcardFlipped] = useState(false);
   const [flashcardRatings, setFlashcardRatings] = useState<Record<string, 'hard' | 'good'>>({});
+  const [duplicateDetectionEnabled, setDuplicateDetectionEnabled] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +58,7 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
       const taskDecks = parsed[task.id] ?? [];
       window.queueMicrotask(() => { setFlashcardDecks(taskDecks); setActiveDeckId(taskDecks[0]?.id ?? null); resetStudyState(); });
     } catch { window.queueMicrotask(() => { setFlashcardDecks([]); setActiveDeckId(null); resetStudyState(); }); }
+    window.queueMicrotask(() => setDuplicateDetectionEnabled(readStoredDuplicateDetectionConfig().flashcards));
 
     async function hydrateMissingSeedData() {
       if (hasLocalProgress && hasLocalComments && hasLocalFlashcards) return;
@@ -88,7 +100,7 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
           task: { id: task.id, title: task.title, level: task.level, deliverable: task.deliverable },
           note: item.note,
           comments: noteComments.map((c) => ({ author: c.author, body: c.body, createdAt: c.createdAt })),
-          existingCards: flashcardDecks.flatMap((d) => d.cards.map((c) => c.front)),
+          existingCards: duplicateDetectionEnabled ? flashcardDecks.flatMap((d) => d.cards.map((c) => c.front)) : [],
         }),
       });
       const body = (await response.json().catch(() => ({}))) as { deck?: Partial<FlashcardDeck> & { cards?: Flashcard[] }; error?: string };
@@ -109,6 +121,12 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
 
   function selectDeck(deckId: string) { setActiveDeckId(deckId); resetStudyState(); }
   function resetStudyState() { setActiveFlashcardIndex(0); setFlashcardFlipped(false); setFlashcardRatings({}); }
+  function updateDuplicateDetection(enabled: boolean) {
+    const current = readStoredDuplicateDetectionConfig();
+    const next = { ...current, flashcards: enabled };
+    setDuplicateDetectionEnabled(enabled);
+    storeDuplicateDetectionConfig(next);
+  }
 
   return (
     <div className="space-y-6">
@@ -148,6 +166,22 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
               <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">Nguồn học gồm toàn bộ note hiện tại và {noteComments.length} comment. Bộ mới sẽ được yêu cầu đổi góc hỏi so với các thẻ đã có.</p>
             </div>
             <div className="w-full shrink-0 space-y-2 lg:w-72">
+              <label className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
+                <span className="min-w-0">
+                  <span className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Chặn câu trùng
+                  </span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                    Gửi thẻ đã có cho AI
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={duplicateDetectionEnabled}
+                  onChange={(event) => updateDuplicateDetection(event.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                />
+              </label>
               <label className="block">
                 <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Mật khẩu xác nhận</span>
                 <input value={aiConfirmPassword} onChange={(e) => setAiConfirmPassword(e.target.value)} type="password" placeholder="Password dùng AI env" autoComplete="off" className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-violet-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100" />
@@ -183,11 +217,12 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
         </Card>
       ) : (
         <FlashcardStudyPanel
-          deck={activeDeck} activeIndex={activeFlashcardIndex} flipped={flashcardFlipped} ratings={flashcardRatings}
+          taskId={task.id} deck={activeDeck} activeIndex={activeFlashcardIndex} flipped={flashcardFlipped} ratings={flashcardRatings}
           onFlip={() => setFlashcardFlipped((c) => !c)}
           onPrevious={() => { setActiveFlashcardIndex((c) => Math.max(c - 1, 0)); setFlashcardFlipped(false); }}
           onNext={() => { setActiveFlashcardIndex((c) => Math.min(c + 1, (activeDeck?.cards.length ?? 1) - 1)); setFlashcardFlipped(false); }}
           onRate={(cardId, rating) => { setFlashcardRatings((c) => ({ ...c, [cardId]: rating })); }}
+          onSegmentClick={(index) => { setActiveFlashcardIndex(index); setFlashcardFlipped(false); }}
           onRestart={resetStudyState}
         />
       )}

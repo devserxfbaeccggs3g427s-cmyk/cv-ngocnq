@@ -13,7 +13,7 @@ export function useQuizDecks() {
 
   useEffect(() => {
     const stored = readStoredQuizzes();
-    setQuizzesByTask(stored);
+    window.queueMicrotask(() => setQuizzesByTask(stored));
   }, []);
 
   const getDecksForTask = useCallback(

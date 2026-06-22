@@ -10,10 +10,13 @@ import {
 import { Card, CardContent } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { FlashcardDeck } from '@/types';
+import { StudyCommentThread } from '@/components/roadmap/comments';
 import { FlashcardFace } from './FlashcardFace';
+import { SegmentedProgressBar } from './SegmentedProgressBar';
 import { formatDate } from './helpers';
 
 interface FlashcardStudyPanelProps {
+  taskId: string;
   deck: FlashcardDeck;
   activeIndex: number;
   flipped: boolean;
@@ -22,10 +25,12 @@ interface FlashcardStudyPanelProps {
   onPrevious: () => void;
   onNext: () => void;
   onRate: (cardId: string, rating: 'hard' | 'good') => void;
+  onSegmentClick: (index: number) => void;
   onRestart: () => void;
 }
 
 export function FlashcardStudyPanel({
+  taskId,
   deck,
   activeIndex,
   flipped,
@@ -34,6 +39,7 @@ export function FlashcardStudyPanel({
   onPrevious,
   onNext,
   onRate,
+  onSegmentClick,
   onRestart,
 }: FlashcardStudyPanelProps) {
   const cards = deck.cards;
@@ -41,7 +47,6 @@ export function FlashcardStudyPanel({
   const reviewedCount = Object.keys(ratings).length;
   const hardCount = Object.values(ratings).filter((rating) => rating === 'hard').length;
   const goodCount = Object.values(ratings).filter((rating) => rating === 'good').length;
-  const progressPercent = cards.length > 0 ? Math.round((reviewedCount / cards.length) * 100) : 0;
   const activeRating = ratings[activeCard?.id ?? ''];
 
   if (!activeCard) {
@@ -84,12 +89,12 @@ export function FlashcardStudyPanel({
                   </span>
                 )}
               </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                <div
-                  className="h-full rounded-full bg-violet-600 transition-all duration-500 ease-out"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
+              <SegmentedProgressBar
+                cards={cards}
+                ratings={ratings}
+                activeIndex={activeIndex}
+                onSegmentClick={onSegmentClick}
+              />
             </div>
             <button
               type="button"
@@ -203,6 +208,18 @@ export function FlashcardStudyPanel({
             </div>
           </div>
         </div>
+        <StudyCommentThread
+          taskId={taskId}
+          deckId={deck.id}
+          contextType="flashcard"
+          contextId={activeCard.id}
+          contextContent={[
+            `Mặt trước: ${activeCard.front}`,
+            `Mặt sau: ${activeCard.back}`,
+            activeCard.hint ? `Gợi ý: ${activeCard.hint}` : '',
+            `Tag: ${activeCard.tag}`,
+          ].filter(Boolean).join('\n')}
+        />
       </CardContent>
     </Card>
   );

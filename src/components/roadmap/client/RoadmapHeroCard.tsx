@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
 import type { Roadmap, ProgressFile, RoadmapTask } from '@/types';
+import { getLeafTasks } from '@/lib/roadmap';
 import { Metric } from './Metric';
 
 interface RoadmapHeroCardProps {
@@ -19,15 +20,16 @@ interface RoadmapHeroCardProps {
 }
 
 export function RoadmapHeroCard({ roadmap, progress, allTasks }: RoadmapHeroCardProps) {
-  const completedCount = allTasks.filter(
+  const leafTasks = getLeafTasks(allTasks);
+  const completedCount = leafTasks.filter(
     (task) => progress.items[task.id]?.completed
   ).length;
-  const totalHours = allTasks.reduce((sum, task) => sum + task.estimateHours, 0);
-  const completedHours = allTasks
+  const totalHours = leafTasks.reduce((sum, task) => sum + task.estimateHours, 0);
+  const completedHours = leafTasks
     .filter((task) => progress.items[task.id]?.completed)
     .reduce((sum, task) => sum + task.estimateHours, 0);
-  const completionRate = allTasks.length
-    ? Math.round((completedCount / allTasks.length) * 100)
+  const completionRate = leafTasks.length
+    ? Math.round((completedCount / leafTasks.length) * 100)
     : 0;
 
   return (
@@ -50,7 +52,7 @@ export function RoadmapHeroCard({ roadmap, progress, allTasks }: RoadmapHeroCard
 
           <div className="grid grid-cols-2 gap-3">
             <Metric icon={CheckCircle2} label="Hoàn thành" value={`${completionRate}%`} />
-            <Metric icon={Layers} label="Task" value={`${completedCount}/${allTasks.length}`} />
+            <Metric icon={Layers} label="Task" value={`${completedCount}/${leafTasks.length}`} />
             <Metric icon={Clock3} label="Giờ đã ôn" value={`${completedHours}/${totalHours}`} />
             <Metric icon={CalendarDays} label="Lộ trình" value={`${roadmap.meta.durationWeeks} tuần`} />
           </div>

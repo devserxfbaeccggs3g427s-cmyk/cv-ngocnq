@@ -4,6 +4,8 @@ export {
   commentsStorageKey,
   flashcardsStorageKey,
   quizzesStorageKey,
+  studyCommentsStorageKey,
+  duplicateDetectionStorageKey,
   shouldSyncProgressFile,
   levelStyles,
   studyStatusOptions,
@@ -12,6 +14,7 @@ export {
 export {
   flattenTasks,
   flattenTasksWithContext,
+  getLeafTasks,
   getTaskContexts,
 } from './flatten-tasks';
 
@@ -22,16 +25,23 @@ export {
   removeStoredComments,
   removeStoredFlashcards,
   removeStoredQuizzes,
+  removeStoredStudyComments,
   hasStoredComments,
   hasStoredFlashcards,
   hasStoredQuizzes,
   readStoredComments,
   readStoredFlashcards,
   readStoredQuizzes,
+  readStoredStudyComments,
+  readStoredDuplicateDetectionConfig,
   storeComments,
   storeFlashcards,
   storeQuizzes,
+  storeStudyComments,
+  storeDuplicateDetectionConfig,
 } from './storage';
+
+export type { DuplicateDetectionConfig } from './storage';
 
 export {
   normalizeProgress,

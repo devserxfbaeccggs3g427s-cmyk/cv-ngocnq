@@ -11,6 +11,8 @@ import {
   storeProgress,
   storeComments,
   storeQuizzes,
+  readStoredDuplicateDetectionConfig,
+  storeDuplicateDetectionConfig,
 } from '@/lib/roadmap';
 import { QuizSessionPanel } from './QuizSessionPanel';
 import { QuizResultPanel } from './QuizResultPanel';
@@ -40,6 +42,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
   const [activeAttemptId, setActiveAttemptId] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [reviewingAttemptId, setReviewingAttemptId] = useState<string | null>(null);
+  const [duplicateDetectionEnabled, setDuplicateDetectionEnabledState] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +58,8 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
     } catch {
       window.queueMicrotask(() => setProgress(null));
     }
+
+    window.queueMicrotask(() => setDuplicateDetectionEnabledState(readStoredDuplicateDetectionConfig().quizzes));
 
     try {
       const raw = window.localStorage.getItem(commentsStorageKey);
@@ -151,7 +156,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
           task: { id: task.id, title: task.title, level: task.level, deliverable: task.deliverable },
           note: item.note,
           comments: noteComments.map((c) => ({ author: c.author, body: c.body, createdAt: c.createdAt })),
-          existingQuestions: quizDecks.flatMap((q) => q.questions.map((qq) => qq.question)),
+          existingQuestions: duplicateDetectionEnabled ? quizDecks.flatMap((q) => q.questions.map((qq) => qq.question)) : [],
         }),
       });
       const body = (await response.json().catch(() => ({}))) as { quiz?: QuizDeck; error?: string };
@@ -181,6 +186,12 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
   }
 
   function selectQuiz(quizId: string) { setActiveQuizId(quizId); restartQuiz(); }
+  function setDuplicateDetectionEnabled(enabled: boolean) {
+    const current = readStoredDuplicateDetectionConfig();
+    const next = { ...current, quizzes: enabled };
+    setDuplicateDetectionEnabledState(enabled);
+    storeDuplicateDetectionConfig(next);
+  }
 
   const persistQuiz = useCallback((nextQuiz: QuizDeck) => {
     const nextQuizzes = quizDecks.map((q) => (q.id === nextQuiz.id ? nextQuiz : q));
@@ -246,6 +257,8 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
       <QuizCreationCard
         canCreateQuiz={canCreateQuiz} generatingQuiz={generatingQuiz}
         aiConfirmPassword={aiConfirmPassword} setAiConfirmPassword={setAiConfirmPassword}
+        duplicateDetectionEnabled={duplicateDetectionEnabled}
+        setDuplicateDetectionEnabled={setDuplicateDetectionEnabled}
         createQuiz={createQuiz} requirement={requirement} quizError={quizError}
         quizDecks={quizDecks} activeQuiz={activeQuiz} selectQuiz={selectQuiz}
       />
@@ -258,7 +271,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
           <QuizSessionPanel
-            activeQuiz={activeQuiz} questions={questions}
+            taskId={task.id} activeQuiz={activeQuiz} questions={questions}
             activeQuestionIndex={activeQuestionIndex} setActiveQuestionIndex={setActiveQuestionIndex}
             answers={answers} answerQuestion={answerQuestion}
             submitted={submitted} quizStarted={quizStarted}

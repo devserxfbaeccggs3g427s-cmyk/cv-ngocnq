@@ -2,7 +2,7 @@
 
 import type { FormEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { KeyRound, Send, X } from 'lucide-react';
+import { ChevronDown, KeyRound, Send, SlidersHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type AiModelOption, type CommentDraft, providerOptions } from './utils';
 import { AiProviderSettings } from './AiProviderSettings';
@@ -51,6 +51,7 @@ export function CommentForm({
   const [modelOptions, setModelOptions] = useState<AiModelOption[]>([]);
   const [modelSearch, setModelSearch] = useState('');
   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
+  const [isAiSettingsOpen, setIsAiSettingsOpen] = useState(false);
   const [loadedModelKey, setLoadedModelKey] = useState('');
   const autoLoadedModelKeyRef = useRef('');
   const [isLoadingModels, setIsLoadingModels] = useState(false);
@@ -139,6 +140,7 @@ export function CommentForm({
   useEffect(() => {
     if (
       draft.mode !== 'ai' ||
+      !isAiSettingsOpen ||
       draft.provider !== 'kilo' ||
       loadedModelKey === modelRequestKey ||
       autoLoadedModelKeyRef.current === modelRequestKey ||
@@ -149,7 +151,16 @@ export function CommentForm({
 
     autoLoadedModelKeyRef.current = modelRequestKey;
     loadModels();
-  }, [draft.mode, draft.provider, isLoadingModels, loadModels, loadedModelKey, modelRequestKey]);
+  }, [draft.mode, draft.provider, isAiSettingsOpen, isLoadingModels, loadModels, loadedModelKey, modelRequestKey]);
+
+  useEffect(() => {
+    if (draft.mode !== 'ai') {
+      window.queueMicrotask(() => {
+        setIsAiSettingsOpen(false);
+        setIsModelPickerOpen(false);
+      });
+    }
+  }, [draft.mode]);
 
   return (
     <form onSubmit={onSubmit} className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900/70">
@@ -174,22 +185,52 @@ export function CommentForm({
       </div>
 
       {draft.mode === 'ai' && (
-        <AiProviderSettings
-          draft={draft}
-          onChange={onChange}
-          usesServerApiKey={usesServerApiKey}
-          currentModelOptions={currentModelOptions}
-          selectedModel={selectedModel}
-          isModelPickerOpen={isModelPickerOpen}
-          setIsModelPickerOpen={setIsModelPickerOpen}
-          filteredModelOptions={filteredModelOptions}
-          modelSearch={modelSearch}
-          setModelSearch={setModelSearch}
-          canLoadModels={canLoadModels}
-          isLoadingModels={isLoadingModels}
-          loadModels={loadModels}
-          currentModelError={currentModelError}
-        />
+        <div className="mt-3 rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+          <button
+            type="button"
+            onClick={() => setIsAiSettingsOpen((current) => !current)}
+            className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left transition hover:bg-gray-50 dark:hover:bg-gray-900"
+            aria-expanded={isAiSettingsOpen}
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  Cấu hình AI
+                </span>
+                <span className="block truncate text-xs text-gray-500 dark:text-gray-400">
+                  {providerOptions.find((option) => option.value === draft.provider)?.label}
+                  {draft.model ? ` · ${draft.model}` : ' · Chưa chọn model'}
+                </span>
+              </span>
+            </span>
+            <ChevronDown
+              className={cn('h-4 w-4 shrink-0 text-gray-400 transition', isAiSettingsOpen && 'rotate-180')}
+              aria-hidden="true"
+            />
+          </button>
+
+          {isAiSettingsOpen && (
+            <div className="border-t border-gray-200 p-3 dark:border-gray-800">
+              <AiProviderSettings
+                draft={draft}
+                onChange={onChange}
+                usesServerApiKey={usesServerApiKey}
+                currentModelOptions={currentModelOptions}
+                selectedModel={selectedModel}
+                isModelPickerOpen={isModelPickerOpen}
+                setIsModelPickerOpen={setIsModelPickerOpen}
+                filteredModelOptions={filteredModelOptions}
+                modelSearch={modelSearch}
+                setModelSearch={setModelSearch}
+                canLoadModels={canLoadModels}
+                isLoadingModels={isLoadingModels}
+                loadModels={loadModels}
+                currentModelError={currentModelError}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       <label className="mt-3 block">

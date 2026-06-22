@@ -13,7 +13,7 @@ export function useNoteComments() {
 
   useEffect(() => {
     const stored = readStoredComments();
-    setCommentsByTask(stored);
+    window.queueMicrotask(() => setCommentsByTask(stored));
   }, []);
 
   const getCommentsForTask = useCallback(

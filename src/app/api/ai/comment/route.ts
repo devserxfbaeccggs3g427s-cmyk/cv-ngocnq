@@ -12,6 +12,7 @@ type AiCommentRequest = {
   baseUrl?: unknown;
   question?: unknown;
   markdownContext?: unknown;
+  studyContext?: unknown;
   threadContext?: unknown;
 };
 
@@ -149,6 +150,24 @@ export async function POST(request: Request) {
     return jsonError('Vui lòng nhập Base URL cho kênh AI tương thích OpenAI.', 400);
   }
 
+  const hasStudyContext = isNonEmptyString(body.studyContext);
+  const rawFocusContext = isNonEmptyString(body.studyContext)
+    ? body.studyContext
+    : isNonEmptyString(body.markdownContext)
+      ? body.markdownContext
+      : 'Không có nội dung Markdown.';
+  const focusContext = compactText(
+    rawFocusContext,
+    hasStudyContext ? 5000 : 10000
+  );
+  const contextTitle = hasStudyContext ? 'Ngữ cảnh học tập hiện tại' : 'Tóm lược nội dung Markdown';
+  const systemFocus = hasStudyContext
+    ? 'Bạn là trợ lý học tập trả lời câu hỏi theo đúng flashcard hoặc câu quiz đang xem.'
+    : 'Bạn là trợ lý review và thảo luận nội dung note Markdown.';
+  const contextGuard = hasStudyContext
+    ? 'Chỉ dùng ngữ cảnh học tập được cung cấp; không suy diễn từ note hoặc thẻ/câu khác.'
+    : 'Nếu cần giả định, hãy nói rõ. Không bịa thông tin ngoài context được cung cấp.';
+
   const markdownContext = compactText(
     isNonEmptyString(body.markdownContext) ? body.markdownContext : 'Không có nội dung Markdown.',
     10000
@@ -162,16 +181,16 @@ export async function POST(request: Request) {
     {
       role: 'system',
       content: [
-        'Bạn là trợ lý review và thảo luận nội dung note Markdown.',
+        systemFocus,
         'Trả lời bằng tiếng Việt, rõ ràng, có cấu trúc, tập trung đúng câu hỏi.',
-        'Nếu cần giả định, hãy nói rõ. Không bịa thông tin ngoài context được cung cấp.',
+        contextGuard,
       ].join(' '),
     },
     {
       role: 'user',
       content: [
-        '## Tóm lược nội dung Markdown',
-        markdownContext,
+        `## ${contextTitle}`,
+        hasStudyContext ? focusContext : markdownContext,
         '',
         '## Context comment/reply hiện tại',
         threadContext,

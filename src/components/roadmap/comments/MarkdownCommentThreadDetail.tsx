@@ -15,6 +15,7 @@ import {
   defaultDraft,
   findCommentNode,
   progressStorageKey,
+  sortCommentNodesNewestFirst,
   summarizeMarkdown,
   summarizeThread,
 } from './utils';
@@ -82,7 +83,7 @@ export function MarkdownCommentThreadDetail({
     return () => { cancelled = true; };
   }, [taskId]);
 
-  const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
+  const commentTree = useMemo(() => sortCommentNodesNewestFirst(buildCommentTree(comments)), [comments]);
   const thread = useMemo(() => findCommentNode(commentTree, commentId), [commentId, commentTree]);
   const openThreadIds = useMemo(() => new Set(thread ? [thread.id] : []), [thread]);
   const markdownContext = useMemo(() => summarizeMarkdown(markdown), [markdown]);

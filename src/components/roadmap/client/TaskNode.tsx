@@ -39,13 +39,17 @@ export function TaskNode({
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
   const descendants = flattenTasks(childTasks);
-  const childCount = descendants.length;
-  const completedChildren = descendants.filter(
+  const childCount = childTasks.length;
+  const completedChildren = childTasks.filter(
+    (child) => progress.items[child.id]?.completed
+  ).length;
+  const completedDescendants = descendants.filter(
     (child) => progress.items[child.id]?.completed
   ).length;
   const hasStartedChildren = completedChildren > 0;
   const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
-  const effectivelyCompleted = completed || allChildrenCompleted;
+  const allDescendantsCompleted = descendants.length > 0 && completedDescendants === descendants.length;
+  const effectivelyCompleted = completed || allDescendantsCompleted;
   const childProgressing = !effectivelyCompleted && hasStartedChildren;
   const isChild = depth > 0;
   const hasChildren = childTasks.length > 0;
@@ -141,37 +145,39 @@ export function TaskNode({
             </a>
           </div>
 
-          <div className="mt-3 rounded-lg border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Prompt AI hỗ trợ học</div>
-                <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{prompt}</p>
+          {!hasChildren && (
+            <div className="mt-3 rounded-lg border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Prompt AI hỗ trợ học</div>
+                  <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{prompt}</p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onTogglePrompt(task.id)}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+                    aria-expanded={isPromptVisible}
+                  >
+                    {isPromptVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    {isPromptVisible ? 'Ẩn' : 'Xem'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onCopyPrompt(task)}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300"
+                  >
+                    <Copy className="h-3.5 w-3.5" />{isPromptCopied ? 'Đã copy' : 'Copy'}
+                  </button>
+                </div>
               </div>
-              <div className="flex shrink-0 gap-2">
-                <button
-                  type="button"
-                  onClick={() => onTogglePrompt(task.id)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
-                  aria-expanded={isPromptVisible}
-                >
-                  {isPromptVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                  {isPromptVisible ? 'Ẩn' : 'Xem'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onCopyPrompt(task)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300"
-                >
-                  <Copy className="h-3.5 w-3.5" />{isPromptCopied ? 'Đã copy' : 'Copy'}
-                </button>
-              </div>
+              {isPromptVisible && (
+                <div className="mt-3 rounded-md bg-gray-50 p-3 text-sm leading-6 text-gray-700 dark:bg-gray-900 dark:text-gray-200">{prompt}</div>
+              )}
             </div>
-            {isPromptVisible && (
-              <div className="mt-3 rounded-md bg-gray-50 p-3 text-sm leading-6 text-gray-700 dark:bg-gray-900 dark:text-gray-200">{prompt}</div>
-            )}
-          </div>
+          )}
 
-          {effectivelyCompleted && (
+          {!hasChildren && effectivelyCompleted && (
             <div className={cn('mt-4 rounded-lg border bg-white p-3 dark:bg-gray-950', hasNote ? 'border-emerald-200 dark:border-emerald-900/60' : 'border-red-300 dark:border-red-800')}>
               <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">

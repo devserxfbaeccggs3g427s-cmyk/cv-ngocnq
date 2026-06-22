@@ -13,7 +13,7 @@ export function useFlashcardDecks() {
 
   useEffect(() => {
     const stored = readStoredFlashcards();
-    setFlashcardsByTask(stored);
+    window.queueMicrotask(() => setFlashcardsByTask(stored));
   }, []);
 
   const getDecksForTask = useCallback(

@@ -64,6 +64,8 @@ interface QuizCreationCardProps {
   generatingQuiz: boolean;
   aiConfirmPassword: string;
   setAiConfirmPassword: (value: string) => void;
+  duplicateDetectionEnabled: boolean;
+  setDuplicateDetectionEnabled: (enabled: boolean) => void;
   createQuiz: () => void;
   requirement: string | null;
   quizError: string | null;
@@ -77,6 +79,8 @@ export function QuizCreationCard({
   generatingQuiz,
   aiConfirmPassword,
   setAiConfirmPassword,
+  duplicateDetectionEnabled,
+  setDuplicateDetectionEnabled,
   createQuiz,
   requirement,
   quizError,
@@ -101,6 +105,22 @@ export function QuizCreationCard({
             </p>
           </div>
           <div className="w-full shrink-0 space-y-2 md:w-72">
+            <label className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Chặn câu trùng
+                </span>
+                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                  Gửi câu đã có cho AI
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                checked={duplicateDetectionEnabled}
+                onChange={(event) => setDuplicateDetectionEnabled(event.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+              />
+            </label>
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Mật khẩu xác nhận

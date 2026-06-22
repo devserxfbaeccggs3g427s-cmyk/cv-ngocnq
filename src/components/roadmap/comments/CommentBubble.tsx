@@ -1,6 +1,7 @@
 'use client';
 
 import type { FormEvent } from 'react';
+import { useState } from 'react';
 import {
   Bot,
   ChevronDown,
@@ -21,6 +22,7 @@ import {
   hasStreamingComment,
   isLongComment,
   plainTextPreview,
+  splitAiReasoning,
   visibleReplyPreviewCount,
 } from './utils';
 import { CommentForm } from './CommentForm';
@@ -65,11 +67,11 @@ export function CommentBubble({
   onSubmit: (event: FormEvent<HTMLFormElement>, parentId: string | null) => void;
 }) {
   const isAi = comment.author === 'ai';
+  const [isReasoningOpen, setIsReasoningOpen] = useState(false);
   const compactDepth = Math.min(depth, 4);
   const draft = getDraft(comment.id);
   const isSubmitting = submittingKey === comment.id;
   const isStreaming = streamingCommentIds.has(comment.id);
-  const isLong = isLongComment(comment.body);
   const isExpanded = expandedCommentIds.has(comment.id);
   const nestedReplyCount = countNestedReplies(comment);
   const latestActivity = getLatestActivityDate(comment);
@@ -81,6 +83,12 @@ export function CommentBubble({
       ? comment.children.slice(Math.max(comment.children.length - visibleReplyPreviewCount, 0))
       : comment.children;
   const hiddenReplyCount = Math.max(comment.children.length - visibleReplies.length, 0);
+  const aiContent = isAi
+    ? splitAiReasoning(comment.body)
+    : { reasoning: '', answer: comment.body, hasOpenReasoning: false };
+  const hasAiReasoning = isAi && Boolean(aiContent.reasoning);
+  const displayBody = hasAiReasoning ? aiContent.answer : comment.body;
+  const isLong = isLongComment(displayBody);
 
   return (
     <div className={cn(depth > 0 && 'border-l border-gray-200 pl-3 dark:border-gray-800')} style={{ marginLeft: `${compactDepth * 0.4}rem` }}>
@@ -170,8 +178,30 @@ export function CommentBubble({
                 isLong && !isExpanded && 'max-h-72'
               )}
             >
-              {comment.body ? (
-                <MarkdownPreview content={comment.body} />
+              {hasAiReasoning && (
+                <div className="mb-3 rounded-lg border border-blue-200 bg-blue-50/80 dark:border-blue-900/70 dark:bg-blue-950/30">
+                  <button
+                    type="button"
+                    onClick={() => setIsReasoningOpen((current) => !current)}
+                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs font-bold text-blue-800 transition hover:bg-blue-100/70 dark:text-blue-200 dark:hover:bg-blue-900/30"
+                    aria-expanded={isReasoningOpen}
+                  >
+                    <span>{aiContent.hasOpenReasoning ? 'AI đang suy nghĩ' : 'Suy nghĩ của AI'}</span>
+                    <ChevronDown
+                      className={cn('h-3.5 w-3.5 shrink-0 transition', isReasoningOpen && 'rotate-180')}
+                      aria-hidden="true"
+                    />
+                  </button>
+                  {isReasoningOpen && (
+                    <div className="border-t border-blue-200 px-3 py-2 text-sm leading-6 text-blue-950 dark:border-blue-900/70 dark:text-blue-100">
+                      <MarkdownPreview content={aiContent.reasoning} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {displayBody ? (
+                <MarkdownPreview content={displayBody} />
               ) : (
                 <div className="flex items-center gap-2 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
                   <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />

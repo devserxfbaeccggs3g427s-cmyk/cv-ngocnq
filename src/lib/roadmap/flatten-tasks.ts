@@ -7,6 +7,28 @@ export function flattenTasks(tasks: RoadmapTask[]): RoadmapTask[] {
   ]);
 }
 
+export function getLeafTasks(tasks: RoadmapTask[]): RoadmapTask[] {
+  const leaves: RoadmapTask[] = [];
+  const seenIds = new Set<string>();
+
+  const visit = (items: RoadmapTask[]) => {
+    items.forEach((task) => {
+      if ((task.children ?? []).length === 0) {
+        if (!seenIds.has(task.id)) {
+          seenIds.add(task.id);
+          leaves.push(task);
+        }
+        return;
+      }
+
+      visit(task.children ?? []);
+    });
+  };
+
+  visit(tasks);
+  return leaves;
+}
+
 export function flattenTasksWithContext(
   tasks: RoadmapTask[],
   trackTitle: string,
