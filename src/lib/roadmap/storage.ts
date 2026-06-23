@@ -141,6 +141,18 @@ export function hasStoredQuizzes() {
   }
 }
 
+export function hasStoredStudyComments() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(studyCommentsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
 export function readStoredComments(): Record<string, NoteComment[]> {
   if (typeof window === 'undefined') {
     return {};

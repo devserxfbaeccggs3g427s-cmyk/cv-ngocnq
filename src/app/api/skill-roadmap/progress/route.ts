@@ -13,6 +13,7 @@ type RoadmapBackupFile = {
   comments?: unknown;
   flashcards?: unknown;
   quizzes?: unknown;
+  studyComments?: unknown;
 };
 
 const progressFilePath = path.join(

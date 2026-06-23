@@ -30,6 +30,7 @@ export {
   hasStoredComments,
   hasStoredFlashcards,
   hasStoredQuizzes,
+  hasStoredStudyComments,
   readStoredComments,
   readStoredFlashcards,
   readStoredQuizzes,

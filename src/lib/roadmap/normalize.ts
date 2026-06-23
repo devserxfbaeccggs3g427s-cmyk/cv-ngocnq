@@ -5,6 +5,8 @@ import type {
   Flashcard,
   FlashcardDeck,
   QuizDeck,
+  StudyComment,
+  StudyCommentContext,
 } from '@/types';
 
 import { normalizeQuizzesByTask } from './normalize-quizzes';
@@ -189,11 +191,83 @@ export function normalizeFlashcardsByTask(input: unknown): Record<string, Flashc
   return flashcards;
 }
 
+function normalizeStudyCommentContext(input: unknown): StudyCommentContext | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  if (input.type === 'flashcard') {
+    if (typeof input.deckId !== 'string' || typeof input.cardId !== 'string') {
+      return null;
+    }
+
+    return {
+      type: 'flashcard',
+      deckId: input.deckId,
+      cardId: input.cardId,
+    };
+  }
+
+  if (input.type === 'quiz') {
+    if (
+      typeof input.deckId !== 'string' ||
+      typeof input.questionId !== 'string' ||
+      typeof input.attemptId !== 'string'
+    ) {
+      return null;
+    }
+
+    return {
+      type: 'quiz',
+      deckId: input.deckId,
+      questionId: input.questionId,
+      attemptId: input.attemptId,
+    };
+  }
+
+  return null;
+}
+
+function normalizeStudyComment(input: unknown): StudyComment | null {
+  const baseComment = normalizeComment(input);
+
+  if (!baseComment || !isRecord(input) || typeof input.taskId !== 'string') {
+    return null;
+  }
+
+  const context = normalizeStudyCommentContext(input.context);
+
+  if (!context) {
+    return null;
+  }
+
+  return {
+    ...baseComment,
+    taskId: input.taskId,
+    context,
+  };
+}
+
+export function normalizeStudyComments(input: unknown): StudyComment[] | null {
+  if (!Array.isArray(input)) {
+    return null;
+  }
+
+  const comments = input.map(normalizeStudyComment);
+
+  if (comments.some((comment) => !comment)) {
+    return null;
+  }
+
+  return comments as StudyComment[];
+}
+
 export function normalizeRoadmapBackup(input: unknown): {
   progress: ProgressFile;
   comments: Record<string, NoteComment[]>;
   flashcards: Record<string, FlashcardDeck[]>;
   quizzes: Record<string, QuizDeck[]>;
+  studyComments: StudyComment[];
 } | null {
   if (!isRecord(input)) {
     return null;
@@ -223,10 +297,17 @@ export function normalizeRoadmapBackup(input: unknown): {
     return null;
   }
 
+  const studyComments = input.studyComments === undefined ? [] : normalizeStudyComments(input.studyComments);
+
+  if (!studyComments) {
+    return null;
+  }
+
   return {
     progress,
     comments,
     flashcards,
     quizzes,
+    studyComments,
   };
 }
