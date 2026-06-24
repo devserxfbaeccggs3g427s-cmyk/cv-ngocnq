@@ -41,7 +41,7 @@ export function MarkdownPreview({ content }: { content: string }) {
 
   return (
     <div className="markdown-preview" data-theme={theme}>
-      {blocks.map((block, index) => renderBlock(block, index, headingIdsByBlockIndex.get(index)))}
+      {blocks.map((block, index) => renderBlock(block, index, headingIdsByBlockIndex.get(index), theme))}
     </div>
   );
 }

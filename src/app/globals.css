@@ -404,7 +404,8 @@ body.dark .markdown-preview,
 .markdown-preview ol,
 .markdown-preview blockquote,
 .markdown-preview .markdown-table-wrap,
-.markdown-preview .markdown-code {
+.markdown-preview .markdown-code,
+.markdown-preview .markdown-mermaid {
   max-width: 100%;
   min-width: 0;
   margin: 0.85rem 0;
@@ -577,6 +578,15 @@ body.dark .markdown-preview,
   overflow: hidden;
 }
 
+.markdown-preview .markdown-mermaid {
+  border: 1px solid var(--md-code-border);
+  border-radius: 0.75rem;
+  background: var(--md-code-bg);
+  box-shadow: 0 18px 45px -30px rgb(15 23 42 / 0.35);
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .markdown-preview .markdown-code[data-language="sql"],
 .markdown-preview .markdown-code[data-language="mysql"],
 .markdown-preview .markdown-code[data-language="pgsql"],
@@ -588,7 +598,8 @@ body.dark .markdown-preview,
   border-color: rgb(20 184 166 / 0.55);
 }
 
-.markdown-preview .markdown-code figcaption {
+.markdown-preview .markdown-code figcaption,
+.markdown-preview .markdown-mermaid figcaption {
   align-items: center;
   background: linear-gradient(180deg, var(--md-code-caption-bg-top), var(--md-code-caption-bg-bottom));
   border-bottom: 1px solid var(--md-code-border);
@@ -601,8 +612,33 @@ body.dark .markdown-preview,
   padding: 0.55rem 0.85rem;
 }
 
-.markdown-preview .markdown-code figcaption span {
+.markdown-preview .markdown-code figcaption span,
+.markdown-preview .markdown-mermaid figcaption span {
   min-width: 0;
+}
+
+.markdown-preview .markdown-mermaid-canvas {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  max-height: 640px;
+  max-width: 100%;
+  min-height: 180px;
+  overflow: auto;
+  padding: 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.markdown-preview .markdown-mermaid-canvas:empty::before {
+  color: var(--md-muted);
+  content: "Dang render so do...";
+  font-size: 0.86rem;
+}
+
+.markdown-preview .markdown-mermaid-canvas svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
 }
 
 .markdown-preview .markdown-code pre {
@@ -765,7 +801,8 @@ body.dark .markdown-preview,
   background: hsl(var(--primary) / 0.11);
 }
 
-.dark .markdown-preview .markdown-code {
+.dark .markdown-preview .markdown-code,
+.dark .markdown-preview .markdown-mermaid {
   background: rgb(2 6 23);
   box-shadow: none;
 }
@@ -811,7 +848,8 @@ body.dark .markdown-preview,
 .quiz-markdown .markdown-preview ol,
 .quiz-markdown .markdown-preview blockquote,
 .quiz-markdown .markdown-preview .markdown-table-wrap,
-.quiz-markdown .markdown-preview .markdown-code {
+.quiz-markdown .markdown-preview .markdown-code,
+.quiz-markdown .markdown-preview .markdown-mermaid {
   margin: 0.45rem 0;
 }
 
@@ -851,13 +889,21 @@ body.dark .markdown-preview,
   padding: 0.5rem 0.65rem;
 }
 
-.quiz-markdown .markdown-preview .markdown-code {
+.quiz-markdown .markdown-preview .markdown-code,
+.quiz-markdown .markdown-preview .markdown-mermaid {
   border-radius: 0.5rem;
   box-shadow: none;
 }
 
-.quiz-markdown .markdown-preview .markdown-code figcaption {
+.quiz-markdown .markdown-preview .markdown-code figcaption,
+.quiz-markdown .markdown-preview .markdown-mermaid figcaption {
   padding: 0.4rem 0.65rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-mermaid-canvas {
+  max-height: 320px;
+  min-height: 140px;
+  padding: 0.85rem;
 }
 
 .quiz-markdown .markdown-preview .markdown-code pre {

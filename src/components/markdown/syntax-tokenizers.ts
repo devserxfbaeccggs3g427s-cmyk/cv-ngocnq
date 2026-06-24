@@ -1,7 +1,17 @@
 import type { SyntaxToken, SyntaxTokenType } from './markdown-types';
-import { jsonLanguages, shellLanguages, sqlLanguages, xmlLanguages, yamlLanguages } from './markdown-types';
+import {
+  jsonLanguages,
+  mermaidLanguages,
+  shellLanguages,
+  sqlLanguages,
+  xmlLanguages,
+  yamlLanguages,
+} from './markdown-types';
 import { genericBooleans, genericKeywords, genericTypes, sqlBooleans, sqlEntityPrefixes, sqlFunctions, sqlKeywords, sqlTypes } from './tokenizer-keywords';
 export function tokenizeCodeLine(line: string, language: string): SyntaxToken[] {
+  if (mermaidLanguages.has(language)) {
+    return tokenizeGenericLine(line, language);
+  }
   if (sqlLanguages.has(language)) {
     return tokenizeSqlLine(line);
   }
@@ -24,6 +34,9 @@ export function detectCodeLanguage(code: string) {
   const lower = sample.toLowerCase();
   if (!sample) {
     return 'text';
+  }
+  if (isMermaidDiagram(sample)) {
+    return 'mermaid';
   }
   if (/^[\s\n]*[{[]/.test(sample) && /["'][\w.-]+["']\s*:/.test(sample)) {
     return 'json';
@@ -50,6 +63,10 @@ export function detectCodeLanguage(code: string) {
     return 'html';
   }
   return 'text';
+}
+function isMermaidDiagram(sample: string) {
+  return /^\s*(graph|flowchart)\s+(?:TB|TD|BT|RL|LR)\b/im.test(sample) ||
+    /^\s*(sequenceDiagram|classDiagram|stateDiagram(?:-v2)?|erDiagram|journey|gantt|pie|mindmap|timeline|gitGraph)\b/im.test(sample);
 }
 function tokenizeGenericLine(line: string, language: string): SyntaxToken[] {
   const tokens: SyntaxToken[] = [];

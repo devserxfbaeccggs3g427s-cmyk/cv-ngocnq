@@ -46,3 +46,4 @@ export const shellLanguages = new Set(['bash', 'sh', 'shell', 'zsh']);
 export const jsonLanguages = new Set(['json', 'jsonc']);
 export const yamlLanguages = new Set(['yaml', 'yml']);
 export const xmlLanguages = new Set(['html', 'xml', 'tsx', 'jsx']);
+export const mermaidLanguages = new Set(['mermaid', 'mmd']);

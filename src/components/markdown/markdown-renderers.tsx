@@ -1,8 +1,14 @@
-import type { ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import type { MarkdownBlock } from './markdown-types';
+import { mermaidLanguages } from './markdown-types';
 import { detectCodeLanguage, tokenizeCodeLine } from './syntax-tokenizers';
 
-export function renderBlock(block: MarkdownBlock, index: number, headingId?: string) {
+export function renderBlock(
+  block: MarkdownBlock,
+  index: number,
+  headingId?: string,
+  theme: 'light' | 'dark' = 'light'
+) {
   switch (block.type) {
     case 'heading':
       return renderHeading(block.level, block.text, index, headingId);
@@ -24,7 +30,7 @@ export function renderBlock(block: MarkdownBlock, index: number, headingId?: str
       );
 
     case 'code':
-      return <CodeBlock key={index} language={block.language} code={block.code} />;
+      return <CodeBlock key={index} language={block.language} code={block.code} theme={theme} />;
 
     case 'table':
       return (
@@ -114,9 +120,22 @@ function renderHeading(level: 1 | 2 | 3 | 4 | 5 | 6, text: string, key: number, 
   }
 }
 
-function CodeBlock({ language, code }: { language: string; code: string }) {
+function CodeBlock({
+  language,
+  code,
+  theme = 'light',
+}: {
+  language: string;
+  code: string;
+  theme?: 'light' | 'dark';
+}) {
   const normalizedLanguage = language.trim().toLowerCase();
   const effectiveLanguage = normalizedLanguage || detectCodeLanguage(code);
+
+  if (mermaidLanguages.has(effectiveLanguage)) {
+    return <MermaidBlock code={code} theme={theme} />;
+  }
+
   const label = getLanguageLabel(effectiveLanguage);
   const lines = code.split('\n');
 
@@ -135,6 +154,68 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
           ))}
         </code>
       </pre>
+    </figure>
+  );
+}
+
+function MermaidBlock({ code, theme }: { code: string; theme: 'light' | 'dark' }) {
+  const reactId = useId();
+  const diagramId = `markdown-mermaid-${reactId.replace(/[^A-Za-z0-9_-]/g, '')}`;
+  const [svg, setSvg] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function renderDiagram() {
+      try {
+        const mermaid = (await import('mermaid')).default;
+
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: theme === 'dark' ? 'dark' : 'default',
+          themeVariables: {
+            fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+          },
+        });
+
+        const result = await mermaid.render(diagramId, code);
+
+        if (!cancelled) {
+          setSvg(result.svg);
+          setError('');
+        }
+      } catch (reason) {
+        if (!cancelled) {
+          setSvg('');
+          setError(reason instanceof Error ? reason.message : 'Cannot render Mermaid diagram.');
+        }
+      }
+    }
+
+    renderDiagram();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [code, diagramId, theme]);
+
+  if (error) {
+    return <CodeBlock language="text" code={code} />;
+  }
+
+  return (
+    <figure className="markdown-mermaid">
+      <figcaption>
+        <span>Mermaid</span>
+        <span>{svg ? 'Đã render sơ đồ' : 'Đang render...'}</span>
+      </figcaption>
+      <div
+        className="markdown-mermaid-canvas"
+        aria-live="polite"
+        dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
+      />
     </figure>
   );
 }
