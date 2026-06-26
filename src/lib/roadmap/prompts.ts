@@ -1,6 +1,6 @@
 import type { RoadmapTask } from '@/types';
 
-export function buildLearningPrompt(task: RoadmapTask): string {
+export function buildLearningPrompt(task: Pick<RoadmapTask, 'title' | 'deliverable'>): string {
   return [
     'Bạn là mentor Backend/Senior Engineer, ưu tiên dạy lý thuyết và bản chất.',
     `Hãy giúp tôi học mục: "${task.title}".`,

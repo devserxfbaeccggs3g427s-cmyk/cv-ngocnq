@@ -11,6 +11,7 @@ import {
   Loader2,
   Save,
   StickyNote,
+  WandSparkles,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
 import { Metric } from '@/components/roadmap/client/Metric';
@@ -112,7 +113,32 @@ export function LearningPromptCard({ learningPrompt, promptVisible, setPromptVis
   );
 }
 
-export function NoteCard({ note, hasNote, updatedAt, savingNote, saveError, onNoteChange, onNoteBlur }: { note: string; hasNote: boolean; updatedAt: string | null; savingNote: boolean; saveError: string | null; onNoteChange: (note: string) => void; onNoteBlur: () => void }) {
+export function NoteCard({
+  note,
+  hasNote,
+  updatedAt,
+  savingNote,
+  saveError,
+  autoNoteStatus = 'idle',
+  autoNoteMessage,
+  onRetryAutoNote,
+  onNoteChange,
+  onNoteBlur,
+}: {
+  note: string;
+  hasNote: boolean;
+  updatedAt: string | null;
+  savingNote: boolean;
+  saveError: string | null;
+  autoNoteStatus?: 'idle' | 'generating' | 'saved' | 'skipped' | 'error';
+  autoNoteMessage?: string | null;
+  onRetryAutoNote?: () => void;
+  onNoteChange: (note: string) => void;
+  onNoteBlur: () => void;
+}) {
+  const canRetryAutoNote =
+    !hasNote && Boolean(onRetryAutoNote) && (autoNoteStatus === 'skipped' || autoNoteStatus === 'error');
+
   return (
     <Card>
       <CardContent className="p-5 md:p-6">
@@ -138,6 +164,35 @@ export function NoteCard({ note, hasNote, updatedAt, savingNote, saveError, onNo
         </div>
         {saveError && (
           <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">{saveError}</p>
+        )}
+        {autoNoteStatus !== 'idle' && autoNoteMessage && (
+          <div
+            className={cn(
+              'mt-2 flex flex-col gap-3 rounded-lg border px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between',
+              autoNoteStatus === 'saved'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200'
+                : autoNoteStatus === 'error'
+                  ? 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200'
+                  : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300'
+            )}
+          >
+            <span>
+              {autoNoteStatus === 'generating' && (
+                <Loader2 className="mr-1.5 inline h-3.5 w-3.5 animate-spin align-[-2px]" />
+              )}
+              {autoNoteMessage}
+            </span>
+            {canRetryAutoNote && (
+              <button
+                type="button"
+                onClick={onRetryAutoNote}
+                className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-800 dark:hover:text-blue-300"
+              >
+                <WandSparkles className="h-3.5 w-3.5" />
+                Thử lại auto note
+              </button>
+            )}
+          </div>
         )}
       </CardContent>
     </Card>

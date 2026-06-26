@@ -6,6 +6,7 @@ export {
   quizzesStorageKey,
   studyCommentsStorageKey,
   duplicateDetectionStorageKey,
+  autoTaskNoteStorageKey,
   shouldSyncProgressFile,
   levelStyles,
   studyStatusOptions,

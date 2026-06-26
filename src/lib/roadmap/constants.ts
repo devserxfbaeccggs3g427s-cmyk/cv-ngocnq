@@ -11,6 +11,7 @@ export const flashcardsStorageKey = 'skill-roadmap-flashcards:v1';
 export const quizzesStorageKey = 'skill-roadmap-quizzes:v1';
 export const studyCommentsStorageKey = 'skill-roadmap-study-comments:v1';
 export const duplicateDetectionStorageKey = 'skill-roadmap-duplicate-detection:v1';
+export const autoTaskNoteStorageKey = 'skill-roadmap-auto-task-note:v1';
 
 export const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
