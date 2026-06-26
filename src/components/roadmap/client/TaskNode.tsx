@@ -19,6 +19,7 @@ interface TaskNodeProps {
   onCopyPrompt: (task: RoadmapTask) => void;
   onNoteChange: (taskId: string, note: string) => void;
   onNoteBlur: (taskId: string, note: string) => void;
+  onTitleClick?: (taskId: string) => void;
 }
 
 function getTaskDepthStyle(depth: number): string {
@@ -31,7 +32,7 @@ function getTaskDepthStyle(depth: number): string {
 export function TaskNode({
   task, depth, progress, expandedTaskIds, visiblePromptIds,
   copiedPromptId, savingTaskId, onToggle, onToggleExpanded,
-  onTogglePrompt, onCopyPrompt, onNoteChange, onNoteBlur,
+  onTogglePrompt, onCopyPrompt, onNoteChange, onNoteBlur, onTitleClick,
 }: TaskNodeProps) {
   const item = progress.items[task.id];
   const hasNote = Boolean(item?.note.trim());
@@ -137,7 +138,17 @@ export function TaskNode({
               <span className="h-6 w-6 shrink-0" />
             )}
             <h4 className={cn('font-semibold leading-6 text-gray-950 dark:text-white', isChild ? 'text-sm' : 'text-base')}>
-              {task.title}
+              {onTitleClick ? (
+                <button
+                  type="button"
+                  onClick={() => onTitleClick(task.id)}
+                  className="text-left transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+                >
+                  {task.title}
+                </button>
+              ) : (
+                task.title
+              )}
             </h4>
           </div>
           <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
@@ -244,6 +255,7 @@ export function TaskNode({
               onCopyPrompt={onCopyPrompt}
               onNoteChange={onNoteChange}
               onNoteBlur={onNoteBlur}
+              onTitleClick={onTitleClick}
             />
           ))}
         </div>

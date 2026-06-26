@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { Roadmap, RoadmapTask } from '@/types';
-import { buildLearningPrompt } from '@/lib/roadmap';
+import { buildLearningPrompt, getTaskContexts } from '@/lib/roadmap';
 import { useProgress, useGithubBackup, useRoadmapFilters } from '@/hooks';
+import { TaskPreviewSlidePanel } from '@/components/roadmap/review-minimap/TaskPreviewSlidePanel';
 import { RoadmapHeroCard } from './RoadmapHeroCard';
 import { RoadmapBackupPanel } from './RoadmapBackupPanel';
 import { RoadmapFilterBar } from './RoadmapFilterBar';
@@ -70,6 +71,18 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const [visiblePromptIds, setVisiblePromptIds] = useState<Set<string>>(new Set());
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
   const [isResettingProgress, setIsResettingProgress] = useState(false);
+  const [previewTaskId, setPreviewTaskId] = useState<string | null>(null);
+
+  const taskContextMap = useMemo(() => getTaskContexts(roadmap.tracks), [roadmap.tracks]);
+  const previewTask = previewTaskId ? taskContextMap.get(previewTaskId) ?? null : null;
+
+  const handleTitleClick = useCallback((taskId: string) => {
+    setPreviewTaskId((prev) => (prev === taskId ? null : taskId));
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setPreviewTaskId(null);
+  }, []);
 
   function togglePrompt(taskId: string) {
     setVisiblePromptIds((current) => {
@@ -168,9 +181,16 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
             onNoteBlur={(taskId, note) =>
               saveTask(taskId, { completed: true, note })
             }
+            onTitleClick={handleTitleClick}
           />
         ))}
       </div>
+
+      <TaskPreviewSlidePanel
+        task={previewTask}
+        progress={progress}
+        onClose={handleClosePreview}
+      />
     </div>
   );
 }

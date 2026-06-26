@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import {
   BookOpen,
   CalendarDays,
   CheckCircle2,
   Clock3,
+  Grid3X3,
   Layers,
   Target,
 } from 'lucide-react';
@@ -65,15 +67,23 @@ export function RoadmapHeroCard({ roadmap, progress, allTasks }: RoadmapHeroCard
           />
         </div>
 
-        <div className="mt-5 grid gap-3 text-sm text-gray-600 dark:text-gray-300 md:grid-cols-2">
-          <div className="flex items-start gap-2">
-            <Clock3 className="mt-0.5 h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>Cam kết: {roadmap.meta.weeklyCommitment}</span>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="flex flex-1 flex-wrap items-start gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex items-start gap-2">
+              <Clock3 className="mt-0.5 h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span>Cam kết: {roadmap.meta.weeklyCommitment}</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <BookOpen className="mt-0.5 h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span>{roadmap.meta.reviewCadence}</span>
+            </div>
           </div>
-          <div className="flex items-start gap-2">
-            <BookOpen className="mt-0.5 h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span>{roadmap.meta.reviewCadence}</span>
-          </div>
+          <Link
+            href="/skill-roadmap/review"
+            className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:border-blue-700 dark:hover:bg-blue-950/50"
+          >
+            <Grid3X3 className="h-4 w-4" /> Minimap ôn tập
+          </Link>
         </div>
       </CardContent>
     </Card>

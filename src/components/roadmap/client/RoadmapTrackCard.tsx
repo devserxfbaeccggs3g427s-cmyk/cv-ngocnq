@@ -18,6 +18,7 @@ interface RoadmapTrackCardProps {
   onCopyPrompt: (task: RoadmapTask) => void;
   onNoteChange: (taskId: string, note: string) => void;
   onNoteBlur: (taskId: string, note: string) => void;
+  onTitleClick?: (taskId: string) => void;
 }
 
 export function RoadmapTrackCard({
@@ -33,6 +34,7 @@ export function RoadmapTrackCard({
   onCopyPrompt,
   onNoteChange,
   onNoteBlur,
+  onTitleClick,
 }: RoadmapTrackCardProps) {
   const trackTasks = track.modules.flatMap((module) => flattenTasks(module.tasks));
   const trackCompleted = trackTasks.filter(
@@ -111,6 +113,7 @@ export function RoadmapTrackCard({
                   onCopyPrompt={onCopyPrompt}
                   onNoteChange={onNoteChange}
                   onNoteBlur={onNoteBlur}
+                  onTitleClick={onTitleClick}
                 />
               ))}
             </div>
