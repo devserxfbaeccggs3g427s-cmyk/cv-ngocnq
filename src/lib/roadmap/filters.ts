@@ -20,27 +20,38 @@ export function filterTaskTree(
   });
 }
 
-function getTaskStudyState(task: RoadmapTask, progress: ProgressFile) {
+export function getTaskStudyState(task: RoadmapTask, progress: ProgressFile) {
   const item = progress.items[task.id];
-  const completed = Boolean(item?.completed);
+  const selfCompleted = Boolean(item?.completed);
   const descendants = flattenTasks(task.children ?? []);
+  const hasChildren = Boolean(task.children?.length);
   const childCount = descendants.length;
   const completedChildren = descendants.filter(
-    (child) => progress.items[child.id]?.completed
+    (child) => isTaskEffectivelyCompleted(child, progress)
   ).length;
   const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
-  const effectivelyCompleted = completed || allChildrenCompleted;
-  const childProgressing = !effectivelyCompleted && completedChildren > 0;
+  const effectivelyCompleted = hasChildren ? allChildrenCompleted : selfCompleted;
+  const childProgressing = hasChildren && !effectivelyCompleted && completedChildren > 0;
   const hasNote = Boolean(item?.note.trim());
 
   return {
-    completed,
+    completed: selfCompleted,
     childCount,
     completedChildren,
     effectivelyCompleted,
     childProgressing,
     hasNote,
   };
+}
+
+function isTaskEffectivelyCompleted(task: RoadmapTask, progress: ProgressFile): boolean {
+  if (!task.children?.length) {
+    return Boolean(progress.items[task.id]?.completed);
+  }
+
+  const descendants = flattenTasks(task.children);
+
+  return descendants.length > 0 && descendants.every((child) => isTaskEffectivelyCompleted(child, progress));
 }
 
 export function matchesTaskStudyStatus(
@@ -123,9 +134,13 @@ export function applyTaskProgressUpdate(
   taskIndex: TaskIndex
 ): ProgressFile {
   const now = new Date().toISOString();
+  const task = taskIndex.taskById.get(taskId);
+  const normalizedNextItem = task?.children?.length
+    ? { ...nextItem, completed: false, completedAt: null }
+    : nextItem;
   const items = {
     ...progress.items,
-    [taskId]: mergeProgressItem(progress.items[taskId], nextItem, now),
+    [taskId]: mergeProgressItem(progress.items[taskId], normalizedNextItem, now),
   };
 
   const ancestorIds = taskIndex.ancestorIdsByTaskId.get(taskId) ?? [];
@@ -137,20 +152,9 @@ export function applyTaskProgressUpdate(
       continue;
     }
 
-    const descendants = flattenTasks(ancestor.children ?? []);
-    const allDescendantsCompleted = descendants.length > 0
-      && descendants.every((descendant) => items[descendant.id]?.completed);
     const current = items[ancestorId];
 
-    if (allDescendantsCompleted) {
-      items[ancestorId] = mergeProgressItem(current, {
-        completed: true,
-        completedAt: current?.completedAt ?? now,
-      }, now);
-      continue;
-    }
-
-    if (current?.completed) {
+    if (current?.completed || current?.completedAt) {
       items[ancestorId] = mergeProgressItem(current, {
         completed: false,
         completedAt: null,

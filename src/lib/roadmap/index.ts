@@ -57,6 +57,7 @@ export {
 export {
   filterTaskTree,
   matchesTaskStudyStatus,
+  getTaskStudyState,
   collectTaskSearchText,
   buildTaskIndex,
   applyTaskProgressUpdate,

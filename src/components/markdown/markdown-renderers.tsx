@@ -1,20 +1,21 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
-import type { MarkdownBlock } from './markdown-types';
+import type { MarkdownBlock, MarkdownReferenceDefinitions } from './markdown-types';
 import { mermaidLanguages } from './markdown-types';
-import { detectCodeLanguage, tokenizeCodeLine } from './syntax-tokenizers';
+import { tokenizeCodeLine } from './syntax-tokenizers';
 
 export function renderBlock(
   block: MarkdownBlock,
   index: number,
   headingId?: string,
-  theme: 'light' | 'dark' = 'light'
+  theme: 'light' | 'dark' = 'light',
+  referenceDefinitions: MarkdownReferenceDefinitions = {}
 ) {
   switch (block.type) {
     case 'heading':
-      return renderHeading(block.level, block.text, index, headingId);
+      return renderHeading(block.level, block.text, index, headingId, referenceDefinitions);
 
     case 'paragraph':
-      return <p key={index}>{renderInlineMarkdown(block.text)}</p>;
+      return <p key={index}>{renderInlineMarkdown(block.text, referenceDefinitions)}</p>;
 
     case 'quote':
       return (
@@ -24,7 +25,7 @@ export function renderBlock(
           data-callout={block.callout}
         >
           {block.lines.map((line, lineIndex) => (
-            <p key={lineIndex}>{renderInlineMarkdown(line)}</p>
+            <p key={lineIndex}>{renderInlineMarkdown(line, referenceDefinitions)}</p>
           ))}
         </blockquote>
       );
@@ -39,7 +40,7 @@ export function renderBlock(
             <thead>
               <tr>
                 {block.headers.map((header, cellIndex) => (
-                  <th key={cellIndex}>{renderInlineMarkdown(header)}</th>
+                  <th key={cellIndex}>{renderInlineMarkdown(header, referenceDefinitions)}</th>
                 ))}
               </tr>
             </thead>
@@ -48,7 +49,7 @@ export function renderBlock(
                 <tr key={rowIndex}>
                   {block.headers.map((_, cellIndex) => (
                     <td key={cellIndex}>
-                      {renderInlineMarkdown(row[cellIndex] ?? '')}
+                      {renderInlineMarkdown(row[cellIndex] ?? '', referenceDefinitions)}
                     </td>
                   ))}
                 </tr>
@@ -72,12 +73,28 @@ export function renderBlock(
               {item.checked !== undefined && (
                 <input type="checkbox" checked={item.checked} readOnly aria-label="Task item" />
               )}
-              <span>{renderInlineMarkdown(item.text)}</span>
+              <span>{renderInlineMarkdown(item.text, referenceDefinitions)}</span>
             </li>
           ))}
         </ListTag>
       );
     }
+
+    case 'details':
+      return (
+        <details key={index} className="markdown-details" open={block.open}>
+          <summary>{renderInlineMarkdown(block.summary, referenceDefinitions)}</summary>
+          <div className="markdown-details-content">
+            {block.blocks.length ? (
+              block.blocks.map((childBlock, childIndex) =>
+                renderBlock(childBlock, childIndex, undefined, theme, referenceDefinitions)
+              )
+            ) : (
+              <p>{renderInlineMarkdown('_Khong co noi dung._', referenceDefinitions)}</p>
+            )}
+          </div>
+        </details>
+      );
 
     case 'image':
       return (
@@ -99,8 +116,56 @@ export function renderBlock(
   }
 }
 
-function renderHeading(level: 1 | 2 | 3 | 4 | 5 | 6, text: string, key: number, id?: string) {
-  const children = renderInlineMarkdown(text);
+export function renderReferenceDefinitions(referenceDefinitions: MarkdownReferenceDefinitions) {
+  const references = Object.entries(referenceDefinitions);
+
+  if (!references.length) {
+    return null;
+  }
+
+  return (
+    <section className="markdown-references" aria-labelledby="markdown-references-title">
+      <div className="markdown-references-heading">
+        <h2 id="markdown-references-title">Tài liệu tham khảo</h2>
+        <span>{references.length} nguồn</span>
+      </div>
+      <ol>
+        {references.map(([id, definition]) => {
+          const href = sanitizeUrl(definition.href);
+          const isPageAnchor = href.startsWith('#');
+          const displayTitle = definition.title || definition.href;
+          const displayUrl = formatReferenceUrl(definition.href);
+
+          return (
+            <li key={id}>
+              <a
+                href={href}
+                title={definition.title}
+                target={isPageAnchor ? undefined : '_blank'}
+                rel={isPageAnchor ? undefined : 'noreferrer'}
+              >
+                <span className="markdown-reference-index">[{definition.label ?? id}]</span>
+                <span className="markdown-reference-body">
+                  <span className="markdown-reference-title">{displayTitle}</span>
+                  <span className="markdown-reference-url">{displayUrl}</span>
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
+function renderHeading(
+  level: 1 | 2 | 3 | 4 | 5 | 6,
+  text: string,
+  key: number,
+  id?: string,
+  referenceDefinitions: MarkdownReferenceDefinitions = {}
+) {
+  const children = renderInlineMarkdown(text, referenceDefinitions);
 
   switch (level) {
     case 1:
@@ -130,7 +195,8 @@ function CodeBlock({
   theme?: 'light' | 'dark';
 }) {
   const normalizedLanguage = language.trim().toLowerCase();
-  const effectiveLanguage = normalizedLanguage || detectCodeLanguage(code);
+  const effectiveLanguage = normalizedLanguage || 'text';
+  const isPlainText = effectiveLanguage === 'text' || effectiveLanguage === 'plain';
 
   if (mermaidLanguages.has(effectiveLanguage)) {
     return <MermaidBlock code={code} theme={theme} />;
@@ -140,11 +206,16 @@ function CodeBlock({
   const lines = code.split('\n');
 
   return (
-    <figure className="markdown-code" data-language={effectiveLanguage || 'text'}>
-      <figcaption>
-        <span>{label}</span>
-        <span>{lines.length} dòng</span>
-      </figcaption>
+    <figure
+      className={isPlainText ? 'markdown-code markdown-code-plain' : 'markdown-code'}
+      data-language={isPlainText ? 'text' : effectiveLanguage}
+    >
+      {!isPlainText && (
+        <figcaption>
+          <span>{label}</span>
+          <span>{lines.length} dòng</span>
+        </figcaption>
+      )}
       <pre>
         <code>
           {lines.map((line, index) => (
@@ -221,6 +292,10 @@ function MermaidBlock({ code, theme }: { code: string; theme: 'light' | 'dark' }
 }
 
 function renderCodeLine(line: string, language: string) {
+  if (language === 'text' || language === 'plain') {
+    return line;
+  }
+
   return tokenizeCodeLine(line, language).map((token, index) => {
     if (token.type === 'plain') {
       return token.text;
@@ -234,9 +309,12 @@ function renderCodeLine(line: string, language: string) {
   });
 }
 
-function renderInlineMarkdown(text: string) {
+function renderInlineMarkdown(
+  text: string,
+  referenceDefinitions: MarkdownReferenceDefinitions = {}
+) {
   const pattern =
-    /(!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|`([^`]+)`|\*\*([^*]+)\*\*|__([^_]+)__|~~([^~]+)~~|\*([^*]+)\*|_([^_]+)_)/g;
+    /(!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|\[([^\]]+)\]\[([^\]]*)\]|\[([^\]]+)\]|`([^`]+)`|\*\*([^*]+)\*\*|__([^_]+)__|~~([^~]+)~~|\*([^*]+)\*|_([^_]+)_)/g;
   const nodes: ReactNode[] = [];
   let cursor = 0;
   let match: RegExpExecArray | null;
@@ -268,17 +346,42 @@ function renderInlineMarkdown(text: string) {
           target={isPageAnchor ? undefined : '_blank'}
           rel={isPageAnchor ? undefined : 'noreferrer'}
         >
-          {renderInlineMarkdown(match[4])}
+          {renderInlineMarkdown(match[4], referenceDefinitions)}
         </a>
       );
-    } else if (match[6] !== undefined) {
-      nodes.push(<code key={nodes.length}>{match[6]}</code>);
-    } else if (match[7] !== undefined || match[8] !== undefined) {
-      nodes.push(<strong key={nodes.length}>{renderInlineMarkdown(match[7] ?? match[8])}</strong>);
+    } else if (match[6] !== undefined && match[7] !== undefined) {
+      const referenceId = match[7].trim() ? match[7] : match[6];
+      const definition = referenceDefinitions[normalizeReferenceId(referenceId)];
+
+      if (definition) {
+        nodes.push(renderReferenceLink(nodes.length, definition.href, match[6], definition.title, referenceDefinitions));
+      } else {
+        nodes.push(match[0]);
+      }
+    } else if (match[8] !== undefined) {
+      const definition = referenceDefinitions[normalizeReferenceId(match[8])];
+
+      if (definition) {
+        nodes.push(renderReferenceLink(nodes.length, definition.href, match[8], definition.title, referenceDefinitions));
+      } else {
+        nodes.push(match[0]);
+      }
     } else if (match[9] !== undefined) {
-      nodes.push(<del key={nodes.length}>{renderInlineMarkdown(match[9])}</del>);
+      nodes.push(<code key={nodes.length}>{match[9]}</code>);
     } else if (match[10] !== undefined || match[11] !== undefined) {
-      nodes.push(<em key={nodes.length}>{renderInlineMarkdown(match[10] ?? match[11])}</em>);
+      nodes.push(
+        <strong key={nodes.length}>
+          {renderInlineMarkdown(match[10] ?? match[11], referenceDefinitions)}
+        </strong>
+      );
+    } else if (match[12] !== undefined) {
+      nodes.push(<del key={nodes.length}>{renderInlineMarkdown(match[12], referenceDefinitions)}</del>);
+    } else if (match[13] !== undefined || match[14] !== undefined) {
+      nodes.push(
+        <em key={nodes.length}>
+          {renderInlineMarkdown(match[13] ?? match[14], referenceDefinitions)}
+        </em>
+      );
     }
 
     cursor = pattern.lastIndex;
@@ -289,6 +392,44 @@ function renderInlineMarkdown(text: string) {
   }
 
   return nodes;
+}
+
+function renderReferenceLink(
+  key: number,
+  href: string,
+  label: string,
+  title: string | undefined,
+  referenceDefinitions: MarkdownReferenceDefinitions
+) {
+  const sanitizedHref = sanitizeUrl(href);
+  const isPageAnchor = sanitizedHref.startsWith('#');
+
+  return (
+    <a
+      key={key}
+      href={sanitizedHref}
+      title={title}
+      target={isPageAnchor ? undefined : '_blank'}
+      rel={isPageAnchor ? undefined : 'noreferrer'}
+    >
+      {renderInlineMarkdown(label, referenceDefinitions)}
+    </a>
+  );
+}
+
+function normalizeReferenceId(id: string) {
+  return id.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function formatReferenceUrl(href: string) {
+  try {
+    const url = new URL(href);
+    const path = `${url.pathname}${url.hash}`.replace(/\/$/, '');
+
+    return `${url.hostname}${path}`;
+  } catch {
+    return href;
+  }
 }
 
 export function slugifyHeading(text: string) {
@@ -305,8 +446,10 @@ export function slugifyHeading(text: string) {
 
 export function stripInlineMarkdown(text: string) {
   return text
+    .replace(/^\s*\[[^\]]+\]:\s+.*$/gm, '')
     .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1')
     .replace(/[`*_~]/g, '')
     .trim();
 }

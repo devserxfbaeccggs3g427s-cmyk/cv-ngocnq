@@ -77,7 +77,7 @@ export function useNotePreviewData(taskId: string) {
   const item = progress?.items?.[taskId] ?? null;
   const note = item?.note?.trim() ?? '';
 
-  return { item, note };
+  return { item, note, progress };
 }
 
 function isRecord(input: unknown): input is Record<string, unknown> {

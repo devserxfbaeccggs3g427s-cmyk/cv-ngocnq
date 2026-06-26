@@ -4,7 +4,7 @@ import { useMemo, useRef } from 'react';
 import { extractMarkdownHeadings, MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import { MarkdownCommentThreads } from '@/components/roadmap/comments';
 import type { TaskContext } from '@/types';
-import { getAdjacentLeafTasks } from '@/lib/roadmap';
+import { getAdjacentLeafTasks, getTaskStudyState } from '@/lib/roadmap';
 import { useNotePreviewData } from './useNotePreviewData';
 import { useActiveHeading } from './useActiveHeading';
 import { AppendixLinks, MobileAppendixDrawer } from './NotePreviewAppendix';
@@ -23,7 +23,10 @@ export function SkillRoadmapNotePreview({
   navigationTasks?: NavigationTask[];
 }) {
   const markdownArticleRef = useRef<HTMLElement | null>(null);
-  const { item, note } = useNotePreviewData(taskId);
+  const { item, note, progress } = useNotePreviewData(taskId);
+  const effectivelyCompleted = task && progress
+    ? getTaskStudyState(task, progress).effectivelyCompleted
+    : Boolean(item?.completed);
   const leafNavigation = useMemo(
     () => getAdjacentLeafTasks(taskId, navigationTasks),
     [navigationTasks, taskId]
@@ -70,7 +73,7 @@ export function SkillRoadmapNotePreview({
           </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">Trạng thái</dt>
-            <dd className="mt-1">{item?.completed ? 'Đã hoàn thành' : 'Chưa hoàn thành'}</dd>
+            <dd className="mt-1">{effectivelyCompleted ? 'Đã hoàn thành' : 'Chưa hoàn thành'}</dd>
           </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">Cập nhật</dt>

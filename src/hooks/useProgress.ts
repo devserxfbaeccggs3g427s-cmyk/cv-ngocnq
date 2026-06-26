@@ -146,6 +146,10 @@ export function useProgress(roadmap: Roadmap) {
 
   const toggleTask = useCallback(
     (task: RoadmapTask) => {
+      if (task.children?.length) {
+        return;
+      }
+
       const current = progress.items[task.id];
       saveTask(task.id, {
         completed: !current?.completed,

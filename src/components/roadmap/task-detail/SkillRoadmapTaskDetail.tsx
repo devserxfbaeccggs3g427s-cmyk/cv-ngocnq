@@ -25,6 +25,7 @@ import {
   storeProgress,
   buildLearningPrompt,
   getAdjacentLeafTasks,
+  getTaskStudyState,
   hydrateFromStorage,
   levelStyles,
   autoTaskNoteStorageKey,
@@ -168,11 +169,12 @@ export function SkillRoadmapTaskDetail({
 
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
   const item = progress?.items?.[task.id] ?? null;
-  const completedDescendants = descendants.filter((c) => progress?.items?.[c.id]?.completed).length;
   const hasChildren = Boolean(task.children?.length);
+  const completedDescendants = descendants.filter((child) =>
+    progress ? getTaskStudyState(child, progress).effectivelyCompleted : false
+  ).length;
   const hasNote = Boolean(item?.note.trim());
-  const allChildrenCompleted = descendants.length > 0 && completedDescendants === descendants.length;
-  const effectivelyCompleted = Boolean(item?.completed) || allChildrenCompleted;
+  const effectivelyCompleted = progress ? getTaskStudyState(task, progress).effectivelyCompleted : false;
   const childProgressing = !effectivelyCompleted && completedDescendants > 0;
   const totalChildHours = descendants.reduce((sum, child) => sum + child.estimateHours, 0);
   const learningPrompt = useMemo(() => buildLearningPrompt(task), [task]);
@@ -259,10 +261,9 @@ export function SkillRoadmapTaskDetail({
         const latestProgress = progressRef.current;
         const latestItem = latestProgress?.items?.[task.id];
         const latestHasNote = Boolean(latestItem?.note.trim());
-        const latestCompleted =
-          Boolean(latestItem?.completed) ||
-          descendants.length > 0 &&
-            descendants.every((child) => Boolean(latestProgress?.items?.[child.id]?.completed));
+        const latestCompleted = latestProgress
+          ? getTaskStudyState(task, latestProgress).effectivelyCompleted
+          : false;
 
         if (!latestProgress || latestHasNote || !latestCompleted) {
           writeAutoTaskNoteRecord(task.id, {
@@ -283,8 +284,8 @@ export function SkillRoadmapTaskDetail({
           items: {
             ...latestProgress.items,
             [task.id]: {
-              completed: true,
-              completedAt: latestItem?.completedAt ?? now,
+              completed: false,
+              completedAt: null,
               note: generatedNote,
               updatedAt: now,
             },
@@ -351,6 +352,7 @@ export function SkillRoadmapTaskDetail({
     hasNote,
     learningPrompt,
     progress,
+    task,
     task.deliverable,
     task.id,
     task.level,
@@ -367,8 +369,8 @@ export function SkillRoadmapTaskDetail({
         items: {
           ...currentProgress.items,
           [task.id]: {
-            completed: currentItem?.completed ?? true,
-            completedAt: currentItem?.completedAt ?? now,
+            completed: hasChildren ? false : currentItem?.completed ?? true,
+            completedAt: hasChildren ? null : currentItem?.completedAt ?? now,
             note,
             updatedAt: now,
           },

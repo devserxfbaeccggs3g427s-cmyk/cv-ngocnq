@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Brain, CheckCircle2, Circle, Clock3, Layers, Loader2, FileText, Sparkles, StickyNote } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
@@ -8,7 +8,7 @@ import { Metric } from '@/components/roadmap/client/Metric';
 import { cn } from '@/lib/utils';
 import type { TaskContext, ProgressFile, NoteComment, Flashcard, FlashcardDeck } from '@/types';
 import {
-  flattenTasks,
+  getTaskStudyState,
   hydrateFromStorage,
   readStoredDuplicateDetectionConfig,
   storeDuplicateDetectionConfig,
@@ -46,10 +46,8 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
     });
   }, [task.id]);
 
-  const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
   const item = progress?.items?.[task.id] ?? null;
-  const completedDescendants = descendants.filter((c) => progress?.items?.[c.id]?.completed).length;
-  const effectivelyCompleted = Boolean(item?.completed) || (descendants.length > 0 && completedDescendants === descendants.length);
+  const effectivelyCompleted = progress ? getTaskStudyState(task, progress).effectivelyCompleted : false;
   const hasNote = Boolean(item?.note.trim());
   const canCreateFlashcards = effectivelyCompleted && hasNote;
   const requirement = getFlashcardRequirement({ completed: effectivelyCompleted, hasNote });

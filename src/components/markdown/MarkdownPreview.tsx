@@ -3,8 +3,13 @@
 import { useEffect, useState } from 'react';
 import type { MarkdownBlock } from './markdown-types';
 import { emptyMessage } from './markdown-types';
-import { parseMarkdown } from './markdown-parser';
-import { renderBlock, slugifyHeading, stripInlineMarkdown } from './markdown-renderers';
+import { parseMarkdown, parseMarkdownReferenceDefinitions } from './markdown-parser';
+import {
+  renderBlock,
+  renderReferenceDefinitions,
+  slugifyHeading,
+  stripInlineMarkdown,
+} from './markdown-renderers';
 
 export type MarkdownHeading = {
   id: string;
@@ -14,6 +19,7 @@ export type MarkdownHeading = {
 
 export function MarkdownPreview({ content }: { content: string }) {
   const blocks = parseMarkdown(content.trim() ? content : emptyMessage);
+  const referenceDefinitions = parseMarkdownReferenceDefinitions(content);
   const headingIdsByBlockIndex = buildHeadingIdsByBlockIndex(blocks);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
@@ -41,7 +47,10 @@ export function MarkdownPreview({ content }: { content: string }) {
 
   return (
     <div className="markdown-preview" data-theme={theme}>
-      {blocks.map((block, index) => renderBlock(block, index, headingIdsByBlockIndex.get(index), theme))}
+      {blocks.map((block, index) =>
+        renderBlock(block, index, headingIdsByBlockIndex.get(index), theme, referenceDefinitions)
+      )}
+      {renderReferenceDefinitions(referenceDefinitions)}
     </div>
   );
 }

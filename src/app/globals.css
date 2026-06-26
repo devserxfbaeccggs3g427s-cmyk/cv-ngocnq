@@ -403,6 +403,7 @@ body.dark .markdown-preview,
 .markdown-preview ul,
 .markdown-preview ol,
 .markdown-preview blockquote,
+.markdown-preview .markdown-details,
 .markdown-preview .markdown-table-wrap,
 .markdown-preview .markdown-code,
 .markdown-preview .markdown-mermaid {
@@ -484,6 +485,60 @@ body.dark .markdown-preview,
 
 .markdown-preview blockquote p {
   margin: 0.35rem 0;
+}
+
+.markdown-preview .markdown-details {
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 0.65rem;
+  overflow: hidden;
+}
+
+.markdown-preview .markdown-details summary {
+  align-items: center;
+  color: var(--md-heading);
+  cursor: pointer;
+  display: flex;
+  font-weight: 750;
+  gap: 0.55rem;
+  line-height: 1.45;
+  list-style: none;
+  padding: 0.75rem 0.95rem;
+  user-select: none;
+}
+
+.markdown-preview .markdown-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.markdown-preview .markdown-details summary::before {
+  border-bottom: 0.32rem solid transparent;
+  border-left: 0.42rem solid var(--md-muted-fg);
+  border-top: 0.32rem solid transparent;
+  content: "";
+  flex: 0 0 auto;
+  transform-origin: 45% 50%;
+  transition: transform 0.16s ease;
+}
+
+.markdown-preview .markdown-details[open] summary {
+  border-bottom: 1px solid var(--md-border);
+}
+
+.markdown-preview .markdown-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.markdown-preview .markdown-details-content {
+  padding: 0.1rem 0.95rem 0.85rem;
+}
+
+.markdown-preview .markdown-details-content > *:first-child {
+  margin-top: 0.75rem;
+}
+
+.markdown-preview .markdown-details-content > *:last-child {
+  margin-bottom: 0;
 }
 
 .markdown-preview .markdown-callout {
@@ -621,12 +676,10 @@ body.dark .markdown-preview,
   align-items: center;
   display: flex;
   justify-content: center;
-  max-height: 640px;
   max-width: 100%;
   min-height: 180px;
-  overflow: auto;
+  overflow: visible;
   padding: 1.25rem;
-  -webkit-overflow-scrolling: touch;
 }
 
 .markdown-preview .markdown-mermaid-canvas:empty::before {
@@ -637,8 +690,10 @@ body.dark .markdown-preview,
 
 .markdown-preview .markdown-mermaid-canvas svg {
   display: block;
-  height: auto;
+  height: auto !important;
+  max-height: none !important;
   max-width: 100%;
+  width: 100% !important;
 }
 
 .markdown-preview .markdown-code pre {
@@ -646,9 +701,9 @@ body.dark .markdown-preview,
     linear-gradient(90deg, var(--md-code-gutter-bg) 0, var(--md-code-gutter-bg) 3.35rem, var(--md-code-gutter-border) 3.35rem, transparent 3.42rem),
     var(--md-code-bg);
   margin: 0;
-  max-height: 560px;
   max-width: 100%;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-inline: contain;
   padding: 0.85rem 0;
   -webkit-overflow-scrolling: touch;
@@ -661,6 +716,15 @@ body.dark .markdown-preview,
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: 0.86rem;
   line-height: 1.7;
+}
+
+.markdown-preview .markdown-code-plain pre {
+  background: var(--md-code-bg);
+  padding: 0.85rem 0;
+}
+
+.markdown-preview .markdown-code-plain code {
+  counter-reset: none;
 }
 
 .markdown-preview .markdown-token-keyword {
@@ -758,6 +822,15 @@ body.dark .markdown-preview,
   width: 2.8rem;
 }
 
+.markdown-preview .markdown-code-plain .markdown-code-line {
+  counter-increment: none;
+  padding: 0 1rem;
+}
+
+.markdown-preview .markdown-code-plain .markdown-code-line::before {
+  content: none;
+}
+
 .markdown-preview .markdown-image {
   border: 1px solid var(--md-border);
   border-radius: 0.65rem;
@@ -782,6 +855,90 @@ body.dark .markdown-preview,
   border: 0;
   border-top: 1px solid var(--md-border);
   margin: 1.4rem 0;
+}
+
+.markdown-preview .markdown-references {
+  border-top: 1px solid var(--md-border);
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.markdown-preview .markdown-references-heading {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-preview .markdown-references-heading h2 {
+  border-bottom: 0;
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.markdown-preview .markdown-references-heading span {
+  color: var(--md-muted-fg);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.markdown-preview .markdown-references ol {
+  display: grid;
+  gap: 0.55rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.markdown-preview .markdown-references li {
+  margin: 0;
+  padding: 0;
+}
+
+.markdown-preview .markdown-references a {
+  align-items: flex-start;
+  border: 1px solid var(--md-border);
+  border-radius: 0.5rem;
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  text-decoration: none;
+}
+
+.markdown-preview .markdown-references a:hover {
+  border-color: var(--md-link);
+  background: color-mix(in srgb, var(--md-link) 6%, transparent);
+}
+
+.markdown-preview .markdown-reference-index {
+  color: var(--md-link);
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.markdown-preview .markdown-reference-body {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.markdown-preview .markdown-reference-title {
+  color: var(--md-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.markdown-preview .markdown-reference-url {
+  color: var(--md-muted-fg);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .dark .markdown-preview .markdown-callout[data-callout="tip"] {
@@ -847,6 +1004,7 @@ body.dark .markdown-preview,
 .quiz-markdown .markdown-preview ul,
 .quiz-markdown .markdown-preview ol,
 .quiz-markdown .markdown-preview blockquote,
+.quiz-markdown .markdown-preview .markdown-details,
 .quiz-markdown .markdown-preview .markdown-table-wrap,
 .quiz-markdown .markdown-preview .markdown-code,
 .quiz-markdown .markdown-preview .markdown-mermaid {
@@ -876,6 +1034,18 @@ body.dark .markdown-preview,
   padding: 0.55rem 0.75rem;
 }
 
+.quiz-markdown .markdown-preview .markdown-details {
+  border-radius: 0.5rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-details summary {
+  padding: 0.55rem 0.7rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-details-content {
+  padding: 0.05rem 0.7rem 0.7rem;
+}
+
 .quiz-markdown .markdown-preview .markdown-table-wrap {
   border-radius: 0.5rem;
 }
@@ -901,13 +1071,11 @@ body.dark .markdown-preview,
 }
 
 .quiz-markdown .markdown-preview .markdown-mermaid-canvas {
-  max-height: 320px;
   min-height: 140px;
   padding: 0.85rem;
 }
 
 .quiz-markdown .markdown-preview .markdown-code pre {
-  max-height: 320px;
   padding: 0.65rem 0;
 }
 
@@ -918,6 +1086,24 @@ body.dark .markdown-preview,
 
 .quiz-markdown .markdown-preview .markdown-code-line {
   padding-right: 0.75rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-code-plain .markdown-code-line {
+  padding: 0 0.75rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-references {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-references-heading {
+  margin-bottom: 0.45rem;
+}
+
+.quiz-markdown .markdown-preview .markdown-references a {
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.6rem;
 }
 
 /* ================================

@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui';
 import type { TaskContext, ProgressFile, NoteComment, QuizAttempt, QuizDeck } from '@/types';
 import {
-  flattenTasks,
+  getTaskStudyState,
   hydrateFromStorage,
   readStoredDuplicateDetectionConfig,
   storeDuplicateDetectionConfig,
@@ -53,11 +53,8 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
     });
   }, [task.id]);
 
-  const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
   const item = progress?.items?.[task.id] ?? null;
-  const completedDescendants = descendants.filter((c) => progress?.items?.[c.id]?.completed).length;
-  const effectivelyCompleted =
-    Boolean(item?.completed) || (descendants.length > 0 && completedDescendants === descendants.length);
+  const effectivelyCompleted = progress ? getTaskStudyState(task, progress).effectivelyCompleted : false;
   const hasNote = Boolean(item?.note.trim());
   const canCreateQuiz = effectivelyCompleted && hasNote;
   const requirement = getQuizRequirement({ completed: effectivelyCompleted, hasNote });

@@ -3,7 +3,7 @@
 import { CheckCircle2, ChevronDown, ChevronRight, Circle, Clock3, Copy, Eye, EyeOff, FileText, ListTree, Loader2, Save, StickyNote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { RoadmapTask, ProgressFile } from '@/types';
-import { flattenTasks, buildLearningPrompt, levelStyles } from '@/lib/roadmap';
+import { flattenTasks, buildLearningPrompt, getTaskStudyState, levelStyles } from '@/lib/roadmap';
 
 interface TaskNodeProps {
   task: RoadmapTask;
@@ -34,25 +34,25 @@ export function TaskNode({
   onTogglePrompt, onCopyPrompt, onNoteChange, onNoteBlur,
 }: TaskNodeProps) {
   const item = progress.items[task.id];
-  const completed = Boolean(item?.completed);
   const hasNote = Boolean(item?.note.trim());
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
   const descendants = flattenTasks(childTasks);
   const childCount = childTasks.length;
+  const hasChildren = childTasks.length > 0;
+  const completed = Boolean(item?.completed);
   const completedChildren = childTasks.filter(
-    (child) => progress.items[child.id]?.completed
+    (child) => getTaskStudyState(child, progress).effectivelyCompleted
   ).length;
   const completedDescendants = descendants.filter(
-    (child) => progress.items[child.id]?.completed
+    (child) => getTaskStudyState(child, progress).effectivelyCompleted
   ).length;
-  const hasStartedChildren = completedChildren > 0;
+  const hasStartedChildren = completedDescendants > 0;
   const allChildrenCompleted = childCount > 0 && completedChildren === childCount;
   const allDescendantsCompleted = descendants.length > 0 && completedDescendants === descendants.length;
-  const effectivelyCompleted = completed || allDescendantsCompleted;
+  const effectivelyCompleted = hasChildren ? allDescendantsCompleted : completed;
   const childProgressing = !effectivelyCompleted && hasStartedChildren;
   const isChild = depth > 0;
-  const hasChildren = childTasks.length > 0;
   const isExpanded = expandedTaskIds.has(task.id);
   const depthStyle = getTaskDepthStyle(depth);
   const prompt = buildLearningPrompt(task);
@@ -72,12 +72,21 @@ export function TaskNode({
       >
         <button
           type="button"
-          onClick={() => onToggle(task)}
+          onClick={hasChildren ? undefined : () => onToggle(task)}
+          disabled={hasChildren}
           className={cn(
             'mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:hover:border-blue-700',
-            isChild && 'h-8 w-8'
+            isChild && 'h-8 w-8',
+            hasChildren && 'cursor-default hover:border-gray-200 hover:text-gray-400 disabled:opacity-100 dark:hover:border-gray-700'
           )}
-          aria-label={effectivelyCompleted ? 'Bỏ đánh dấu hoàn thành' : 'Đánh dấu hoàn thành'}
+          aria-label={
+            hasChildren
+              ? 'Trạng thái task cha tự tính theo task con'
+              : effectivelyCompleted
+                ? 'Bỏ đánh dấu hoàn thành'
+                : 'Đánh dấu hoàn thành'
+          }
+          title={hasChildren ? 'Task cha tự tính trạng thái theo task con' : undefined}
         >
           {saving ? (
             <Loader2 className="h-5 w-5 animate-spin" />

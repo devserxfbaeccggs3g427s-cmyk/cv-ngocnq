@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { RoadmapTask, ProgressFile } from '@/types';
-import { flattenTasks, levelStyles } from '@/lib/roadmap';
+import { flattenTasks, getTaskStudyState, levelStyles } from '@/lib/roadmap';
 
 export function ChildTaskRow({
   task,
@@ -27,8 +27,10 @@ export function ChildTaskRow({
   onToggleExpanded: (taskId: string) => void;
 }) {
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
-  const completedDescendants = descendants.filter((child) => progress?.items?.[child.id]?.completed).length;
-  const completed = Boolean(progress?.items?.[task.id]?.completed) || (descendants.length > 0 && completedDescendants === descendants.length);
+  const completedDescendants = descendants.filter((child) =>
+    progress ? getTaskStudyState(child, progress).effectivelyCompleted : false
+  ).length;
+  const completed = progress ? getTaskStudyState(task, progress).effectivelyCompleted : false;
   const hasChildren = Boolean(task.children?.length);
   const isExpanded = expandedTaskIds.has(task.id);
 

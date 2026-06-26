@@ -2,7 +2,7 @@
 
 import { Badge, Card, CardContent } from '@/components/ui';
 import type { RoadmapTrack, RoadmapTask, ProgressFile } from '@/types';
-import { flattenTasks } from '@/lib/roadmap';
+import { flattenTasks, getTaskStudyState } from '@/lib/roadmap';
 import { TaskNode } from './TaskNode';
 
 interface RoadmapTrackCardProps {
@@ -36,7 +36,7 @@ export function RoadmapTrackCard({
 }: RoadmapTrackCardProps) {
   const trackTasks = track.modules.flatMap((module) => flattenTasks(module.tasks));
   const trackCompleted = trackTasks.filter(
-    (task) => progress.items[task.id]?.completed
+    (task) => getTaskStudyState(task, progress).effectivelyCompleted
   ).length;
   const trackRate = Math.round((trackCompleted / trackTasks.length) * 100);
 

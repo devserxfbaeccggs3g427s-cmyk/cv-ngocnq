@@ -5,6 +5,7 @@ export type MarkdownBlock =
   | { type: 'code'; language: string; code: string }
   | { type: 'table'; headers: string[]; rows: string[][] }
   | { type: 'list'; ordered: boolean; items: ListItem[] }
+  | { type: 'details'; summary: string; blocks: MarkdownBlock[]; open: boolean }
   | { type: 'image'; alt: string; src: string }
   | { type: 'hr' };
 
@@ -38,6 +39,14 @@ export type SyntaxToken = {
   text: string;
   type: SyntaxTokenType;
 };
+
+export type MarkdownReferenceDefinition = {
+  href: string;
+  label?: string;
+  title?: string;
+};
+
+export type MarkdownReferenceDefinitions = Record<string, MarkdownReferenceDefinition>;
 
 export const emptyMessage = '_Chưa có note._';
 export const headingLevels = [1, 2, 3, 4, 5, 6] as const;
