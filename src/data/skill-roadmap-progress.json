@@ -1,8 +1,8 @@
 {
   "version": 5,
-  "exportedAt": "2026-06-25T10:22:15.091Z",
+  "exportedAt": "2026-06-26T00:48:28.243Z",
   "progress": {
-    "updatedAt": "2026-06-25T10:21:49.359Z",
+    "updatedAt": "2026-06-25T23:54:31.347Z",
     "items": {
       "java-001.oop.composition": {
         "completed": true,
@@ -699,6 +699,222 @@
         "note": "",
         "completedAt": "2026-06-25T10:20:17.863Z",
         "updatedAt": "2026-06-25T10:21:49.359Z"
+      },
+      "spring-004.locking-deadlock-va-timeout.phan-tich-deadlock-report-va-chon": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:06:25.691Z",
+        "updatedAt": "2026-06-25T12:06:25.694Z"
+      },
+      "spring-004.locking": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:06:27.682Z",
+        "updatedAt": "2026-06-25T12:06:27.683Z"
+      },
+      "spring-004.locking-deadlock-va-timeout": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:06:27.683Z",
+        "updatedAt": "2026-06-25T12:06:27.683Z"
+      },
+      "spring-004": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:06:27.683Z",
+        "updatedAt": "2026-06-25T12:06:27.683Z"
+      },
+      "spring-005.entity-lifecycle-transient-managed": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:06:34.813Z",
+        "updatedAt": "2026-06-25T12:06:34.813Z"
+      },
+      "spring-005.persistence-context-dirty-checking": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:09:21.259Z",
+        "updatedAt": "2026-06-25T12:09:21.259Z"
+      },
+      "spring-005.cascade-orphanremoval-va-transaction": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:11:25.315Z",
+        "updatedAt": "2026-06-25T12:11:25.316Z"
+      },
+      "spring-005.persistence-context-va-entity-lifecycle": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:11:25.316Z",
+        "updatedAt": "2026-06-25T12:11:25.316Z"
+      },
+      "spring-005.lazy-eager-loading-va": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:14:18.527Z",
+        "updatedAt": "2026-06-25T12:14:18.527Z"
+      },
+      "spring-005.n-1-query-detect": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:17:55.521Z",
+        "updatedAt": "2026-06-25T12:17:55.524Z"
+      },
+      "spring-005.fetch-strategy-va-query-performance": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:17:55.524Z",
+        "updatedAt": "2026-06-25T12:17:55.524Z"
+      },
+      "spring-005.optimistic-locking-voi-version": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:21:28.588Z",
+        "updatedAt": "2026-06-25T12:21:28.589Z"
+      },
+      "spring-005.concurrency-conflict-handling.retry-optimistic-lock-co-gioi-han": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:23:50.825Z",
+        "updatedAt": "2026-06-25T12:23:50.827Z"
+      },
+      "spring-005.concurrency-conflict-handling": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:23:50.827Z",
+        "updatedAt": "2026-06-25T12:23:50.827Z"
+      },
+      "spring-005": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T12:23:50.827Z",
+        "updatedAt": "2026-06-25T12:23:50.827Z"
+      },
+      "spring-006.jdbctemplate-query-update-va": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:34:34.459Z",
+        "updatedAt": "2026-06-25T23:34:34.460Z"
+      },
+      "spring-006.transaction-timeout-va-exception": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:36:05.153Z",
+        "updatedAt": "2026-06-25T23:36:05.154Z"
+      },
+      "spring-006.jdbctemplate-foundation": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:36:05.154Z",
+        "updatedAt": "2026-06-25T23:36:05.154Z"
+      },
+      "spring-006.stored-procedure-call-simplejdbccall": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:37:31.710Z",
+        "updatedAt": "2026-06-25T23:37:31.711Z"
+      },
+      "spring-006.ref-cursor-mapping-sang": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:39:24.127Z",
+        "updatedAt": "2026-06-25T23:39:24.128Z"
+      },
+      "spring-006.stored-procedure-integration": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:39:24.128Z",
+        "updatedAt": "2026-06-25T23:39:24.128Z"
+      },
+      "spring-006.rowmapper-resultsetextractor-cho-response": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:40:40.061Z",
+        "updatedAt": "2026-06-25T23:40:40.061Z"
+      },
+      "spring-006.test-stored-procedure-adapter": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:42:03.369Z",
+        "updatedAt": "2026-06-25T23:42:03.370Z"
+      },
+      "spring-006.banking-mapper-va-test-strategy": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:42:03.370Z",
+        "updatedAt": "2026-06-25T23:42:03.370Z"
+      },
+      "spring-006": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:42:03.370Z",
+        "updatedAt": "2026-06-25T23:42:03.370Z"
+      },
+      "spring-007.dto-boundary-request-response": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:43:44.414Z",
+        "updatedAt": "2026-06-25T23:43:44.415Z"
+      },
+      "spring-007.validation-contract-giua-dto": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:45:24.370Z",
+        "updatedAt": "2026-06-25T23:45:24.371Z"
+      },
+      "spring-007.versioning-response-contract-va": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:46:49.809Z",
+        "updatedAt": "2026-06-25T23:46:49.809Z"
+      },
+      "spring-007.contract-boundary-va-validation": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:46:49.809Z",
+        "updatedAt": "2026-06-25T23:46:49.809Z"
+      },
+      "spring-007.mapstruct-basic-mapping-va": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:48:32.045Z",
+        "updatedAt": "2026-06-25T23:48:32.046Z"
+      },
+      "spring-007.nested-mapping-collection-mapping": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:50:10.050Z",
+        "updatedAt": "2026-06-25T23:50:10.051Z"
+      },
+      "spring-007.mapstruct-generated-mapping": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:50:10.051Z",
+        "updatedAt": "2026-06-25T23:50:10.051Z"
+      },
+      "spring-007.partial-update-nullvaluepropertymappingstrategy": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:52:15.145Z",
+        "updatedAt": "2026-06-25T23:52:15.145Z"
+      },
+      "spring-007.partial-update-va-compatibility.patch-contract-phan-biet-null-missing": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:54:31.346Z",
+        "updatedAt": "2026-06-25T23:54:31.347Z"
+      },
+      "spring-007.partial-update-va-compatibility": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:54:31.347Z",
+        "updatedAt": "2026-06-25T23:54:31.347Z"
+      },
+      "spring-007": {
+        "completed": true,
+        "note": "",
+        "completedAt": "2026-06-25T23:54:31.347Z",
+        "updatedAt": "2026-06-25T23:54:31.347Z"
       }
     }
   },
@@ -2087,9 +2303,9 @@
       "parentId": "86b5f3d9-d766-4240-a1ab-afba6ce784d0",
       "author": "ai",
       "body": "<think>\nThe user is asking a follow-up question in Vietnamese about Lombok's @Value annotation. They want to know if a DTO marked with @Value can have its data set from a client request, given that @Value doesn't generate setters.\n\nThis is a great practical question. Let me think about this carefully.\n\n@Value in Lombok:\n- Creates an immutable class\n- All fields are private and final\n- Generates a constructor with all fields (all-args constructor)\n- Generates getters (not setters)\n- toString(), equals(), hashCode()\n- The class itself is final\n\nSo the question is: how can data be set into a @Value DTO when receiving a request from client?\n\nThere are several ways:\n\n1. **Constructor injection**: Spring (and Jackson) can use the all-args constructor to create the object and populate fields. Jackson supports this through `@JsonCreator` and `@JsonProperty` annotations, or by using `-parameters` compiler flag to preserve parameter names, or by using tools like openAPI generators that add `@JsonCreator` automatically.\n\n2. **Jackson's deserialization**: Jackson by default needs either:\n   - Default constructor + setters (which @Value doesn't provide)\n   - A constructor annotated with `@JsonCreator` + `@JsonProperty` on each parameter\n   - Or using ParameterNamesModule with `-parameters` flag\n\n3. **In Spring, when using @RequestBody**: \n   - By default, Spring uses Jackson to deserialize JSON to the object\n   - If you only have @Value, Jackson needs the all-args constructor with proper annotations\n   - You may need to add `@Jacksonized` (Lombok 1.18.20+) which generates `@JsonCreator` and `@JsonProperty` automatically\n   - Or manually add `@JsonCreator` and `@JsonProperty` annotations\n\n4. **With frameworks like MapStruct or ModelMapper**: These can use the all-args constructor to map data.\n\n5. **Manually using builder pattern**: @Value also generates a builder, so you can do `MyDto.builder().field1(value1).field2(value2).build()`.\n\nSo the answer is YES, you can still receive data from client into a @Value DTO, but you need to use the all-args constructor (which is auto-generated by @Value), typically with Jackson annotations or @Jacksonized.\n\nLet me format a clear, structured response in Vietnamese.\n\nI should:\n1. Confirm that yes, it's possible\n2. Explain how (via constructor, not setter)\n3. Mention practical solutions (Jackson annotations, @Jacksonized)\n4. Maybe give a code example\n5. Keep it focused on the current question\n\nThe context comment is the same as the new question, so I need to answer the user's specific concern about using @Value as a request DTO.</think>\n\n# Trả lời: Dùng `@Value` làm request DTO hoàn toàn được nhé 👍\n\n`@Value` **không có setter** nhưng vẫn nhận dữ liệu từ client bình thường, vì nó sinh ra **constructor đầy đủ tham số (all-args constructor)**. Quá trình deserialize JSON → object sẽ đi qua constructor thay vì gọi setter từng field.\n\n## 1. Cơ chế hoạt động\n\n| Annotation | Setter | Constructor | Cách Jackson map dữ liệu |\n|------------|--------|-------------|---------------------------|\n| `@Data` | ✅ Có | Mặc định có no-args | Gọi setter sau khi tạo object bằng no-args constructor |\n| `@Value` | ❌ Không | ✅ All-args (bắt buộc) | Truyền thẳng giá trị vào constructor |\n\n## 2. Ví dụ thực tế\n\n### ❌ Cách dễ fail (thiếu annotation cho Jackson)\n\n```java\n@Value\npublic class CreateUserRequest {\n    String username;\n    String email;\n    Integer age;\n}\n```\n\nJackson mặc định không biết ghép JSON field nào với constructor parameter nào → có thể throw lỗi hoặc field bị `null`.\n\n### ✅ Cách 1: Dùng `@Jacksonized` (khuyến nghị, Lombok ≥ 1.18.20)\n\n```java\n@Value\n@Jacksonized   // tự sinh @JsonCreator + @JsonProperty cho constructor\npublic class CreateUserRequest {\n    String username;\n    String email;\n    Integer age;\n}\n```\n\n```java\n@PostMapping(\"/users\")\npublic UserDto create(@RequestBody CreateUserRequest req) {   // ← vẫn bind được\n    // req.getUsername(), req.getEmail(), req.getAge()\n    ...\n}\n```\n\n### ✅ Cách 2: Tự thêm `@JsonCreator` + `@JsonProperty`\n\n```java\n@Value\npublic class CreateUserRequest {\n    String username;\n    String email;\n    Integer age;\n\n    @JsonCreator\n    public CreateUserRequest(\n            @JsonProperty(\"username\") String username,\n            @JsonProperty(\"email\") String email,\n            @JsonProperty(\"age\") Integer age) {\n        this.username = username;\n        this.email = email;\n        this.age = age;\n    }\n}\n```\n\n### ✅ Cách 3: Bật `-parameters` khi compile\n\nGiữ nguyên tên tham số trong bytecode → Jackson tự khớp được tên:\n\n```xml\n<plugin>\n    <groupId>org.apache.maven.plugins</groupId>\n    <artifactId>maven-compiler-plugin</artifactId>\n    <configuration>\n        <parameters>true</parameters>\n    </configuration>\n</plugin>\n```\n\n## 3. Tóm lại\n\n- **Không có setter ≠ không nhận dữ liệu được**. Spring + Jackson deserialize qua constructor là chuyện bình thường.\n- Điểm cần lưu ý duy nhất: phải đảm bảo Jackson biết cách ánh xạ JSON key → parameter của constructor, dùng `@Jacksonized` là gọn nhất.\n- Vì thế `@Value` vẫn rất phù hợp làm **request DTO, response DTO, value object** — vừa immutable, vừa thread-safe, vừa bảo vệ được invariant. 👌",
+      "createdAt": "2026-06-22T09:50:18.877Z",
       "model": "minimax/minimax-m3",
       "provider": "kilo",
-      "createdAt": "2026-06-22T09:50:18.877Z",
       "taskId": "java-001.oop.encapsulation",
       "context": {
         "type": "quiz",
@@ -2117,9 +2333,9 @@
       "parentId": "9e67cb54-ca7e-46fc-9e27-660e7b488984",
       "author": "ai",
       "body": "<think>\nThe user is asking about \"rich domain model\" based on the context of the previous flashcard which discussed Anemic Domain Model. I should explain what a Rich Domain Model is, contrasting it with the Anemic Domain Model mentioned in the original question. I need to stay focused on answering this question clearly in Vietnamese, with good structure.\n\nLet me provide a comprehensive answer about Rich Domain Model:\n\n1. Definition\n2. Key characteristics\n3. Contrast with Anemic Domain Model\n4. Benefits\n5. Example (maybe brief)\n\nI should answer in Vietnamese as per the system prompt.</think>\n\n# Rich Domain Model là gì?\n\n## Định nghĩa\n**Rich Domain Model** (mô hình giàu) là cách thiết kế trong đó **domain object tự chứa cả dữ liệu (state) lẫn hành vi (behavior/logic nghiệp vụ)**. Object không chỉ lưu thông tin mà còn **tự xử lý, tự bảo vệ các quy tắc nghiệp vụ (invariant)** của chính nó.\n\n## Đặc điểm chính\n\n| Đặc điểm | Mô tả |\n|----------|-------|\n| **Encapsulation đầy đủ** | Object tự kiểm soát dữ liệu nội tại |\n| **Logic đặt trong object** | Validate, tính toán, chuyển trạng thái nằm ngay trong class |\n| **Invariant tự bảo vệ** | Object đảm bảo trạng thái luôn hợp lệ |\n| **Nghiệp vụ tập trung** | Tránh phân tán logic ra nhiều nơi |\n\n## So sánh với Anemic Domain Model (anti-pattern)\n\n### ❌ Anemic Domain Model (ví dụ ở câu hỏi trước)\n```java\nclass Order {\n    private Status status;\n    private List<Item> items;\n    private double total;\n    // chỉ có getter/setter\n}\n\nclass OrderService {\n    void validate(Order o) { ... }\n    void calculateTotal(Order o) { ... }\n    boolean canCancel(Order o) { ... }\n}\n```\n→ Order là \"data container rỗng\", mọi logic nằm ở Service.\n\n### ✅ Rich Domain Model\n```java\nclass Order {\n    private Status status;\n    private List<Item> items;\n\n    public void addItem(Item item) {\n        if (status != Status.NEW) \n            throw new IllegalStateException(\"Không thể thêm khi đã xử lý\");\n        items.add(item);\n    }\n\n    public double total() {\n        return items.stream().mapToDouble(Item::price).sum();\n    }\n\n    public void cancel() {\n        if (status == Status.SHIPPED) \n            throw new IllegalStateException(\"Đã giao, không hủy được\");\n        this.status = Status.CANCELLED;\n    }\n}\n```\n→ Order **tự biết cách tính tổng, tự kiểm tra điều kiện, tự bảo vệ quy tắc nghiệp vụ**.\n\n## Lợi ích\n\n1. **Encapsulation đúng nghĩa** — object che giấu cài đặt, chỉ expose hành vi.\n2. **Tái sử dụng cao** — logic nằm trong object nên dùng ở đâu cũng đúng.\n3. **Dễ bảo trì** — quy tắc nghiệp vụ tập trung một chỗ, tránh phân tán.\n4. **Ít bug** — không thể tạo trạng thái bất hợp lệ (ví dụ: total âm, hủy đơn đã giao).\n5. **Phù hợp DDD (Domain-Driven Design)** — đây là triết lý cốt lõi của DDD.\n\n## Mối liên hệ với tag \"encapsulation\"\nRich Domain Model là cách thể hiện **encapsulation đầy đủ**: object không chỉ giấu dữ liệu qua private, mà còn **đảm bảo mọi thay đổi dữ liệu đều đi qua logic nghiệp vụ hợp lệ** của chính nó.\n\n## Tóm lại\n> **Rich Domain Model = Object \"biết làm\" + \"biết bảo vệ chính mình\"**, không phải object \"rỗng\" chỉ chứa dữ liệu rồi để bên ngoài lo mọi thứ.",
+      "createdAt": "2026-06-22T10:03:17.289Z",
       "model": "minimax/minimax-m3",
       "provider": "kilo",
-      "createdAt": "2026-06-22T10:03:17.289Z",
       "taskId": "java-001.oop.encapsulation",
       "context": {
         "type": "quiz",
