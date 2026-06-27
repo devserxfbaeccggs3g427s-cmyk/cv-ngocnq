@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback, useEffect, useMemo, memo } from 'react';
 import {
   ChevronRight,
+  Hand,
   Maximize2,
   Minus,
   Plus,
@@ -10,7 +11,7 @@ import {
   ZoomOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { Roadmap, ProgressFile, TaskContext } from '@/types';
+import type { ProgressFile, TaskContext } from '@/types';
 import { getTaskStudyState } from '@/lib/roadmap';
 
 // ─── Layout Constants ────────────────────────────────────────────
@@ -26,6 +27,8 @@ const H_GAP_3 = 150;
 const V_GAP_TRACK = 50;
 const V_GAP_MODULE = 28;
 const V_GAP_TASK = 8;
+const MIN_ZOOM = 0.3;
+const MAX_ZOOM = 2.5;
 
 // ─── Types ───────────────────────────────────────────────────────
 type LayoutNode = {
@@ -53,8 +56,12 @@ type LayoutEdge = {
   type: 'root-track' | 'track-module' | 'module-task';
 };
 
+type PointerPoint = {
+  x: number;
+  y: number;
+};
+
 interface MindmapCanvasProps {
-  roadmap: Roadmap;
   filteredTasks: TaskContext[];
   progress: ProgressFile;
   selectedTaskId: string | null;
@@ -200,14 +207,21 @@ function buildLayout(
 }
 
 // ─── Main Component ──────────────────────────────────────────────
-export function MindmapCanvas({ roadmap, filteredTasks, progress, selectedTaskId, onSelectTask }: MindmapCanvasProps) {
+export function MindmapCanvas({ filteredTasks, progress, selectedTaskId, onSelectTask }: MindmapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
+  const zoomRef = useRef(1);
   const panRef = useRef({ x: 0, y: 0 });
-  const [, forceRender] = useState(0);
   const isPanningRef = useRef(false);
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+  const activePointersRef = useRef(new Map<number, PointerPoint>());
+  const pinchStartRef = useRef<{
+    distance: number;
+    zoom: number;
+    contentX: number;
+    contentY: number;
+  } | null>(null);
   const rafRef = useRef<number>(0);
 
   const [collapsedTracks, setCollapsedTracks] = useState<Set<string>>(() => new Set(filteredTasks.map((t) => t.trackTitle)));
@@ -228,104 +242,189 @@ export function MindmapCanvas({ roadmap, filteredTasks, progress, selectedTaskId
   );
 
   // Apply transform directly to DOM for 60fps pan/zoom
-  const applyTransform = useCallback(() => {
+  const applyTransform = useCallback((nextZoom = zoomRef.current) => {
     if (!canvasRef.current) return;
-    canvasRef.current.style.transform = `translate3d(${panRef.current.x}px, ${panRef.current.y}px, 0) scale(${zoom})`;
-  }, [zoom]);
+    canvasRef.current.style.transform = `translate3d(${panRef.current.x}px, ${panRef.current.y}px, 0) scale(${nextZoom})`;
+  }, []);
 
   useEffect(() => { applyTransform(); }, [applyTransform, nodes]);
+  useEffect(() => {
+    zoomRef.current = zoom;
+    applyTransform(zoom);
+  }, [applyTransform, zoom]);
+
+  const scheduleTransform = useCallback((nextZoom = zoomRef.current) => {
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => applyTransform(nextZoom));
+  }, [applyTransform]);
+
+  const updateZoomAroundPoint = useCallback((nextZoom: number, centerX: number, centerY: number) => {
+    const clampedZoom = Math.max(MIN_ZOOM, Math.min(nextZoom, MAX_ZOOM));
+    const currentZoom = zoomRef.current;
+    const contentX = (centerX - panRef.current.x) / currentZoom;
+    const contentY = (centerY - panRef.current.y) / currentZoom;
+    zoomRef.current = clampedZoom;
+    panRef.current = {
+      x: centerX - contentX * clampedZoom,
+      y: centerY - contentY * clampedZoom,
+    };
+    setZoom(clampedZoom);
+    scheduleTransform(clampedZoom);
+  }, [scheduleTransform]);
 
   const handleFit = useCallback(() => {
     if (!containerRef.current) return;
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
     const fitZoom = Math.min(cw / totalWidth, ch / totalHeight, 1.2) * 0.9;
-    const clampedZoom = Math.max(0.3, Math.min(fitZoom, 2.5));
+    const clampedZoom = Math.max(MIN_ZOOM, Math.min(fitZoom, MAX_ZOOM));
     panRef.current = { x: (cw - totalWidth * clampedZoom) / 2, y: (ch - totalHeight * clampedZoom) / 2 };
+    zoomRef.current = clampedZoom;
     setZoom(clampedZoom);
   }, [totalWidth, totalHeight]);
 
-  const handleZoomIn = useCallback(() => setZoom((z) => Math.min(z + 0.15, 2.5)), []);
-  const handleZoomOut = useCallback(() => setZoom((z) => Math.max(z - 0.15, 0.3)), []);
+  const zoomFromCenter = useCallback((delta: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    updateZoomAroundPoint(zoomRef.current + delta, rect.width / 2, rect.height / 2);
+  }, [updateZoomAroundPoint]);
+  const handleZoomIn = useCallback(() => zoomFromCenter(0.15), [zoomFromCenter]);
+  const handleZoomOut = useCallback(() => zoomFromCenter(-0.15), [zoomFromCenter]);
 
   // Wheel: scroll = pan, ctrl+scroll = zoom — no React state during pan for perf
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    const currentElement = containerRef.current;
+    if (!currentElement) return;
+    const element: HTMLDivElement = currentElement;
     function onWheel(e: WheelEvent) {
       e.preventDefault();
       if (e.ctrlKey || e.metaKey) {
         const delta = e.deltaY > 0 ? -0.07 : 0.07;
-        setZoom((z) => Math.max(0.3, Math.min(z + delta, 2.5)));
+        const rect = element.getBoundingClientRect();
+        updateZoomAroundPoint(zoomRef.current + delta, e.clientX - rect.left, e.clientY - rect.top);
       } else {
         panRef.current.x -= e.deltaX * 0.8;
         panRef.current.y -= e.deltaY * 0.8;
-        if (canvasRef.current) {
-          cancelAnimationFrame(rafRef.current);
-          rafRef.current = requestAnimationFrame(() => {
-            if (canvasRef.current) canvasRef.current.style.transform = `translate3d(${panRef.current.x}px, ${panRef.current.y}px, 0) scale(${zoom})`;
-          });
-        }
+        scheduleTransform();
       }
     }
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, [zoom]);
+    element.addEventListener('wheel', onWheel, { passive: false });
+    return () => element.removeEventListener('wheel', onWheel);
+  }, [scheduleTransform, updateZoomAroundPoint]);
 
-  // Pointer pan — direct DOM manipulation for smooth 60fps
+  // Pointer pan and pinch zoom. This keeps mobile touch smooth without
+  // forcing React state updates on every move event.
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (e.button !== 0) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     if ((e.target as HTMLElement).closest('[data-mindmap-node]')) return;
-    isPanningRef.current = true;
-    panStartRef.current = { x: e.clientX, y: e.clientY, panX: panRef.current.x, panY: panRef.current.y };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    activePointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+
+    if (activePointersRef.current.size === 1) {
+      isPanningRef.current = true;
+      panStartRef.current = { x: e.clientX, y: e.clientY, panX: panRef.current.x, panY: panRef.current.y };
+      pinchStartRef.current = null;
+    }
+
+    if (activePointersRef.current.size === 2) {
+      const [a, b] = [...activePointersRef.current.values()];
+      const centerX = (a.x + b.x) / 2;
+      const centerY = (a.y + b.y) / 2;
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      pinchStartRef.current = {
+        distance,
+        zoom: zoomRef.current,
+        contentX: (centerX - panRef.current.x) / zoomRef.current,
+        contentY: (centerY - panRef.current.y) / zoomRef.current,
+      };
+      isPanningRef.current = false;
+    }
+
     if (containerRef.current) containerRef.current.style.cursor = 'grabbing';
   }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!activePointersRef.current.has(e.pointerId)) return;
+    activePointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (activePointersRef.current.size >= 2 && pinchStartRef.current) {
+      const [a, b] = [...activePointersRef.current.values()];
+      const centerX = (a.x + b.x) / 2;
+      const centerY = (a.y + b.y) / 2;
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      const nextZoom = Math.max(
+        MIN_ZOOM,
+        Math.min((distance / pinchStartRef.current.distance) * pinchStartRef.current.zoom, MAX_ZOOM)
+      );
+      zoomRef.current = nextZoom;
+      panRef.current = {
+        x: centerX - pinchStartRef.current.contentX * nextZoom,
+        y: centerY - pinchStartRef.current.contentY * nextZoom,
+      };
+      setZoom(nextZoom);
+      scheduleTransform(nextZoom);
+      return;
+    }
+
     if (!isPanningRef.current) return;
     panRef.current.x = panStartRef.current.panX + (e.clientX - panStartRef.current.x);
     panRef.current.y = panStartRef.current.panY + (e.clientY - panStartRef.current.y);
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      if (canvasRef.current) canvasRef.current.style.transform = `translate3d(${panRef.current.x}px, ${panRef.current.y}px, 0) scale(${zoom})`;
-    });
-  }, [zoom]);
+    scheduleTransform();
+  }, [scheduleTransform]);
 
-  const handlePointerUp = useCallback(() => {
-    isPanningRef.current = false;
-    if (containerRef.current) containerRef.current.style.cursor = 'grab';
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    activePointersRef.current.delete(e.pointerId);
+    pinchStartRef.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+
+    if (activePointersRef.current.size === 1) {
+      const [remaining] = [...activePointersRef.current.values()];
+      isPanningRef.current = true;
+      panStartRef.current = { x: remaining.x, y: remaining.y, panX: panRef.current.x, panY: panRef.current.y };
+    } else {
+      isPanningRef.current = false;
+      if (containerRef.current) containerRef.current.style.cursor = 'grab';
+    }
   }, []);
 
-  useEffect(() => { const t = setTimeout(handleFit, 80); return () => clearTimeout(t); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  useEffect(() => {
+    const t = setTimeout(handleFit, 80);
+    return () => clearTimeout(t);
+  }, [handleFit]);
 
   const getTrackTitle = useCallback((id: string) => id.replace('track-', ''), []);
   const getModuleKey = useCallback((id: string) => id.replace('module-', ''), []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 bg-gradient-to-br from-slate-50 via-white to-indigo-50/20 shadow-lg dark:border-gray-800 dark:from-gray-950 dark:via-gray-900 dark:to-indigo-950/10">
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 bg-[radial-gradient(circle_at_1px_1px,rgba(100,116,139,0.18)_1px,transparent_0)] bg-[length:22px_22px] shadow-lg dark:border-gray-800 dark:bg-gray-950">
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50/95 via-white/92 to-cyan-50/75 dark:from-gray-950/96 dark:via-slate-950/94 dark:to-cyan-950/20" />
       {/* Toolbar left */}
-      <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-lg border border-gray-200/80 bg-white/95 px-1.5 py-1 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95">
-        <button type="button" onClick={expandAll} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" title="Mở rộng tất cả">
+      <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] items-center gap-1 rounded-lg border border-gray-200/80 bg-white/95 px-1.5 py-1 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95">
+        <button type="button" onClick={expandAll} className="inline-flex min-h-8 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" title="Mở rộng tất cả">
           <Plus className="h-3 w-3" /> Mở hết
         </button>
-        <button type="button" onClick={collapseAll} className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" title="Thu gọn tất cả">
+        <button type="button" onClick={collapseAll} className="inline-flex min-h-8 items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" title="Thu gọn tất cả">
           <Minus className="h-3 w-3" /> Thu hết
         </button>
       </div>
       {/* Zoom controls */}
       <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-lg border border-gray-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95">
-        <button type="button" onClick={handleZoomIn} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Phóng to"><ZoomIn className="h-3.5 w-3.5" /></button>
+        <button type="button" onClick={handleZoomIn} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Phóng to"><ZoomIn className="h-3.5 w-3.5" /></button>
         <span className="min-w-[3.5ch] text-center text-[11px] font-semibold tabular-nums text-gray-500 dark:text-gray-400">{Math.round(zoom * 100)}%</span>
-        <button type="button" onClick={handleZoomOut} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Thu nhỏ"><ZoomOut className="h-3.5 w-3.5" /></button>
+        <button type="button" onClick={handleZoomOut} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Thu nhỏ"><ZoomOut className="h-3.5 w-3.5" /></button>
         <div className="mx-0.5 h-4 w-px bg-gray-200 dark:bg-gray-700" />
-        <button type="button" onClick={handleFit} className="inline-flex h-7 w-7 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Fit to screen"><Maximize2 className="h-3.5 w-3.5" /></button>
+        <button type="button" onClick={handleFit} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800" aria-label="Fit to screen"><Maximize2 className="h-3.5 w-3.5" /></button>
       </div>
 
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="h-[75vh] min-h-[500px] w-full cursor-grab touch-none select-none"
+        className="relative h-[68vh] min-h-[520px] w-full cursor-grab touch-none select-none sm:h-[72vh]"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -333,7 +432,7 @@ export function MindmapCanvas({ roadmap, filteredTasks, progress, selectedTaskId
       >
         <div
           ref={canvasRef}
-          className="relative origin-top-left transition-transform duration-300 ease-out will-change-transform"
+          className="relative origin-top-left will-change-transform"
           style={{ width: totalWidth, height: totalHeight }}
         >
           {/* Edges SVG */}
@@ -354,8 +453,10 @@ export function MindmapCanvas({ roadmap, filteredTasks, progress, selectedTaskId
         </div>
       </div>
       {/* Hint */}
-      <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full border border-gray-200/60 bg-white/80 px-3 py-1 text-[10px] text-gray-400 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-500">
-        Scroll = di chuyển · Ctrl+Scroll = zoom · Click track/module = mở/đóng · Click task = preview
+      <div className="absolute bottom-3 left-3 right-3 z-10 flex flex-wrap items-center justify-center gap-1.5 rounded-xl border border-gray-200/70 bg-white/90 px-3 py-2 text-[10px] font-medium text-gray-500 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/90 dark:text-gray-400 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:rounded-full">
+        <Hand className="h-3 w-3" />
+        <span className="hidden sm:inline">Kéo chuột/trackpad để di chuyển · Ctrl/⌘ + scroll để zoom · Click task để preview</span>
+        <span className="sm:hidden">Kéo canvas · Chụm hai ngón để zoom · Chạm task để preview</span>
       </div>
     </div>
   );
@@ -396,7 +497,7 @@ const NodeEl = memo(function NodeEl({
     <div
       data-mindmap-node
       className={cn(
-        'mindmap-node absolute flex items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold shadow-sm select-none',
+        'mindmap-node absolute flex items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold shadow-sm select-none transition-[box-shadow,transform,border-color,background-color] duration-150 active:scale-[0.98]',
         node.type === 'root' && 'justify-center rounded-2xl border-blue-200/80 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 dark:border-blue-800 dark:from-blue-700 dark:to-indigo-800',
         node.type === 'track' && 'cursor-pointer border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50 text-violet-800 hover:shadow-md dark:border-violet-800/60 dark:from-violet-950/50 dark:to-fuchsia-950/30 dark:text-violet-200',
         node.type === 'module' && 'cursor-pointer border-slate-200 bg-white text-slate-700 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200',
@@ -409,7 +510,12 @@ const NodeEl = memo(function NodeEl({
       onClick={handleClick}
       role={isClickable || canCollapse ? 'button' : undefined}
       tabIndex={isClickable || canCollapse ? 0 : undefined}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClick(); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       aria-label={node.fullLabel}
       title={node.fullLabel}
     >
