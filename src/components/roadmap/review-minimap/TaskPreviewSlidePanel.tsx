@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -18,20 +19,28 @@ import {
 import { cn } from '@/lib/utils';
 import type { ProgressFile, TaskContext } from '@/types';
 import { getTaskStudyState, levelStyles } from '@/lib/roadmap';
+import { useAutoTaskNote } from '@/hooks';
 import { MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 
 interface TaskPreviewSlidePanelProps {
   task: TaskContext | null;
   progress: ProgressFile;
+  onProgressChange?: Dispatch<SetStateAction<ProgressFile | null>>;
   onClose: () => void;
 }
 
 export function TaskPreviewSlidePanel({
   task,
   progress,
+  onProgressChange,
   onClose,
 }: TaskPreviewSlidePanelProps) {
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
+  const { autoNoteStatus, autoNoteMessage, retryAutoNote } = useAutoTaskNote({
+    task: onProgressChange ? task : null,
+    progress,
+    setProgress: onProgressChange ?? (() => undefined),
+  });
   const item = task ? progress.items[task.id] ?? null : null;
   const note = item?.note?.trim() ?? '';
   const hasNote = Boolean(note);
@@ -190,11 +199,27 @@ export function TaskPreviewSlidePanel({
                   <div className="flex flex-col items-center rounded-lg border border-dashed border-gray-300 bg-gray-50/50 py-12 dark:border-gray-700 dark:bg-gray-900/30">
                     <FileText className="mb-2 h-8 w-8 text-gray-300 dark:text-gray-600" />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Task này chưa có note ôn tập.
+                      {autoNoteStatus === 'generating'
+                        ? 'Đang tự động sinh note ôn tập...'
+                        : 'Task này chưa có note ôn tập.'}
                     </p>
                     <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                       Hoàn thành task và viết note để review sau.
                     </p>
+                    {autoNoteStatus !== 'idle' && autoNoteMessage && (
+                      <div className="mt-4 max-w-md rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-xs text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
+                        {autoNoteMessage}
+                        {!hasNote && (autoNoteStatus === 'skipped' || autoNoteStatus === 'error') && (
+                          <button
+                            type="button"
+                            onClick={retryAutoNote}
+                            className="ml-2 font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                          >
+                            Thử lại
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

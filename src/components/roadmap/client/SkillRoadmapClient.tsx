@@ -189,6 +189,14 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
       <TaskPreviewSlidePanel
         task={previewTask}
         progress={progress}
+        onProgressChange={(nextProgress) => {
+          setProgress((currentProgress) => {
+            const resolvedProgress =
+              typeof nextProgress === 'function' ? nextProgress(currentProgress) : nextProgress;
+
+            return resolvedProgress ?? currentProgress;
+          });
+        }}
         onClose={handleClosePreview}
       />
     </div>

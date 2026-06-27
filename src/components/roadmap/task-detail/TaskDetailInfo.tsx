@@ -29,13 +29,33 @@ export function DetailItem({ label, value, mono = false }: { label: string; valu
   );
 }
 
-export function PathLine({ label, value, href, active = false }: { label: string; value: string; href?: string; active?: boolean }) {
+export function PathLine({
+  label,
+  value,
+  href,
+  active = false,
+  onClick,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  active?: boolean;
+  onClick?: () => void;
+}) {
   const content = (
     <div className={cn('rounded-lg border px-3 py-2', active ? 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-100' : 'border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200')}>
       <div className="text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</div>
       <div className="mt-1 leading-5 [overflow-wrap:anywhere]">{value}</div>
     </div>
   );
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className="block w-full text-left">
+        {content}
+      </button>
+    );
+  }
+
   return href ? <Link href={href}>{content}</Link> : content;
 }
 

@@ -18,7 +18,7 @@ import { MinimapStats } from './MinimapStats';
 import { MindmapCanvas } from './MindmapCanvas';
 
 export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
-  const { progress } = useProgress(roadmap);
+  const { progress, setProgress } = useProgress(roadmap);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [trackFilter, setTrackFilter] = useState<string>('all');
@@ -182,6 +182,14 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
       <TaskPreviewSlidePanel
         task={selectedTask}
         progress={progress}
+        onProgressChange={(nextProgress) => {
+          setProgress((currentProgress) => {
+            const resolvedProgress =
+              typeof nextProgress === 'function' ? nextProgress(currentProgress) : nextProgress;
+
+            return resolvedProgress ?? currentProgress;
+          });
+        }}
         onClose={handleClosePanel}
       />
     </div>

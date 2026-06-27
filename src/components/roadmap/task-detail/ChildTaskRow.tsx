@@ -19,12 +19,14 @@ export function ChildTaskRow({
   depth,
   expandedTaskIds,
   onToggleExpanded,
+  onTitleClick,
 }: {
   task: RoadmapTask;
   progress: ProgressFile | null;
   depth: number;
   expandedTaskIds: Set<string>;
   onToggleExpanded: (taskId: string) => void;
+  onTitleClick?: (taskId: string) => void;
 }) {
   const descendants = useMemo(() => flattenTasks(task.children ?? []), [task.children]);
   const completedDescendants = descendants.filter((child) =>
@@ -71,9 +73,13 @@ export function ChildTaskRow({
             ) : (
               <span className="h-6 w-6 shrink-0" />
             )}
-            <h3 className="text-sm font-semibold leading-6 text-gray-950 dark:text-white">
+            <button
+              type="button"
+              onClick={() => onTitleClick?.(task.id)}
+              className="text-left text-sm font-semibold leading-6 text-gray-950 transition hover:text-blue-700 dark:text-white dark:hover:text-blue-300"
+            >
               {task.title}
-            </h3>
+            </button>
           </div>
           <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
             {task.deliverable}
@@ -103,6 +109,7 @@ export function ChildTaskRow({
               depth={depth + 1}
               expandedTaskIds={expandedTaskIds}
               onToggleExpanded={onToggleExpanded}
+              onTitleClick={onTitleClick}
             />
           ))}
         </div>

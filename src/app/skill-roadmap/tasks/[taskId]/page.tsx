@@ -29,7 +29,9 @@ export default async function SkillRoadmapTaskDetailPage({
 }) {
   const { taskId } = await params;
   const decodedTaskId = decodeURIComponent(taskId);
-  const task = getTaskContexts(roadmap.tracks).get(decodedTaskId);
+  const taskContextMap = getTaskContexts(roadmap.tracks);
+  const task = taskContextMap.get(decodedTaskId);
+  const previewTasks = Array.from(taskContextMap.values());
   const navigationTasks = getLeafTaskContexts(roadmap.tracks).map((leafTask) => ({
     id: leafTask.id,
     title: leafTask.title,
@@ -43,7 +45,7 @@ export default async function SkillRoadmapTaskDetailPage({
 
   return (
     <Container size="lg" className="py-10 md:py-12">
-      <SkillRoadmapTaskDetail task={task} navigationTasks={navigationTasks} />
+      <SkillRoadmapTaskDetail task={task} navigationTasks={navigationTasks} previewTasks={previewTasks} />
     </Container>
   );
 }
