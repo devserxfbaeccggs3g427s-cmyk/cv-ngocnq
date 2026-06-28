@@ -1,13 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import Link from 'next/link';
 import {
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   Clock3,
-  ListTree,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { RoadmapTask, ProgressFile } from '@/types';
@@ -85,13 +83,6 @@ export function ChildTaskRow({
             {task.deliverable}
           </p>
         </div>
-        <Link
-          href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}`}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
-        >
-          <ListTree className="h-3.5 w-3.5" />
-          Chi tiết
-        </Link>
       </div>
       {completed && (
         <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
