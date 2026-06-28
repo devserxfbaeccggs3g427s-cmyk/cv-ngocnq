@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -13,6 +13,7 @@ import {
   Clock3,
   ExternalLink,
   FileText,
+  MessageSquareText,
   StickyNote,
   X,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ import type { ProgressFile, TaskContext } from '@/types';
 import { getTaskStudyState, levelStyles } from '@/lib/roadmap';
 import { useAutoTaskNote } from '@/hooks';
 import { MarkdownPreview } from '@/components/markdown/MarkdownPreview';
+import { TaskPreviewComments } from './TaskPreviewComments';
 
 interface TaskPreviewSlidePanelProps {
   task: TaskContext | null;
@@ -36,6 +38,8 @@ export function TaskPreviewSlidePanel({
   onClose,
 }: TaskPreviewSlidePanelProps) {
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
+  const [isCommentPanelOpen, setIsCommentPanelOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
   const { autoNoteStatus, autoNoteMessage, retryAutoNote } = useAutoTaskNote({
     task: onProgressChange ? task : null,
     progress,
@@ -77,6 +81,18 @@ export function TaskPreviewSlidePanel({
     syncPanelMode();
     mediaQuery.addEventListener('change', syncPanelMode);
     return () => mediaQuery.removeEventListener('change', syncPanelMode);
+  }, []);
+
+  useEffect(() => {
+    setIsCommentPanelOpen(false);
+    setCommentCount(0);
+  }, [task?.id]);
+
+  const handleCommentCountChange = useCallback((count: number) => {
+    setCommentCount(count);
+    if (count === 0) {
+      setIsCommentPanelOpen(false);
+    }
   }, []);
 
   return (
@@ -168,7 +184,7 @@ export function TaskPreviewSlidePanel({
               </div>
 
               {/* Note Preview */}
-              <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5">
+              <div className="px-4 py-4 sm:px-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-200">
                     <StickyNote
@@ -240,6 +256,12 @@ export function TaskPreviewSlidePanel({
               )}
             </div>
 
+            <TaskPreviewComments
+              taskId={task.id}
+              isOpen={isCommentPanelOpen}
+              onCommentCountChange={handleCommentCountChange}
+            />
+
             {/* Panel Footer */}
             <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-gray-200 px-4 py-3 dark:border-gray-800 sm:flex sm:flex-wrap sm:items-center sm:px-5">
               <Link
@@ -266,6 +288,20 @@ export function TaskPreviewSlidePanel({
               >
                 <CircleHelp className="h-3.5 w-3.5" /> Trắc nghiệm
               </Link>
+              {commentCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsCommentPanelOpen((current) => !current)}
+                  className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-blue-200 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:border-blue-400 dark:border-blue-900/70 dark:text-blue-300 dark:hover:border-blue-600"
+                  aria-expanded={isCommentPanelOpen}
+                >
+                  <MessageSquareText className="h-3.5 w-3.5" />
+                  {isCommentPanelOpen ? 'Ẩn bình luận' : 'Bình luận'}
+                  <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+                    {commentCount}
+                  </span>
+                </button>
+              )}
             </div>
           </motion.aside>
         </>
