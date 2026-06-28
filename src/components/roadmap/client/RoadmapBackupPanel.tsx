@@ -72,7 +72,7 @@ export function RoadmapBackupPanel({
             <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
               Export/Import JSON là lựa chọn an toàn nhất cho backup thủ công. File
               backup hiện bao gồm cả tiến độ học tập, note, comment trong màn hình
-              preview Markdown, flashcard/trắc nghiệm đã tạo, comment trong flashcard/trắc nghiệm và file Markdown tự tạo. GitHub backup phù hợp khi dùng riêng; token chỉ gửi
+              preview Markdown, flashcard/trắc nghiệm đã tạo, comment trong flashcard/trắc nghiệm, lịch sử AI Context độc lập và file Markdown tự tạo. GitHub backup phù hợp khi dùng riêng; token chỉ gửi
               một lần tới API server và không được lưu lại.
             </p>
           </div>

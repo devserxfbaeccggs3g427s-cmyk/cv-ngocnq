@@ -102,7 +102,7 @@ export function useGithubBackup(
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm và file Markdown tự tạo.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm, lịch sử AI Context độc lập và file Markdown tự tạo.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -160,7 +160,7 @@ export function useGithubBackup(
           });
         }
 
-        setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm và file Markdown tự tạo.');
+        setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm, lịch sử AI Context độc lập và file Markdown tự tạo.');
       } catch (error) {
         setBackupError(
           error instanceof Error ? error.message : 'Không import được file backup.'
@@ -206,7 +206,7 @@ export function useGithubBackup(
 
       setGithubToken('');
       setGithubCommitUrl(result.commitUrl ?? null);
-      setBackupMessage(`Đã commit backup gồm tiến độ, comment, flashcard, trắc nghiệm và file Markdown lên GitHub: ${result.path ?? githubBackupPath}.`);
+      setBackupMessage(`Đã commit backup gồm tiến độ, comment, flashcard, trắc nghiệm, lịch sử AI Context và file Markdown lên GitHub: ${result.path ?? githubBackupPath}.`);
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không backup được lên GitHub.'

@@ -6,6 +6,7 @@ export type NoteComment = {
   createdAt: string;
   model?: string;
   provider?: string;
+  title?: string;
 };
 
 export type CommentNode = NoteComment & {

@@ -241,7 +241,9 @@ export function readStoredStudyComments(): StudyComment[] {
               typeof comment.body === 'string' &&
               (comment.author === 'user' || comment.author === 'ai') &&
               comment.context &&
-              (comment.context.type === 'flashcard' || comment.context.type === 'quiz')
+              (comment.context.type === 'flashcard' ||
+                comment.context.type === 'quiz' ||
+                comment.context.type === 'ai-review')
           )
         )
       : [];

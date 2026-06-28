@@ -16,6 +16,7 @@ const navItems = [
   { href: '/portfolio', label: 'Dự án' },
   { href: '/skill-roadmap', label: 'Ôn tập' },
   { href: '/markdown-files', label: 'Markdown' },
+  { href: '/ai-context', label: 'AI Context' },
 ];
 
 export function Header() {

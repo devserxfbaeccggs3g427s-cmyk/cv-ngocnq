@@ -90,6 +90,7 @@ function normalizeComment(input: unknown): NoteComment | null {
     createdAt: input.createdAt,
     model: typeof input.model === 'string' ? input.model : undefined,
     provider: typeof input.provider === 'string' ? input.provider : undefined,
+    title: typeof input.title === 'string' ? input.title : undefined,
   };
 }
 
@@ -223,6 +224,42 @@ function normalizeStudyCommentContext(input: unknown): StudyCommentContext | nul
       deckId: input.deckId,
       questionId: input.questionId,
       attemptId: input.attemptId,
+    };
+  }
+
+  if (input.type === 'ai-review') {
+    if (typeof input.contextId !== 'string' || !Array.isArray(input.sources)) {
+      return null;
+    }
+
+    const sources = input.sources
+      .map((source) => {
+        if (!isRecord(source) || typeof source.id !== 'string' || typeof source.title !== 'string') {
+          return null;
+        }
+
+        if (source.type !== 'markdown-file' && source.type !== 'roadmap-task') {
+          return null;
+        }
+
+        return {
+          type: source.type,
+          id: source.id,
+          title: source.title,
+        };
+      })
+      .filter((source): source is { type: 'markdown-file' | 'roadmap-task'; id: string; title: string } =>
+        Boolean(source)
+      );
+
+    if (sources.length !== input.sources.length) {
+      return null;
+    }
+
+    return {
+      type: 'ai-review',
+      contextId: input.contextId,
+      sources,
     };
   }
 
