@@ -30,10 +30,12 @@ import type { MarkdownFile, Roadmap, StudyComment, StudyCommentContext, TaskCont
 const workspaceTaskId = 'ai-context-workspace';
 const maxContextChars = 18000;
 
+type AiReviewContext = Extract<StudyCommentContext, { type: 'ai-review' }>;
+
 type AiReviewHistoryItem = {
   rootId: string;
   contextId: string;
-  sources: Extract<StudyCommentContext, { type: 'ai-review' }>['sources'];
+  sources: AiReviewContext['sources'];
   commentCount: number;
   latestAt: string;
   title: string;
@@ -171,7 +173,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
     );
   }, [progress.items, selectedFiles, selectedTasks]);
 
-  const context = useMemo<StudyCommentContext | null>(() => {
+  const context = useMemo<AiReviewContext | null>(() => {
     if (selectedFiles.length === 0 && selectedTasks.length === 0) {
       return null;
     }
