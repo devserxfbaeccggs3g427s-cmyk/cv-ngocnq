@@ -1,4 +1,4 @@
-import type { NoteComment, FlashcardDeck, QuizDeck, ProgressFile, StudyComment } from '@/types';
+import type { NoteComment, FlashcardDeck, QuizDeck, ProgressFile, StudyComment, MarkdownEntry } from '@/types';
 
 import {
   progressStorageKey,
@@ -6,9 +6,12 @@ import {
   flashcardsStorageKey,
   quizzesStorageKey,
   studyCommentsStorageKey,
+  markdownFilesStorageKey,
   duplicateDetectionStorageKey,
 } from './constants';
-import { normalizeProgress, normalizeCommentsByTask, normalizeFlashcardsByTask, normalizeQuizzesByTask } from './normalize';
+import { normalizeProgress, normalizeCommentsByTask, normalizeFlashcardsByTask, normalizeQuizzesByTask, normalizeMarkdownFiles } from './normalize';
+
+const legacyRoadmapMarkdownFilesStorageKey = 'skill-roadmap-markdown-files:v1';
 
 export type DuplicateDetectionConfig = {
   flashcards: boolean;
@@ -105,6 +108,19 @@ export function removeStoredStudyComments() {
   }
 }
 
+export function removeStoredMarkdownFiles() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.removeItem(markdownFilesStorageKey);
+    window.localStorage.removeItem(legacyRoadmapMarkdownFilesStorageKey);
+  } catch {
+    // localStorage can fail in locked-down browsers. Progress reset still proceeds.
+  }
+}
+
 export function hasStoredComments() {
   if (typeof window === 'undefined') {
     return false;
@@ -148,6 +164,21 @@ export function hasStoredStudyComments() {
 
   try {
     return window.localStorage.getItem(studyCommentsStorageKey) !== null;
+  } catch {
+    return false;
+  }
+}
+
+export function hasStoredMarkdownFiles() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return (
+      window.localStorage.getItem(markdownFilesStorageKey) !== null ||
+      window.localStorage.getItem(legacyRoadmapMarkdownFilesStorageKey) !== null
+    );
   } catch {
     return false;
   }
@@ -219,6 +250,30 @@ export function readStoredStudyComments(): StudyComment[] {
   }
 }
 
+export function readStoredMarkdownFiles(): MarkdownEntry[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(markdownFilesStorageKey);
+    if (raw) {
+      return normalizeMarkdownFiles(JSON.parse(raw)) ?? [];
+    }
+
+    const legacyRaw = window.localStorage.getItem(legacyRoadmapMarkdownFilesStorageKey);
+    const legacyFiles = legacyRaw ? normalizeMarkdownFiles(JSON.parse(legacyRaw)) ?? [] : [];
+
+    if (legacyFiles.length > 0) {
+      storeMarkdownFiles(legacyFiles);
+    }
+
+    return legacyFiles;
+  } catch {
+    return [];
+  }
+}
+
 export function readStoredDuplicateDetectionConfig(): DuplicateDetectionConfig {
   if (typeof window === 'undefined') {
     return defaultDuplicateDetectionConfig;
@@ -280,6 +335,18 @@ export function storeStudyComments(comments: StudyComment[]) {
 
   try {
     window.localStorage.setItem(studyCommentsStorageKey, JSON.stringify(comments));
+  } catch {
+    // localStorage can fail in private browsing or full quota. UI state still remains in memory.
+  }
+}
+
+export function storeMarkdownFiles(files: MarkdownEntry[]) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(markdownFilesStorageKey, JSON.stringify(files));
   } catch {
     // localStorage can fail in private browsing or full quota. UI state still remains in memory.
   }

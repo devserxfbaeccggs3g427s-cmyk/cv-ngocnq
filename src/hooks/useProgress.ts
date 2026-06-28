@@ -12,14 +12,17 @@ import {
   removeStoredFlashcards,
   removeStoredQuizzes,
   removeStoredStudyComments,
+  removeStoredMarkdownFiles,
   hasStoredComments,
   hasStoredFlashcards,
   hasStoredQuizzes,
   hasStoredStudyComments,
+  hasStoredMarkdownFiles,
   storeComments,
   storeFlashcards,
   storeQuizzes,
   storeStudyComments,
+  storeMarkdownFiles,
   normalizeRoadmapBackup,
   buildTaskIndex,
   applyTaskProgressUpdate,
@@ -85,6 +88,10 @@ export function useProgress(roadmap: Roadmap) {
 
           if (!hasStoredStudyComments()) {
             storeStudyComments(seed.studyComments);
+          }
+
+          if (!hasStoredMarkdownFiles()) {
+            storeMarkdownFiles(seed.markdownFiles);
           }
         }
       } catch {
@@ -186,7 +193,7 @@ export function useProgress(roadmap: Roadmap) {
 
   const resetProgress = useCallback(async () => {
     const confirmed = window.confirm(
-      'Bạn chắc chắn muốn xoá tiến độ, comment, flashcard, trắc nghiệm và comment trong flashcard/trắc nghiệm đang lưu trong trình duyệt, sau đó tải lại tiến độ mới nhất từ file JSON trong project?'
+      'Bạn chắc chắn muốn xoá tiến độ, comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm và file Markdown tự tạo đang lưu trong trình duyệt, sau đó tải lại dữ liệu mới nhất từ file JSON trong project?'
     );
 
     if (!confirmed) {
@@ -198,6 +205,7 @@ export function useProgress(roadmap: Roadmap) {
     removeStoredFlashcards();
     removeStoredQuizzes();
     removeStoredStudyComments();
+    removeStoredMarkdownFiles();
 
     try {
       const response = await fetch('/api/skill-roadmap/progress', {
@@ -220,6 +228,7 @@ export function useProgress(roadmap: Roadmap) {
       storeFlashcards(data.flashcards);
       storeQuizzes(data.quizzes);
       storeStudyComments(data.studyComments);
+      storeMarkdownFiles(data.markdownFiles);
       setLoadError(null);
     } catch (error) {
       throw error;

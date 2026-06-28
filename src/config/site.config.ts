@@ -188,6 +188,7 @@ export const siteConfig: SiteConfig = {
       { label: 'Kinh nghiệm', href: '#experience', icon: 'Briefcase', enabled: true },
       { label: 'Kỹ năng', href: '#skills', icon: 'Code', enabled: true },
       { label: 'Ôn tập', href: '/skill-roadmap', icon: 'ListChecks', enabled: true },
+      { label: 'Markdown', href: '/markdown-files', icon: 'FileText', enabled: true },
       { label: 'Học vấn', href: '#education', icon: 'GraduationCap', enabled: true },
       { label: 'Dự án', href: '/portfolio', icon: 'Folder', enabled: true },
       { label: 'Liên hệ', href: '#contact', icon: 'Mail', enabled: true },

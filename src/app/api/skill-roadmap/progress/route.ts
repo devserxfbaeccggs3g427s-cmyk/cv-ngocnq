@@ -14,6 +14,7 @@ type RoadmapBackupFile = {
   flashcards?: unknown;
   quizzes?: unknown;
   studyComments?: unknown;
+  markdownFiles?: unknown;
 };
 
 const progressFilePath = path.join(

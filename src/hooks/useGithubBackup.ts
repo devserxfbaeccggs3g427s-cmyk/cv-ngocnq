@@ -10,6 +10,7 @@ import {
   storeFlashcards,
   storeQuizzes,
   storeStudyComments,
+  storeMarkdownFiles,
   normalizeRoadmapBackup,
   buildRoadmapBackup,
 } from '@/lib/roadmap';
@@ -101,7 +102,7 @@ export function useGithubBackup(
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, note comment, flashcard, trắc nghiệm và comment trong flashcard/trắc nghiệm.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm và file Markdown tự tạo.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -126,7 +127,7 @@ export function useGithubBackup(
         const data = normalizeRoadmapBackup(JSON.parse(text));
 
         if (!data) {
-          throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress, comments, flashcards, quizzes và studyComments.');
+          throw new Error('File backup không đúng định dạng. File cần có progress/items hoặc backup tổng hợp gồm progress, comments, flashcards, quizzes, studyComments và markdownFiles.');
         }
 
         const imported: ProgressFile = {
@@ -140,24 +141,26 @@ export function useGithubBackup(
         storeFlashcards(data.flashcards);
         storeQuizzes(data.quizzes);
         storeStudyComments(data.studyComments);
+        storeMarkdownFiles(data.markdownFiles);
 
         if (shouldSyncProgressFile) {
           await fetch('/api/skill-roadmap/progress', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              version: 5,
+              version: 6,
               exportedAt: new Date().toISOString(),
               progress: imported,
               comments: data.comments,
               flashcards: data.flashcards,
               quizzes: data.quizzes,
               studyComments: data.studyComments,
+              markdownFiles: data.markdownFiles,
             }),
           });
         }
 
-        setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, note comment, flashcard, trắc nghiệm và comment trong flashcard/trắc nghiệm.');
+        setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm và file Markdown tự tạo.');
       } catch (error) {
         setBackupError(
           error instanceof Error ? error.message : 'Không import được file backup.'
@@ -203,7 +206,7 @@ export function useGithubBackup(
 
       setGithubToken('');
       setGithubCommitUrl(result.commitUrl ?? null);
-      setBackupMessage(`Đã commit backup gồm tiến độ, comment, flashcard và trắc nghiệm lên GitHub: ${result.path ?? githubBackupPath}.`);
+      setBackupMessage(`Đã commit backup gồm tiến độ, comment, flashcard, trắc nghiệm và file Markdown lên GitHub: ${result.path ?? githubBackupPath}.`);
     } catch (error) {
       setBackupError(
         error instanceof Error ? error.message : 'Không backup được lên GitHub.'

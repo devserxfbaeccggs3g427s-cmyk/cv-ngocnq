@@ -217,7 +217,7 @@ page.tsx
 - React Hook Form for contact form
 - Local `useState` for filters, toggles
 - No global state needed (data is static)
-- Skill roadmap learning artifacts use browser `localStorage`: progress, note comments, flashcard decks, and quiz packs. Flashcards and quizzes are stored as multiple decks/packs per task with backup/import compatibility for older single-deck flashcard data.
+- Skill roadmap learning artifacts use browser `localStorage`: progress, note comments, flashcard decks, quiz packs, and study comments. Flashcards and quizzes are stored as multiple decks/packs per task with backup/import compatibility for older single-deck flashcard data. Standalone Markdown document storage is a separate `/markdown-files` feature using `markdown-files:v1`; it stores folder/file nodes with `parentId` hierarchy and is still included in the versioned backup payload so export/import can preserve all local learning data.
 
 ## File Naming Conventions
 

@@ -1,18 +1,19 @@
-import type { ProgressFile, RoadmapBackupFile, NoteComment, FlashcardDeck, QuizDeck } from '@/types';
+import type { ProgressFile, RoadmapBackupFile } from '@/types';
 
-import { readStoredComments, readStoredFlashcards, readStoredQuizzes, readStoredStudyComments } from './storage';
+import { readStoredComments, readStoredFlashcards, readStoredQuizzes, readStoredStudyComments, readStoredMarkdownFiles } from './storage';
 import { normalizeRoadmapBackup } from './normalize';
 
 export { normalizeRoadmapBackup };
 
 export function buildRoadmapBackup(progress: ProgressFile): RoadmapBackupFile {
   return {
-    version: 5,
+    version: 6,
     exportedAt: new Date().toISOString(),
     progress,
     comments: readStoredComments(),
     flashcards: readStoredFlashcards(),
     quizzes: readStoredQuizzes(),
     studyComments: readStoredStudyComments(),
+    markdownFiles: readStoredMarkdownFiles(),
   };
 }

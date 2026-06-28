@@ -15,6 +15,7 @@ const navItems = [
   { href: '/#contact', label: 'Liên hệ' },
   { href: '/portfolio', label: 'Dự án' },
   { href: '/skill-roadmap', label: 'Ôn tập' },
+  { href: '/markdown-files', label: 'Markdown' },
 ];
 
 export function Header() {

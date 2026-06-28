@@ -7,6 +7,7 @@ import type {
   QuizDeck,
   StudyComment,
   StudyCommentContext,
+  MarkdownEntry,
 } from '@/types';
 
 import { normalizeQuizzesByTask } from './normalize-quizzes';
@@ -262,12 +263,72 @@ export function normalizeStudyComments(input: unknown): StudyComment[] | null {
   return comments as StudyComment[];
 }
 
+function normalizeMarkdownFile(input: unknown): MarkdownEntry | null {
+  if (!isRecord(input)) {
+    return null;
+  }
+
+  if (
+    typeof input.id !== 'string' ||
+    typeof input.title !== 'string'
+  ) {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  const parentId = typeof input.parentId === 'string' ? input.parentId : null;
+
+  if (input.type === 'folder') {
+    return {
+      id: input.id,
+      type: 'folder',
+      title: input.title,
+      parentId,
+      createdAt: typeof input.createdAt === 'string' ? input.createdAt : now,
+      updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : now,
+    };
+  }
+
+  if (input.type !== undefined && input.type !== 'file') {
+    return null;
+  }
+
+  if (typeof input.content !== 'string') {
+    return null;
+  }
+
+  return {
+    id: input.id,
+    type: 'file',
+    title: input.title,
+    parentId,
+    content: input.content,
+    createdAt: typeof input.createdAt === 'string' ? input.createdAt : now,
+    updatedAt: typeof input.updatedAt === 'string' ? input.updatedAt : now,
+  };
+}
+
+export function normalizeMarkdownFiles(input: unknown): MarkdownEntry[] | null {
+  if (!Array.isArray(input)) {
+    return null;
+  }
+
+  const files = input.map(normalizeMarkdownFile);
+
+  if (files.some((file) => !file)) {
+    return null;
+  }
+
+  return files as MarkdownEntry[];
+}
+
 export function normalizeRoadmapBackup(input: unknown): {
   progress: ProgressFile;
   comments: Record<string, NoteComment[]>;
   flashcards: Record<string, FlashcardDeck[]>;
   quizzes: Record<string, QuizDeck[]>;
   studyComments: StudyComment[];
+  markdownFiles: MarkdownEntry[];
 } | null {
   if (!isRecord(input)) {
     return null;
@@ -303,11 +364,18 @@ export function normalizeRoadmapBackup(input: unknown): {
     return null;
   }
 
+  const markdownFiles = input.markdownFiles === undefined ? [] : normalizeMarkdownFiles(input.markdownFiles);
+
+  if (!markdownFiles) {
+    return null;
+  }
+
   return {
     progress,
     comments,
     flashcards,
     quizzes,
     studyComments,
+    markdownFiles,
   };
 }

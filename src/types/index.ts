@@ -4,4 +4,5 @@ export type { NoteComment, CommentNode } from './comments';
 export type { StudyComment, StudyCommentContext } from './study-comments';
 export type { Flashcard, FlashcardDeck } from './flashcards';
 export type { QuizQuestion, QuizAttempt, QuizDeck } from './quizzes';
+export type { MarkdownEntry, MarkdownFile, MarkdownFolder } from './markdown-files';
 export type { RoadmapBackupFile, GithubBackupConfig } from './backup';
