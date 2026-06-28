@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { validateEnvAiPassword } from '../env-confirmation';
 import {
   compactText,
   isNonEmptyString,
@@ -13,11 +14,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 type TaskNoteRequest = {
+  mode?: unknown;
+  confirmPassword?: unknown;
   task?: unknown;
   learningPrompt?: unknown;
   isCompleted?: unknown;
   hasChildren?: unknown;
   hasNote?: unknown;
+  note?: unknown;
+  editInstruction?: unknown;
   descendantSummary?: unknown;
 };
 
@@ -67,7 +72,10 @@ export async function POST(request: Request) {
   }
 
   const task = readTask(body.task);
+  const mode = body.mode === 'rewrite' ? 'rewrite' : 'auto';
   const learningPrompt = isNonEmptyString(body.learningPrompt) ? body.learningPrompt.trim() : '';
+  const currentNote = isNonEmptyString(body.note) ? compactText(body.note, 18000) : '';
+  const editInstruction = isNonEmptyString(body.editInstruction) ? compactText(body.editInstruction, 3000) : '';
   const descendantSummary = isNonEmptyString(body.descendantSummary)
     ? compactText(body.descendantSummary, 5000)
     : 'Không có tóm tắt task con.';
@@ -76,15 +84,31 @@ export async function POST(request: Request) {
     return jsonError('Thiếu thông tin task để sinh note.', 400);
   }
 
-  if (!body.hasChildren) {
+  if (mode === 'rewrite') {
+    if (!currentNote) {
+      return jsonError('Task cần có note hiện tại trước khi yêu cầu AI chỉnh sửa.', 400);
+    }
+
+    if (!editInstruction) {
+      return jsonError('Thiếu yêu cầu chỉnh sửa note.', 400);
+    }
+
+    const passwordError = validateEnvAiPassword(body.confirmPassword);
+
+    if (passwordError) {
+      return jsonError(passwordError.message, passwordError.status);
+    }
+  }
+
+  if (mode === 'auto' && !body.hasChildren) {
     return jsonError('Chỉ tự động sinh note cho task cha có task con.', 409);
   }
 
-  if (!body.isCompleted) {
+  if (mode === 'auto' && !body.isCompleted) {
     return jsonError('Task cha phải hoàn thành trước khi tự động sinh note.', 409);
   }
 
-  if (body.hasNote) {
+  if (mode === 'auto' && body.hasNote) {
     return jsonError('Task đã có note nên không tự động ghi đè.', 409);
   }
 
@@ -101,35 +125,69 @@ export async function POST(request: Request) {
     );
   }
 
-  const messages = [
-    {
-      role: 'system',
-      content: [
-        'Bạn là mentor Backend/Senior Engineer tạo note học tập Markdown cho kỹ sư phần mềm.',
-        'Trả lời bằng tiếng Việt, chỉ xuất Markdown note hoàn chỉnh, không bọc toàn bộ bằng code fence.',
-        'Nội dung phải thực dụng, đúng trọng tâm task, có cấu trúc rõ, có ví dụ nhỏ và câu hỏi tự kiểm tra.',
-        'Không thêm lời dẫn kiểu "Dưới đây là". Không bịa thông tin ngoài prompt và tóm tắt task con.',
-      ].join(' '),
-    },
-    {
-      role: 'user',
-      content: [
-        '## Prompt học tập của task cha',
-        learningPrompt,
-        '',
-        '## Thông tin task cha',
-        `ID: ${task.id}`,
-        `Tiêu đề: ${task.title}`,
-        `Cấp độ: ${task.level}`,
-        `Deliverable: ${task.deliverable}`,
-        '',
-        '## Tóm tắt tiến độ task con',
-        descendantSummary,
-        '',
-        'Hãy tạo note Markdown theo đúng prompt học tập ở trên.',
-      ].join('\n'),
-    },
-  ];
+  const messages =
+    mode === 'rewrite'
+      ? [
+          {
+            role: 'system',
+            content: [
+              'Bạn là mentor Backend/Senior Engineer chỉnh sửa note học tập Markdown cho kỹ sư phần mềm.',
+              'Trả lời bằng tiếng Việt, chỉ xuất Markdown note hoàn chỉnh sau khi chỉnh sửa, không bọc toàn bộ bằng code fence.',
+              'Giữ lại nội dung đúng và hữu ích từ note hiện tại, chỉnh theo đúng yêu cầu người dùng, tăng tính rõ ràng và thực dụng.',
+              'Không thêm lời dẫn kiểu "Dưới đây là". Không bịa thông tin ngoài note, prompt và thông tin task.',
+            ].join(' '),
+          },
+          {
+            role: 'user',
+            content: [
+              '## Yêu cầu chỉnh sửa',
+              editInstruction,
+              '',
+              '## Prompt học tập của task',
+              learningPrompt,
+              '',
+              '## Thông tin task',
+              `ID: ${task.id}`,
+              `Tiêu đề: ${task.title}`,
+              `Cấp độ: ${task.level}`,
+              `Deliverable: ${task.deliverable}`,
+              '',
+              '## Note hiện tại cần chỉnh sửa',
+              currentNote,
+              '',
+              'Hãy viết lại toàn bộ note Markdown theo yêu cầu chỉnh sửa ở trên.',
+            ].join('\n'),
+          },
+        ]
+      : [
+          {
+            role: 'system',
+            content: [
+              'Bạn là mentor Backend/Senior Engineer tạo note học tập Markdown cho kỹ sư phần mềm.',
+              'Trả lời bằng tiếng Việt, chỉ xuất Markdown note hoàn chỉnh, không bọc toàn bộ bằng code fence.',
+              'Nội dung phải thực dụng, đúng trọng tâm task, có cấu trúc rõ, có ví dụ nhỏ và câu hỏi tự kiểm tra.',
+              'Không thêm lời dẫn kiểu "Dưới đây là". Không bịa thông tin ngoài prompt và tóm tắt task con.',
+            ].join(' '),
+          },
+          {
+            role: 'user',
+            content: [
+              '## Prompt học tập của task cha',
+              learningPrompt,
+              '',
+              '## Thông tin task cha',
+              `ID: ${task.id}`,
+              `Tiêu đề: ${task.title}`,
+              `Cấp độ: ${task.level}`,
+              `Deliverable: ${task.deliverable}`,
+              '',
+              '## Tóm tắt tiến độ task con',
+              descendantSummary,
+              '',
+              'Hãy tạo note Markdown theo đúng prompt học tập ở trên.',
+            ].join('\n'),
+          },
+        ];
 
   try {
     const response = await fetch(`${baseUrl}/chat/completions`, {
@@ -156,7 +214,7 @@ export async function POST(request: Request) {
 
     const note = responseBody.choices?.[0]?.message?.content?.trim() ?? '';
 
-    if (!note || note.length < 200) {
+    if (!note || (mode === 'auto' && note.length < 200) || (mode === 'rewrite' && note.length < 40)) {
       return jsonError('AI không trả về note đủ nội dung để lưu.', 502);
     }
 

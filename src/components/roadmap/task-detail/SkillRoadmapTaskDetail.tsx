@@ -140,6 +140,90 @@ export function SkillRoadmapTaskDetail({
     }
   }
 
+  async function rewriteNoteWithAi({
+    editInstruction,
+    confirmPassword,
+  }: {
+    editInstruction: string;
+    confirmPassword: string;
+  }) {
+    const currentProgress = progress;
+    const currentNote = currentProgress?.items?.[task.id]?.note?.trim() ?? '';
+
+    if (!currentProgress || !currentNote) {
+      throw new Error('Task cần có note trước khi yêu cầu AI chỉnh sửa.');
+    }
+
+    const response = await fetch('/api/ai/task-note', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'rewrite',
+        confirmPassword,
+        task: {
+          id: task.id,
+          title: task.title,
+          level: task.level,
+          deliverable: task.deliverable,
+        },
+        learningPrompt,
+        hasChildren,
+        note: currentNote,
+        editInstruction,
+      }),
+    });
+
+    const payload = (await response.json().catch(() => ({}))) as {
+      note?: unknown;
+      error?: unknown;
+    };
+
+    if (!response.ok) {
+      throw new Error(typeof payload.error === 'string' ? payload.error : 'Không chỉnh sửa được note bằng AI.');
+    }
+
+    const rewrittenNote = typeof payload.note === 'string' ? payload.note.trim() : '';
+
+    if (!rewrittenNote) {
+      throw new Error('AI không trả về note hợp lệ.');
+    }
+
+    const now = new Date().toISOString();
+    const currentItem = currentProgress.items[task.id];
+    const nextProgress: ProgressFile = {
+      ...currentProgress,
+      updatedAt: now,
+      items: {
+        ...currentProgress.items,
+        [task.id]: {
+          completed: hasChildren ? false : currentItem?.completed ?? true,
+          completedAt: hasChildren ? null : currentItem?.completedAt ?? now,
+          note: rewrittenNote,
+          updatedAt: now,
+        },
+      },
+    };
+
+    setProgress(nextProgress);
+    storeProgress(nextProgress);
+
+    if (shouldSyncProgressFile) {
+      const saveResponse = await fetch('/api/skill-roadmap/progress', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: nextProgress.items }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error('Đã lưu note AI vào trình duyệt, nhưng không sync được vào file JSON local.');
+      }
+
+      const saved = (await saveResponse.json()) as ProgressFile;
+      setProgress(saved);
+      storeProgress(saved);
+    }
+  }
+
   function toggleChildTask(taskId: string) {
     setExpandedChildTaskIds((current) => {
       const next = new Set(current);
@@ -235,7 +319,7 @@ export function SkillRoadmapTaskDetail({
           <QuizCard taskId={task.id} commentCount={noteComments.length} />
           <FlashcardCard taskId={task.id} commentCount={noteComments.length} />
           <LearningPromptCard learningPrompt={learningPrompt} promptVisible={promptVisible} setPromptVisible={setPromptVisible} promptCopied={promptCopied} promptCopyError={promptCopyError} onCopy={copyLearningPrompt} />
-          <NoteCard note={item?.note ?? ''} hasNote={hasNote} updatedAt={item?.updatedAt ?? null} savingNote={savingNote} saveError={saveError} autoNoteStatus={autoNoteStatus} autoNoteMessage={autoNoteMessage} onRetryAutoNote={retryAutoNote} onNoteChange={updateNote} onNoteBlur={saveNote} />
+          <NoteCard note={item?.note ?? ''} hasNote={hasNote} updatedAt={item?.updatedAt ?? null} savingNote={savingNote} saveError={saveError} autoNoteStatus={autoNoteStatus} autoNoteMessage={autoNoteMessage} onRetryAutoNote={retryAutoNote} onNoteChange={updateNote} onNoteBlur={saveNote} onRequestAiRewrite={rewriteNoteWithAi} />
 
           <Card>
             <CardContent className="p-5 md:p-6">

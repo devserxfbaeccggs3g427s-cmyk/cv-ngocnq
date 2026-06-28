@@ -13,13 +13,21 @@ import {
   Clock3,
   ExternalLink,
   FileText,
+  Loader2,
   MessageSquareText,
   StickyNote,
+  WandSparkles,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ProgressFile, TaskContext } from '@/types';
-import { getTaskStudyState, levelStyles } from '@/lib/roadmap';
+import {
+  buildLearningPrompt,
+  getTaskStudyState,
+  levelStyles,
+  shouldSyncProgressFile,
+  storeProgress,
+} from '@/lib/roadmap';
 import { useAutoTaskNote } from '@/hooks';
 import { MarkdownPreview } from '@/components/markdown/MarkdownPreview';
 import { TaskPreviewComments } from './TaskPreviewComments';
@@ -40,6 +48,11 @@ export function TaskPreviewSlidePanel({
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const [isCommentPanelOpen, setIsCommentPanelOpen] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+  const [aiRewriteOpen, setAiRewriteOpen] = useState(false);
+  const [editInstruction, setEditInstruction] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [aiRewriteStatus, setAiRewriteStatus] = useState<'idle' | 'rewriting' | 'saved' | 'error'>('idle');
+  const [aiRewriteMessage, setAiRewriteMessage] = useState<string | null>(null);
   const { autoNoteStatus, autoNoteMessage, retryAutoNote } = useAutoTaskNote({
     task: onProgressChange ? task : null,
     progress,
@@ -48,6 +61,13 @@ export function TaskPreviewSlidePanel({
   const item = task ? progress.items[task.id] ?? null : null;
   const note = item?.note?.trim() ?? '';
   const hasNote = Boolean(note);
+  const canRewriteNote =
+    Boolean(task) &&
+    Boolean(onProgressChange) &&
+    hasNote &&
+    editInstruction.trim().length > 0 &&
+    confirmPassword.trim().length > 0 &&
+    aiRewriteStatus !== 'rewriting';
   const effectivelyCompleted = task
     ? getTaskStudyState(task, progress).effectivelyCompleted
     : false;
@@ -86,6 +106,11 @@ export function TaskPreviewSlidePanel({
   useEffect(() => {
     setIsCommentPanelOpen(false);
     setCommentCount(0);
+    setAiRewriteOpen(false);
+    setEditInstruction('');
+    setConfirmPassword('');
+    setAiRewriteStatus('idle');
+    setAiRewriteMessage(null);
   }, [task?.id]);
 
   const handleCommentCountChange = useCallback((count: number) => {
@@ -94,6 +119,95 @@ export function TaskPreviewSlidePanel({
       setIsCommentPanelOpen(false);
     }
   }, []);
+
+  async function handleAiRewriteNote() {
+    if (!task || !onProgressChange || !canRewriteNote) {
+      return;
+    }
+
+    setAiRewriteStatus('rewriting');
+    setAiRewriteMessage('AI đang chỉnh sửa lại note...');
+
+    try {
+      const response = await fetch('/api/ai/task-note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'rewrite',
+          confirmPassword: confirmPassword.trim(),
+          task: {
+            id: task.id,
+            title: task.title,
+            level: task.level,
+            deliverable: task.deliverable,
+          },
+          learningPrompt: buildLearningPrompt(task),
+          hasChildren: Boolean(task.children?.length),
+          note,
+          editInstruction: editInstruction.trim(),
+        }),
+      });
+
+      const payload = (await response.json().catch(() => ({}))) as {
+        note?: unknown;
+        error?: unknown;
+      };
+
+      if (!response.ok) {
+        throw new Error(typeof payload.error === 'string' ? payload.error : 'Không chỉnh sửa được note bằng AI.');
+      }
+
+      const rewrittenNote = typeof payload.note === 'string' ? payload.note.trim() : '';
+
+      if (!rewrittenNote) {
+        throw new Error('AI không trả về note hợp lệ.');
+      }
+
+      const now = new Date().toISOString();
+      const currentItem = progress.items[task.id];
+      const hasChildren = Boolean(task.children?.length);
+      const nextProgress: ProgressFile = {
+        ...progress,
+        updatedAt: now,
+        items: {
+          ...progress.items,
+          [task.id]: {
+            completed: hasChildren ? false : currentItem?.completed ?? true,
+            completedAt: hasChildren ? null : currentItem?.completedAt ?? now,
+            note: rewrittenNote,
+            updatedAt: now,
+          },
+        },
+      };
+
+      onProgressChange(nextProgress);
+      storeProgress(nextProgress);
+
+      if (shouldSyncProgressFile) {
+        const saveResponse = await fetch('/api/skill-roadmap/progress', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: nextProgress.items }),
+        });
+
+        if (!saveResponse.ok) {
+          throw new Error('Đã lưu note AI vào trình duyệt, nhưng không sync được vào file JSON local.');
+        }
+
+        const saved = (await saveResponse.json()) as ProgressFile;
+        onProgressChange(saved);
+        storeProgress(saved);
+      }
+
+      setEditInstruction('');
+      setConfirmPassword('');
+      setAiRewriteStatus('saved');
+      setAiRewriteMessage('Đã cập nhật note bằng AI.');
+    } catch (error) {
+      setAiRewriteStatus('error');
+      setAiRewriteMessage(error instanceof Error ? error.message : 'Không chỉnh sửa được note bằng AI.');
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -208,8 +322,79 @@ export function TaskPreviewSlidePanel({
                 </div>
 
                 {hasNote ? (
-                  <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/50 sm:p-4">
-                    <MarkdownPreview content={note} />
+                  <div className="space-y-3">
+                    {onProgressChange && (
+                      <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-950 dark:bg-blue-950/20">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">Yêu cầu AI chỉnh sửa note</p>
+                            <p className="mt-1 text-xs leading-5 text-gray-600 dark:text-gray-300">Viết lại note trong panel theo yêu cầu của bạn.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setAiRewriteOpen((current) => !current)}
+                            className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-white px-3 text-xs font-semibold text-blue-700 transition hover:border-blue-400 dark:border-blue-900 dark:bg-gray-950 dark:text-blue-300 dark:hover:border-blue-700"
+                            aria-expanded={aiRewriteOpen}
+                          >
+                            <WandSparkles className="h-3.5 w-3.5" />
+                            {aiRewriteOpen ? 'Ẩn' : 'Mở yêu cầu'}
+                          </button>
+                        </div>
+                        {aiRewriteOpen && (
+                          <div className="mt-3 space-y-3">
+                            <textarea
+                              value={editInstruction}
+                              onChange={(event) => setEditInstruction(event.target.value)}
+                              rows={3}
+                              placeholder="Ví dụ: rút gọn note, bổ sung ví dụ thực tế, làm rõ trade-off, thêm checklist ôn tập..."
+                              className="w-full resize-y rounded-lg border border-blue-200 bg-white p-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-blue-900 dark:bg-gray-950 dark:text-white"
+                            />
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                              <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(event) => setConfirmPassword(event.target.value)}
+                                placeholder="Mật khẩu xác nhận AI"
+                                className="min-h-10 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-800 dark:bg-gray-950 dark:text-white"
+                              />
+                              <button
+                                type="button"
+                                onClick={handleAiRewriteNote}
+                                disabled={!canRewriteNote}
+                                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-800 dark:disabled:text-gray-500"
+                              >
+                                {aiRewriteStatus === 'rewriting' ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <WandSparkles className="h-4 w-4" />
+                                )}
+                                Chỉnh bằng AI
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {aiRewriteMessage && (
+                          <p
+                            className={cn(
+                              'mt-3 rounded-md border px-3 py-2 text-sm',
+                              aiRewriteStatus === 'saved'
+                                ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200'
+                                : aiRewriteStatus === 'error'
+                                  ? 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200'
+                                  : 'border-gray-200 bg-white text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300'
+                            )}
+                          >
+                            {aiRewriteStatus === 'rewriting' && (
+                              <Loader2 className="mr-1.5 inline h-3.5 w-3.5 animate-spin align-[-2px]" />
+                            )}
+                            {aiRewriteMessage}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/50 sm:p-4">
+                      <MarkdownPreview content={note} />
+                    </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center rounded-lg border border-dashed border-gray-300 bg-gray-50/50 py-12 dark:border-gray-700 dark:bg-gray-900/30">

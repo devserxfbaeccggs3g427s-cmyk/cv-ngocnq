@@ -129,6 +129,7 @@ bun typecheck      # Run TypeScript type checking
 - Skill roadmap progress seed/local-dev JSON sync and optional GitHub backup endpoints
 - Markdown preview AI comment bridge at `/api/ai/comment`, using OpenAI-compatible chat completion APIs with user-supplied per-request API keys
 - AI flashcard generator at `/api/ai/flashcards`, using server-side env variables `AI_FLASHCARD_API_KEY`, `AI_FLASHCARD_BASE_URL`, and `AI_FLASHCARD_MODEL`; it accepts existing card fronts for anti-duplication and powers the dedicated `/skill-roadmap/tasks/[taskId]/flashcards` screen
+- AI task-note endpoint at `/api/ai/task-note`, using server-side `AI_TASK_NOTE_*` env config. It supports automatic parent task note generation plus manual rewrite requests for existing task notes; manual rewrite requires `AI_ENV_CONFIRM_PASSWORD`.
 - Can be extended for additional functionality
 
 ### Browser Support
