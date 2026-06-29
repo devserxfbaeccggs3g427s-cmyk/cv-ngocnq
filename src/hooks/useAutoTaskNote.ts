@@ -141,9 +141,21 @@ export function useAutoTaskNote({
   }, [progress]);
 
   useEffect(() => {
-    setAutoNoteStatus('idle');
-    setAutoNoteMessage(null);
+    let cancelled = false;
+
+    queueMicrotask(() => {
+      if (cancelled) {
+        return;
+      }
+
+      setAutoNoteStatus('idle');
+      setAutoNoteMessage(null);
+    });
     autoNoteInFlightRef.current = false;
+
+    return () => {
+      cancelled = true;
+    };
   }, [task?.id]);
 
   useEffect(() => {

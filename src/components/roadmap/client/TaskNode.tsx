@@ -1,24 +1,18 @@
 'use client';
 
-import { CheckCircle2, ChevronDown, ChevronRight, Circle, Clock3, Copy, Eye, EyeOff, Loader2, Save, StickyNote } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronRight, Circle, Clock3, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { RoadmapTask, ProgressFile } from '@/types';
-import { flattenTasks, buildLearningPrompt, getTaskStudyState, levelStyles } from '@/lib/roadmap';
+import { flattenTasks, getTaskStudyState, levelStyles } from '@/lib/roadmap';
 
 interface TaskNodeProps {
   task: RoadmapTask;
   depth: number;
   progress: ProgressFile;
   expandedTaskIds: Set<string>;
-  visiblePromptIds: Set<string>;
-  copiedPromptId: string | null;
   savingTaskId: string | null;
   onToggle: (task: RoadmapTask) => void;
   onToggleExpanded: (taskId: string) => void;
-  onTogglePrompt: (taskId: string) => void;
-  onCopyPrompt: (task: RoadmapTask) => void;
-  onNoteChange: (taskId: string, note: string) => void;
-  onNoteBlur: (taskId: string, note: string) => void;
   onTitleClick?: (taskId: string) => void;
 }
 
@@ -30,12 +24,10 @@ function getTaskDepthStyle(depth: number): string {
 }
 
 export function TaskNode({
-  task, depth, progress, expandedTaskIds, visiblePromptIds,
-  copiedPromptId, savingTaskId, onToggle, onToggleExpanded,
-  onTogglePrompt, onCopyPrompt, onNoteChange, onNoteBlur, onTitleClick,
+  task, depth, progress, expandedTaskIds,
+  savingTaskId, onToggle, onToggleExpanded, onTitleClick,
 }: TaskNodeProps) {
   const item = progress.items[task.id];
-  const hasNote = Boolean(item?.note.trim());
   const saving = savingTaskId === task.id;
   const childTasks = task.children ?? [];
   const descendants = flattenTasks(childTasks);
@@ -56,9 +48,6 @@ export function TaskNode({
   const isChild = depth > 0;
   const isExpanded = expandedTaskIds.has(task.id);
   const depthStyle = getTaskDepthStyle(depth);
-  const prompt = buildLearningPrompt(task);
-  const isPromptVisible = visiblePromptIds.has(task.id);
-  const isPromptCopied = copiedPromptId === task.id;
 
   return (
     <div className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -155,67 +144,10 @@ export function TaskNode({
             <span className="font-semibold text-gray-800 dark:text-gray-100">Kết quả cần có:</span>{' '}
             {task.deliverable}
           </p>
-
-          {!hasChildren && (
-            <div className="mt-3 rounded-lg border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/50">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Prompt AI hỗ trợ học</div>
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">{prompt}</p>
-                </div>
-                <div className="flex shrink-0 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onTogglePrompt(task.id)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
-                    aria-expanded={isPromptVisible}
-                  >
-                    {isPromptVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                    {isPromptVisible ? 'Ẩn' : 'Xem'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onCopyPrompt(task)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-700 transition hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300"
-                  >
-                    <Copy className="h-3.5 w-3.5" />{isPromptCopied ? 'Đã copy' : 'Copy'}
-                  </button>
-                </div>
-              </div>
-              {isPromptVisible && (
-                <div className="mt-3 rounded-md bg-gray-50 p-3 text-sm leading-6 text-gray-700 dark:bg-gray-900 dark:text-gray-200">{prompt}</div>
-              )}
-            </div>
-          )}
-
-          {!hasChildren && effectivelyCompleted && (
-            <div className={cn('mt-4 rounded-lg border bg-white p-3 dark:bg-gray-950', hasNote ? 'border-emerald-200 dark:border-emerald-900/60' : 'border-red-300 dark:border-red-800')}>
-              <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
-                  <StickyNote className={cn('h-4 w-4', hasNote ? 'text-emerald-600' : 'text-red-600')} />
-                  Note sau khi đã thực hiện
-                </label>
-              </div>
-              <textarea
-                value={item?.note ?? ''}
-                onChange={(event) => onNoteChange(task.id, event.target.value)}
-                onBlur={(event) => onNoteBlur(task.id, event.target.value)}
-                rows={3}
-                placeholder="Ghi lại nội dung đã học, link tài liệu, lỗi gặp phải, checklist cần ôn lại..."
-                className={cn(
-                  'min-h-24 w-full resize-y rounded-lg border bg-white p-3 text-sm text-gray-900 outline-none transition focus:ring-2 dark:bg-gray-900 dark:text-white',
-                  hasNote ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20 dark:border-emerald-800' : 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
-                )}
-              />
-              <div className="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                <span>
-                  {item?.completedAt ? `Hoàn thành: ${new Date(item.completedAt).toLocaleString('vi-VN')}` : 'Đã đánh dấu hoàn thành'}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  {saving ? (<><Loader2 className="h-3.5 w-3.5 animate-spin" />Đang lưu</>) : (<><Save className="h-3.5 w-3.5" />Tự lưu khi rời ô note</>)}
-                </span>
-              </div>
-            </div>
+          {item?.completedAt && (
+            <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+              Hoàn thành: {new Date(item.completedAt).toLocaleString('vi-VN')}
+            </p>
           )}
         </div>
       </div>
@@ -229,15 +161,9 @@ export function TaskNode({
               depth={depth + 1}
               progress={progress}
               expandedTaskIds={expandedTaskIds}
-              visiblePromptIds={visiblePromptIds}
-              copiedPromptId={copiedPromptId}
               savingTaskId={savingTaskId}
               onToggle={onToggle}
               onToggleExpanded={onToggleExpanded}
-              onTogglePrompt={onTogglePrompt}
-              onCopyPrompt={onCopyPrompt}
-              onNoteChange={onNoteChange}
-              onNoteBlur={onNoteBlur}
               onTitleClick={onTitleClick}
             />
           ))}

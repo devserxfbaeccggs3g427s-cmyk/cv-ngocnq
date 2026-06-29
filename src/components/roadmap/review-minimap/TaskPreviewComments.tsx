@@ -62,7 +62,11 @@ export function TaskPreviewComments({ taskId, isOpen, onCommentCountChange }: Ta
       }
     }
 
-    setOpenCommentIds(new Set());
+    window.queueMicrotask(() => {
+      if (!cancelled) {
+        setOpenCommentIds(new Set());
+      }
+    });
     hydrateSeedComments();
 
     return () => {

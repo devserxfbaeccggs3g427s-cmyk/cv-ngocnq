@@ -104,13 +104,25 @@ export function TaskPreviewSlidePanel({
   }, []);
 
   useEffect(() => {
-    setIsCommentPanelOpen(false);
-    setCommentCount(0);
-    setAiRewriteOpen(false);
-    setEditInstruction('');
-    setConfirmPassword('');
-    setAiRewriteStatus('idle');
-    setAiRewriteMessage(null);
+    let cancelled = false;
+
+    window.queueMicrotask(() => {
+      if (cancelled) {
+        return;
+      }
+
+      setIsCommentPanelOpen(false);
+      setCommentCount(0);
+      setAiRewriteOpen(false);
+      setEditInstruction('');
+      setConfirmPassword('');
+      setAiRewriteStatus('idle');
+      setAiRewriteMessage(null);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [task?.id]);
 
   const handleCommentCountChange = useCallback((count: number) => {

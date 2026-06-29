@@ -9,15 +9,9 @@ interface RoadmapTrackCardProps {
   track: RoadmapTrack;
   progress: ProgressFile;
   expandedTaskIds: Set<string>;
-  visiblePromptIds: Set<string>;
-  copiedPromptId: string | null;
   savingTaskId: string | null;
   onToggle: (task: RoadmapTask) => void;
   onToggleExpanded: (taskId: string) => void;
-  onTogglePrompt: (taskId: string) => void;
-  onCopyPrompt: (task: RoadmapTask) => void;
-  onNoteChange: (taskId: string, note: string) => void;
-  onNoteBlur: (taskId: string, note: string) => void;
   onTitleClick?: (taskId: string) => void;
 }
 
@@ -25,15 +19,9 @@ export function RoadmapTrackCard({
   track,
   progress,
   expandedTaskIds,
-  visiblePromptIds,
-  copiedPromptId,
   savingTaskId,
   onToggle,
   onToggleExpanded,
-  onTogglePrompt,
-  onCopyPrompt,
-  onNoteChange,
-  onNoteBlur,
   onTitleClick,
 }: RoadmapTrackCardProps) {
   const trackTasks = track.modules.flatMap((module) => flattenTasks(module.tasks));
@@ -104,15 +92,9 @@ export function RoadmapTrackCard({
                   depth={0}
                   progress={progress}
                   expandedTaskIds={expandedTaskIds}
-                  visiblePromptIds={visiblePromptIds}
-                  copiedPromptId={copiedPromptId}
                   savingTaskId={savingTaskId}
                   onToggle={onToggle}
                   onToggleExpanded={onToggleExpanded}
-                  onTogglePrompt={onTogglePrompt}
-                  onCopyPrompt={onCopyPrompt}
-                  onNoteChange={onNoteChange}
-                  onNoteBlur={onNoteBlur}
                   onTitleClick={onTitleClick}
                 />
               ))}

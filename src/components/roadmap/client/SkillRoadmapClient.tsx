@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import type { Roadmap, RoadmapTask } from '@/types';
-import { buildLearningPrompt, getTaskContexts } from '@/lib/roadmap';
+import type { Roadmap } from '@/types';
+import { getTaskContexts } from '@/lib/roadmap';
 import { useProgress, useGithubBackup, useRoadmapFilters } from '@/hooks';
 import { TaskPreviewSlidePanel } from '@/components/roadmap/review-minimap/TaskPreviewSlidePanel';
 import { RoadmapHeroCard } from './RoadmapHeroCard';
@@ -21,10 +21,7 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     allTasks,
     savingTaskId,
     loadError,
-    setLoadError,
-    saveTask,
     toggleTask,
-    updateNote,
     resetProgress,
   } = useProgress(roadmap);
 
@@ -68,8 +65,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     backupProgressToGithub,
   } = useGithubBackup(progress, setProgress);
 
-  const [visiblePromptIds, setVisiblePromptIds] = useState<Set<string>>(new Set());
-  const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
   const [isResettingProgress, setIsResettingProgress] = useState(false);
   const [previewTaskId, setPreviewTaskId] = useState<string | null>(null);
 
@@ -83,29 +78,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
   const handleClosePreview = useCallback(() => {
     setPreviewTaskId(null);
   }, []);
-
-  function togglePrompt(taskId: string) {
-    setVisiblePromptIds((current) => {
-      const next = new Set(current);
-      if (next.has(taskId)) {
-        next.delete(taskId);
-      } else {
-        next.add(taskId);
-      }
-      return next;
-    });
-  }
-
-  async function copyPrompt(task: RoadmapTask) {
-    const prompt = buildLearningPrompt(task);
-    try {
-      await navigator.clipboard.writeText(prompt);
-      setCopiedPromptId(task.id);
-      window.setTimeout(() => setCopiedPromptId(null), 1400);
-    } catch {
-      setLoadError('Không copy được prompt tự động. Vui lòng mở prompt và copy thủ công.');
-    }
-  }
 
   async function resetProgressFromProject() {
     setIsResettingProgress(true);
@@ -170,17 +142,9 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
             track={track}
             progress={progress}
             expandedTaskIds={expandedTaskIds}
-            visiblePromptIds={visiblePromptIds}
-            copiedPromptId={copiedPromptId}
             savingTaskId={savingTaskId}
             onToggle={toggleTask}
             onToggleExpanded={toggleExpandedTask}
-            onTogglePrompt={togglePrompt}
-            onCopyPrompt={copyPrompt}
-            onNoteChange={updateNote}
-            onNoteBlur={(taskId, note) =>
-              saveTask(taskId, { completed: true, note })
-            }
             onTitleClick={handleTitleClick}
           />
         ))}
