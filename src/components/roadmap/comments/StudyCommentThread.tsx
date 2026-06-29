@@ -36,23 +36,23 @@ function sameContext(comment: StudyComment, context: StudyCommentContext, taskId
     return false;
   }
 
-  if (context.type === 'flashcard') {
-    if (comment.context.type !== 'flashcard') {
-      return false;
-    }
-
-    return comment.context.deckId === context.deckId && comment.context.cardId === context.cardId;
+  switch (context.type) {
+    case 'flashcard':
+      return (
+        comment.context.type === 'flashcard' &&
+        comment.context.deckId === context.deckId &&
+        comment.context.cardId === context.cardId
+      );
+    case 'quiz':
+      return (
+        comment.context.type === 'quiz' &&
+        comment.context.deckId === context.deckId &&
+        comment.context.questionId === context.questionId &&
+        comment.context.attemptId === context.attemptId
+      );
+    case 'ai-review':
+      return comment.context.type === 'ai-review' && comment.context.contextId === context.contextId;
   }
-
-  if (comment.context.type !== 'quiz') {
-    return false;
-  }
-
-  return (
-    comment.context.deckId === context.deckId &&
-    comment.context.questionId === context.questionId &&
-    comment.context.attemptId === context.attemptId
-  );
 }
 
 export function StudyCommentThread({
