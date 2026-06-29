@@ -31,6 +31,11 @@ const workspaceTaskId = 'ai-context-workspace';
 const maxContextChars = 18000;
 
 type AiReviewContext = Extract<StudyCommentContext, { type: 'ai-review' }>;
+type AiContextRequestItem = {
+  sourceType: 'markdown-file' | 'roadmap-task';
+  title: string;
+  content: string;
+};
 
 type AiReviewHistoryItem = {
   rootId: string;
@@ -161,21 +166,33 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
     [leafTasks, taskQuery]
   );
 
-  const contextContent = useMemo(() => {
-    const fileSections = selectedFiles.map((file) =>
-      [`# Markdown file: ${file.title}`, `- ID: ${file.id}`, '', file.content.trim() || 'File đang trống.'].join('\n')
-    );
-    const taskSections = selectedTasks.map((task) => summarizeTask(task, progress.items[task.id]?.note));
+  const contextItems = useMemo<AiContextRequestItem[]>(
+    () => [
+      ...selectedFiles.map((file) => ({
+        sourceType: 'markdown-file' as const,
+        title: file.title,
+        content: [`# Markdown file: ${file.title}`, `- ID: ${file.id}`, '', file.content.trim() || 'File đang trống.'].join('\n'),
+      })),
+      ...selectedTasks.map((task) => ({
+        sourceType: 'roadmap-task' as const,
+        title: task.title,
+        content: summarizeTask(task, progress.items[task.id]?.note),
+      })),
+    ],
+    [progress.items, selectedFiles, selectedTasks]
+  );
 
-    return truncateContext(
-      [
-        'Bạn đang trả lời dựa trên context học tập được người dùng chọn thủ công.',
-        '',
-        ...fileSections,
-        ...taskSections,
-      ].join('\n\n---\n\n')
-    );
-  }, [progress.items, selectedFiles, selectedTasks]);
+  const contextContent = useMemo(
+    () =>
+      truncateContext(
+        [
+          'Bạn đang trả lời dựa trên context học tập được người dùng chọn thủ công.',
+          '',
+          ...contextItems.map((item) => item.content),
+        ].join('\n\n---\n\n')
+      ),
+    [contextItems]
+  );
 
   const context = useMemo<AiReviewContext | null>(() => {
     if (selectedFiles.length === 0 && selectedTasks.length === 0) {
@@ -363,7 +380,13 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
 
     const baseContextComments = baseComments.filter((comment) => sameAiContext(comment, context));
     const aiComment: StudyComment = {
-      ...createComment({ parentId, author: 'ai', body: '', model: draft.model, provider: draft.provider }),
+      ...createComment({
+        parentId,
+        author: 'ai',
+        body: 'Đang tóm lược từng nguồn context trước khi trả lời...',
+        model: draft.model,
+        provider: draft.provider,
+      }),
       taskId: workspaceTaskId,
       context,
     };
@@ -382,6 +405,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
           model: draft.model,
           question,
           studyContext: contextContent,
+          studyContextItems: contextItems,
           threadContext: parentId
             ? summarizeThread(baseContextComments, parentId)
             : 'Chưa có lịch sử trao đổi trong thread context này.',
