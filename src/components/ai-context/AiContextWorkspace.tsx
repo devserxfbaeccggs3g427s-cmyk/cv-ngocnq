@@ -84,8 +84,12 @@ function taskMatchesQuery(task: TaskContext, query: string) {
     return true;
   }
 
-  return [task.title, task.id, task.trackTitle, task.moduleTitle, task.deliverable]
+  return [task.title, task.id, task.trackTitle, task.moduleTitle, task.deliverable, ...task.parentTasks.map((parent) => parent.title)]
     .some((value) => value.toLowerCase().includes(normalized));
+}
+
+function getTaskParentPath(task: TaskContext) {
+  return [task.trackTitle, task.moduleTitle, ...task.parentTasks.map((parent) => parent.title)];
 }
 
 function summarizeTask(task: TaskContext, note: string | undefined) {
@@ -187,6 +191,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
       ],
     };
   }, [selectedFileIds, selectedFiles, selectedTaskIds, selectedTasks]);
+  const activeContextId = context?.type === 'ai-review' ? context.contextId : 'empty';
 
   const comments = useMemo(
     () => allComments.filter((comment) => sameAiContext(comment, context)),
@@ -252,7 +257,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
 
   useEffect(() => {
     window.queueMicrotask(() => setVisibleCommentCount(getVisibleCommentBatchSize()));
-  }, [context?.type === 'ai-review' ? context.contextId : 'empty']);
+  }, [activeContextId]);
 
   function persist(nextComments: StudyComment[]) {
     setAllComments(nextComments);
@@ -643,30 +648,68 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                 />
               </div>
               <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
-                {filteredTasks.map((task) => (
-                  <label
-                    key={task.id}
-                    className={cn(
-                      'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition',
-                      selectedTaskIds.includes(task.id)
-                        ? 'border-emerald-300 bg-emerald-50 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/30'
-                        : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700 dark:hover:bg-gray-900'
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedTaskIds.includes(task.id)}
-                      onChange={() => toggleSelection(task.id, selectedTaskIds, setSelectedTaskIds)}
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    />
-                    <span className="min-w-0">
-                      <span className="block text-sm font-semibold leading-5 text-gray-900 dark:text-white">{task.title}</span>
-                      <span className="mt-1 line-clamp-2 block text-xs leading-5 text-gray-500 dark:text-gray-400">
-                        {task.trackTitle} · {task.moduleTitle}
-                      </span>
-                    </span>
-                  </label>
-                ))}
+                {filteredTasks.length === 0 ? (
+                  <p className="rounded-lg border border-dashed border-gray-200 px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                    Không có task phù hợp.
+                  </p>
+                ) : (
+                  filteredTasks.map((task) => {
+                    const parentPath = getTaskParentPath(task);
+
+                    return (
+                      <label
+                        key={task.id}
+                        className={cn(
+                          'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition',
+                          selectedTaskIds.includes(task.id)
+                            ? 'border-emerald-300 bg-emerald-50 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/30'
+                            : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700 dark:hover:bg-gray-900'
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedTaskIds.includes(task.id)}
+                          onChange={() => toggleSelection(task.id, selectedTaskIds, setSelectedTaskIds)}
+                          className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span className="min-w-0 flex-1" title={[...parentPath, task.title].join(' / ')}>
+                          <span className="flex flex-wrap items-center gap-1 text-[11px] font-semibold uppercase leading-5 text-gray-500 dark:text-gray-400">
+                            <span className="rounded-md bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">{task.trackTitle}</span>
+                            <span className="text-gray-300 dark:text-gray-600">/</span>
+                            <span className="rounded-md bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">{task.moduleTitle}</span>
+                          </span>
+
+                          {task.parentTasks.length > 0 && (
+                            <span className="mt-2 block rounded-md border-l-2 border-emerald-200 bg-white/70 px-2 py-1 text-xs leading-5 text-gray-600 dark:border-emerald-900/70 dark:bg-gray-900/70 dark:text-gray-300">
+                              <span className="font-semibold text-gray-700 dark:text-gray-200">Cha: </span>
+                              {task.parentTasks.map((parent, index) => (
+                                <span key={parent.id}>
+                                  {index > 0 && <span className="px-1 text-gray-400">/</span>}
+                                  <span>{parent.title}</span>
+                                </span>
+                              ))}
+                            </span>
+                          )}
+
+                          <span
+                            className="mt-2 block border-l-2 border-emerald-500 pl-2"
+                            style={{ marginLeft: `${Math.min(task.depth, 4) * 6}px` }}
+                          >
+                            <span className="block text-sm font-semibold leading-5 text-gray-900 dark:text-white">
+                              {task.title}
+                            </span>
+                            <span className="mt-1 flex flex-wrap items-center gap-2 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                              <span className="font-mono">{task.id}</span>
+                              <span>{task.level}</span>
+                              <span>{task.estimateHours}h</span>
+                              <span>{task.parentTasks.length} task cha</span>
+                            </span>
+                          </span>
+                        </span>
+                      </label>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
