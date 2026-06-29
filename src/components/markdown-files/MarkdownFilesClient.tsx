@@ -1,22 +1,28 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import {
   ChevronDown,
   ChevronRight,
   Eye,
+  EyeOff,
   FilePlus2,
   FileText,
   Folder,
   FolderPlus,
   Home,
+  ListTree,
+  PanelLeftClose,
+  PanelLeftOpen,
   Pencil,
   Save,
   Trash2,
+  X,
 } from 'lucide-react';
 import type { MarkdownEntry, MarkdownFile, MarkdownFolder } from '@/types';
 import { Card, CardContent } from '@/components/ui';
-import { MarkdownPreview } from '@/components/markdown';
+import { extractMarkdownHeadings, MarkdownPreview } from '@/components/markdown';
+import type { MarkdownHeading } from '@/components/markdown/MarkdownPreview';
 import {
   hasStoredMarkdownFiles,
   normalizeRoadmapBackup,
@@ -44,7 +50,9 @@ export function MarkdownFilesClient() {
   const [entries, setEntries] = useState<MarkdownEntry[]>([]);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
   const [expandedFolderIds, setExpandedFolderIds] = useState<Set<string>>(new Set());
-  const [mode, setMode] = useState<'edit' | 'preview'>('edit');
+  const [mode, setMode] = useState<'edit' | 'preview'>('preview');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [editPreviewVisible, setEditPreviewVisible] = useState(true);
 
   useEffect(() => {
     let ignore = false;
@@ -113,6 +121,15 @@ export function MarkdownFilesClient() {
     storeMarkdownFiles(nextEntries);
   }, []);
 
+  const selectEntry = useCallback((entryId: string | null) => {
+    setActiveEntryId(entryId);
+
+    const selectedEntry = entryId ? entries.find((entry) => entry.id === entryId) : null;
+    if (selectedEntry?.type === 'file') {
+      setMode('preview');
+    }
+  }, [entries]);
+
   function createFolder() {
     const now = new Date().toISOString();
     const parentId = selectedFolderId;
@@ -145,7 +162,7 @@ export function MarkdownFilesClient() {
 
     persistEntries([nextFile, ...entries]);
     setActiveEntryId(nextFile.id);
-    setMode('edit');
+    setMode('preview');
     if (parentId) {
       setExpandedFolderIds((current) => new Set([...current, parentId]));
     }
@@ -253,23 +270,53 @@ export function MarkdownFilesClient() {
 
       <Card>
         <CardContent className="p-5 md:p-6">
-          <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <div
+            className={cn(
+              'grid gap-4',
+              sidebarCollapsed
+                ? 'lg:grid-cols-[64px_minmax(0,1fr)]'
+                : 'lg:grid-cols-[320px_minmax(0,1fr)]'
+            )}
+          >
             <aside className="rounded-lg border border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-950/60">
+              <div className={cn('mb-2 flex items-center gap-2', sidebarCollapsed ? 'justify-center' : 'justify-between')}>
+                {!sidebarCollapsed && (
+                  <span className="px-2 text-xs font-bold uppercase tracking-wide text-gray-400">
+                    Tài liệu
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+                  title={sidebarCollapsed ? 'Mở cây thư mục' : 'Thu gọn cây thư mục'}
+                  aria-label={sidebarCollapsed ? 'Mở cây thư mục' : 'Thu gọn cây thư mục'}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-blue-800 dark:hover:text-blue-200"
+                >
+                  {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+                </button>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setActiveEntryId(null)}
+                onClick={() => selectEntry(null)}
                 className={cn(
-                  'mb-2 flex h-10 w-full items-center gap-2 rounded-md px-3 text-left text-sm font-semibold transition',
+                  'mb-2 flex h-10 w-full items-center rounded-md text-left text-sm font-semibold transition',
+                  sidebarCollapsed ? 'justify-center px-0' : 'gap-2 px-3',
                   !activeEntry
                     ? 'bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-100'
                     : 'text-gray-700 hover:bg-white hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white'
                 )}
+                title="Tất cả tài liệu"
               >
                 <Home className="h-4 w-4" />
-                Tất cả tài liệu
+                {!sidebarCollapsed && 'Tất cả tài liệu'}
               </button>
 
-              {entries.length === 0 ? (
+              {sidebarCollapsed ? (
+                <div className="flex min-h-44 items-center justify-center rounded-md border border-dashed border-gray-300 text-gray-400 dark:border-gray-700 dark:text-gray-500">
+                  <Folder className="h-5 w-5" />
+                </div>
+              ) : entries.length === 0 ? (
                 <div className="flex min-h-44 flex-col items-center justify-center rounded-md border border-dashed border-gray-300 px-4 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
                   <Folder className="mb-2 h-5 w-5" />
                   Chưa có thư mục hoặc file.
@@ -283,7 +330,7 @@ export function MarkdownFilesClient() {
                       level={0}
                       activeEntryId={activeEntry?.id ?? null}
                       expandedFolderIds={expandedFolderIds}
-                      onSelect={setActiveEntryId}
+                      onSelect={selectEntry}
                       onToggleFolder={toggleFolder}
                     />
                   ))}
@@ -296,7 +343,7 @@ export function MarkdownFilesClient() {
                 <div className="min-w-0 rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
                   <div className="border-b border-gray-200 p-4 dark:border-gray-800">
                     <div className="mb-3 flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                      <button type="button" onClick={() => setActiveEntryId(null)} className="font-semibold hover:text-blue-700 dark:hover:text-blue-300">
+                      <button type="button" onClick={() => selectEntry(null)} className="font-semibold hover:text-blue-700 dark:hover:text-blue-300">
                         Gốc
                       </button>
                       {activePath.map((entry) => (
@@ -304,7 +351,7 @@ export function MarkdownFilesClient() {
                           <ChevronRight className="h-3 w-3" />
                           <button
                             type="button"
-                            onClick={() => setActiveEntryId(entry.id)}
+                            onClick={() => selectEntry(entry.id)}
                             className={cn(
                               'max-w-40 truncate hover:text-blue-700 dark:hover:text-blue-300',
                               entry.id === activeEntry.id && 'font-semibold text-gray-800 dark:text-gray-100'
@@ -384,29 +431,17 @@ export function MarkdownFilesClient() {
                   </div>
 
                   {activeFile ? (
-                    <div className="grid min-h-[520px] gap-0 lg:grid-cols-2">
-                      <div className={cn('border-gray-200 dark:border-gray-800 lg:border-r', mode === 'preview' && 'hidden lg:block')}>
-                        <div className="flex h-11 items-center gap-2 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
-                          <Save className="h-4 w-4" />
-                          Editor
-                        </div>
-                        <textarea
-                          value={activeFile.content}
-                          onChange={(event) => updateActiveEntry({ content: event.target.value })}
-                          spellCheck={false}
-                          className="min-h-[476px] w-full resize-y border-0 bg-white p-4 font-mono text-sm leading-6 text-gray-900 outline-none dark:bg-gray-950 dark:text-gray-100"
+                    <div className="h-[calc(100dvh-18rem)] min-h-[520px] overflow-hidden">
+                      {mode === 'edit' ? (
+                        <MarkdownFileEditPanel
+                          file={activeFile}
+                          previewVisible={editPreviewVisible}
+                          onTogglePreview={() => setEditPreviewVisible((visible) => !visible)}
+                          onChangeContent={(content) => updateActiveEntry({ content })}
                         />
-                      </div>
-
-                      <div className={cn(mode === 'edit' && 'hidden lg:block')}>
-                        <div className="flex h-11 items-center gap-2 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
-                          <Eye className="h-4 w-4" />
-                          Preview
-                        </div>
-                        <div className="min-h-[476px] overflow-x-auto p-4">
-                          <MarkdownPreview content={activeFile.content} />
-                        </div>
-                      </div>
+                      ) : (
+                        <MarkdownFilePreviewPanel file={activeFile} />
+                      )}
                     </div>
                   ) : (
                     <FolderDetail
@@ -414,7 +449,7 @@ export function MarkdownFilesClient() {
                       childEntries={childEntries}
                       onCreateFolder={createFolder}
                       onCreateFile={createFile}
-                      onSelect={setActiveEntryId}
+                      onSelect={selectEntry}
                     />
                   )}
                 </div>
@@ -424,7 +459,7 @@ export function MarkdownFilesClient() {
                   childEntries={entries.filter((entry) => entry.parentId === null).sort(sortEntries)}
                   onCreateFolder={createFolder}
                   onCreateFile={createFile}
-                  onSelect={setActiveEntryId}
+                  onSelect={selectEntry}
                 />
               )}
             </section>
@@ -433,6 +468,305 @@ export function MarkdownFilesClient() {
       </Card>
     </div>
   );
+}
+
+function MarkdownFileEditPanel({
+  file,
+  previewVisible,
+  onTogglePreview,
+  onChangeContent,
+}: {
+  file: MarkdownFile;
+  previewVisible: boolean;
+  onTogglePreview: () => void;
+  onChangeContent: (content: string) => void;
+}) {
+  const editorRef = useRef<HTMLTextAreaElement | null>(null);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+  const scrollSyncSourceRef = useRef<'editor' | 'preview' | null>(null);
+  const scrollSyncFrameRef = useRef<number | null>(null);
+
+  function syncScroll(source: 'editor' | 'preview') {
+    if (scrollSyncSourceRef.current && scrollSyncSourceRef.current !== source) {
+      return;
+    }
+
+    const sourceElement = source === 'editor' ? editorRef.current : previewRef.current;
+    const targetElement = source === 'editor' ? previewRef.current : editorRef.current;
+
+    if (!sourceElement || !targetElement) {
+      return;
+    }
+
+    const sourceScrollable = Math.max(0, sourceElement.scrollHeight - sourceElement.clientHeight);
+    const targetScrollable = Math.max(0, targetElement.scrollHeight - targetElement.clientHeight);
+    const ratio = sourceScrollable === 0 ? 0 : sourceElement.scrollTop / sourceScrollable;
+
+    scrollSyncSourceRef.current = source;
+    targetElement.scrollTop = ratio * targetScrollable;
+
+    if (scrollSyncFrameRef.current) {
+      window.cancelAnimationFrame(scrollSyncFrameRef.current);
+    }
+
+    scrollSyncFrameRef.current = window.requestAnimationFrame(() => {
+      scrollSyncSourceRef.current = null;
+      scrollSyncFrameRef.current = null;
+    });
+  }
+
+  useEffect(() => {
+    return () => {
+      if (scrollSyncFrameRef.current) {
+        window.cancelAnimationFrame(scrollSyncFrameRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (previewVisible) {
+      window.requestAnimationFrame(() => syncScroll('editor'));
+    }
+  }, [previewVisible, file.content]);
+
+  return (
+    <div className={cn('grid h-full min-h-0 gap-0', previewVisible && 'lg:grid-cols-2')}>
+      <div className="flex h-full min-h-0 flex-col border-gray-200 dark:border-gray-800 lg:border-r">
+        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-4 dark:border-gray-800">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <Save className="h-4 w-4" />
+            Editor
+          </div>
+          <button
+            type="button"
+            onClick={onTogglePreview}
+            className="inline-flex h-8 items-center gap-2 rounded-md border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:text-gray-300 dark:hover:border-blue-800 dark:hover:text-blue-200"
+          >
+            {previewVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+            {previewVisible ? 'Ẩn preview' : 'Hiện preview'}
+          </button>
+        </div>
+        <textarea
+          ref={editorRef}
+          value={file.content}
+          onChange={(event) => onChangeContent(event.target.value)}
+          onScroll={() => syncScroll('editor')}
+          spellCheck={false}
+          className="min-h-0 flex-1 resize-none border-0 bg-white p-4 font-mono text-sm leading-6 text-gray-900 outline-none dark:bg-gray-950 dark:text-gray-100"
+        />
+      </div>
+
+      {previewVisible && (
+        <div className="hidden h-full min-h-0 min-w-0 flex-col lg:flex">
+          <div className="flex h-11 shrink-0 items-center gap-2 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
+            <Eye className="h-4 w-4" />
+            Preview
+          </div>
+          <div
+            ref={previewRef}
+            onScroll={() => syncScroll('preview')}
+            className="min-h-0 flex-1 overflow-auto overscroll-contain p-4"
+          >
+            <MarkdownPreview content={file.content} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MarkdownFilePreviewPanel({ file }: { file: MarkdownFile }) {
+  const markdownArticleRef = useRef<HTMLElement | null>(null);
+  const previewScrollRef = useRef<HTMLDivElement | null>(null);
+  const headings = useMemo(() => extractMarkdownHeadings(file.content), [file.content]);
+  const activeHeadingId = useActiveHeadingInScrollContainer(headings, previewScrollRef);
+
+  function scrollToHeading(headingId: string) {
+    const container = previewScrollRef.current;
+    const heading = document.getElementById(headingId);
+
+    if (!container || !heading) {
+      return;
+    }
+
+    const containerTop = container.getBoundingClientRect().top;
+    const headingTop = heading.getBoundingClientRect().top;
+
+    container.scrollTo({
+      top: container.scrollTop + headingTop - containerTop - 16,
+      behavior: 'smooth',
+    });
+  }
+
+  return (
+    <div className="relative h-full min-h-0 min-w-0">
+      <article ref={markdownArticleRef} className="flex h-full min-h-0 min-w-0 flex-col">
+        <div className="flex h-11 shrink-0 items-center gap-2 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <Eye className="h-4 w-4" />
+            Preview
+          </div>
+        </div>
+
+        <div ref={previewScrollRef} className="min-h-0 min-w-0 flex-1 overflow-auto p-4 sm:p-5">
+          <MarkdownPreview content={file.content} />
+        </div>
+      </article>
+
+      <MarkdownFileAppendixDrawer
+        headings={headings}
+        activeHeadingId={activeHeadingId}
+        onNavigate={scrollToHeading}
+      />
+    </div>
+  );
+}
+
+function MarkdownFileAppendixDrawer({
+  headings,
+  activeHeadingId,
+  onNavigate,
+}: {
+  headings: MarkdownHeading[];
+  activeHeadingId: string | null;
+  onNavigate: (headingId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  if (headings.length === 0) {
+    return null;
+  }
+
+  function handleNavigate(headingId: string) {
+    onNavigate(headingId);
+    setOpen(false);
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="absolute bottom-4 right-4 z-20 inline-flex items-center gap-2 rounded-full bg-gray-950 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-gray-950/20 transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+      >
+        <ListTree className="h-4 w-4" aria-hidden="true" />
+        Phụ lục
+        <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs dark:bg-gray-950/10">
+          {headings.length}
+        </span>
+      </button>
+
+      {open && (
+        <div className="absolute inset-0 z-30" role="dialog" aria-modal="true" aria-label="Phụ lục file Markdown">
+          <button
+            type="button"
+            className="absolute inset-0 bg-gray-950/45"
+            onClick={() => setOpen(false)}
+            aria-label="Đóng phụ lục"
+          />
+          <div className="absolute inset-x-0 bottom-0 max-h-[78%] rounded-t-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-950">
+            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+              <div>
+                <h3 className="font-semibold text-gray-950 dark:text-white">Phụ lục</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{headings.length} mục trong file</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+                aria-label="Đóng phụ lục"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+
+            <ol className="max-h-[calc(78vh-4.5rem)] space-y-1 overflow-y-auto overscroll-contain p-4">
+              {headings.map((heading) => (
+                <li key={heading.id} style={{ paddingLeft: `${Math.max(0, heading.level - 1) * 0.65}rem` }}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavigate(heading.id)}
+                    aria-current={activeHeadingId === heading.id ? 'location' : undefined}
+                    className={cn(
+                      'block w-full rounded-md border-l-2 border-transparent px-2 py-1.5 text-left text-sm font-medium leading-snug text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white',
+                      activeHeadingId === heading.id &&
+                        'border-blue-500 bg-blue-50 text-blue-700 shadow-sm dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200'
+                    )}
+                  >
+                    {heading.text}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function useActiveHeadingInScrollContainer(
+  headings: MarkdownHeading[],
+  containerRef: RefObject<HTMLElement | null>
+) {
+  const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
+  const headingIds = useMemo(() => headings.map((heading) => heading.id).join('|'), [headings]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container || headings.length === 0) {
+      setActiveHeadingId(null);
+      return;
+    }
+
+    let frameId = 0;
+
+    const updateActiveHeading = () => {
+      frameId = 0;
+
+      const containerTop = container.getBoundingClientRect().top;
+      const headingElements = headings
+        .map((heading) => document.getElementById(heading.id))
+        .filter((element): element is HTMLElement => Boolean(element));
+
+      if (!headingElements.length) {
+        setActiveHeadingId(null);
+        return;
+      }
+
+      const current =
+        headingElements.findLast((element) => element.getBoundingClientRect().top - containerTop <= 32) ??
+        headingElements[0];
+
+      setActiveHeadingId(current.id);
+    };
+
+    const requestUpdate = () => {
+      if (frameId) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(updateActiveHeading);
+    };
+
+    requestUpdate();
+    container.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      container.removeEventListener('scroll', requestUpdate);
+      window.removeEventListener('resize', requestUpdate);
+    };
+  }, [containerRef, headingIds, headings]);
+
+  return activeHeadingId;
 }
 
 function TreeItem({
