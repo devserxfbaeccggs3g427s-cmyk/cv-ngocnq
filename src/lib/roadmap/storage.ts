@@ -243,7 +243,8 @@ export function readStoredStudyComments(): StudyComment[] {
               comment.context &&
               (comment.context.type === 'flashcard' ||
                 comment.context.type === 'quiz' ||
-                comment.context.type === 'ai-review')
+                comment.context.type === 'ai-review' ||
+                comment.context.type === 'image-analysis')
           )
         )
       : [];

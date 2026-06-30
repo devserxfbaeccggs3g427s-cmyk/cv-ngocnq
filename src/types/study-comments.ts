@@ -2,6 +2,16 @@ export type StudyCommentContext =
   | { type: 'flashcard'; deckId: string; cardId: string }
   | { type: 'quiz'; deckId: string; questionId: string; attemptId: string }
   | {
+      type: 'image-analysis';
+      analysisId: string;
+      analysisKind: string;
+      prompt: string;
+      imageCount: number;
+      imageNames: string[];
+      model?: string;
+      provider?: string;
+    }
+  | {
       type: 'ai-review';
       contextId: string;
       sources: Array<

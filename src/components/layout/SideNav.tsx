@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { User, Briefcase, Code, GraduationCap, Folder, Mail, ListChecks, FileText, BotMessageSquare } from 'lucide-react';
+import { User, Briefcase, Code, GraduationCap, Folder, Mail, ListChecks, FileText, BotMessageSquare, FileImage } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/skill-roadmap', label: 'Ôn tập', icon: ListChecks },
   { href: '/markdown-files', label: 'Markdown', icon: FileText },
   { href: '/ai-context', label: 'AI Context', icon: BotMessageSquare },
+  { href: '/ai-image-analysis', label: 'AI Ảnh', icon: FileImage },
 ];
 
 interface SideNavProps {

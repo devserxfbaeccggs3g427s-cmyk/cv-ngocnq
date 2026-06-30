@@ -128,6 +128,7 @@ bun typecheck      # Run TypeScript type checking
 - PDF/text/JSON export endpoints
 - Skill roadmap progress seed/local-dev JSON sync and optional GitHub backup endpoints
 - Markdown preview AI comment bridge at `/api/ai/comment`, using OpenAI-compatible chat completion APIs with user-supplied per-request API keys
+- Image analysis bridge at `/api/ai/image-analysis`, using OpenAI-compatible multimodal chat completion APIs with uploaded image data URLs plus a focused analysis type/prompt. It reuses the shared provider helpers and supports env-backed Kilo credentials guarded by `AI_ENV_CONFIRM_PASSWORD`. Saved image-analysis results, generated titles, and comments are stored as `studyComments` with context type `image-analysis`, so the current version-6 backup payload preserves them without adding a separate storage key.
 - AI flashcard generator at `/api/ai/flashcards`, using server-side env variables `AI_FLASHCARD_API_KEY`, `AI_FLASHCARD_BASE_URL`, and `AI_FLASHCARD_MODEL`; it accepts existing card fronts for anti-duplication and powers the dedicated `/skill-roadmap/tasks/[taskId]/flashcards` screen
 - AI task-note endpoint at `/api/ai/task-note`, using server-side `AI_TASK_NOTE_*` env config. It supports automatic parent task note generation plus manual rewrite requests for existing task notes; manual rewrite requires `AI_ENV_CONFIRM_PASSWORD`.
 - Can be extended for additional functionality
@@ -169,6 +170,7 @@ bun typecheck      # Run TypeScript type checking
 
 - None required for base template
 - Add as needed for analytics, form integrations
+- Image analysis can use `AI_IMAGE_ANALYSIS_MODEL` as the server-side default vision/multimodal model. Kilo image analysis reuses `AI_COMMENT_KILO_API_KEY` and `AI_COMMENT_KILO_BASE_URL`; env-backed requests require `AI_ENV_CONFIRM_PASSWORD`.
 - Task flashcard generation requires `AI_FLASHCARD_API_KEY`, `AI_FLASHCARD_BASE_URL`, and `AI_FLASHCARD_MODEL`; values stay server-side and are not exposed to browser JavaScript. Flashcard storage uses `skill-roadmap-flashcards:v1` as `Record<taskId, FlashcardDeck[]>`, with normalizers still accepting the older `Record<taskId, FlashcardDeck>` shape.
 
 ## Development Workflow

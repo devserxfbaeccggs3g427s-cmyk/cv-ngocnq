@@ -16,11 +16,13 @@ src/
 │   ├── skill-roadmap/tasks/[taskId]/flashcards/page.tsx # Dedicated AI flashcard screen for a roadmap task
 │   ├── skill-roadmap/tasks/[taskId]/quiz/page.tsx # Dedicated AI quiz screen for a roadmap task
 │   ├── ai-context/page.tsx # Independent AI context workspace for Markdown files and roadmap tasks
+│   ├── ai-image-analysis/page.tsx # Independent AI vision workspace for uploaded images
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
 │       ├── ai/models/route.ts # OpenAI-compatible model discovery for comment AI
 │       ├── ai/comment/route.ts # OpenAI-compatible comment AI proxy
+│       ├── ai/image-analysis/route.ts # OpenAI-compatible multimodal image analysis proxy
 │       ├── ai/quizzes/route.ts # OpenAI-compatible roadmap task quiz generator
 │       ├── skill-roadmap/progress/route.ts # Roadmap progress seed + local-dev JSON sync
 │       ├── skill-roadmap/backup/github/route.ts # Optional browser progress GitHub backup
@@ -54,6 +56,8 @@ src/
 │   │   └── SkillRoadmapNotePreview.tsx
 │   ├── markdown/           # Reusable Markdown rendering components
 │   │   └── MarkdownPreview.tsx
+│   ├── ai-image-analysis/  # Upload + prompt UI for multimodal image analysis
+│   │   └── AiImageAnalysisWorkspace.tsx
 │   ├── contact/            # Contact components
 │   │   ├── ContactForm.tsx
 │   │   ├── ContactSection.tsx
@@ -218,7 +222,7 @@ page.tsx
 - React Hook Form for contact form
 - Local `useState` for filters, toggles
 - No global state needed (data is static)
-- Skill roadmap learning artifacts use browser `localStorage`: progress, note comments, flashcard decks, quiz packs, and study comments. Flashcards and quizzes are stored as multiple decks/packs per task with backup/import compatibility for older single-deck flashcard data. Standalone Markdown document storage is a separate `/markdown-files` feature using `markdown-files:v1`; it stores folder/file nodes with `parentId` hierarchy and is still included in the versioned backup payload so export/import can preserve all local learning data. The independent `/ai-context` workspace reuses `skill-roadmap-study-comments:v1` with an `ai-review` context type, so AI Q&A history for selected Markdown files/tasks is backed up through the existing `studyComments` payload.
+- Skill roadmap learning artifacts use browser `localStorage`: progress, note comments, flashcard decks, quiz packs, and study comments. Flashcards and quizzes are stored as multiple decks/packs per task with backup/import compatibility for older single-deck flashcard data. Standalone Markdown document storage is a separate `/markdown-files` feature using `markdown-files:v1`; it stores folder/file nodes with `parentId` hierarchy and is still included in the versioned backup payload so export/import can preserve all local learning data. The independent `/ai-context` workspace reuses `skill-roadmap-study-comments:v1` with an `ai-review` context type. `/ai-image-analysis` uses the same storage with an `image-analysis` context type for saved analysis results, AI-generated titles, and result comments/follow-up AI replies, so both features are backed up through the existing `studyComments` payload.
 
 ## File Naming Conventions
 

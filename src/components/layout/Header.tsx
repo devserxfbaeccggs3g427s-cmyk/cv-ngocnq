@@ -17,6 +17,7 @@ const navItems = [
   { href: '/skill-roadmap', label: 'Ôn tập' },
   { href: '/markdown-files', label: 'Markdown' },
   { href: '/ai-context', label: 'AI Context' },
+  { href: '/ai-image-analysis', label: 'AI Ảnh' },
 ];
 
 export function Header() {

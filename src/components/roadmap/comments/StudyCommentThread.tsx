@@ -52,6 +52,8 @@ function sameContext(comment: StudyComment, context: StudyCommentContext, taskId
       );
     case 'ai-review':
       return comment.context.type === 'ai-review' && comment.context.contextId === context.contextId;
+    case 'image-analysis':
+      return comment.context.type === 'image-analysis' && comment.context.analysisId === context.analysisId;
   }
 }
 

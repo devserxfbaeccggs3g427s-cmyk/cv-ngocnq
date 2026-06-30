@@ -263,6 +263,35 @@ function normalizeStudyCommentContext(input: unknown): StudyCommentContext | nul
     };
   }
 
+  if (input.type === 'image-analysis') {
+    if (
+      typeof input.analysisId !== 'string' ||
+      typeof input.analysisKind !== 'string' ||
+      typeof input.prompt !== 'string' ||
+      typeof input.imageCount !== 'number' ||
+      !Array.isArray(input.imageNames)
+    ) {
+      return null;
+    }
+
+    const imageNames = input.imageNames.filter((name): name is string => typeof name === 'string');
+
+    if (imageNames.length !== input.imageNames.length) {
+      return null;
+    }
+
+    return {
+      type: 'image-analysis',
+      analysisId: input.analysisId,
+      analysisKind: input.analysisKind,
+      prompt: input.prompt,
+      imageCount: input.imageCount,
+      imageNames,
+      model: typeof input.model === 'string' ? input.model : undefined,
+      provider: typeof input.provider === 'string' ? input.provider : undefined,
+    };
+  }
+
   return null;
 }
 
