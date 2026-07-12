@@ -14,40 +14,40 @@ export function ContactSection() {
 
   return (
     <Section id="contact" title="Liên hệ" subtitle="Sẵn sàng trao đổi về cơ hội và dự án phù hợp">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Contact Info */}
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="h-full">
             <CardContent className="p-6 space-y-6">
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+              <h3 className="text-lg font-bold tracking-tight text-slate-950 dark:text-white">
                 Thông tin liên hệ
               </h3>
 
               <div className="space-y-4">
                 {contactInfo.map(({ icon: Icon, label, value, href }) => (
-                  <div key={label} className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div key={label} className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-white/55 p-3 dark:border-slate-800 dark:bg-slate-950/35">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
                       {href ? (
                         <a
                           href={href}
-                          className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          className="font-semibold text-slate-950 transition-colors hover:text-blue-700 dark:text-white dark:hover:text-blue-300"
                         >
                           {value}
                         </a>
                       ) : (
-                        <p className="font-medium text-gray-900 dark:text-white">{value}</p>
+                        <p className="font-semibold text-slate-950 dark:text-white">{value}</p>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              <div className="border-t border-slate-200/70 pt-4 dark:border-slate-800">
+                <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
                   Kết nối với tôi
                 </p>
                 <SocialLinks size="md" />
@@ -60,7 +60,7 @@ export function ContactSection() {
         <div className="lg:col-span-2">
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-6">
+              <h3 className="mb-6 text-lg font-bold tracking-tight text-slate-950 dark:text-white">
                 Gửi lời nhắn
               </h3>
               <ContactForm />

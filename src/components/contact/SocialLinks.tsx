@@ -45,7 +45,7 @@ export function SocialLinks({ size = 'md', className }: SocialLinksProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              'flex items-center justify-center rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-colors',
+              'flex items-center justify-center rounded-2xl border border-slate-200/70 bg-white/70 text-slate-600 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400 dark:hover:border-blue-800 dark:hover:bg-blue-950/30 dark:hover:text-blue-300',
               sizes[size]
             )}
             aria-label={label}

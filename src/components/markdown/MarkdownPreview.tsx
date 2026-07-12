@@ -92,8 +92,17 @@ function resolveRenderedTheme(): 'light' | 'dark' {
     return 'light';
   }
 
-  const background = getComputedStyle(body).backgroundColor || getComputedStyle(root).backgroundColor;
-  const luminance = getRgbLuminance(background);
+  const rootStyles = getComputedStyle(root);
+  const bodyStyles = getComputedStyle(body);
+  const themeBackground = rootStyles.getPropertyValue('--background') || bodyStyles.getPropertyValue('--background');
+  const variableLuminance = getCssColorLuminance(themeBackground);
+
+  if (variableLuminance !== null) {
+    return variableLuminance < 128 ? 'dark' : 'light';
+  }
+
+  const background = bodyStyles.backgroundColor || rootStyles.backgroundColor;
+  const luminance = getCssColorLuminance(background);
 
   if (luminance !== null) {
     return luminance < 128 ? 'dark' : 'light';
@@ -102,16 +111,34 @@ function resolveRenderedTheme(): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-function getRgbLuminance(color: string) {
-  const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+function getCssColorLuminance(color: string) {
+  const normalizedColor = color.trim();
 
-  if (!match) {
+  if (!normalizedColor) {
     return null;
   }
 
-  const red = Number(match[1]);
-  const green = Number(match[2]);
-  const blue = Number(match[3]);
+  const hslMatch = normalizedColor.match(/^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/);
+
+  if (hslMatch) {
+    return (Number(hslMatch[3]) / 100) * 255;
+  }
+
+  const rgbMatch = normalizedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([.\d]+))?/);
+
+  if (!rgbMatch) {
+    return null;
+  }
+
+  const alpha = rgbMatch[4] === undefined ? 1 : Number(rgbMatch[4]);
+
+  if (alpha === 0) {
+    return null;
+  }
+
+  const red = Number(rgbMatch[1]);
+  const green = Number(rgbMatch[2]);
+  const blue = Number(rgbMatch[3]);
 
   return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 }

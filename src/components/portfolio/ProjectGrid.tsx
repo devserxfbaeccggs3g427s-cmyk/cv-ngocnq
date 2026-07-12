@@ -33,7 +33,7 @@ export function ProjectGrid({ showFilters = true, limit, featuredOnly = false }:
         />
       )}
 
-      <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div layout className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {displayProjects.map((project) => (
             <motion.div
@@ -51,8 +51,8 @@ export function ProjectGrid({ showFilters = true, limit, featuredOnly = false }:
       </motion.div>
 
       {displayProjects.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">
+        <div className="glass-panel rounded-3xl py-12 text-center">
+          <p className="text-slate-500 dark:text-slate-400">
             Không tìm thấy dự án trong nhóm này.
           </p>
         </div>

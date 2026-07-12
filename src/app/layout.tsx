@@ -25,10 +25,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" className="scroll-smooth">
-      <body className={`${inter.className} bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased`}>
+      <body className={`${inter.className} overflow-x-hidden bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-100`}>
         <Header />
         <SideNav />
-        <main className="pt-16">{children}</main>
+        <main className="relative pt-16">{children}</main>
         <Footer />
       </body>
     </html>

@@ -3,10 +3,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { Roadmap } from '@/types';
 import { getTaskContexts } from '@/lib/roadmap';
-import { useProgress, useGithubBackup, useRoadmapFilters } from '@/hooks';
+import { useProgress, useRoadmapFilters } from '@/hooks';
 import { TaskPreviewSlidePanel } from '@/components/roadmap/review-minimap/TaskPreviewSlidePanel';
 import { RoadmapHeroCard } from './RoadmapHeroCard';
-import { RoadmapBackupPanel } from './RoadmapBackupPanel';
 import { RoadmapFilterBar } from './RoadmapFilterBar';
 import { RoadmapTrackCard } from './RoadmapTrackCard';
 
@@ -22,7 +21,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     savingTaskId,
     loadError,
     toggleTask,
-    resetProgress,
   } = useProgress(roadmap);
 
   const {
@@ -42,30 +40,6 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     collapseAllTasks,
   } = useRoadmapFilters(roadmap, progress);
 
-  const {
-    backupMessage,
-    backupError,
-    githubCommitUrl,
-    isExporting,
-    isImporting,
-    isBackingUpGithub,
-    hasServerGithubToken,
-    githubToken,
-    setGithubToken,
-    githubRepoUrl,
-    setGithubRepoUrl,
-    githubBranch,
-    setGithubBranch,
-    githubBackupPath,
-    setGithubBackupPath,
-    githubCommitMessage,
-    setGithubCommitMessage,
-    exportProgress,
-    importProgress,
-    backupProgressToGithub,
-  } = useGithubBackup(progress, setProgress);
-
-  const [isResettingProgress, setIsResettingProgress] = useState(false);
   const [previewTaskId, setPreviewTaskId] = useState<string | null>(null);
 
   const taskContextMap = useMemo(() => getTaskContexts(roadmap.tracks), [roadmap.tracks]);
@@ -79,45 +53,9 @@ export function SkillRoadmapClient({ roadmap }: SkillRoadmapClientProps) {
     setPreviewTaskId(null);
   }, []);
 
-  async function resetProgressFromProject() {
-    setIsResettingProgress(true);
-    try {
-      await resetProgress();
-    } catch {
-      // resetProgress handles the confirm dialog internally
-    } finally {
-      setIsResettingProgress(false);
-    }
-  }
-
   return (
     <div className="space-y-8">
       <RoadmapHeroCard roadmap={roadmap} progress={progress} allTasks={allTasks} />
-
-      <RoadmapBackupPanel
-        backupMessage={backupMessage}
-        backupError={backupError}
-        githubCommitUrl={githubCommitUrl}
-        isExporting={isExporting}
-        isImporting={isImporting}
-        isBackingUpGithub={isBackingUpGithub}
-        hasServerGithubToken={hasServerGithubToken}
-        githubToken={githubToken}
-        setGithubToken={setGithubToken}
-        githubRepoUrl={githubRepoUrl}
-        setGithubRepoUrl={setGithubRepoUrl}
-        githubBranch={githubBranch}
-        setGithubBranch={setGithubBranch}
-        githubBackupPath={githubBackupPath}
-        setGithubBackupPath={setGithubBackupPath}
-        githubCommitMessage={githubCommitMessage}
-        setGithubCommitMessage={setGithubCommitMessage}
-        exportProgress={exportProgress}
-        importProgress={importProgress}
-        backupProgressToGithub={backupProgressToGithub}
-        isResettingProgress={isResettingProgress}
-        onResetProgress={resetProgressFromProject}
-      />
 
       <RoadmapFilterBar
         roadmap={roadmap}

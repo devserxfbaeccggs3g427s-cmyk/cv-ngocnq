@@ -3,8 +3,8 @@ import { AiImageAnalysisWorkspace } from '@/components/ai-image-analysis/AiImage
 import { Container } from '@/components/ui';
 
 export const metadata: Metadata = {
-  title: 'AI Image Analysis | Skill Roadmap',
-  description: 'Upload hinh anh va yeu cau AI phan tich theo loai du lieu can tap trung.',
+  title: 'AI Image Analysis | Workspace Nguyễn Quang Ngọc',
+  description: 'Upload hình ảnh và yêu cầu AI phân tích theo loại dữ liệu cần tập trung.',
 };
 
 export default function AiImageAnalysisPage() {

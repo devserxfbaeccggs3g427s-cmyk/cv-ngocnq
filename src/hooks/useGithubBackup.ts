@@ -218,7 +218,7 @@ async function commitBackupDirectlyToGithub({
   const normalizedBackupPath = normalizeGithubPath(backupPath);
 
   if (!normalizedBackupPath || normalizedBackupPath.endsWith('/')) {
-    throw new Error('File path phải là đường dẫn tới file, ví dụ backups/skill-roadmap-progress.json');
+    throw new Error('File path phải là đường dẫn tới file, ví dụ backups/workspace-backup.json');
   }
 
   await fetchGithubJson(`https://api.github.com/repos/${repo.owner}/${repo.repo}`, {
@@ -330,8 +330,8 @@ export function useGithubBackup(
   const [githubToken, setGithubToken] = useState('');
   const [githubRepoUrl, setGithubRepoUrl] = useState('');
   const [githubBranch, setGithubBranch] = useState('main');
-  const [githubBackupPath, setGithubBackupPath] = useState('backups/skill-roadmap-progress.json');
-  const [githubCommitMessage, setGithubCommitMessage] = useState('Backup skill roadmap progress');
+  const [githubBackupPath, setGithubBackupPath] = useState('backups/workspace-backup.json');
+  const [githubCommitMessage, setGithubCommitMessage] = useState('Backup workspace data');
 
   useEffect(() => {
     let ignore = false;
@@ -394,12 +394,12 @@ export function useGithubBackup(
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = `skill-roadmap-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.download = `workspace-backup-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setBackupMessage('Đã export file backup JSON gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm, lịch sử AI Context độc lập và file Markdown tự tạo.');
+      setBackupMessage('Đã export file backup JSON gồm tiến độ roadmap, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm, lịch sử AI Context, lịch sử AI Image Analysis và file Markdown tự tạo.');
     } catch (error) {
       setBackupError(error instanceof Error ? error.message : 'Không export được backup.');
     } finally {
@@ -457,7 +457,7 @@ export function useGithubBackup(
           });
         }
 
-        setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ học tập, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm, lịch sử AI Context độc lập và file Markdown tự tạo.');
+        setBackupMessage('Đã import backup JSON vào trình duyệt, bao gồm tiến độ roadmap, note comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm, lịch sử AI Context, lịch sử AI Image Analysis và file Markdown tự tạo.');
       } catch (error) {
         setBackupError(
           error instanceof Error ? error.message : 'Không import được file backup.'

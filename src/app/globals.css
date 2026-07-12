@@ -2,32 +2,36 @@
 
 /* Custom CSS Variables */
 :root {
-  --primary: 220 92% 50%;
+  --primary: 222 89% 55%;
   --primary-foreground: 0 0% 100%;
-  --background: 0 0% 98%;
-  --foreground: 220 15% 10%;
+  --background: 222 33% 98%;
+  --foreground: 222 47% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 220 15% 10%;
-  --muted: 220 10% 95%;
-  --muted-foreground: 220 10% 45%;
-  --border: 220 15% 90%;
-  --ring: 220 92% 50%;
+  --card-foreground: 222 47% 11%;
+  --muted: 214 32% 92%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214 32% 88%;
+  --ring: 222 89% 55%;
+  --accent: 263 85% 62%;
+  --accent-2: 187 92% 46%;
   --edge-root: #60a5fa;
   --edge-track: #a78bfa;
   --edge-module: #94a3b8;
 }
 
 .dark {
-  --primary: 220 92% 60%;
+  --primary: 217 91% 60%;
   --primary-foreground: 0 0% 100%;
-  --background: 220 20% 5%;
-  --foreground: 220 5% 95%;
-  --card: 220 15% 10%;
-  --card-foreground: 220 5% 95%;
-  --muted: 220 15% 15%;
-  --muted-foreground: 220 5% 60%;
-  --border: 220 15% 20%;
-  --ring: 220 92% 60%;
+  --background: 222 47% 5%;
+  --foreground: 214 32% 91%;
+  --card: 222 47% 8%;
+  --card-foreground: 214 32% 91%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --border: 217 33% 18%;
+  --ring: 217 91% 60%;
+  --accent: 263 85% 68%;
+  --accent-2: 187 92% 52%;
   --edge-root: #3b82f6;
   --edge-track: #7c3aed;
   --edge-module: #475569;
@@ -35,16 +39,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary: 220 92% 60%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-    --background: 220 20% 5%;
-    --foreground: 220 5% 95%;
-    --card: 220 15% 10%;
-    --card-foreground: 220 5% 95%;
-    --muted: 220 15% 15%;
-    --muted-foreground: 220 5% 60%;
-    --border: 220 15% 20%;
-    --ring: 220 92% 60%;
+    --background: 222 47% 5%;
+    --foreground: 214 32% 91%;
+    --card: 222 47% 8%;
+    --card-foreground: 214 32% 91%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --border: 217 33% 18%;
+    --ring: 217 91% 60%;
+    --accent: 263 85% 68%;
+    --accent-2: 187 92% 52%;
     --edge-root: #3b82f6;
     --edge-track: #7c3aed;
     --edge-module: #475569;
@@ -53,14 +59,40 @@
 
 /* Base Styles */
 html {
+  color-scheme: light;
   max-width: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
 body {
   font-feature-settings: "rlig" 1, "calt" 1;
   max-width: 100%;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, hsl(var(--primary) / 0.16), transparent 32rem),
+    radial-gradient(circle at top right, hsl(var(--accent) / 0.14), transparent 30rem),
+    linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+  color: hsl(var(--foreground));
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(hsl(var(--foreground) / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--foreground) / 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
 }
 
 /* Selection */
@@ -229,7 +261,7 @@ a {
 
 /* Gradient Text */
 .gradient-text {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(280 70% 50%) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 54%, hsl(var(--accent-2)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -237,12 +269,85 @@ a {
 
 /* Card Hover Effect */
 .card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 24px 80px -48px hsl(var(--primary) / 0.65);
+}
+
+.glass-panel {
+  border: 1px solid hsl(var(--border) / 0.78);
+  background:
+    linear-gradient(135deg, hsl(var(--card) / 0.92), hsl(var(--card) / 0.74)),
+    linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--accent) / 0.05));
+  box-shadow: 0 24px 80px -56px hsl(var(--foreground) / 0.5);
+  backdrop-filter: blur(18px);
+}
+
+.premium-ring {
+  position: relative;
+}
+
+.premium-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.55), hsl(var(--accent) / 0.35), transparent 65%);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.input-modern {
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card) / 0.82);
+  color: hsl(var(--foreground));
+  box-shadow: 0 1px 0 hsl(var(--foreground) / 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.input-modern:focus {
+  border-color: hsl(var(--primary) / 0.7);
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.14);
+  outline: none;
+}
+
+.task-node-row {
+  padding-left: calc(1rem + min(var(--task-depth, 0), 3) * 0.72rem);
+}
+
+@media (min-width: 768px) {
+  .task-node-row {
+    padding-left: calc(1.25rem + var(--task-depth, 0) * 1.5rem);
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    scroll-padding-top: 4.5rem;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, hsl(var(--primary) / 0.14), transparent 22rem),
+      linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+  }
+
+  body::before {
+    background-size: 36px 36px;
+    opacity: 0.65;
+  }
+
+  .glass-panel {
+    backdrop-filter: blur(14px);
+    box-shadow: 0 18px 60px -48px hsl(var(--foreground) / 0.55);
+  }
 }
 
 /* ================================

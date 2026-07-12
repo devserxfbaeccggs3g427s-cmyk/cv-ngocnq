@@ -497,54 +497,54 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex flex-col gap-4 border-b border-gray-200 p-4 dark:border-gray-800 md:flex-row md:items-center md:justify-between md:p-5">
+      <div className="premium-ring overflow-hidden rounded-[2rem] border border-white/60 bg-white/70 shadow-[0_28px_100px_-70px_rgba(37,99,235,0.9)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/72">
+        <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between md:p-6">
           <div className="min-w-0">
             <Link
-              href="/skill-roadmap"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-gray-950 dark:text-gray-300 dark:hover:text-white"
+              href="/workspace"
+              className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
-              Roadmap
+              Workspace
             </Link>
-            <h1 className="mt-3 flex items-center gap-2 text-2xl font-bold text-gray-950 dark:text-white md:text-3xl">
-              <BotMessageSquare className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+            <h1 className="mt-3 flex items-center gap-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-4xl">
+              <BotMessageSquare className="h-8 w-8 text-blue-700 dark:text-blue-300" />
               AI Context
             </h1>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 sm:min-w-[360px]">
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[11px] font-semibold uppercase text-gray-500 dark:text-gray-400">Nguồn</p>
-              <p className="mt-1 text-lg font-bold text-gray-950 dark:text-white">{selectedSourceCount}</p>
+          <div className="grid w-full grid-cols-3 gap-2 md:w-auto sm:min-w-[360px]">
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Nguồn</p>
+              <p className="mt-1 text-lg font-black text-slate-950 dark:text-white">{selectedSourceCount}</p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[11px] font-semibold uppercase text-gray-500 dark:text-gray-400">Markdown</p>
-              <p className="mt-1 text-lg font-bold text-blue-700 dark:text-blue-300">{selectedFiles.length}</p>
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Markdown</p>
+              <p className="mt-1 text-lg font-black text-blue-700 dark:text-blue-300">{selectedFiles.length}</p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[11px] font-semibold uppercase text-gray-500 dark:text-gray-400">Task</p>
-              <p className="mt-1 text-lg font-bold text-emerald-700 dark:text-emerald-300">{selectedTasks.length}</p>
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Task</p>
+              <p className="mt-1 text-lg font-black text-emerald-700 dark:text-emerald-300">{selectedTasks.length}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(320px,420px)_minmax(0,1fr)]">
-        <aside className="space-y-4 xl:sticky xl:top-20 xl:self-start">
-          <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+      <div className="grid gap-4 lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)] xl:gap-5 xl:grid-cols-[minmax(320px,420px)_minmax(0,1fr)]">
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <div className="glass-panel overflow-hidden rounded-3xl">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <MessageSquareText className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                <h2 className="text-sm font-bold text-gray-950 dark:text-white">Lịch sử</h2>
+                <h2 className="text-sm font-bold text-slate-950 dark:text-white">Lịch sử</h2>
               </div>
-              <span className="rounded-md bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-200">
+              <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-200">
                 {historyItems.length}
               </span>
             </div>
-            <div className="max-h-64 space-y-2 overflow-y-auto p-3">
+            <div className="max-h-48 space-y-2 overflow-y-auto p-3 lg:max-h-64">
               {historyItems.length === 0 ? (
-                <p className="rounded-lg border border-dashed border-gray-200 px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                <p className="rounded-2xl border border-dashed border-slate-200 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
                   Chưa có lịch sử AI Context.
                 </p>
               ) : (
@@ -558,10 +558,10 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                     <div
                       key={item.rootId}
                       className={cn(
-                        'group flex items-start gap-2 rounded-lg border p-2 transition',
+                        'group flex items-start gap-2 rounded-2xl border p-2 transition',
                         isActive
                           ? 'border-indigo-300 bg-indigo-50 shadow-sm dark:border-indigo-800 dark:bg-indigo-950/30'
-                          : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700 dark:hover:bg-gray-900'
+                          : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
                       )}
                     >
                       <button
@@ -569,21 +569,21 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                         onClick={() => restoreHistoryContext(item)}
                         className="min-w-0 flex-1 p-1 text-left"
                       >
-                        <span className="block truncate text-sm font-semibold text-gray-950 dark:text-white">
+                        <span className="block truncate text-sm font-semibold text-slate-950 dark:text-white">
                           {item.title}
                         </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                           <span>{item.summary}</span>
                           <span>{Math.max(item.commentCount - 1, 0)} trả lời</span>
                         </span>
-                        <span className="mt-2 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                        <span className="mt-2 block text-xs font-medium text-slate-500 dark:text-slate-400">
                           {formatHistoryDate(item.latestAt)}
                         </span>
                       </button>
                       <button
                         type="button"
                         onClick={() => deleteHistoryThread(item.rootId)}
-                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-red-500 opacity-100 transition hover:bg-red-50 hover:text-red-700 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200 md:opacity-0 md:group-hover:opacity-100"
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-red-500 opacity-100 transition hover:bg-red-50 hover:text-red-700 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200 md:opacity-0 md:group-hover:opacity-100"
                         aria-label="Xóa lịch sử chat"
                         title="Xóa lịch sử chat"
                       >
@@ -596,29 +596,29 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+          <div className="glass-panel overflow-hidden rounded-3xl">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-sm font-bold text-gray-950 dark:text-white">File Markdown</h2>
+                <h2 className="text-sm font-bold text-slate-950 dark:text-white">File Markdown</h2>
               </div>
-              <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700 dark:bg-blue-950/50 dark:text-blue-200">
+              <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-200">
                 {selectedFiles.length}/{markdownFiles.length}
               </span>
             </div>
             <div className="space-y-3 p-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   value={fileQuery}
                   onChange={(event) => setFileQuery(event.target.value)}
                   placeholder="Tìm file Markdown"
-                  className="min-h-10 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                  className="input-modern min-h-10 w-full rounded-2xl py-2 pl-9 pr-3 text-sm"
                 />
               </div>
-              <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+              <div className="max-h-56 space-y-2 overflow-y-auto pr-1 lg:max-h-72">
                 {filteredFiles.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-gray-200 px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                  <p className="rounded-2xl border border-dashed border-slate-200 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
                     Không có file phù hợp.
                   </p>
                 ) : (
@@ -626,10 +626,10 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                     <label
                       key={file.id}
                       className={cn(
-                        'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition',
+                        'flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition',
                         selectedFileIds.includes(file.id)
                           ? 'border-blue-300 bg-blue-50 shadow-sm dark:border-blue-800 dark:bg-blue-950/30'
-                          : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700 dark:hover:bg-gray-900'
+                          : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
                       )}
                     >
                       <input
@@ -639,8 +639,8 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                         className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-gray-900 dark:text-white">{file.title}</span>
-                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-gray-500 dark:text-gray-400">
+                        <span className="block truncate text-sm font-semibold text-slate-900 dark:text-white">{file.title}</span>
+                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-slate-500 dark:text-slate-400">
                           {file.content.trim() || 'File đang trống.'}
                         </span>
                       </span>
@@ -651,29 +651,29 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+          <div className="glass-panel overflow-hidden rounded-3xl">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <ListChecks className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-gray-950 dark:text-white">Task ôn tập</h2>
+                <h2 className="text-sm font-bold text-slate-950 dark:text-white">Task ôn tập</h2>
               </div>
-              <span className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
                 {selectedTasks.length}/{leafTasks.length}
               </span>
             </div>
             <div className="space-y-3 p-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   value={taskQuery}
                   onChange={(event) => setTaskQuery(event.target.value)}
                   placeholder="Tìm task"
-                  className="min-h-10 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                  className="input-modern min-h-10 w-full rounded-2xl py-2 pl-9 pr-3 text-sm"
                 />
               </div>
-              <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
+              <div className="max-h-60 space-y-2 overflow-y-auto pr-1 lg:max-h-80">
                 {filteredTasks.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-gray-200 px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                  <p className="rounded-2xl border border-dashed border-slate-200 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
                     Không có task phù hợp.
                   </p>
                 ) : (
@@ -684,10 +684,10 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                       <label
                         key={task.id}
                         className={cn(
-                          'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition',
+                          'flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition',
                           selectedTaskIds.includes(task.id)
                             ? 'border-emerald-300 bg-emerald-50 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/30'
-                            : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700 dark:hover:bg-gray-900'
+                            : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
                         )}
                       >
                         <input
@@ -739,13 +739,13 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
           </div>
         </aside>
 
-        <section className="min-w-0 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
+        <section className="glass-panel min-w-0 overflow-hidden rounded-3xl">
+          <div className="flex flex-col gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800 md:flex-row md:items-center md:justify-between">
             <div className="flex min-w-0 items-center gap-2">
               <MessageSquareText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <div className="min-w-0">
-                <h2 className="text-sm font-bold text-gray-950 dark:text-white">Hội thoại</h2>
-                <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                <h2 className="text-sm font-bold text-slate-950 dark:text-white">Hội thoại</h2>
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                   {context ? `${commentTree.length} thread trong context đang mở` : 'Chọn lịch sử hoặc nguồn context'}
                 </p>
               </div>
@@ -758,7 +758,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                   setSelectedTaskIds([]);
                   setSelectedHistoryRootId(null);
                 }}
-                className="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-950 dark:hover:text-white"
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white/60 px-3 text-sm font-bold text-slate-600 transition hover:bg-white hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-950 dark:hover:text-white"
               >
                 <Trash2 className="h-4 w-4" />
                 Bỏ chọn
@@ -766,10 +766,10 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             )}
           </div>
 
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
 
         {!context && (
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
             Chọn ít nhất một nguồn context trước khi hỏi AI.
           </div>
         )}
@@ -779,7 +779,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             {context.sources.map((source) => (
               <span
                 key={`${source.type}:${source.id}`}
-                className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                className="rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-bold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200"
               >
                 {source.type === 'markdown-file' ? 'Markdown' : 'Task'} · {source.title}
               </span>
@@ -796,14 +796,14 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
         />
 
         {error && (
-          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+          <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
             {error}
           </div>
         )}
 
         <div className="mt-4 space-y-3">
           {commentTree.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
+            <p className="rounded-2xl border border-dashed border-slate-200 bg-white/50 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-400">
               Chưa có lịch sử cho context này.
             </p>
           ) : (
@@ -858,7 +858,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             <button
               type="button"
               onClick={() => setVisibleCommentCount((current) => current + visibleStep)}
-              className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+              className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white/70 px-3 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
             >
               Xem thêm {Math.min(visibleStep, hiddenCommentCount)} comment cũ hơn
             </button>

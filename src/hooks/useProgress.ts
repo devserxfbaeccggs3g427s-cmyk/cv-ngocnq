@@ -193,7 +193,7 @@ export function useProgress(roadmap: Roadmap) {
 
   const resetProgress = useCallback(async () => {
     const confirmed = window.confirm(
-      'Bạn chắc chắn muốn xoá tiến độ, comment, flashcard, trắc nghiệm, comment trong flashcard/trắc nghiệm và file Markdown tự tạo đang lưu trong trình duyệt, sau đó tải lại dữ liệu mới nhất từ file JSON trong project?'
+      'Bạn chắc chắn muốn xoá toàn bộ dữ liệu Workspace đang lưu trong trình duyệt, gồm tiến độ roadmap, comment, flashcard, trắc nghiệm, AI Context, AI Image Analysis và file Markdown tự tạo, sau đó tải lại dữ liệu mới nhất từ file JSON trong project?'
     );
 
     if (!confirmed) {

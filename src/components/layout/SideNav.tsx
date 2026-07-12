@@ -1,21 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { User, Briefcase, Code, GraduationCap, Folder, Mail, ListChecks, FileText, BotMessageSquare, FileImage } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { portfolioNavItems, workspaceFeatures } from '@/config';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { href: '/#about', label: 'Giới thiệu', icon: User },
-  { href: '/#experience', label: 'Kinh nghiệm', icon: Briefcase },
-  { href: '/#skills', label: 'Kỹ năng', icon: Code },
-  { href: '/#education', label: 'Học vấn', icon: GraduationCap },
-  { href: '/#contact', label: 'Liên hệ', icon: Mail },
-  { href: '/portfolio', label: 'Dự án', icon: Folder },
-  { href: '/skill-roadmap', label: 'Ôn tập', icon: ListChecks },
-  { href: '/markdown-files', label: 'Markdown', icon: FileText },
-  { href: '/ai-context', label: 'AI Context', icon: BotMessageSquare },
-  { href: '/ai-image-analysis', label: 'AI Ảnh', icon: FileImage },
-];
 
 interface SideNavProps {
   className?: string;
@@ -25,19 +13,47 @@ export function SideNav({ className }: SideNavProps) {
   return (
     <nav
       className={cn(
-        'fixed left-0 top-1/2 -translate-y-1/2 z-30 hidden lg:block',
+        'fixed left-3 top-1/2 z-30 hidden -translate-y-1/2 lg:block',
         className
       )}
     >
-      <ul className="flex flex-col gap-1 p-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-r-xl shadow-lg border border-l-0 border-gray-200 dark:border-gray-800">
-        {navItems.map(({ href, label, icon: Icon }) => (
+      <ul className="glass-panel flex flex-col gap-1 rounded-3xl p-2 shadow-xl">
+        {portfolioNavItems.map(({ href, label, icon: Icon }) => (
           <li key={href}>
             <Link
               href={href}
-              className="flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition-colors group relative"
+              className="group relative flex items-center gap-3 rounded-2xl p-3 text-slate-500 transition-all hover:bg-white/75 hover:text-blue-700 hover:shadow-sm dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-blue-300"
             >
               <Icon className="w-5 h-5" />
-              <span className="absolute left-full ml-2 px-3 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap">
+              <span className="invisible absolute left-full ml-3 whitespace-nowrap rounded-xl bg-slate-950 px-3 py-1.5 text-sm font-semibold text-white opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-x-1 group-hover:opacity-100 dark:bg-white dark:text-slate-950">
+                {label}
+              </span>
+            </Link>
+          </li>
+        ))}
+
+        <li aria-hidden="true" className="my-1 h-px bg-slate-200/80 dark:bg-slate-800/90" />
+
+        <li>
+          <Link
+            href="/workspace"
+            className="group relative flex items-center gap-3 rounded-2xl p-3 text-blue-600 transition-all hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm dark:text-blue-300 dark:hover:bg-blue-950/40 dark:hover:text-blue-200"
+          >
+            <Sparkles className="w-5 h-5" />
+            <span className="invisible absolute left-full ml-3 whitespace-nowrap rounded-xl bg-slate-950 px-3 py-1.5 text-sm font-semibold text-white opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-x-1 group-hover:opacity-100 dark:bg-white dark:text-slate-950">
+              Workspace
+            </span>
+          </Link>
+        </li>
+
+        {workspaceFeatures.map(({ href, label, icon: Icon }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className="group relative flex items-center gap-3 rounded-2xl p-3 text-slate-500 transition-all hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm dark:text-slate-400 dark:hover:bg-blue-950/40 dark:hover:text-blue-300"
+            >
+              <Icon className="w-5 h-5" />
+              <span className="invisible absolute left-full ml-3 whitespace-nowrap rounded-xl bg-slate-950 px-3 py-1.5 text-sm font-semibold text-white opacity-0 shadow-xl transition-all group-hover:visible group-hover:translate-x-1 group-hover:opacity-100 dark:bg-white dark:text-slate-950">
                 {label}
               </span>
             </Link>

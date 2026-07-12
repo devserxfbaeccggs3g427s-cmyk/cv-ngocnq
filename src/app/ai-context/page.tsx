@@ -4,7 +4,7 @@ import { Container } from '@/components/ui';
 import roadmap from '@/data/skill-roadmap.json';
 
 export const metadata: Metadata = {
-  title: 'AI Context | Skill Roadmap',
+  title: 'AI Context | Workspace Nguyễn Quang Ngọc',
   description: 'Màn hỏi AI độc lập với context từ file Markdown tự tạo hoặc task ôn tập đã chọn.',
 };
 

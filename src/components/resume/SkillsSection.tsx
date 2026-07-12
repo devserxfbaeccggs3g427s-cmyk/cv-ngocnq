@@ -69,7 +69,7 @@ function SkillChip({ skill }: { skill: Skill }) {
   return (
     <motion.div 
       whileHover={{ scale: 1.02 }}
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${colors.bg} ${colors.border} transition-shadow hover:shadow-sm`}
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md ${colors.bg} ${colors.border}`}
     >
       <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
       <span className="font-medium text-gray-800 dark:text-gray-200 text-sm">
@@ -97,13 +97,13 @@ function SkillCategory({ category, index }: { category: string; index: number })
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
       viewport={{ once: true }}
-      className="space-y-3"
+      className="glass-panel rounded-3xl p-5"
     >
-      <div className="flex items-center gap-2">
-        <span className="text-gray-500 dark:text-gray-400">
+      <div className="mb-4 flex items-center gap-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950">
           {categoryIcons[category]}
         </span>
-        <h3 className="font-semibold text-gray-900 dark:text-white text-sm uppercase tracking-wide">
+        <h3 className="text-sm font-bold uppercase tracking-[0.16em] text-slate-800 dark:text-slate-100">
           {getSkillCategoryLabel(category)}
         </h3>
       </div>
@@ -120,26 +120,26 @@ export function SkillsSection() {
   return (
     <Section id="skills" title="Kỹ năng chuyên môn" subtitle="Công nghệ, công cụ và năng lực kỹ thuật đã sử dụng trong dự án thực tế">
       {/* Legend */}
-      <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-800">
+      <div className="mb-8 rounded-3xl border border-slate-200/80 bg-white/65 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/65">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-          <span className="text-gray-500 dark:text-gray-400 font-medium">Mức độ:</span>
+          <span className="font-bold text-slate-500 dark:text-slate-400">Mức độ:</span>
           <span className="inline-flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span className="text-gray-600 dark:text-gray-400">Chuyên sâu (90%+)</span>
+            <span className="text-slate-600 dark:text-slate-300">Chuyên sâu (90%+)</span>
           </span>
           <span className="inline-flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <span className="text-gray-600 dark:text-gray-400">Thành thạo (75%+)</span>
+            <span className="text-slate-600 dark:text-slate-300">Thành thạo (75%+)</span>
           </span>
           <span className="inline-flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span className="text-gray-600 dark:text-gray-400">Khá (60%+)</span>
+            <span className="text-slate-600 dark:text-slate-300">Khá (60%+)</span>
           </span>
         </div>
       </div>
 
       {/* Skills Grid - 3 columns on large screens, 2 on medium, 1 on small */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {skillCategories.map((category, index) => (
           <SkillCategory key={category} category={category} index={index} />
         ))}

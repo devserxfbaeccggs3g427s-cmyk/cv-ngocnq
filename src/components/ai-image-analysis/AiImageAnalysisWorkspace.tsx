@@ -779,42 +779,42 @@ export function AiImageAnalysisWorkspace() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex flex-col gap-4 border-b border-gray-200 p-4 dark:border-gray-800 md:flex-row md:items-center md:justify-between md:p-5">
+      <div className="premium-ring overflow-hidden rounded-[2rem] border border-white/60 bg-white/70 shadow-[0_28px_100px_-70px_rgba(37,99,235,0.9)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/72">
+        <div className="flex flex-col gap-4 border-b border-slate-200/70 p-4 dark:border-slate-800 md:flex-row md:items-center md:justify-between md:p-6">
           <div className="min-w-0">
             <Link
-              href="/ai-context"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-gray-950 dark:text-gray-300 dark:hover:text-white"
+              href="/workspace"
+              className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
             >
               <ArrowLeft className="h-4 w-4" />
-              AI Context
+              Workspace
             </Link>
-            <h1 className="mt-3 flex items-center gap-2 text-2xl font-bold text-gray-950 dark:text-white md:text-3xl">
-              <FileImage className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+            <h1 className="mt-3 flex items-center gap-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-4xl">
+              <FileImage className="h-8 w-8 text-blue-700 dark:text-blue-300" />
               AI Image Analysis
             </h1>
             <button
               type="button"
               onClick={startNewAnalysis}
-              className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/70 dark:bg-blue-950/30 dark:text-blue-200 dark:hover:border-blue-800 dark:hover:bg-blue-950/50"
+              className="mt-3 inline-flex h-9 items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 text-sm font-bold text-blue-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 dark:border-blue-900/70 dark:bg-blue-950/30 dark:text-blue-200 dark:hover:border-blue-800 dark:hover:bg-blue-950/50"
             >
               <ImagePlus className="h-4 w-4" aria-hidden="true" />
               Phân tích mới
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 sm:min-w-[360px]">
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[11px] font-semibold uppercase text-gray-500 dark:text-gray-400">Ảnh</p>
-              <p className="mt-1 text-lg font-bold text-gray-950 dark:text-white">{displayedImageCount}</p>
+          <div className="grid w-full grid-cols-3 gap-2 md:w-auto sm:min-w-[360px]">
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Ảnh</p>
+              <p className="mt-1 text-lg font-black text-slate-950 dark:text-white">{displayedImageCount}</p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[11px] font-semibold uppercase text-gray-500 dark:text-gray-400">Loại</p>
-              <p className="mt-1 truncate text-sm font-bold text-blue-700 dark:text-blue-300">{selectedAnalysisOption.label}</p>
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Loại</p>
+              <p className="mt-1 truncate text-sm font-black text-blue-700 dark:text-blue-300">{selectedAnalysisOption.label}</p>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
-              <p className="text-[11px] font-semibold uppercase text-gray-500 dark:text-gray-400">Model</p>
-              <p className="mt-1 truncate text-sm font-bold text-emerald-700 dark:text-emerald-300">
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Model</p>
+              <p className="mt-1 truncate text-sm font-black text-emerald-700 dark:text-emerald-300">
                 {draft.model || 'Chưa chọn'}
               </p>
             </div>
@@ -830,9 +830,9 @@ export function AiImageAnalysisWorkspace() {
                 void addFiles(event.dataTransfer.files);
               }}
               className={cn(
-                'flex min-h-48 flex-col items-center justify-center rounded-lg border border-dashed p-5 text-center transition',
+                'flex min-h-48 flex-col items-center justify-center rounded-3xl border border-dashed p-5 text-center transition',
                 images.length >= maxImages
-                  ? 'border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-500'
+                  ? 'border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-500'
                   : 'border-blue-200 bg-blue-50/60 text-blue-800 hover:border-blue-300 dark:border-blue-900/70 dark:bg-blue-950/20 dark:text-blue-200'
               )}
             >
@@ -840,7 +840,7 @@ export function AiImageAnalysisWorkspace() {
               <p className="mt-3 text-sm font-bold">
                 {images.length >= maxImages ? 'Đã đủ 4 ảnh' : 'Upload ảnh phân tích'}
               </p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 PNG, JPG hoặc WebP, tối đa 8MB mỗi ảnh
               </p>
               <input
@@ -855,7 +855,7 @@ export function AiImageAnalysisWorkspace() {
                 type="button"
                 onClick={() => inputRef.current?.click()}
                 disabled={images.length >= maxImages || isReadingFiles}
-                className="mt-4 inline-flex h-9 items-center gap-2 rounded-lg bg-gray-950 px-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+                className="mt-4 inline-flex h-9 items-center gap-2 rounded-full bg-slate-950 px-3.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
               >
                 {isReadingFiles ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
                 {isReadingFiles ? 'Đang đọc ảnh...' : 'Chọn ảnh'}
@@ -867,9 +867,9 @@ export function AiImageAnalysisWorkspace() {
                 {images.map((image) => (
                   <div
                     key={image.id}
-                    className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950"
+                    className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm dark:border-slate-800 dark:bg-slate-950"
                   >
-                    <div className="aspect-video bg-gray-100 dark:bg-gray-900">
+                    <div className="aspect-video bg-slate-100 dark:bg-slate-900">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={image.dataUrl}
@@ -879,13 +879,13 @@ export function AiImageAnalysisWorkspace() {
                     </div>
                     <div className="flex items-center justify-between gap-2 px-3 py-2">
                       <div className="min-w-0">
-                        <p className="truncate text-xs font-semibold text-gray-900 dark:text-white">{image.name}</p>
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400">{formatFileSize(image.size)}</p>
+                        <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{image.name}</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">{formatFileSize(image.size)}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => setImages((current) => current.filter((item) => item.id !== image.id))}
-                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-red-500 transition hover:bg-red-50 hover:text-red-700 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200"
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-red-500 transition hover:bg-red-50 hover:text-red-700 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200"
                         aria-label="Xóa ảnh"
                         title="Xóa ảnh"
                       >
@@ -897,29 +897,29 @@ export function AiImageAnalysisWorkspace() {
               </div>
             )}
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
-              <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-3 py-2 dark:border-gray-800">
+            <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/60 dark:border-slate-800 dark:bg-slate-950/45">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-3 py-2 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <MessageSquareText className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                  <h2 className="text-sm font-bold text-gray-950 dark:text-white">Lịch sử phân tích</h2>
+                  <h2 className="text-sm font-bold text-slate-950 dark:text-white">Lịch sử phân tích</h2>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={startNewAnalysis}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2.5 text-xs font-bold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-blue-800 dark:hover:text-blue-300"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-blue-800 dark:hover:text-blue-300"
                   >
                     <ImagePlus className="h-3.5 w-3.5" aria-hidden="true" />
                     Mới
                   </button>
-                  <span className="rounded-md bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-200">
+                  <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-200">
                     {historyItems.length}
                   </span>
                 </div>
               </div>
-              <div className="max-h-80 space-y-2 overflow-y-auto p-3">
+              <div className="max-h-60 space-y-2 overflow-y-auto p-3 lg:max-h-80">
                 {historyItems.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-gray-200 bg-white px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+                  <p className="rounded-2xl border border-dashed border-slate-200 bg-white px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                     Chưa có lịch sử phân tích ảnh.
                   </p>
                 ) : (
@@ -930,10 +930,10 @@ export function AiImageAnalysisWorkspace() {
                       <div
                         key={item.rootId}
                         className={cn(
-                          'group flex items-start gap-2 rounded-lg border p-2 transition',
+                          'group flex items-start gap-2 rounded-2xl border p-2 transition',
                           isActive
                             ? 'border-indigo-300 bg-indigo-50 shadow-sm dark:border-indigo-800 dark:bg-indigo-950/30'
-                            : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700'
+                            : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
                         )}
                       >
                         <button
@@ -972,13 +972,13 @@ export function AiImageAnalysisWorkspace() {
 
           <section className="min-w-0 space-y-4">
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Loại phân tích
               </span>
               <select
                 value={analysisKind}
                 onChange={(event) => updateAnalysisKind(event.target.value as AnalysisKind)}
-                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 outline-none transition focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+                className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm font-medium"
               >
                 {analysisOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -999,40 +999,40 @@ export function AiImageAnalysisWorkspace() {
                     type="button"
                     onClick={() => updateAnalysisKind(option.value)}
                     className={cn(
-                      'min-h-20 rounded-lg border p-3 text-left transition',
+                      'min-h-20 rounded-2xl border p-3 text-left transition',
                       active
                         ? 'border-blue-300 bg-blue-50 shadow-sm dark:border-blue-800 dark:bg-blue-950/30'
-                        : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-700 dark:hover:bg-gray-900'
+                        : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
                     )}
                   >
-                    <span className="flex items-center gap-2 text-sm font-bold text-gray-950 dark:text-white">
-                      <Icon className={cn('h-4 w-4', active ? 'text-blue-600 dark:text-blue-300' : 'text-gray-500')} />
+                    <span className="flex items-center gap-2 text-sm font-bold text-slate-950 dark:text-white">
+                      <Icon className={cn('h-4 w-4', active ? 'text-blue-600 dark:text-blue-300' : 'text-slate-500')} />
                       {option.label}
                     </span>
-                    <span className="mt-1 block text-xs leading-5 text-gray-500 dark:text-gray-400">{option.detail}</span>
+                    <span className="mt-1 block text-xs leading-5 text-slate-500 dark:text-slate-400">{option.detail}</span>
                   </button>
                 );
               })}
             </div>
 
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Prompt
               </span>
               <textarea
                 value={prompt}
                 onChange={(event) => setPrompt(event.target.value)}
                 rows={5}
-                className="mt-1 w-full resize-y rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm leading-6 text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+                className="input-modern mt-1 w-full resize-y rounded-2xl px-3 py-2 text-sm leading-6 placeholder:text-slate-400"
                 placeholder="Nhập yêu cầu phân tích ảnh..."
               />
             </label>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900/70">
+            <div className="rounded-3xl border border-slate-200/80 bg-white/60 p-3 dark:border-slate-800 dark:bg-slate-900/50">
               <div className="mb-2">
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-gray-950 dark:text-white">Cấu hình AI</p>
-                  <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-sm font-bold text-slate-950 dark:text-white">Cấu hình AI</p>
+                  <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                     Chọn model có hỗ trợ vision/multimodal
                   </p>
                 </div>
@@ -1060,7 +1060,7 @@ export function AiImageAnalysisWorkspace() {
                 type="button"
                 onClick={submitAnalysis}
                 disabled={!canSubmit}
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-gray-950 px-4 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 px-4 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 {isSubmitting ? 'Đang phân tích...' : 'Phân tích ảnh'}
@@ -1071,19 +1071,19 @@ export function AiImageAnalysisWorkspace() {
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
           {error}
         </div>
       )}
 
-      <section className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+      <section className="glass-panel overflow-hidden rounded-3xl">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
           <div className="flex min-w-0 items-center gap-2">
             <BotMessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <div className="min-w-0">
-              <h2 className="text-sm font-bold text-gray-950 dark:text-white">Kết quả phân tích</h2>
+              <h2 className="text-sm font-bold text-slate-950 dark:text-white">Kết quả phân tích</h2>
               {activeAnalysisRoot?.context.type === 'image-analysis' && (
-                <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                   {getAnalysisLabel(activeAnalysisRoot.context.analysisKind)} · {activeAnalysisRoot.context.imageCount} ảnh
                 </p>
               )}
@@ -1092,48 +1092,48 @@ export function AiImageAnalysisWorkspace() {
         </div>
         <div className="min-h-60 p-4">
           {isSubmitting ? (
-            <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50 text-sm font-medium text-gray-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
+            <div className="flex min-h-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/50 text-sm font-medium text-slate-500 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-400">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Đang chờ AI phân tích ảnh...
             </div>
           ) : activeAnalysisRoot ? (
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-950/40 dark:text-blue-200">
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200">
                   {activeAnalysisRoot.title || 'Phân tích ảnh'}
                 </span>
                 {activeAnalysisRoot.model && (
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
                     {activeAnalysisRoot.model}
                   </span>
                 )}
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                <span className="rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200">
                   {formatHistoryDate(activeAnalysisRoot.createdAt)}
                 </span>
               </div>
               {activeAnalysisRoot.context.type === 'image-analysis' && (
-                <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm leading-6 text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">
-                  <span className="font-semibold text-gray-950 dark:text-white">Prompt: </span>
+                <div className="rounded-2xl border border-slate-200 bg-white/55 px-3 py-2 text-sm leading-6 text-slate-700 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-300">
+                  <span className="font-bold text-slate-950 dark:text-white">Prompt: </span>
                   {activeAnalysisRoot.context.prompt}
                 </div>
               )}
               <MarkdownPreview content={activeAnalysisRoot.body} />
             </div>
           ) : (
-            <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
+            <div className="flex min-h-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/50 px-3 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-400">
               Chưa có kết quả. Hãy phân tích ảnh mới hoặc chọn một lịch sử.
             </div>
           )}
         </div>
       </section>
 
-      <section className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+      <section className="glass-panel overflow-hidden rounded-3xl">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
           <div className="flex min-w-0 items-center gap-2">
             <MessageSquareText className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             <div className="min-w-0">
-              <h2 className="text-sm font-bold text-gray-950 dark:text-white">Comment kết quả</h2>
-              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+              <h2 className="text-sm font-bold text-slate-950 dark:text-white">Comment kết quả</h2>
+              <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                 Comment thường hoặc hỏi AI dựa trên kết quả phân tích đang mở
               </p>
             </div>
@@ -1141,7 +1141,7 @@ export function AiImageAnalysisWorkspace() {
         </div>
         <div className="p-4">
           {!activeAnalysisRoot && (
-            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+            <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
               Hãy phân tích ảnh hoặc chọn một lịch sử trước khi comment.
             </div>
           )}
@@ -1156,7 +1156,7 @@ export function AiImageAnalysisWorkspace() {
 
           <div className="mt-4 space-y-3">
             {commentTree.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
+              <p className="rounded-2xl border border-dashed border-slate-200 bg-white/50 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-400">
                 Chưa có comment cho kết quả này.
               </p>
             ) : (
@@ -1211,7 +1211,7 @@ export function AiImageAnalysisWorkspace() {
               <button
                 type="button"
                 onClick={() => setVisibleCommentCount((current) => current + visibleStep)}
-                className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+                className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white/70 px-3 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
               >
                 Xem thêm {Math.min(visibleStep, hiddenCommentCount)} comment cũ hơn
               </button>

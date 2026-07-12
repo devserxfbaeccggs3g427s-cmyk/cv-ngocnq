@@ -56,13 +56,13 @@ export function ContactForm() {
   if (status === 'success') {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-          <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 shadow-lg shadow-emerald-600/10 dark:bg-emerald-900/30">
+          <CheckCircle className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="mb-2 text-xl font-bold text-slate-950 dark:text-white">
           Đã gửi lời nhắn!
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
+        <p className="mb-6 text-slate-600 dark:text-slate-300">
           Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi trong thời gian sớm nhất.
         </p>
         <Button onClick={() => setStatus('idle')} variant="outline">
@@ -75,7 +75,7 @@ export function ContactForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {status === 'error' && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
         </div>
@@ -84,7 +84,7 @@ export function ContactForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="name" className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             Họ và tên
           </label>
           <input
@@ -92,10 +92,10 @@ export function ContactForm() {
             type="text"
             {...register('name')}
             className={cn(
-              'w-full px-4 py-3 rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors',
+              'input-modern w-full rounded-2xl px-4 py-3 placeholder-slate-400 dark:placeholder-slate-500',
               errors.name
-                ? 'border-red-300 dark:border-red-700'
-                : 'border-gray-300 dark:border-gray-700'
+                ? '!border-red-300 dark:!border-red-700'
+                : ''
             )}
             placeholder="Nhập họ và tên"
           />
@@ -106,7 +106,7 @@ export function ContactForm() {
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             Email
           </label>
           <input
@@ -114,10 +114,10 @@ export function ContactForm() {
             type="email"
             {...register('email')}
             className={cn(
-              'w-full px-4 py-3 rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors',
+              'input-modern w-full rounded-2xl px-4 py-3 placeholder-slate-400 dark:placeholder-slate-500',
               errors.email
-                ? 'border-red-300 dark:border-red-700'
-                : 'border-gray-300 dark:border-gray-700'
+                ? '!border-red-300 dark:!border-red-700'
+                : ''
             )}
             placeholder="your@email.com"
           />
@@ -129,7 +129,7 @@ export function ContactForm() {
 
       {/* Subject */}
       <div>
-        <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="subject" className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             Tiêu đề
         </label>
         <input
@@ -137,10 +137,10 @@ export function ContactForm() {
           type="text"
           {...register('subject')}
           className={cn(
-            'w-full px-4 py-3 rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors',
+            'input-modern w-full rounded-2xl px-4 py-3 placeholder-slate-400 dark:placeholder-slate-500',
             errors.subject
-              ? 'border-red-300 dark:border-red-700'
-              : 'border-gray-300 dark:border-gray-700'
+              ? '!border-red-300 dark:!border-red-700'
+              : ''
           )}
           placeholder="Nội dung trao đổi chính"
         />
@@ -151,7 +151,7 @@ export function ContactForm() {
 
       {/* Message */}
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label htmlFor="message" className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
           Nội dung
         </label>
         <textarea
@@ -159,10 +159,10 @@ export function ContactForm() {
           rows={5}
           {...register('message')}
           className={cn(
-            'w-full px-4 py-3 rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none',
+            'input-modern w-full resize-none rounded-2xl px-4 py-3 placeholder-slate-400 dark:placeholder-slate-500',
             errors.message
-              ? 'border-red-300 dark:border-red-700'
-              : 'border-gray-300 dark:border-gray-700'
+              ? '!border-red-300 dark:!border-red-700'
+              : ''
           )}
           placeholder="Nhập nội dung lời nhắn..."
         />

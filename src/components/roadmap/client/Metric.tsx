@@ -17,12 +17,12 @@ export function Metric({ icon: Icon, label, value, variant = 'default' }: Metric
     return (
       <Card>
         <CardContent className="flex items-center gap-3 p-4">
-          <div className="rounded-lg bg-blue-50 p-2 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
+          <div className="rounded-2xl bg-blue-50 p-2 text-blue-700 shadow-sm dark:bg-blue-950/40 dark:text-blue-300">
             <Icon className="h-5 w-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-gray-950 dark:text-white">{value}</div>
-            <div className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <div className="text-xl font-black text-slate-950 dark:text-white">{value}</div>
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               {label}
             </div>
           </div>
@@ -32,10 +32,10 @@ export function Metric({ icon: Icon, label, value, variant = 'default' }: Metric
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950">
-      <Icon className="mb-3 h-5 w-5 text-blue-600 dark:text-blue-400" />
-      <div className="text-2xl font-bold text-gray-950 dark:text-white">{value}</div>
-      <div className="mt-1 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <div className="rounded-3xl border border-slate-200/80 bg-white/70 p-4 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/65">
+      <Icon className="mb-3 h-5 w-5 text-blue-700 dark:text-blue-300" />
+      <div className="text-2xl font-black text-slate-950 dark:text-white">{value}</div>
+      <div className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {label}
       </div>
     </div>

@@ -14,9 +14,9 @@ const progressFilePath = path.join(
 const defaultGithubRepoUrl = process.env.GITHUB_BACKUP_REPO_URL ?? '';
 const defaultGithubBranch = process.env.GITHUB_BACKUP_BRANCH ?? 'main';
 const defaultGithubBackupPath =
-  process.env.GITHUB_BACKUP_PATH ?? 'backups/skill-roadmap-progress.json';
+  process.env.GITHUB_BACKUP_PATH ?? 'backups/workspace-backup.json';
 const defaultGithubCommitMessage =
-  process.env.GITHUB_BACKUP_COMMIT_MESSAGE ?? 'Backup skill roadmap progress';
+  process.env.GITHUB_BACKUP_COMMIT_MESSAGE ?? 'Backup workspace data';
 
 type GithubBackupRequest = {
   token?: string;
@@ -293,7 +293,7 @@ export async function POST(request: Request) {
 
   if (!backupPath || backupPath.endsWith('/')) {
     return NextResponse.json(
-      { error: 'File path phải là đường dẫn tới file, ví dụ backups/skill-roadmap-progress.json' },
+      { error: 'File path phải là đường dẫn tới file, ví dụ backups/workspace-backup.json' },
       { status: 400 }
     );
   }

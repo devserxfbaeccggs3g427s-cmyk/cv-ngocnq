@@ -22,13 +22,15 @@ export function ProjectCard({ project }: ProjectCardProps) {
       viewport={{ once: true }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-lg transition-all duration-300"
+      className="group glass-panel card-hover relative overflow-hidden rounded-3xl"
     >
       {/* Thumbnail */}
-      <div className="relative h-48 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-950 via-blue-900 to-violet-700">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.26),transparent_24%),radial-gradient(circle_at_80%_30%,rgba(34,211,238,0.25),transparent_28%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/70 to-transparent" />
         {/* Placeholder gradient - replace with actual image when available */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-white/50 text-4xl font-bold">
+          <span className="text-5xl font-black tracking-tight text-white/35">
             {project.title.substring(0, 2).toUpperCase()}
           </span>
         </div>
@@ -44,7 +46,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 bg-white rounded-full text-gray-900 hover:bg-blue-500 hover:text-white transition-colors"
+              className="rounded-full bg-white p-3 text-slate-900 shadow-xl transition-colors hover:bg-blue-600 hover:text-white"
               aria-label="Xem website"
             >
               <ExternalLink className="w-5 h-5" />
@@ -55,7 +57,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 bg-white rounded-full text-gray-900 hover:bg-gray-900 hover:text-white transition-colors"
+              className="rounded-full bg-white p-3 text-slate-900 shadow-xl transition-colors hover:bg-slate-950 hover:text-white"
               aria-label="Xem mã nguồn"
             >
               <Github className="w-5 h-5" />
@@ -74,13 +76,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {/* Content */}
       <div className="p-6">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-semibold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-bold tracking-tight text-slate-950 transition-colors group-hover:text-blue-700 dark:text-white dark:group-hover:text-blue-300">
             {project.title}
           </h3>
           <Badge variant="secondary" size="sm">{project.category}</Badge>
         </div>
 
-        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+        <p className="mb-4 line-clamp-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
           {project.description}
         </p>
 
@@ -101,7 +103,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {/* View Project Link */}
         <Link
           href={`/portfolio/${project.slug}`}
-          className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+          className="inline-flex items-center text-sm font-bold text-blue-700 transition-colors hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
         >
           Xem chi tiết
           <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />

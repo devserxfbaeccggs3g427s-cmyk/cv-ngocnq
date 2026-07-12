@@ -8,7 +8,7 @@ import { Section, Badge, Card, CardContent } from '@/components/ui';
 export function EducationSection() {
   return (
     <Section id="education" title="Học vấn" subtitle="Nền tảng đào tạo và chuyên ngành">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
         {education.map((edu, index) => (
           <motion.div
             key={edu.id}
@@ -17,25 +17,25 @@ export function EducationSection() {
             transition={{ duration: 0.5, delay: index * 0.1 }}
             viewport={{ once: true }}
           >
-            <Card hover>
+            <Card hover className="h-full">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-600/20">
+                    <GraduationCap className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-bold tracking-tight text-slate-950 dark:text-white">
                       {edu.degree} - {edu.field}
                     </h3>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium">
+                    <p className="font-semibold text-blue-700 dark:text-blue-300">
                       {edu.school}
                     </p>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="mt-2 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                       <MapPin className="w-4 h-4" />
                       {edu.location} · {edu.startYear} - {edu.endYear}
                     </div>
                     {edu.gpa && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
                         Điểm: {edu.gpa}
                       </p>
                     )}
