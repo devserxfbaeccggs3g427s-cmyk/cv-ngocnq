@@ -26,9 +26,14 @@ export default function RootLayout({
   return (
     <html lang="vi" className="scroll-smooth">
       <body className={`${inter.className} overflow-x-hidden bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-100`}>
+        <a href="#main-content" className="skip-link">
+          Bỏ qua điều hướng
+        </a>
         <Header />
         <SideNav />
-        <main className="relative pt-16">{children}</main>
+        <main id="main-content" tabIndex={-1} className="relative pt-16" aria-label="Nội dung chính">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

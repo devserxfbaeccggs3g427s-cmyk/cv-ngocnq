@@ -8,6 +8,7 @@ The template is fully implemented with all core sections working. It's ready for
 
 ## Recently Completed
 
+- [x] Improved accessibility and keyboard UX across shared layout/primitives. Added a visible skip link to the main content landmark, made `main` focusable for skip navigation, added reduced-motion handling, improved Header desktop/mobile navigation labels and `aria-current`, prevented closed mobile-menu links from staying in the tab order, added Escape support for the mobile menu, improved SideNav labels/current-state semantics, added modal `role="dialog"`/`aria-modal`/focus trap/return-focus behavior, and made shared `Button` default to `type="button"` unless explicitly submitted.
 - [x] Moved backup/export/import/reset/GitHub commit UI out of `/skill-roadmap` into a dedicated `/workspace/backup` page. Workspace navigation and the Workspace hub now include a Backup card, Roadmap is focused back on study/review only, backup copy now describes the full workspace payload, export downloads use `workspace-backup-YYYY-MM-DD.json`, and default GitHub backup path/message are now `backups/workspace-backup.json` / `Backup workspace data` while preserving the existing combined backup format.
 - [x] Reworked the overall site information architecture around a dedicated `/workspace` hub for feature-heavy tools. Header navigation now focuses on portfolio/CV sections plus a single Workspace entry, the mobile menu is grouped into Portfolio and Workspace sections, SideNav separates public CV links from workspace tools, Footer includes Workspace, the home page previews all workspace tools, and the roadmap/Markdown/AI entry pages now link back to Workspace for a consistent cross-feature flow. A shared `navigation.config.ts` centralizes public nav items and workspace feature metadata.
 - [x] Fixed Markdown preview theme detection so light-mode Markdown remains readable. `MarkdownPreview` now resolves light/dark from the app `--background` HSL token and ignores transparent computed backgrounds from gradient page styling, preventing false `data-theme="dark"` on light UI that made Markdown text render white on white.
@@ -291,6 +292,7 @@ Edit `src/config/site.config.ts` → `features`:
 
 | Date | Activity |
 |------|----------|
+| 2026-07-13 | Improved accessibility and keyboard UX with skip link/main landmark focus, reduced-motion CSS, Header/SideNav ARIA/current-state improvements, mobile menu Escape behavior, modal focus trap/return-focus, and safer default button type |
 | 2026-07-12 | Moved backup/export/import/reset/GitHub commit UI from `/skill-roadmap` to `/workspace/backup`, added Backup to Workspace hub/navigation, and changed default backup naming/path to workspace backup |
 | 2026-07-12 | Reworked site-wide layout/IA with a new `/workspace` hub, grouped Header/mobile/SideNav navigation, homepage workspace preview, footer link, and consistent Workspace backlinks from feature entry pages |
 | 2026-07-12 | Fixed Markdown preview light-mode contrast by resolving theme from CSS background tokens instead of transparent gradient backgroundColor |
