@@ -91,23 +91,23 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
         <div className="min-w-0">
           <Link
             href="/skill-roadmap"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            className="inline-flex min-h-10 items-center gap-2 text-base font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 sm:min-h-0 sm:text-sm"
           >
             <ArrowLeft className="h-4 w-4" /> Quay lại roadmap
           </Link>
-          <h1 className="mt-3 flex items-center gap-2 text-2xl font-bold text-gray-950 dark:text-white sm:text-3xl">
+          <h1 className="mt-3 flex items-center gap-2 text-[1.65rem] font-bold leading-tight text-gray-950 dark:text-white sm:text-3xl">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">
               <Grid3X3 className="h-5 w-5" />
             </span>
             <span className="min-w-0">Mindmap ôn tập</span>
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+          <p className="mt-2 max-w-2xl text-base leading-7 text-gray-700 dark:text-gray-200 sm:text-sm sm:leading-relaxed sm:text-gray-600 sm:dark:text-gray-300">
             Tổng quan toàn bộ lộ trình theo track, module và task. Trên mobile có thể kéo canvas, chụm hai ngón để zoom và chạm task để mở preview.
           </p>
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800/70 dark:text-gray-300 md:max-w-xs">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800/70 dark:text-gray-200 sm:text-xs sm:text-gray-600 sm:dark:text-gray-300 md:max-w-xs">
           <span className="font-semibold text-gray-500 dark:text-gray-400">Chú thích:</span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-5 rounded-full bg-emerald-500" />
@@ -135,20 +135,20 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
       {/* Filters */}
       <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:grid-cols-[minmax(220px,1fr)_minmax(180px,auto)_minmax(180px,auto)]">
         <div className="relative min-w-0">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 sm:h-4 sm:w-4" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm task..."
-            className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            className="min-h-12 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-3 text-base text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:min-h-11 sm:pl-9 sm:text-sm"
           />
         </div>
 
         <select
           value={trackFilter}
           onChange={(e) => setTrackFilter(e.target.value)}
-          className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+          className="min-h-12 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 sm:min-h-11 sm:text-sm"
         >
           <option value="all">Tất cả track</option>
           {tracks.map((track) => (
@@ -161,7 +161,7 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StudyStatusFilter)}
-          className="min-h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+          className="min-h-12 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 sm:min-h-11 sm:text-sm"
         >
           <option value="all">Tất cả trạng thái</option>
           <option value="completed">Đã hoàn thành</option>

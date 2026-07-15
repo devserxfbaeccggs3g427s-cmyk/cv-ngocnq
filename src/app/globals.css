@@ -363,7 +363,10 @@ a {
 
 @media (max-width: 640px) {
   html {
+    font-size: 17px;
     scroll-padding-top: 4.5rem;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -380,6 +383,14 @@ a {
   .glass-panel {
     backdrop-filter: blur(14px);
     box-shadow: 0 18px 60px -48px hsl(var(--foreground) / 0.55);
+  }
+
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
   }
 }
 
@@ -1279,6 +1290,56 @@ body.dark .markdown-preview,
 .quiz-markdown .markdown-preview .markdown-references a {
   border-radius: 0.375rem;
   padding: 0.5rem 0.6rem;
+}
+
+@media (max-width: 640px) {
+  .markdown-preview {
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+
+  .markdown-preview h1 {
+    font-size: 1.55rem;
+  }
+
+  .markdown-preview h2 {
+    font-size: 1.3rem;
+  }
+
+  .markdown-preview h3 {
+    font-size: 1.12rem;
+  }
+
+  .markdown-preview p,
+  .markdown-preview ul,
+  .markdown-preview ol,
+  .markdown-preview blockquote,
+  .markdown-preview .markdown-details,
+  .markdown-preview .markdown-table-wrap,
+  .markdown-preview .markdown-code,
+  .markdown-preview .markdown-mermaid {
+    margin: 0.95rem 0;
+  }
+
+  .markdown-preview .markdown-code code {
+    font-size: 0.92rem;
+    line-height: 1.75;
+  }
+
+  .quiz-markdown-question .markdown-preview {
+    font-size: 1.18rem;
+    line-height: 1.85;
+  }
+
+  .quiz-markdown-option .markdown-preview,
+  .quiz-markdown-explanation .markdown-preview {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .quiz-markdown .markdown-preview .markdown-code code {
+    font-size: 0.88rem;
+  }
 }
 
 /* ================================

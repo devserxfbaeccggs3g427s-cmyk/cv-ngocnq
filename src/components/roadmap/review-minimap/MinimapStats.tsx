@@ -48,13 +48,13 @@ function StatCard({
   value: string | number;
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-3 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:px-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+    <div className="flex min-w-0 items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:px-4 sm:py-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 sm:h-9 sm:w-9">
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium text-gray-500 dark:text-gray-400">{label}</p>
-        <p className="truncate text-sm font-bold text-gray-900 dark:text-white">{value}</p>
+        <p className="truncate text-sm font-medium text-gray-600 dark:text-gray-300 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">{label}</p>
+        <p className="truncate text-base font-bold text-gray-900 dark:text-white sm:text-sm">{value}</p>
       </div>
     </div>
   );

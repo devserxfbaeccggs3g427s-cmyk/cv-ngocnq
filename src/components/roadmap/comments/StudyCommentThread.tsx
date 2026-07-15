@@ -237,19 +237,19 @@ export function StudyCommentThread({
   }
 
   return (
-    <section className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900/70">
+    <section className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900/70 sm:rounded-lg sm:p-4">
       <div className="mb-4 flex items-center gap-2">
         <MessageSquareText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
         <div>
-          <h3 className="text-sm font-bold text-gray-950 dark:text-white">Comment và hỏi AI</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <h3 className="text-base font-bold text-gray-950 dark:text-white sm:text-sm">Comment và hỏi AI</h3>
+          <p className="text-sm leading-6 text-gray-600 dark:text-gray-300 sm:text-xs sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
             Ngữ cảnh chỉ lấy từ {contextLabel}; không gửi toàn bộ note.
           </p>
         </div>
       </div>
 
       {!context && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-base leading-7 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 sm:text-sm sm:leading-normal">
           Hãy bắt đầu làm bài hoặc mở một lượt đã lưu để comment theo đúng lượt làm.
         </div>
       )}
@@ -263,14 +263,14 @@ export function StudyCommentThread({
       />
 
       {error && (
-        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-base leading-7 text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 sm:text-sm sm:leading-normal">
           {error}
         </div>
       )}
 
       <div className="mt-4 space-y-3">
         {commentTree.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-gray-200 bg-white px-3 py-4 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-400">
+          <p className="rounded-lg border border-dashed border-gray-200 bg-white px-3 py-4 text-center text-base leading-7 text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 sm:text-sm sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
             Chưa có comment cho {contextLabel}.
           </p>
         ) : (
@@ -325,7 +325,7 @@ export function StudyCommentThread({
           <button
             type="button"
             onClick={() => setVisibleCommentCount((current) => current + visibleStep)}
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-base font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:h-9 sm:min-h-0 sm:px-3 sm:py-0 sm:text-sm"
           >
             Xem thêm {Math.min(visibleStep, hiddenCommentCount)} comment cũ hơn
           </button>
