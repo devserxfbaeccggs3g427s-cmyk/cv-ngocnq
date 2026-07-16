@@ -363,7 +363,7 @@ a {
 
 @media (max-width: 640px) {
   html {
-    font-size: 17px;
+    font-size: 18px;
     scroll-padding-top: 4.5rem;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -377,12 +377,13 @@ a {
 
   body::before {
     background-size: 36px 36px;
-    opacity: 0.65;
+    opacity: 0.35;
   }
 
   .glass-panel {
-    backdrop-filter: blur(14px);
-    box-shadow: 0 18px 60px -48px hsl(var(--foreground) / 0.55);
+    background: hsl(var(--card) / 0.97);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 42px -34px hsl(var(--foreground) / 0.45);
   }
 
   button,
@@ -390,7 +391,7 @@ a {
   input,
   select,
   textarea {
-    font-size: max(1rem, 16px);
+    font-size: max(1rem, 18px);
   }
 }
 
@@ -1294,20 +1295,20 @@ body.dark .markdown-preview,
 
 @media (max-width: 640px) {
   .markdown-preview {
-    font-size: 1rem;
-    line-height: 1.85;
+    font-size: 1.08rem;
+    line-height: 1.92;
   }
 
   .markdown-preview h1 {
-    font-size: 1.55rem;
+    font-size: 1.62rem;
   }
 
   .markdown-preview h2 {
-    font-size: 1.3rem;
+    font-size: 1.38rem;
   }
 
   .markdown-preview h3 {
-    font-size: 1.12rem;
+    font-size: 1.2rem;
   }
 
   .markdown-preview p,
@@ -1318,27 +1319,27 @@ body.dark .markdown-preview,
   .markdown-preview .markdown-table-wrap,
   .markdown-preview .markdown-code,
   .markdown-preview .markdown-mermaid {
-    margin: 0.95rem 0;
+    margin: 1.05rem 0;
   }
 
   .markdown-preview .markdown-code code {
-    font-size: 0.92rem;
-    line-height: 1.75;
+    font-size: 0.96rem;
+    line-height: 1.8;
   }
 
   .quiz-markdown-question .markdown-preview {
-    font-size: 1.18rem;
-    line-height: 1.85;
+    font-size: 1.34rem;
+    line-height: 1.88;
   }
 
   .quiz-markdown-option .markdown-preview,
   .quiz-markdown-explanation .markdown-preview {
-    font-size: 1rem;
-    line-height: 1.75;
+    font-size: 1.1rem;
+    line-height: 1.86;
   }
 
   .quiz-markdown .markdown-preview .markdown-code code {
-    font-size: 0.88rem;
+    font-size: 0.95rem;
   }
 }
 

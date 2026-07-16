@@ -92,24 +92,24 @@ export function CommentBubble({
 
   return (
     <div className={cn(depth > 0 && 'border-l border-gray-200 pl-3 dark:border-gray-800')} style={{ marginLeft: `${compactDepth * 0.4}rem` }}>
-      <article className={cn('rounded-lg border p-3', isAi ? 'border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/20' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950')}>
+      <article className={cn('rounded-lg border p-4 sm:p-3', isAi ? 'border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/20' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950')}>
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2">
-            <span className={cn('inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full', isAi ? 'bg-blue-600 text-white' : 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-950')}>
+            <span className={cn('inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8', isAi ? 'bg-blue-600 text-white' : 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-950')}>
               {isAi ? <Bot className="h-4 w-4" aria-hidden="true" /> : <UserRound className="h-4 w-4" aria-hidden="true" />}
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-sm font-bold text-gray-950 dark:text-white">
+                <h3 className="text-lg font-bold text-gray-950 dark:text-white sm:text-sm">
                   {isAi ? 'AI Assistant' : 'Bạn'}
                 </h3>
                 {comment.model && (
-                  <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:ring-blue-900">
+                  <span className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:ring-blue-900 sm:px-2 sm:py-0.5 sm:text-xs">
                     {comment.model}
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-base text-gray-600 dark:text-gray-300 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
                 {formatDate(comment.createdAt)}
                 {depth === 0 && latestActivity !== comment.createdAt ? ` · mới nhất ${formatDate(latestActivity)}` : ''}
               </p>
@@ -120,7 +120,7 @@ export function CommentBubble({
               <button
                 type="button"
                 onClick={() => onToggleThread(comment.id)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-base font-semibold text-gray-700 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-900 dark:hover:text-white sm:h-8 sm:min-h-0 sm:border-gray-200 sm:px-2.5 sm:py-0 sm:text-xs sm:text-gray-600 sm:dark:border-gray-800 sm:dark:text-gray-300"
                 aria-expanded={isThreadOpen}
               >
                 {isThreadOpen ? <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" /> : <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />}
@@ -130,7 +130,7 @@ export function CommentBubble({
             <button
               type="button"
               onClick={() => onReply(comment.id)}
-              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-base font-semibold text-gray-700 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-900 dark:hover:text-white sm:h-8 sm:min-h-0 sm:border-gray-200 sm:px-2.5 sm:py-0 sm:text-xs sm:text-gray-600 sm:dark:border-gray-800 sm:dark:text-gray-300"
             >
               <Reply className="h-3.5 w-3.5" aria-hidden="true" />
               Trả lời
@@ -138,7 +138,7 @@ export function CommentBubble({
             <button
               type="button"
               onClick={() => onDelete(comment.id)}
-              className="inline-flex h-8 items-center justify-center rounded-lg border border-red-200 px-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/70 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-red-200 px-3 py-2 text-base font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/70 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200 sm:h-8 sm:min-h-0 sm:px-2.5 sm:py-0 sm:text-xs"
               aria-label="Xóa comment"
               title="Xóa comment"
             >
@@ -153,10 +153,10 @@ export function CommentBubble({
             onClick={() => onToggleThread(comment.id)}
             className="mt-3 block w-full rounded-md bg-white/72 p-3 text-left transition hover:bg-gray-50 dark:bg-gray-950/45 dark:hover:bg-gray-900/80"
           >
-            <p className="line-clamp-2 text-sm leading-6 text-gray-700 dark:text-gray-300">
+            <p className="line-clamp-2 text-lg leading-8 text-gray-800 dark:text-gray-100 sm:text-sm sm:leading-6 sm:text-gray-700 sm:dark:text-gray-300">
               {comment.body ? plainTextPreview(comment.body) : 'AI đang soạn câu trả lời...'}
             </p>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-base font-semibold text-gray-600 dark:text-gray-300 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
               {nestedReplyCount > 0 && (
                 <span className="rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-900">
                   {nestedReplyCount} trả lời
@@ -181,11 +181,11 @@ export function CommentBubble({
               {hasAiReasoning && (
                 <div className="mb-3 rounded-lg border border-blue-200 bg-blue-50/80 dark:border-blue-900/70 dark:bg-blue-950/30">
                   <button
-                    type="button"
-                    onClick={() => setIsReasoningOpen((current) => !current)}
-                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-xs font-bold text-blue-800 transition hover:bg-blue-100/70 dark:text-blue-200 dark:hover:bg-blue-900/30"
-                    aria-expanded={isReasoningOpen}
-                  >
+	                    type="button"
+	                    onClick={() => setIsReasoningOpen((current) => !current)}
+	                    className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left text-base font-bold text-blue-900 transition hover:bg-blue-100/70 dark:text-blue-100 dark:hover:bg-blue-900/30 sm:py-2 sm:text-xs sm:text-blue-800 sm:dark:text-blue-200"
+	                    aria-expanded={isReasoningOpen}
+	                  >
                     <span>{aiContent.hasOpenReasoning ? 'AI đang suy nghĩ' : 'Suy nghĩ của AI'}</span>
                     <ChevronDown
                       className={cn('h-3.5 w-3.5 shrink-0 transition', isReasoningOpen && 'rotate-180')}
@@ -193,7 +193,7 @@ export function CommentBubble({
                     />
                   </button>
                   {isReasoningOpen && (
-                    <div className="border-t border-blue-200 px-3 py-2 text-sm leading-6 text-blue-950 dark:border-blue-900/70 dark:text-blue-100">
+	                    <div className="border-t border-blue-200 px-3 py-3 text-lg leading-8 text-blue-950 dark:border-blue-900/70 dark:text-blue-100 sm:py-2 sm:text-sm sm:leading-6">
                       <MarkdownPreview content={aiContent.reasoning} />
                     </div>
                   )}
@@ -203,13 +203,13 @@ export function CommentBubble({
               {displayBody ? (
                 <MarkdownPreview content={displayBody} />
               ) : (
-                <div className="flex items-center gap-2 py-2 text-sm font-medium text-blue-700 dark:text-blue-300">
+	                <div className="flex items-center gap-2 py-3 text-lg font-medium text-blue-700 dark:text-blue-300 sm:py-2 sm:text-sm">
                   <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
                   AI đang soạn câu trả lời...
                 </div>
               )}
               {isStreaming && comment.body && (
-                <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300">
+	                <span className="mt-2 inline-flex items-center gap-1.5 text-base font-semibold text-blue-700 dark:text-blue-300 sm:text-xs">
                   <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                   Đang nhận nội dung
                 </span>
@@ -223,7 +223,7 @@ export function CommentBubble({
                 <button
                   type="button"
                   onClick={() => onToggleExpanded(comment.id)}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 transition hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+	                  className="inline-flex items-center gap-1.5 text-base font-bold text-blue-700 transition hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200 sm:text-xs"
                   aria-expanded={isExpanded}
                 >
                   {isExpanded ? (
@@ -263,7 +263,7 @@ export function CommentBubble({
             <button
               type="button"
               onClick={() => onToggleReplyGroup(comment.id)}
-              className="ml-3 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+	              className="ml-3 inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-base font-bold text-gray-700 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 dark:hover:text-white sm:min-h-0 sm:border-gray-200 sm:px-3 sm:text-xs sm:text-gray-600 sm:dark:border-gray-800 sm:dark:text-gray-300"
               aria-expanded={isReplyGroupExpanded}
             >
               <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />

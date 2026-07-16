@@ -259,29 +259,29 @@ export function TaskPreviewSlidePanel({
                 <div className="flex flex-wrap items-center gap-2">
                   <span
                     className={cn(
-                      'inline-block rounded-full px-2.5 py-1 text-sm font-bold sm:px-2 sm:py-0.5 sm:text-[11px]',
+                      'inline-block rounded-full px-3 py-1.5 text-base font-bold sm:px-2 sm:py-0.5 sm:text-[11px]',
                       levelStyles[task.level] ?? levelStyles['Trung cấp']
                     )}
                   >
                     {task.level}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
+                  <span className="inline-flex items-center gap-1 text-base text-gray-700 dark:text-gray-200 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
                     <Clock3 className="h-4 w-4 sm:h-3 sm:w-3" /> {task.estimateHours}h
                   </span>
                   {effectivelyCompleted ? (
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 dark:text-emerald-400 sm:text-xs">
+                    <span className="inline-flex items-center gap-1 text-base font-semibold text-emerald-700 dark:text-emerald-300 sm:text-xs">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Đã hoàn thành
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500 dark:text-gray-300 sm:text-xs sm:text-gray-400">
+                    <span className="inline-flex items-center gap-1 text-base font-semibold text-gray-600 dark:text-gray-200 sm:text-xs sm:text-gray-400">
                       <Circle className="h-3.5 w-3.5" /> Chưa hoàn thành
                     </span>
                   )}
                 </div>
-                <h2 className="mt-2 text-xl font-bold leading-snug text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-lg sm:leading-tight">
+                <h2 className="mt-2 text-2xl font-bold leading-snug text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-lg sm:leading-tight">
                   {task.title}
                 </h2>
-                <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-600 dark:text-gray-300 sm:text-xs sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
+                <p className="mt-1 line-clamp-2 text-base leading-7 text-gray-700 dark:text-gray-200 sm:text-xs sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
                   {task.trackTitle} / {task.moduleTitle}
                 </p>
               </div>
@@ -289,7 +289,7 @@ export function TaskPreviewSlidePanel({
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-900 dark:hover:bg-red-950/30 dark:hover:text-red-400 sm:h-9 sm:w-9 sm:text-gray-500 sm:dark:text-gray-400"
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-gray-300 text-gray-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-600 dark:text-gray-200 dark:hover:border-red-900 dark:hover:bg-red-950/30 dark:hover:text-red-400 sm:h-9 sm:w-9 sm:border-gray-200 sm:text-gray-500 sm:dark:border-gray-700 sm:dark:text-gray-400"
                 aria-label="Đóng panel"
               >
                 <X className="h-4 w-4" />
@@ -300,11 +300,11 @@ export function TaskPreviewSlidePanel({
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
               {/* Task info */}
               <div className="border-b border-gray-100 px-4 py-4 dark:border-gray-800/60 sm:px-5">
-                <h3 className="flex items-center gap-2 text-base font-bold text-gray-800 dark:text-gray-100 sm:text-sm sm:text-gray-700 sm:dark:text-gray-200">
+                <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white sm:text-sm sm:text-gray-700 sm:dark:text-gray-200">
                   <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   Kết quả cần có
                 </h3>
-                <p className="mt-2 text-base leading-7 text-gray-700 dark:text-gray-200 sm:text-sm sm:leading-relaxed sm:text-gray-600 sm:dark:text-gray-300">
+                <p className="mt-2 text-lg leading-8 text-gray-800 dark:text-gray-100 sm:text-sm sm:leading-relaxed sm:text-gray-600 sm:dark:text-gray-300">
                   {task.deliverable}
                 </p>
               </div>
@@ -312,7 +312,7 @@ export function TaskPreviewSlidePanel({
               {/* Note Preview */}
               <div className="px-4 py-4 sm:px-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <h3 className="flex items-center gap-2 text-base font-bold text-gray-800 dark:text-gray-100 sm:text-sm sm:text-gray-700 sm:dark:text-gray-200">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white sm:text-sm sm:text-gray-700 sm:dark:text-gray-200">
                     <StickyNote
                       className={cn(
                         'h-4 w-4',
@@ -326,7 +326,7 @@ export function TaskPreviewSlidePanel({
                   {hasNote && (
                     <Link
                       href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`}
-                      className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-md px-2 py-1 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30 sm:min-h-0 sm:text-xs"
+                      className="inline-flex min-h-12 shrink-0 items-center gap-1 rounded-md px-3 py-2 text-base font-semibold text-blue-700 transition hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950/30 sm:min-h-0 sm:px-2 sm:py-1 sm:text-xs"
                     >
                       Xem đầy đủ <ExternalLink className="h-3 w-3" />
                     </Link>
@@ -339,13 +339,13 @@ export function TaskPreviewSlidePanel({
                       <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-3 dark:border-blue-950 dark:bg-blue-950/20">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="min-w-0">
-                            <p className="text-base font-bold text-gray-900 dark:text-white sm:text-sm">Yêu cầu AI chỉnh sửa note</p>
-                            <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300 sm:text-xs sm:leading-5">Viết lại note trong panel theo yêu cầu của bạn.</p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-white sm:text-sm">Yêu cầu AI chỉnh sửa note</p>
+                            <p className="mt-1 text-base leading-7 text-gray-700 dark:text-gray-200 sm:text-xs sm:leading-5 sm:text-gray-600 sm:dark:text-gray-300">Viết lại note trong panel theo yêu cầu của bạn.</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => setAiRewriteOpen((current) => !current)}
-                            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-400 dark:border-blue-900 dark:bg-gray-950 dark:text-blue-300 dark:hover:border-blue-700 sm:h-9 sm:min-h-0 sm:py-0 sm:text-xs"
+                            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-white px-4 py-2 text-base font-semibold text-blue-700 transition hover:border-blue-400 dark:border-blue-900 dark:bg-gray-950 dark:text-blue-300 dark:hover:border-blue-700 sm:h-9 sm:min-h-0 sm:px-3 sm:py-0 sm:text-xs"
                             aria-expanded={aiRewriteOpen}
                           >
                             <WandSparkles className="h-3.5 w-3.5" />
@@ -359,7 +359,7 @@ export function TaskPreviewSlidePanel({
                               onChange={(event) => setEditInstruction(event.target.value)}
                               rows={3}
                               placeholder="Ví dụ: rút gọn note, bổ sung ví dụ thực tế, làm rõ trade-off, thêm checklist ôn tập..."
-                              className="w-full resize-y rounded-lg border border-blue-200 bg-white p-3 text-base leading-7 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-blue-900 dark:bg-gray-950 dark:text-white sm:text-sm sm:leading-normal"
+                              className="w-full resize-y rounded-lg border border-blue-200 bg-white p-3 text-lg leading-8 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-blue-900 dark:bg-gray-950 dark:text-white sm:text-sm sm:leading-normal"
                             />
                             <div className="flex flex-col gap-2 sm:flex-row">
                               <input
@@ -367,13 +367,13 @@ export function TaskPreviewSlidePanel({
                                 value={confirmPassword}
                                 onChange={(event) => setConfirmPassword(event.target.value)}
                                 placeholder="Mật khẩu xác nhận AI"
-                                className="min-h-12 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-base text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-800 dark:bg-gray-950 dark:text-white sm:min-h-10 sm:text-sm"
+                                className="min-h-14 flex-1 rounded-lg border border-gray-300 bg-white px-3 text-lg text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white sm:min-h-10 sm:border-gray-200 sm:text-sm sm:dark:border-gray-800"
                               />
                               <button
                                 type="button"
                                 onClick={handleAiRewriteNote}
                                 disabled={!canRewriteNote}
-                                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-base font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 sm:min-h-10 sm:py-0 sm:text-sm"
+                                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 sm:min-h-10 sm:py-0 sm:text-sm"
                               >
                                 {aiRewriteStatus === 'rewriting' ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -388,7 +388,7 @@ export function TaskPreviewSlidePanel({
                         {aiRewriteMessage && (
                           <p
                             className={cn(
-                              'mt-3 rounded-md border px-3 py-2 text-base leading-7 sm:text-sm sm:leading-normal',
+                              'mt-3 rounded-md border px-3 py-3 text-lg leading-8 sm:py-2 sm:text-sm sm:leading-normal',
                               aiRewriteStatus === 'saved'
                                 ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200'
                                 : aiRewriteStatus === 'error'
@@ -411,16 +411,16 @@ export function TaskPreviewSlidePanel({
                 ) : (
                   <div className="flex flex-col items-center rounded-lg border border-dashed border-gray-300 bg-gray-50/50 py-12 dark:border-gray-700 dark:bg-gray-900/30">
                     <FileText className="mb-2 h-8 w-8 text-gray-300 dark:text-gray-600" />
-                    <p className="text-base text-gray-600 dark:text-gray-300 sm:text-sm sm:text-gray-500 sm:dark:text-gray-400">
+                    <p className="text-lg text-gray-700 dark:text-gray-200 sm:text-sm sm:text-gray-500 sm:dark:text-gray-400">
                       {autoNoteStatus === 'generating'
                         ? 'Đang tự động sinh note ôn tập...'
                         : 'Task này chưa có note ôn tập.'}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:text-xs sm:text-gray-400 sm:dark:text-gray-500">
+                    <p className="mt-1 text-base text-gray-600 dark:text-gray-300 sm:text-xs sm:text-gray-400 sm:dark:text-gray-500">
                       Hoàn thành task và viết note để review sau.
                     </p>
                     {autoNoteStatus !== 'idle' && autoNoteMessage && (
-                      <div className="mt-4 max-w-md rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-sm leading-6 text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 sm:text-xs sm:leading-normal">
+                      <div className="mt-4 max-w-md rounded-lg border border-gray-200 bg-white px-3 py-3 text-center text-base leading-7 text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 sm:py-2 sm:text-xs sm:leading-normal">
                         {autoNoteMessage}
                         {!hasNote && (autoNoteStatus === 'skipped' || autoNoteStatus === 'error') && (
                           <button
@@ -440,7 +440,7 @@ export function TaskPreviewSlidePanel({
               {/* Completion info */}
               {item?.completedAt && (
                 <div className="border-t border-gray-100 px-4 py-3 dark:border-gray-800/60 sm:px-5">
-                  <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
+                  <p className="text-base text-gray-700 dark:text-gray-200 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
                     Hoàn thành:{' '}
                     <span className="font-medium text-gray-700 dark:text-gray-200">
                       {new Intl.DateTimeFormat('vi-VN', {
@@ -463,25 +463,25 @@ export function TaskPreviewSlidePanel({
             <div className="grid shrink-0 grid-cols-2 gap-2 border-t border-gray-200 px-4 py-3 dark:border-gray-800 sm:flex sm:flex-wrap sm:items-center sm:px-5">
               <Link
                 href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}`}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:min-h-10 sm:text-xs"
+                className="inline-flex min-h-14 items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-3 text-base font-semibold text-gray-800 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:min-h-10 sm:border-gray-200 sm:py-2 sm:text-xs sm:text-gray-700 sm:dark:border-gray-700 sm:dark:text-gray-300"
               >
                 <BookOpen className="h-3.5 w-3.5" /> Chi tiết
               </Link>
               <Link
                 href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:min-h-10 sm:text-xs"
+                className="inline-flex min-h-14 items-center justify-center gap-1.5 rounded-lg border border-gray-300 px-3 py-3 text-base font-semibold text-gray-800 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:min-h-10 sm:border-gray-200 sm:py-2 sm:text-xs sm:text-gray-700 sm:dark:border-gray-700 sm:dark:text-gray-300"
               >
                 <FileText className="h-3.5 w-3.5" /> Note đầy đủ
               </Link>
               <Link
                 href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}/flashcards`}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-violet-200 px-3 py-2 text-sm font-semibold text-violet-700 transition hover:border-violet-400 dark:border-violet-900/70 dark:text-violet-300 dark:hover:border-violet-600 sm:min-h-10 sm:text-xs"
+                className="inline-flex min-h-14 items-center justify-center gap-1.5 rounded-lg border border-violet-200 px-3 py-3 text-base font-semibold text-violet-800 transition hover:border-violet-400 dark:border-violet-900/70 dark:text-violet-200 dark:hover:border-violet-600 sm:min-h-10 sm:py-2 sm:text-xs sm:text-violet-700 sm:dark:text-violet-300"
               >
                 <Brain className="h-3.5 w-3.5" /> Flashcard
               </Link>
               <Link
                 href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}/quiz`}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-cyan-200 px-3 py-2 text-sm font-semibold text-cyan-700 transition hover:border-cyan-400 dark:border-cyan-900/70 dark:text-cyan-300 dark:hover:border-cyan-600 sm:min-h-10 sm:text-xs"
+                className="inline-flex min-h-14 items-center justify-center gap-1.5 rounded-lg border border-cyan-200 px-3 py-3 text-base font-semibold text-cyan-800 transition hover:border-cyan-400 dark:border-cyan-900/70 dark:text-cyan-200 dark:hover:border-cyan-600 sm:min-h-10 sm:py-2 sm:text-xs sm:text-cyan-700 sm:dark:text-cyan-300"
               >
                 <CircleHelp className="h-3.5 w-3.5" /> Trắc nghiệm
               </Link>
@@ -489,7 +489,7 @@ export function TaskPreviewSlidePanel({
                 <button
                   type="button"
                   onClick={() => setIsCommentPanelOpen((current) => !current)}
-                  className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-400 dark:border-blue-900/70 dark:text-blue-300 dark:hover:border-blue-600 sm:min-h-10 sm:text-xs"
+                  className="inline-flex min-h-14 items-center justify-center gap-1.5 rounded-lg border border-blue-200 px-3 py-3 text-base font-semibold text-blue-800 transition hover:border-blue-400 dark:border-blue-900/70 dark:text-blue-200 dark:hover:border-blue-600 sm:min-h-10 sm:py-2 sm:text-xs sm:text-blue-700 sm:dark:text-blue-300"
                   aria-expanded={isCommentPanelOpen}
                 >
                   <MessageSquareText className="h-3.5 w-3.5" />

@@ -241,15 +241,15 @@ export function StudyCommentThread({
       <div className="mb-4 flex items-center gap-2">
         <MessageSquareText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
         <div>
-          <h3 className="text-base font-bold text-gray-950 dark:text-white sm:text-sm">Comment và hỏi AI</h3>
-          <p className="text-sm leading-6 text-gray-600 dark:text-gray-300 sm:text-xs sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
+          <h3 className="text-lg font-bold text-gray-950 dark:text-white sm:text-sm">Comment và hỏi AI</h3>
+          <p className="text-base leading-7 text-gray-700 dark:text-gray-200 sm:text-xs sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
             Ngữ cảnh chỉ lấy từ {contextLabel}; không gửi toàn bộ note.
           </p>
         </div>
       </div>
 
       {!context && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-base leading-7 text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 sm:text-sm sm:leading-normal">
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-lg leading-8 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 sm:py-2 sm:text-sm sm:leading-normal">
           Hãy bắt đầu làm bài hoặc mở một lượt đã lưu để comment theo đúng lượt làm.
         </div>
       )}
@@ -263,14 +263,14 @@ export function StudyCommentThread({
       />
 
       {error && (
-        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-base leading-7 text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 sm:text-sm sm:leading-normal">
+        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-lg leading-8 text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 sm:py-2 sm:text-sm sm:leading-normal">
           {error}
         </div>
       )}
 
       <div className="mt-4 space-y-3">
         {commentTree.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-gray-200 bg-white px-3 py-4 text-center text-base leading-7 text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 sm:text-sm sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
+          <p className="rounded-lg border border-dashed border-gray-200 bg-white px-3 py-5 text-center text-lg leading-8 text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 sm:py-4 sm:text-sm sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
             Chưa có comment cho {contextLabel}.
           </p>
         ) : (
@@ -325,7 +325,7 @@ export function StudyCommentThread({
           <button
             type="button"
             onClick={() => setVisibleCommentCount((current) => current + visibleStep)}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-base font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:h-9 sm:min-h-0 sm:px-3 sm:py-0 sm:text-sm"
+            className="inline-flex min-h-14 items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-lg font-semibold text-gray-800 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-blue-700 dark:hover:text-blue-300 sm:h-9 sm:min-h-0 sm:border-gray-200 sm:px-3 sm:py-0 sm:text-sm sm:text-gray-700 sm:dark:border-gray-800 sm:dark:text-gray-300"
           >
             Xem thêm {Math.min(visibleStep, hiddenCommentCount)} comment cũ hơn
           </button>
