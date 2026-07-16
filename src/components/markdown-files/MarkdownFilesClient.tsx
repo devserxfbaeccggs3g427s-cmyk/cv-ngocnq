@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } fro
 import Link from 'next/link';
 import {
   ArrowLeft,
+  BookOpen,
   ChevronDown,
   ChevronRight,
   Eye,
@@ -577,7 +578,7 @@ function MarkdownFileEditPanel({
             onScroll={() => syncScroll('preview')}
             className="min-h-0 flex-1 overflow-auto overscroll-contain p-4"
           >
-            <MarkdownPreview content={file.content} />
+            <MarkdownPreview content={file.content} enableBookReader bookReaderTitle={file.title} />
           </div>
         </div>
       )}
@@ -611,15 +612,22 @@ function MarkdownFilePreviewPanel({ file }: { file: MarkdownFile }) {
   return (
     <div className="relative h-full min-h-0 min-w-0">
       <article ref={markdownArticleRef} className="flex h-full min-h-0 min-w-0 flex-col">
-        <div className="flex h-11 shrink-0 items-center gap-2 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
+        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             <Eye className="h-4 w-4" />
             Preview
           </div>
+          <Link
+            href={`/markdown-files/read/${encodeURIComponent(file.id)}`}
+            className="inline-flex h-8 items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 text-xs font-bold normal-case tracking-normal text-amber-900 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100 dark:hover:border-amber-800 dark:hover:bg-amber-950/50"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            Sách
+          </Link>
         </div>
 
         <div ref={previewScrollRef} className="min-h-0 min-w-0 flex-1 overflow-auto p-4 sm:p-5">
-          <MarkdownPreview content={file.content} />
+          <MarkdownPreview content={file.content} enableBookReader={false} />
         </div>
       </article>
 

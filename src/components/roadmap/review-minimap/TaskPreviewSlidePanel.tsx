@@ -405,7 +405,7 @@ export function TaskPreviewSlidePanel({
                       </div>
                     )}
                     <div className="rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-800 dark:bg-gray-900/50 sm:p-4">
-                      <MarkdownPreview content={note} />
+                      <MarkdownPreview content={note} enableBookReader bookReaderTitle={`${task.id}.md`} />
                     </div>
                   </div>
                 ) : (

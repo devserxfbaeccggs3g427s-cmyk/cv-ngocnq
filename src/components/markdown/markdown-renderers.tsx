@@ -1,7 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import type { MarkdownBlock, MarkdownReferenceDefinitions } from './markdown-types';
 import { mermaidLanguages } from './markdown-types';
-import { tokenizeCodeLine } from './syntax-tokenizers';
+import { detectCodeLanguage, tokenizeCodeLine } from './syntax-tokenizers';
 
 export function renderBlock(
   block: MarkdownBlock,
@@ -195,7 +195,12 @@ function CodeBlock({
   theme?: 'light' | 'dark';
 }) {
   const normalizedLanguage = language.trim().toLowerCase();
-  const effectiveLanguage = normalizedLanguage || 'text';
+  const detectedLanguage = detectCodeLanguage(code);
+  const effectiveLanguage =
+    !normalizedLanguage ||
+    ((normalizedLanguage === 'text' || normalizedLanguage === 'plain') && detectedLanguage === 'mermaid')
+      ? detectedLanguage
+      : normalizedLanguage;
   const isPlainText = effectiveLanguage === 'text' || effectiveLanguage === 'plain';
 
   if (mermaidLanguages.has(effectiveLanguage)) {

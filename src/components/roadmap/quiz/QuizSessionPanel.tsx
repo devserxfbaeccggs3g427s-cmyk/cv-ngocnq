@@ -151,7 +151,11 @@ export function QuizSessionPanel({
             </div>
 
             <div className="quiz-markdown quiz-markdown-question mt-4 text-gray-950 dark:text-white">
-              <MarkdownPreview content={activeQuestion.question} />
+              <MarkdownPreview
+                content={activeQuestion.question}
+                enableBookReader
+                bookReaderTitle={`Câu hỏi ${activeQuestionIndex + 1}`}
+              />
             </div>
 
             <div className="mt-5 space-y-3">
@@ -195,7 +199,11 @@ export function QuizSessionPanel({
                   Giải thích
                 </div>
                 <div className="quiz-markdown quiz-markdown-explanation mt-2">
-                  <MarkdownPreview content={activeQuestion.explanation || 'AI không trả về giải thích cho câu này.'} />
+                  <MarkdownPreview
+                    content={activeQuestion.explanation || 'AI không trả về giải thích cho câu này.'}
+                    enableBookReader
+                    bookReaderTitle={`Giải thích câu ${activeQuestionIndex + 1}`}
+                  />
                 </div>
               </div>
             )}

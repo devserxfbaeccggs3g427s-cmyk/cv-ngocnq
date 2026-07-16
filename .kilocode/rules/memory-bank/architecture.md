@@ -17,6 +17,9 @@ src/
 │   ├── skill-roadmap/tasks/[taskId]/quiz/page.tsx # Dedicated AI quiz screen for a roadmap task
 │   ├── ai-context/page.tsx # Independent AI context workspace for Markdown files and roadmap tasks
 │   ├── ai-image-analysis/page.tsx # Independent AI vision workspace for uploaded images
+│   ├── markdown-files/page.tsx # Standalone Markdown file/folder workspace
+│   ├── markdown-files/read/[fileId]/page.tsx # Full-screen Markdown book reader
+│   ├── markdown-reader/[readerId]/page.tsx # Generic full-screen reader for arbitrary MarkdownPreview content
 │   ├── print/page.tsx      # Print-optimized view
 │   └── api/
 │       ├── contact/route.ts   # Contact form handler
@@ -56,6 +59,9 @@ src/
 │   │   └── SkillRoadmapNotePreview.tsx
 │   ├── markdown/           # Reusable Markdown rendering components
 │   │   └── MarkdownPreview.tsx
+│   ├── markdown-files/     # Standalone Markdown workspace and book reader components
+│   │   ├── MarkdownFilesClient.tsx
+│   │   └── MarkdownBookReader.tsx
 │   ├── ai-image-analysis/  # Upload + prompt UI for multimodal image analysis
 │   │   └── AiImageAnalysisWorkspace.tsx
 │   ├── contact/            # Contact components
@@ -182,6 +188,9 @@ The renderer covers common note formats without adding runtime dependencies:
 - fenced code blocks with language labels, language auto-detection, line numbers, syntax token coloring, and SQL/database-oriented labels
 
 Global `.markdown-preview` styles in `src/app/globals.css` keep Markdown content readable in both light and dark themes.
+
+Markdown previews can opt into book-reader mode through `MarkdownPreview` props. Standalone Markdown files support `/markdown-files/read/[fileId]`; arbitrary preview content is stored in browser storage and opened through `/markdown-reader/[readerId]`.
+The shared reader reuses `MarkdownPreview` with a forced light paper theme, paginates the full rendered DOM with CSS columns instead of slicing Markdown text, remembers reading progress, preserves internal scrolling inside code/table/Mermaid frames, and uses invisible left/right page areas plus swipe/keyboard navigation so the mobile book surface stays free of visible controls.
 
 ## Component Communication
 

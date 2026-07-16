@@ -225,14 +225,14 @@ function PreviewCommentNode({
                 </button>
                 {isReasoningOpen && (
                   <div className="border-t border-blue-200 px-3 py-2 text-sm leading-6 text-blue-950 dark:border-blue-900/70 dark:text-blue-100">
-                    <MarkdownPreview content={aiContent.reasoning} />
+                    <MarkdownPreview content={aiContent.reasoning} enableBookReader bookReaderTitle="Suy nghĩ của AI" />
                   </div>
                 )}
               </div>
             )}
 
             {displayBody ? (
-              <MarkdownPreview content={displayBody} />
+              <MarkdownPreview content={displayBody} enableBookReader bookReaderTitle={comment.author === 'ai' ? 'Phản hồi AI' : 'Bình luận'} />
             ) : (
               <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
                 <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { BookOpen } from 'lucide-react';
 import type { MarkdownBlock } from './markdown-types';
 import { emptyMessage } from './markdown-types';
 import { parseMarkdown, parseMarkdownReferenceDefinitions } from './markdown-parser';
@@ -17,13 +19,29 @@ export type MarkdownHeading = {
   text: string;
 };
 
-export function MarkdownPreview({ content }: { content: string }) {
+export function MarkdownPreview({
+  content,
+  theme: forcedTheme,
+  enableBookReader = false,
+  bookReaderTitle,
+}: {
+  content: string;
+  theme?: 'light' | 'dark';
+  enableBookReader?: boolean;
+  bookReaderTitle?: string;
+}) {
+  const router = useRouter();
   const blocks = parseMarkdown(content.trim() ? content : emptyMessage);
   const referenceDefinitions = parseMarkdownReferenceDefinitions(content);
   const headingIdsByBlockIndex = buildHeadingIdsByBlockIndex(blocks);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>(forcedTheme ?? 'light');
+  const renderedTheme = forcedTheme ?? theme;
 
   useEffect(() => {
+    if (forcedTheme) {
+      return;
+    }
+
     const updateTheme = () => setTheme(resolveRenderedTheme());
     const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const observer = new MutationObserver(updateTheme);
@@ -43,14 +61,55 @@ export function MarkdownPreview({ content }: { content: string }) {
       darkQuery.removeEventListener('change', updateTheme);
       observer.disconnect();
     };
-  }, []);
+  }, [forcedTheme]);
 
-  return (
-    <div className="markdown-preview" data-theme={theme}>
+  const preview = (
+    <div className="markdown-preview" data-theme={renderedTheme}>
       {blocks.map((block, index) =>
-        renderBlock(block, index, headingIdsByBlockIndex.get(index), theme, referenceDefinitions)
+        renderBlock(block, index, headingIdsByBlockIndex.get(index), renderedTheme, referenceDefinitions)
       )}
       {renderReferenceDefinitions(referenceDefinitions)}
+    </div>
+  );
+
+  if (!enableBookReader) {
+    return preview;
+  }
+
+  function openBookReader() {
+    const readerId = createReaderId();
+    const payload = JSON.stringify({
+      title: bookReaderTitle || extractMarkdownTitle(content),
+      content,
+      backHref: window.location.pathname + window.location.search,
+    });
+    const storageKey = getReaderContentKey(readerId);
+
+    try {
+      window.sessionStorage.setItem(storageKey, payload);
+    } catch {
+      try {
+        window.localStorage.setItem(storageKey, payload);
+      } catch {
+        return;
+      }
+    }
+
+    router.push(`/markdown-reader/${encodeURIComponent(readerId)}`);
+  }
+
+  return (
+    <div className="markdown-preview-frame has-book-reader">
+      <button
+        type="button"
+        onClick={openBookReader}
+        className="markdown-book-open"
+        aria-label="Đọc Markdown dạng sách"
+        title="Đọc dạng sách"
+      >
+        <BookOpen className="h-4 w-4" aria-hidden="true" />
+      </button>
+      {preview}
     </div>
   );
 }
@@ -159,4 +218,24 @@ function buildHeadingIdsByBlockIndex(blocks: MarkdownBlock[]) {
   });
 
   return idsByBlockIndex;
+}
+
+function getReaderContentKey(readerId: string) {
+  return `markdown-book-reader-content:${readerId}`;
+}
+
+function createReaderId() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function extractMarkdownTitle(content: string) {
+  const heading = content
+    .split(/\r?\n/)
+    .find((line) => /^#{1,6}\s+\S/.test(line.trim()));
+
+  return heading ? stripInlineMarkdown(heading.replace(/^#{1,6}\s+/, '').trim()) : 'Markdown';
 }

@@ -1117,7 +1117,11 @@ export function AiImageAnalysisWorkspace() {
                   {activeAnalysisRoot.context.prompt}
                 </div>
               )}
-              <MarkdownPreview content={activeAnalysisRoot.body} />
+              <MarkdownPreview
+                content={activeAnalysisRoot.body}
+                enableBookReader
+                bookReaderTitle={activeAnalysisRoot.title || 'Phân tích ảnh'}
+              />
             </div>
           ) : (
             <div className="flex min-h-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/50 px-3 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-400">

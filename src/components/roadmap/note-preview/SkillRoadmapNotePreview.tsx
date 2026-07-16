@@ -114,7 +114,7 @@ export function SkillRoadmapNotePreview({
             {taskId}.md
           </div>
           <div className="min-w-0 max-w-full overflow-hidden p-4 sm:p-5">
-            <MarkdownPreview content={note} />
+            <MarkdownPreview content={note} enableBookReader bookReaderTitle={`${taskId}.md`} />
           </div>
         </article>
 

@@ -1518,6 +1518,490 @@ body.dark .markdown-preview,
 }
 
 /* ================================
+   MARKDOWN BOOK ENTRY
+   ================================ */
+.markdown-preview-frame {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.markdown-preview-frame.has-book-reader {
+  padding-top: 2.55rem;
+}
+
+.markdown-book-open {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 2;
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(203 213 225);
+  border-radius: 0.6rem;
+  background: rgb(255 255 255 / 0.88);
+  color: rgb(71 85 105);
+  box-shadow: 0 10px 28px -22px rgb(15 23 42 / 0.45);
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease,
+    background-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.markdown-book-open:hover {
+  border-color: rgb(245 158 11 / 0.65);
+  background: rgb(255 251 235);
+  color: rgb(146 64 14);
+  transform: translateY(-1px);
+}
+
+.dark .markdown-book-open,
+[data-theme="dark"] .markdown-book-open {
+  border-color: rgb(51 65 85);
+  background: rgb(15 23 42 / 0.88);
+  color: rgb(203 213 225);
+}
+
+.dark .markdown-book-open:hover,
+[data-theme="dark"] .markdown-book-open:hover {
+  border-color: rgb(245 158 11 / 0.55);
+  background: rgb(69 26 3 / 0.72);
+  color: rgb(253 230 138);
+}
+
+/* ================================
+   MARKDOWN BOOK READER
+   ================================ */
+.book-reader-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  min-height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 0%, rgb(239 218 174 / 0.14), transparent 32rem),
+    radial-gradient(circle at 18% 92%, rgb(78 49 24 / 0.28), transparent 26rem),
+    linear-gradient(135deg, #1b211b 0%, #2a3125 42%, #1e1711 100%);
+  color: #2f271e;
+}
+
+.book-reader-stage {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.5rem, 2.2vw, 1.25rem);
+  touch-action: pan-y;
+}
+
+.book-cover {
+  position: relative;
+  height: calc(100dvh - clamp(1rem, 4.4vw, 2.5rem));
+  width: min(100%, 860px);
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: clamp(0.6rem, 2vw, 1rem);
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.32), transparent 2.25rem),
+    linear-gradient(145deg, #24362d, #161f1a 58%, #0f1512);
+  box-shadow:
+    0 28px 70px -26px rgb(0 0 0 / 0.72),
+    0 7px 18px rgb(0 0 0 / 0.28),
+    inset 0 1px 0 rgb(255 255 255 / 0.16);
+  padding: clamp(0.42rem, 1.8vw, 0.9rem);
+}
+
+.book-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 clamp(0.85rem, 2.5vw, 1.35rem);
+  z-index: 2;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgb(255 255 255 / 0.16), transparent);
+  pointer-events: none;
+}
+
+.book-page {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(120 100 72 / 0.32);
+  border-radius: clamp(0.45rem, 1.6vw, 0.75rem);
+  background:
+    linear-gradient(90deg, rgb(82 52 18 / 0.25), transparent 3.25rem),
+    radial-gradient(ellipse at 18% 10%, rgb(250 225 163 / 0.5), transparent 20rem),
+    radial-gradient(ellipse at 82% 16%, rgb(105 63 17 / 0.2), transparent 15rem),
+    radial-gradient(ellipse at 25% 76%, rgb(82 45 10 / 0.18), transparent 18rem),
+    radial-gradient(ellipse at 68% 64%, rgb(139 89 25 / 0.13), transparent 21rem),
+    radial-gradient(circle at 36% 34%, rgb(82 48 12 / 0.08), transparent 4.8rem),
+    radial-gradient(circle at 57% 18%, rgb(255 244 205 / 0.13), transparent 9rem),
+    radial-gradient(circle at 75% 84%, rgb(72 39 8 / 0.09), transparent 5.5rem),
+    linear-gradient(105deg, rgb(255 245 206 / 0.08), transparent 32%, rgb(75 42 9 / 0.06) 62%, transparent),
+    linear-gradient(180deg, #e6cf96 0%, #d2ac61 58%, #bd9041 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.58),
+    inset 18px 0 30px -28px rgb(71 45 16 / 0.68),
+    inset -12px 0 22px -25px rgb(71 45 16 / 0.42),
+    0 12px 28px -16px rgb(0 0 0 / 0.55);
+  perspective: 1800px;
+  transform-style: preserve-3d;
+}
+
+.book-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 22%, rgb(107 71 27 / 0.075), transparent 6rem),
+    radial-gradient(circle at 82% 72%, rgb(92 58 22 / 0.08), transparent 8rem),
+    radial-gradient(circle at 52% 38%, rgb(255 255 255 / 0.14), transparent 12rem),
+    radial-gradient(circle at 22% 64%, rgb(68 41 12 / 0.055), transparent 3.5rem),
+    radial-gradient(circle at 73% 41%, rgb(78 48 14 / 0.05), transparent 4rem);
+  background-size: auto;
+  mix-blend-mode: multiply;
+}
+
+.book-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(60 38 13 / 0.2), transparent 3.2rem, transparent calc(100% - 2.2rem), rgb(70 43 14 / 0.1)),
+    linear-gradient(180deg, rgb(255 255 255 / 0.28), transparent 18%, transparent 82%, rgb(95 61 20 / 0.12));
+  mix-blend-mode: multiply;
+}
+
+.book-turn-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  transform-origin: right center;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.book-turn-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  background:
+    linear-gradient(90deg, rgb(82 52 18 / 0.2), transparent 3rem),
+    radial-gradient(ellipse at 16% 12%, rgb(250 225 163 / 0.48), transparent 19rem),
+    radial-gradient(ellipse at 83% 20%, rgb(105 63 17 / 0.18), transparent 15rem),
+    linear-gradient(180deg, #e6cf96 0%, #d2ac61 58%, #bd9041 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.36),
+    inset 20px 0 30px -28px rgb(71 45 16 / 0.64),
+    inset -18px 0 28px -28px rgb(71 45 16 / 0.46);
+}
+
+.book-turn-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgb(255 246 219 / 0.24) 35%, rgb(56 32 8 / 0.2) 100%),
+    radial-gradient(circle at 78% 52%, rgb(62 36 10 / 0.16), transparent 9rem),
+    radial-gradient(circle at 18% 26%, rgb(120 79 28 / 0.08), transparent 7rem);
+  mix-blend-mode: multiply;
+}
+
+.book-turn-face-back {
+  transform: rotateY(180deg);
+}
+
+.book-page.is-turning-next .book-turn-sheet {
+  animation: book-page-turn-next 0.88s cubic-bezier(0.14, 0.72, 0.18, 1) both;
+  box-shadow: -42px 0 70px -45px rgb(40 24 7 / 0.9);
+}
+
+.book-page.is-turning-previous .book-turn-sheet {
+  animation: book-page-turn-previous 0.88s cubic-bezier(0.14, 0.72, 0.18, 1) both;
+  transform-origin: left center;
+  box-shadow: 42px 0 70px -45px rgb(40 24 7 / 0.9);
+}
+
+@keyframes book-page-turn-next {
+  0% {
+    opacity: 1;
+    transform: rotateY(0deg) translateX(0) translateZ(1px);
+    filter: brightness(1.02);
+  }
+  34% {
+    opacity: 1;
+    transform: rotateY(-42deg) translateX(-0.7%) translateZ(1px);
+    filter: brightness(0.99);
+  }
+  62% {
+    opacity: 1;
+    transform: rotateY(-96deg) translateX(-2.1%) translateZ(1px);
+    filter: brightness(0.94);
+  }
+  84% {
+    opacity: 1;
+    transform: rotateY(-150deg) translateX(-3.5%) translateZ(1px);
+    filter: brightness(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(-180deg) translateX(-4%) translateZ(1px);
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes book-page-turn-previous {
+  0% {
+    opacity: 1;
+    transform: rotateY(0deg) translateX(0) translateZ(1px);
+    filter: brightness(1.02);
+  }
+  34% {
+    opacity: 1;
+    transform: rotateY(42deg) translateX(0.7%) translateZ(1px);
+    filter: brightness(0.99);
+  }
+  62% {
+    opacity: 1;
+    transform: rotateY(96deg) translateX(2.1%) translateZ(1px);
+    filter: brightness(0.94);
+  }
+  84% {
+    opacity: 1;
+    transform: rotateY(150deg) translateX(3.5%) translateZ(1px);
+    filter: brightness(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(180deg) translateX(4%) translateZ(1px);
+    filter: brightness(0.9);
+  }
+}
+
+.book-page-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  padding: clamp(1.35rem, 5.2vw, 4.6rem);
+  scrollbar-width: none;
+}
+
+.book-page-content::-webkit-scrollbar {
+  display: none;
+}
+
+.book-page-flow {
+  column-fill: auto;
+  column-gap: var(--book-page-gap);
+  column-width: var(--book-page-width);
+  height: 100%;
+  max-height: 100%;
+  transform: translateX(calc(-1 * var(--book-page-index) * (var(--book-page-width) + var(--book-page-gap))));
+  transition: none;
+  width: var(--book-page-width);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-page-flow {
+    transition: none;
+  }
+}
+
+.book-page-content .markdown-preview {
+  --md-border: rgb(171 139 93 / 0.5);
+  --md-code-bg: rgb(214 184 121 / 0.34);
+  --md-code-border: rgb(117 78 31 / 0.34);
+  --md-code-caption-bg-top: rgb(204 173 108 / 0.52);
+  --md-code-caption-bg-bottom: rgb(184 146 78 / 0.36);
+  --md-code-caption-fg: rgb(69 43 14);
+  --md-code-fg: rgb(46 31 15);
+  --md-code-gutter-bg: transparent;
+  --md-code-gutter-border: rgb(108 69 24 / 0.22);
+  --md-code-line-hover: rgb(87 53 16 / 0.08);
+  --md-code-line-number: rgb(96 63 25 / 0.58);
+  --md-fg: #2f2618;
+  --md-heading: #1b1309;
+  --md-inline-code-bg: rgb(211 178 111 / 0.4);
+  --md-inline-code-border: rgb(126 83 33 / 0.32);
+  --md-inline-code-fg: #2d251c;
+  --md-link: #205f63;
+  --md-link-decoration: rgb(32 95 99 / 0.38);
+  --md-muted-fg: #675744;
+  --md-quote-bg: rgb(216 185 123 / 0.25);
+  --md-quote-border: #5f7f67;
+  --md-strong: #1f1a14;
+  --md-surface: rgb(217 185 120 / 0.18);
+  --md-table-header-bg: rgb(204 171 105 / 0.42);
+  --md-table-row-alt: rgb(220 190 130 / 0.2);
+  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+  font-size: clamp(1.04rem, 2.9vw, 1.18rem);
+  line-height: 1.86;
+  overflow-x: visible;
+  overflow-wrap: break-word;
+}
+
+.book-page-content .markdown-preview h1,
+.book-page-content .markdown-preview h2,
+.book-page-content .markdown-preview h3,
+.book-page-content .markdown-preview h4,
+.book-page-content .markdown-preview h5,
+.book-page-content .markdown-preview h6 {
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
+  font-weight: 700;
+}
+
+.book-page-content .markdown-preview h1,
+.book-page-content .markdown-preview h2,
+.book-page-content .markdown-preview h3,
+.book-page-content .markdown-preview h4,
+.book-page-content .markdown-preview h5,
+.book-page-content .markdown-preview h6,
+.book-page-content .markdown-preview blockquote,
+.book-page-content .markdown-preview .markdown-details,
+.book-page-content .markdown-preview .markdown-table-wrap,
+.book-page-content .markdown-preview .markdown-code,
+.book-page-content .markdown-preview .markdown-mermaid,
+.book-page-content .markdown-preview .markdown-image {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.book-page-content .markdown-preview h1 {
+  font-size: clamp(1.62rem, 5.4vw, 2.2rem);
+}
+
+.book-page-content .markdown-preview h2 {
+  font-size: clamp(1.32rem, 4.4vw, 1.7rem);
+}
+
+.book-page-content .markdown-preview h3 {
+  font-size: clamp(1.16rem, 3.7vw, 1.34rem);
+}
+
+.book-page-content .markdown-preview p,
+.book-page-content .markdown-preview ul,
+.book-page-content .markdown-preview ol,
+.book-page-content .markdown-preview blockquote,
+.book-page-content .markdown-preview .markdown-details,
+.book-page-content .markdown-preview .markdown-table-wrap,
+.book-page-content .markdown-preview .markdown-code,
+.book-page-content .markdown-preview .markdown-mermaid {
+  margin: 0.9rem 0;
+}
+
+.book-page-content .markdown-preview .markdown-code code {
+  font-size: 0.92em;
+  line-height: 1.72;
+  min-width: 100%;
+  width: max-content;
+}
+
+.book-page-content .markdown-preview .markdown-code pre {
+  background:
+    linear-gradient(90deg, rgb(105 65 20 / 0.08) 0, rgb(105 65 20 / 0.08) 3.35rem, rgb(96 58 16 / 0.18) 3.35rem, transparent 3.42rem),
+    rgb(190 149 73 / 0.12);
+}
+
+.book-page-content .markdown-preview .markdown-code-line::before {
+  color: rgb(92 57 18 / 0.62);
+}
+
+.book-page-content .markdown-preview .markdown-code,
+.book-page-content .markdown-preview .markdown-mermaid,
+.book-page-content .markdown-preview .markdown-table-wrap,
+.book-page-content .markdown-preview blockquote,
+.book-page-content .markdown-preview .markdown-details {
+  background-color: rgb(206 172 101 / 0.18);
+  box-shadow:
+    inset 0 1px 0 rgb(255 245 214 / 0.22),
+    0 14px 26px -24px rgb(60 37 11 / 0.48);
+}
+
+.book-page-content .markdown-preview .markdown-code figcaption,
+.book-page-content .markdown-preview .markdown-mermaid figcaption {
+  background: linear-gradient(180deg, rgb(200 164 93 / 0.42), rgb(174 132 63 / 0.26));
+}
+
+.book-page-content .markdown-preview .markdown-table-wrap,
+.book-page-content .markdown-preview .markdown-code pre {
+  max-height: min(58dvh, 34rem);
+  overflow-x: auto;
+  overflow-y: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.book-page-content .markdown-preview .markdown-mermaid {
+  max-height: min(62dvh, 36rem);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.book-page-content .markdown-preview .markdown-mermaid-canvas {
+  justify-content: flex-start;
+  min-width: max-content;
+}
+
+.book-page-content .markdown-preview .markdown-code-line {
+  min-width: max-content;
+  white-space: pre;
+}
+
+@media (max-width: 640px) {
+  .book-reader-stage {
+    padding: 0;
+  }
+
+  .book-cover {
+    height: 100dvh;
+    width: 100%;
+    border-width: 0;
+    border-radius: 0;
+    background: #d2ac61;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .book-cover::before {
+    content: none;
+  }
+
+  .book-page {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .book-page::before {
+    background:
+      linear-gradient(90deg, rgb(87 56 20 / 0.11), transparent 2.25rem, transparent calc(100% - 1.8rem), rgb(87 56 20 / 0.06)),
+      linear-gradient(180deg, rgb(255 255 255 / 0.2), transparent 16%, transparent 84%, rgb(95 61 20 / 0.1));
+  }
+
+  .book-page-content {
+    padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem max(1.35rem, env(safe-area-inset-bottom));
+  }
+
+  .book-page-content .markdown-preview {
+    font-size: 1.1rem;
+    line-height: 1.92;
+  }
+}
+
+/* ================================
    PRINT PAGE SPECIFIC STYLES
    ================================ */
 .print-resume {

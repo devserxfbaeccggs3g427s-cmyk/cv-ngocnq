@@ -194,14 +194,14 @@ export function CommentBubble({
                   </button>
                   {isReasoningOpen && (
 	                    <div className="border-t border-blue-200 px-3 py-3 text-lg leading-8 text-blue-950 dark:border-blue-900/70 dark:text-blue-100 sm:py-2 sm:text-sm sm:leading-6">
-                      <MarkdownPreview content={aiContent.reasoning} />
+                      <MarkdownPreview content={aiContent.reasoning} enableBookReader bookReaderTitle="Suy nghĩ của AI" />
                     </div>
                   )}
                 </div>
               )}
 
               {displayBody ? (
-                <MarkdownPreview content={displayBody} />
+                <MarkdownPreview content={displayBody} enableBookReader bookReaderTitle={comment.author === 'ai' ? 'Phản hồi AI' : 'Bình luận'} />
               ) : (
 	                <div className="flex items-center gap-2 py-3 text-lg font-medium text-blue-700 dark:text-blue-300 sm:py-2 sm:text-sm">
                   <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
