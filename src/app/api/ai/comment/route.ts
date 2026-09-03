@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { validateEnvAiPassword } from '../env-confirmation';
 import {
   compactText,
   isNonEmptyString,
   jsonError,
   resolveApiKey,
   resolveBaseUrl,
-  usesEnvApiKey,
 } from '@/lib/api';
 import type { ChatCompletionChunk, ChatCompletionResponse } from '@/lib/api';
 
@@ -16,7 +14,6 @@ export const dynamic = 'force-dynamic';
 type AiCommentRequest = {
   provider?: unknown;
   apiKey?: unknown;
-  confirmPassword?: unknown;
   model?: unknown;
   baseUrl?: unknown;
   question?: unknown;
@@ -196,27 +193,13 @@ export async function POST(request: Request) {
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'openrouter';
-  const shouldValidateEnvPassword = usesEnvApiKey(provider, body.apiKey);
-  const passwordError = shouldValidateEnvPassword
-    ? validateEnvAiPassword(body.confirmPassword)
-    : null;
-
-  if (passwordError) {
-    return jsonError(passwordError.message, passwordError.status);
-  }
-
   const apiKey = resolveApiKey(provider, body.apiKey);
   const model = isNonEmptyString(body.model) ? body.model.trim() : '';
   const question = isNonEmptyString(body.question) ? body.question.trim() : '';
   const baseUrl = resolveBaseUrl(provider, body.baseUrl);
 
   if (!apiKey) {
-    return jsonError(
-      provider === 'kilo'
-        ? 'Chưa cấu hình API key Kilo AI trong env.'
-        : 'Vui lòng nhập API key trước khi hỏi AI.',
-      provider === 'kilo' ? 500 : 400
-    );
+    return jsonError('Vui lòng nhập token (API key) trước khi hỏi AI.', 400);
   }
 
   if (!model) {

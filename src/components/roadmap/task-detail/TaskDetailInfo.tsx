@@ -157,11 +157,11 @@ export function NoteCard({
   onRetryAutoNote?: () => void;
   onNoteChange: (note: string) => void;
   onNoteBlur: () => void;
-  onRequestAiRewrite?: (payload: { editInstruction: string; confirmPassword: string }) => Promise<void>;
+  onRequestAiRewrite?: (payload: { editInstruction: string; token: string }) => Promise<void>;
 }) {
   const [aiRewriteOpen, setAiRewriteOpen] = useState(false);
   const [editInstruction, setEditInstruction] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState('');
   const [aiRewriteStatus, setAiRewriteStatus] = useState<'idle' | 'rewriting' | 'saved' | 'error'>('idle');
   const [aiRewriteMessage, setAiRewriteMessage] = useState<string | null>(null);
   const canRetryAutoNote =
@@ -170,7 +170,7 @@ export function NoteCard({
     Boolean(onRequestAiRewrite) &&
     hasNote &&
     editInstruction.trim().length > 0 &&
-    confirmPassword.trim().length > 0 &&
+    token.trim().length > 0 &&
     aiRewriteStatus !== 'rewriting';
 
   async function handleAiRewrite() {
@@ -184,10 +184,10 @@ export function NoteCard({
     try {
       await onRequestAiRewrite({
         editInstruction: editInstruction.trim(),
-        confirmPassword: confirmPassword.trim(),
+        token: token.trim(),
       });
       setEditInstruction('');
-      setConfirmPassword('');
+      setToken('');
       setAiRewriteStatus('saved');
       setAiRewriteMessage('Đã cập nhật note bằng AI.');
     } catch (error) {
@@ -251,9 +251,9 @@ export function NoteCard({
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     type="password"
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    placeholder="Mật khẩu xác nhận AI"
+                    value={token}
+                    onChange={(event) => setToken(event.target.value)}
+                    placeholder="Nhập token (API key) để dùng AI"
                     className="min-h-10 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-800 dark:bg-gray-950 dark:text-white"
                   />
                   <button

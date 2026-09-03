@@ -25,7 +25,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
   const [noteComments, setNoteComments] = useState<NoteComment[]>([]);
   const [quizDecks, setQuizDecks] = useState<QuizDeck[]>([]);
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
-  const [aiConfirmPassword, setAiConfirmPassword] = useState('');
+  const [aiToken, setAiToken] = useState('');
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [quizError, setQuizError] = useState<string | null>(null);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
@@ -74,8 +74,8 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
 
   async function createQuiz() {
     if (!canCreateQuiz || !item?.note.trim()) { setQuizError(requirement); return; }
-    if (!aiConfirmPassword.trim()) {
-      setQuizError('Vui lòng nhập mật khẩu xác nhận trước khi dùng AI cấu hình trong env.');
+    if (!aiToken.trim()) {
+      setQuizError('Vui lòng nhập token (API key) trước khi tạo trắc nghiệm.');
       return;
     }
     setGeneratingQuiz(true);
@@ -85,7 +85,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          confirmPassword: aiConfirmPassword,
+          token: aiToken,
           task: { id: task.id, title: task.title, level: task.level, deliverable: task.deliverable },
           note: item.note,
           comments: noteComments.map((c) => ({ author: c.author, body: c.body, createdAt: c.createdAt })),
@@ -189,7 +189,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
       <QuizHeader task={task} quizDecks={quizDecks} noteComments={noteComments} />
       <QuizCreationCard
         canCreateQuiz={canCreateQuiz} generatingQuiz={generatingQuiz}
-        aiConfirmPassword={aiConfirmPassword} setAiConfirmPassword={setAiConfirmPassword}
+        aiToken={aiToken} setAiToken={setAiToken}
         duplicateDetectionEnabled={duplicateDetectionEnabled}
         setDuplicateDetectionEnabled={setDuplicateDetectionEnabled}
         createQuiz={createQuiz} requirement={requirement} quizError={quizError}

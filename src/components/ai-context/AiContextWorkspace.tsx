@@ -399,8 +399,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: draft.provider === 'kilo' ? undefined : draft.apiKey,
-          confirmPassword: draft.provider === 'kilo' ? draft.confirmPassword : undefined,
+          apiKey: draft.apiKey,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
           model: draft.model,
           question,

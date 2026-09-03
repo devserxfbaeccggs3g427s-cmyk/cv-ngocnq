@@ -17,7 +17,6 @@ export type AiStreamOptions = {
   model: string;
   apiKey: string;
   baseUrl: string;
-  confirmPassword: string;
   markdownContext?: string;
   studyContext?: string;
   threadContext?: string | ((comments: NoteComment[], userComment: NoteComment) => string);
@@ -53,7 +52,6 @@ export async function streamAiComment(options: AiStreamOptions, callbacks: AiStr
       body: JSON.stringify({
         provider: options.provider,
         apiKey: options.apiKey,
-        confirmPassword: options.confirmPassword,
         model: options.model,
         baseUrl: options.baseUrl,
         question: options.question,

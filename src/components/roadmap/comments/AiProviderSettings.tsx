@@ -8,7 +8,6 @@ import { CommentSearchBar } from './CommentSearchBar';
 export function AiProviderSettings({
   draft,
   onChange,
-  usesServerApiKey,
   currentModelOptions,
   selectedModel,
   isModelPickerOpen,
@@ -23,7 +22,6 @@ export function AiProviderSettings({
 }: {
   draft: CommentDraft;
   onChange: (update: Partial<CommentDraft>) => void;
-  usesServerApiKey: boolean;
   currentModelOptions: AiModelOption[];
   selectedModel: AiModelOption | undefined;
   isModelPickerOpen: boolean;
@@ -49,8 +47,7 @@ export function AiProviderSettings({
             onChange({
               provider,
               model: '',
-              apiKey: provider === 'kilo' ? '' : draft.apiKey,
-              confirmPassword: provider === 'kilo' ? draft.confirmPassword : '',
+              apiKey: draft.apiKey,
             });
           }}
           className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm font-medium"
@@ -129,43 +126,23 @@ export function AiProviderSettings({
         </label>
       )}
 
-      {!usesServerApiKey && (
-        <label className="block min-w-0 md:col-span-2">
-          <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            API key
-          </span>
-          <input
-            value={draft.apiKey}
-            onChange={(event) => onChange({ apiKey: event.target.value })}
-            type="password"
-            placeholder="Nhập API key khi hỏi AI"
-            autoComplete="off"
-            className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm"
-          />
-        </label>
-      )}
-
-      {usesServerApiKey && (
-        <label className="block min-w-0 md:col-span-2">
-          <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            Mật khẩu xác nhận
-          </span>
-          <input
-            value={draft.confirmPassword}
-            onChange={(event) => onChange({ confirmPassword: event.target.value })}
-            type="password"
-            placeholder="Nhập mật khẩu để dùng AI cấu hình trong env"
-            autoComplete="off"
-            className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm"
-          />
-        </label>
-      )}
+      <label className="block min-w-0 md:col-span-2">
+        <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          Token (API key)
+        </span>
+        <input
+          value={draft.apiKey}
+          onChange={(event) => onChange({ apiKey: event.target.value })}
+          type="password"
+          placeholder="Nhập token để dùng AI"
+          autoComplete="off"
+          className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm"
+        />
+      </label>
 
       <div className="flex flex-col gap-2 md:col-span-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {usesServerApiKey
-            ? 'Kilo AI tự tải model bằng cấu hình env phía server; Base URL và API key không được đưa ra trình duyệt.'
-            : 'Tải danh sách model do kênh AI cung cấp. API key chỉ cần khi gửi câu hỏi; Base URL chỉ cần nhập khi chọn Custom.'}
+          Tải danh sách model do kênh AI cung cấp. Token (API key) chỉ cần khi gửi câu hỏi; Base URL chỉ cần nhập khi chọn Custom.
         </p>
         <button
           type="button"

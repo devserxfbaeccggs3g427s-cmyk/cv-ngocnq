@@ -211,11 +211,9 @@ export function AiImageAnalysisWorkspace() {
   const [visibleCommentCount, setVisibleCommentCount] = useState(getVisibleCommentBatchSize);
   const [error, setError] = useState<string | null>(null);
 
-  const usesServerApiKey = draft.provider === 'kilo';
   const modelRequestKey = [
     draft.provider,
     draft.provider === 'custom' ? draft.baseUrl.trim() : '',
-    usesServerApiKey ? draft.confirmPassword : '',
   ].join('|');
   const currentModelOptions = loadedModelKey === modelRequestKey ? modelOptions : [];
   const currentModelError = modelError?.key === modelRequestKey ? modelError.message : null;
@@ -293,9 +291,9 @@ export function AiImageAnalysisWorkspace() {
   const hiddenCommentCount = Math.max(commentTree.length - visibleCommentTree.length, 0);
   const canLoadModels =
     (draft.provider !== 'custom' || Boolean(draft.baseUrl.trim())) &&
-    (!usesServerApiKey || Boolean(draft.confirmPassword.trim()));
-  const hasModelOrServerDefault = draft.provider === 'kilo' || draft.model.trim().length > 0;
-  const hasRequiredCredential = !usesServerApiKey || Boolean(draft.confirmPassword.trim());
+    Boolean(draft.apiKey.trim());
+  const hasModelOrServerDefault = draft.model.trim().length > 0;
+  const hasRequiredCredential = Boolean(draft.apiKey.trim());
   const canSubmit =
     images.length > 0 && prompt.trim().length > 0 && hasModelOrServerDefault && hasRequiredCredential && !isSubmitting;
   const displayedImageCount =
@@ -332,8 +330,7 @@ export function AiImageAnalysisWorkspace() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: usesServerApiKey ? undefined : draft.apiKey,
-          confirmPassword: usesServerApiKey ? draft.confirmPassword : undefined,
+          apiKey: draft.apiKey,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
         }),
       });
@@ -372,11 +369,9 @@ export function AiImageAnalysisWorkspace() {
   }, [
     draft.apiKey,
     draft.baseUrl,
-    draft.confirmPassword,
     draft.model,
     draft.provider,
     modelRequestKey,
-    usesServerApiKey,
   ]);
 
   function updateDraft(update: Partial<CommentDraft>) {
@@ -596,8 +591,7 @@ export function AiImageAnalysisWorkspace() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: commentDraft.provider,
-          apiKey: commentDraft.provider === 'kilo' ? undefined : commentDraft.apiKey,
-          confirmPassword: commentDraft.provider === 'kilo' ? commentDraft.confirmPassword : undefined,
+          apiKey: commentDraft.apiKey,
           baseUrl: commentDraft.provider === 'custom' ? commentDraft.baseUrl : undefined,
           model: commentDraft.model,
           question: userQuestion,
@@ -704,8 +698,8 @@ export function AiImageAnalysisWorkspace() {
       return;
     }
 
-    if (usesServerApiKey && !draft.confirmPassword.trim()) {
-      setError('Vui lòng nhập mật khẩu xác nhận để dùng AI cấu hình trong env.');
+    if (!draft.apiKey.trim()) {
+      setError('Vui lòng nhập token (API key) để phân tích ảnh.');
       return;
     }
 
@@ -717,8 +711,7 @@ export function AiImageAnalysisWorkspace() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: usesServerApiKey ? undefined : draft.apiKey,
-          confirmPassword: usesServerApiKey ? draft.confirmPassword : undefined,
+          apiKey: draft.apiKey,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
           model: draft.model,
           analysisKind,
@@ -1040,7 +1033,6 @@ export function AiImageAnalysisWorkspace() {
               <AiProviderSettings
                 draft={draft}
                 onChange={updateDraft}
-                usesServerApiKey={usesServerApiKey}
                 currentModelOptions={currentModelOptions}
                 selectedModel={selectedModel}
                 isModelPickerOpen={isModelPickerOpen}

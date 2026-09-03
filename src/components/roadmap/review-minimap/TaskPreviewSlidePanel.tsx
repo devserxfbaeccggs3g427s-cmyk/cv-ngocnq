@@ -50,7 +50,7 @@ export function TaskPreviewSlidePanel({
   const [commentCount, setCommentCount] = useState(0);
   const [aiRewriteOpen, setAiRewriteOpen] = useState(false);
   const [editInstruction, setEditInstruction] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState('');
   const [aiRewriteStatus, setAiRewriteStatus] = useState<'idle' | 'rewriting' | 'saved' | 'error'>('idle');
   const [aiRewriteMessage, setAiRewriteMessage] = useState<string | null>(null);
   const { autoNoteStatus, autoNoteMessage, retryAutoNote } = useAutoTaskNote({
@@ -66,7 +66,7 @@ export function TaskPreviewSlidePanel({
     Boolean(onProgressChange) &&
     hasNote &&
     editInstruction.trim().length > 0 &&
-    confirmPassword.trim().length > 0 &&
+    token.trim().length > 0 &&
     aiRewriteStatus !== 'rewriting';
   const effectivelyCompleted = task
     ? getTaskStudyState(task, progress).effectivelyCompleted
@@ -115,7 +115,7 @@ export function TaskPreviewSlidePanel({
       setCommentCount(0);
       setAiRewriteOpen(false);
       setEditInstruction('');
-      setConfirmPassword('');
+      setToken('');
       setAiRewriteStatus('idle');
       setAiRewriteMessage(null);
     });
@@ -146,7 +146,7 @@ export function TaskPreviewSlidePanel({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'rewrite',
-          confirmPassword: confirmPassword.trim(),
+          token: token.trim(),
           task: {
             id: task.id,
             title: task.title,
@@ -212,7 +212,7 @@ export function TaskPreviewSlidePanel({
       }
 
       setEditInstruction('');
-      setConfirmPassword('');
+      setToken('');
       setAiRewriteStatus('saved');
       setAiRewriteMessage('Đã cập nhật note bằng AI.');
     } catch (error) {
@@ -364,9 +364,9 @@ export function TaskPreviewSlidePanel({
                             <div className="flex flex-col gap-2 sm:flex-row">
                               <input
                                 type="password"
-                                value={confirmPassword}
-                                onChange={(event) => setConfirmPassword(event.target.value)}
-                                placeholder="Mật khẩu xác nhận AI"
+                                value={token}
+                                onChange={(event) => setToken(event.target.value)}
+                                placeholder="Nhập token (API key) để dùng AI"
                                 className="min-h-14 flex-1 rounded-lg border border-gray-300 bg-white px-3 text-lg text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-white sm:min-h-10 sm:border-gray-200 sm:text-sm sm:dark:border-gray-800"
                               />
                               <button

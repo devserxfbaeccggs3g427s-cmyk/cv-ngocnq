@@ -16,7 +16,7 @@ export type CommentDraft = {
   baseUrl: string;
   model: string;
   apiKey: string;
-  confirmPassword: string;
+  token: string;
 };
 
 export type AiModelOption = {
@@ -40,24 +40,14 @@ export const defaultDraft: CommentDraft = {
   baseUrl: '',
   model: '',
   apiKey: '',
-  confirmPassword: '',
+  token: '',
 };
 
 export const providerOptions: Array<{ value: AiProvider; label: string; hint: string }> = [
   {
-    value: 'kilo',
-    label: 'Kilo AI',
-    hint: 'Dùng Base URL mặc định https://api.kilo.ai/api/gateway.',
-  },
-  {
     value: 'openrouter',
     label: 'OpenRouter',
     hint: 'Dùng endpoint OpenRouter mặc định.',
-  },
-  {
-    value: 'custom',
-    label: 'Kilo AI / OpenAI-compatible',
-    hint: 'Nhập Base URL tương thích OpenAI.',
   },
 ];
 

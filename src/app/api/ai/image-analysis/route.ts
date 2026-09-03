@@ -4,10 +4,8 @@ import {
   jsonError,
   resolveApiKey,
   resolveBaseUrl,
-  usesEnvApiKey,
 } from '@/lib/api';
 import type { ChatCompletionResponse } from '@/lib/api';
-import { validateEnvAiPassword } from '../env-confirmation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +21,6 @@ type ImageInput = {
 type ImageAnalysisRequest = {
   provider?: unknown;
   apiKey?: unknown;
-  confirmPassword?: unknown;
   model?: unknown;
   baseUrl?: unknown;
   prompt?: unknown;
@@ -169,15 +166,6 @@ export async function POST(request: Request) {
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'kilo';
-  const shouldValidateEnvPassword = usesEnvApiKey(provider, body.apiKey);
-  const passwordError = shouldValidateEnvPassword
-    ? validateEnvAiPassword(body.confirmPassword)
-    : null;
-
-  if (passwordError) {
-    return jsonError(passwordError.message, passwordError.status);
-  }
-
   const apiKey = resolveApiKey(provider, body.apiKey);
   const baseUrl = resolveBaseUrl(provider, body.baseUrl);
   const model = resolveDefaultModel(provider, body.model);
@@ -186,12 +174,7 @@ export async function POST(request: Request) {
   const { images, error: imageError } = readImages(body.images);
 
   if (!apiKey) {
-    return jsonError(
-      provider === 'kilo'
-        ? 'Chưa cấu hình API key Kilo AI trong env.'
-        : 'Vui lòng nhập API key trước khi phân tích ảnh.',
-      provider === 'kilo' ? 500 : 400
-    );
+    return jsonError('Vui lòng nhập token (API key) trước khi phân tích ảnh.', 400);
   }
 
   if (!baseUrl) {

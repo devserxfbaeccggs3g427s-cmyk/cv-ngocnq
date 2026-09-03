@@ -142,10 +142,10 @@ export function SkillRoadmapTaskDetail({
 
   async function rewriteNoteWithAi({
     editInstruction,
-    confirmPassword,
+    token,
   }: {
     editInstruction: string;
-    confirmPassword: string;
+    token: string;
   }) {
     const currentProgress = progress;
     const currentNote = currentProgress?.items?.[task.id]?.note?.trim() ?? '';
@@ -159,7 +159,7 @@ export function SkillRoadmapTaskDetail({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         mode: 'rewrite',
-        confirmPassword,
+        token,
         task: {
           id: task.id,
           title: task.title,

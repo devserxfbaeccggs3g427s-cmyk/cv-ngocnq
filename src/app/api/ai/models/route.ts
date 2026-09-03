@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import { validateEnvAiPassword } from '../env-confirmation';
 import {
   isNonEmptyString,
   resolveApiKey,
   resolveBaseUrl,
-  usesEnvApiKey,
 } from '@/lib/api';
 
 export const runtime = 'nodejs';
@@ -13,7 +11,6 @@ export const dynamic = 'force-dynamic';
 type AiModelsRequest = {
   provider?: unknown;
   apiKey?: unknown;
-  confirmPassword?: unknown;
   baseUrl?: unknown;
 };
 
@@ -53,15 +50,6 @@ export async function POST(request: Request) {
   }
 
   const provider = isNonEmptyString(body.provider) ? body.provider.trim() : 'openrouter';
-  const shouldValidateEnvPassword = usesEnvApiKey(provider, body.apiKey);
-  const passwordError = shouldValidateEnvPassword
-    ? validateEnvAiPassword(body.confirmPassword)
-    : null;
-
-  if (passwordError) {
-    return NextResponse.json({ error: passwordError.message }, { status: passwordError.status });
-  }
-
   const apiKey = resolveApiKey(provider, body.apiKey);
   const baseUrl = resolveBaseUrl(provider, body.baseUrl);
   const defaultModel = resolveDefaultModel(provider);

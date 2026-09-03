@@ -11,7 +11,6 @@ export {
   providerBaseUrls,
   resolveApiKey,
   resolveBaseUrl,
-  usesEnvApiKey,
 } from './providers';
 export type { ChatCompletionChunk, ChatCompletionResponse } from './providers';
 export {

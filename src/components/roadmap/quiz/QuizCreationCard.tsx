@@ -62,8 +62,8 @@ export function QuizHeader({ task, quizDecks, noteComments }: QuizHeaderProps) {
 interface QuizCreationCardProps {
   canCreateQuiz: boolean;
   generatingQuiz: boolean;
-  aiConfirmPassword: string;
-  setAiConfirmPassword: (value: string) => void;
+  aiToken: string;
+  setAiToken: (value: string) => void;
   duplicateDetectionEnabled: boolean;
   setDuplicateDetectionEnabled: (enabled: boolean) => void;
   createQuiz: () => void;
@@ -77,8 +77,8 @@ interface QuizCreationCardProps {
 export function QuizCreationCard({
   canCreateQuiz,
   generatingQuiz,
-  aiConfirmPassword,
-  setAiConfirmPassword,
+  aiToken,
+  setAiToken,
   duplicateDetectionEnabled,
   setDuplicateDetectionEnabled,
   createQuiz,
@@ -123,13 +123,13 @@ export function QuizCreationCard({
             </label>
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Mật khẩu xác nhận
+                Token (API key)
               </span>
               <input
-                value={aiConfirmPassword}
-                onChange={(event) => setAiConfirmPassword(event.target.value)}
+                value={aiToken}
+                onChange={(event) => setAiToken(event.target.value)}
                 type="password"
-                placeholder="Password dùng AI env"
+                placeholder="Nhập token để dùng AI"
                 autoComplete="off"
                 className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-cyan-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
               />

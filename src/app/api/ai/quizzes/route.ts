@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { validateEnvAiPassword } from '../env-confirmation';
 import {
   compactText,
   hasTooMuchOverlap,
@@ -15,7 +14,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 type QuizRequest = {
-  confirmPassword?: unknown;
+  token?: unknown;
+  baseUrl?: unknown;
+  model?: unknown;
   task?: unknown;
   note?: unknown;
   comments?: unknown;
@@ -138,20 +139,17 @@ export async function POST(request: Request) {
     return jsonError('Task cần có note trước khi tạo trắc nghiệm.', 400);
   }
 
-  const passwordError = validateEnvAiPassword(body.confirmPassword);
-
-  if (passwordError) {
-    return jsonError(passwordError.message, passwordError.status);
-  }
-
-  const apiKey = process.env.AI_QUIZZ_API_KEY?.trim() ?? '';
-  const baseUrl = normalizeBaseUrl(process.env.AI_QUIZZ_BASE_URL ?? '');
-  const model = process.env.AI_QUIZZ_MODEL?.trim() ?? '';
+  const token = isNonEmptyString(body.token) ? body.token.trim() : '';
+  const apiKey = token || process.env.AI_QUIZZ_API_KEY?.trim() || '';
+  const baseUrl = normalizeBaseUrl(
+    isNonEmptyString(body.baseUrl) ? body.baseUrl : (process.env.AI_QUIZZ_BASE_URL ?? '')
+  );
+  const model = isNonEmptyString(body.model) ? body.model.trim() : (process.env.AI_QUIZZ_MODEL?.trim() ?? '');
 
   if (!apiKey || !baseUrl || !model) {
     return jsonError(
-      'Chưa cấu hình AI_QUIZZ_API_KEY, AI_QUIZZ_BASE_URL hoặc AI_QUIZZ_MODEL trong env.',
-      500
+      'Vui lòng nhập token (API key) hoặc cấu hình AI_QUIZZ_API_KEY, AI_QUIZZ_BASE_URL, AI_QUIZZ_MODEL trong env.',
+      400
     );
   }
 

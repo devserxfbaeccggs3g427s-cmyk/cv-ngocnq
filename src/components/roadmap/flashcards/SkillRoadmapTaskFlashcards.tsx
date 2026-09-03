@@ -21,7 +21,7 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
   const [noteComments, setNoteComments] = useState<NoteComment[]>([]);
   const [flashcardDecks, setFlashcardDecks] = useState<FlashcardDeck[]>([]);
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
-  const [aiConfirmPassword, setAiConfirmPassword] = useState('');
+  const [aiToken, setAiToken] = useState('');
   const [generatingFlashcards, setGeneratingFlashcards] = useState(false);
   const [flashcardError, setFlashcardError] = useState<string | null>(null);
   const [activeFlashcardIndex, setActiveFlashcardIndex] = useState(0);
@@ -56,7 +56,7 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
 
   async function createFlashcards() {
     if (!canCreateFlashcards || !item?.note.trim()) { setFlashcardError(requirement); return; }
-    if (!aiConfirmPassword.trim()) { setFlashcardError('Vui lòng nhập mật khẩu xác nhận trước khi dùng AI cấu hình trong env.'); return; }
+    if (!aiToken.trim()) { setFlashcardError('Vui lòng nhập token (API key) trước khi tạo flashcard.'); return; }
     setGeneratingFlashcards(true);
     setFlashcardError(null);
     try {
@@ -64,7 +64,7 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          confirmPassword: aiConfirmPassword,
+          token: aiToken,
           task: { id: task.id, title: task.title, level: task.level, deliverable: task.deliverable },
           note: item.note,
           comments: noteComments.map((c) => ({ author: c.author, body: c.body, createdAt: c.createdAt })),
@@ -151,8 +151,8 @@ export function SkillRoadmapTaskFlashcards({ task }: { task: TaskContext }) {
                 />
               </label>
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Mật khẩu xác nhận</span>
-                <input value={aiConfirmPassword} onChange={(e) => setAiConfirmPassword(e.target.value)} type="password" placeholder="Password dùng AI env" autoComplete="off" className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-violet-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100" />
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Token (API key)</span>
+                <input value={aiToken} onChange={(e) => setAiToken(e.target.value)} type="password" placeholder="Nhập token để dùng AI" autoComplete="off" className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-violet-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100" />
               </label>
               <button type="button" onClick={createFlashcards} disabled={!canCreateFlashcards || generatingFlashcards} className={cn('inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition', canCreateFlashcards ? 'bg-violet-600 text-white hover:bg-violet-700 disabled:cursor-wait disabled:bg-violet-400' : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400')}>
                 {generatingFlashcards ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}

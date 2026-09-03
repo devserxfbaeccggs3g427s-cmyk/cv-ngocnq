@@ -56,11 +56,10 @@ export function CommentForm({
   const autoLoadedModelKeyRef = useRef('');
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<{ key: string; message: string } | null>(null);
-  const usesServerApiKey = draft.provider === 'kilo';
+  const usesServerApiKey = false;
   const modelRequestKey = [
     draft.provider,
     draft.provider === 'custom' ? draft.baseUrl.trim() : '',
-    usesServerApiKey ? draft.confirmPassword : '',
   ].join('|');
   const currentModelOptions = loadedModelKey === modelRequestKey ? modelOptions : [];
   const currentModelError = modelError?.key === modelRequestKey ? modelError.message : null;
@@ -77,7 +76,7 @@ export function CommentForm({
   const canLoadModels =
     draft.mode === 'ai' &&
     (draft.provider !== 'custom' || Boolean(draft.baseUrl.trim())) &&
-    (!usesServerApiKey || Boolean(draft.confirmPassword.trim()));
+    Boolean(draft.apiKey.trim());
 
   const loadModels = useCallback(async () => {
     setModelError(null);
@@ -89,8 +88,7 @@ export function CommentForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: draft.provider,
-          apiKey: usesServerApiKey ? undefined : draft.apiKey,
-          confirmPassword: usesServerApiKey ? draft.confirmPassword : undefined,
+          apiKey: draft.apiKey,
           baseUrl: draft.provider === 'custom' ? draft.baseUrl : undefined,
         }),
       });
@@ -129,19 +127,17 @@ export function CommentForm({
   }, [
     draft.apiKey,
     draft.baseUrl,
-    draft.confirmPassword,
     draft.model,
     draft.provider,
     modelRequestKey,
     onChange,
-    usesServerApiKey,
   ]);
 
   useEffect(() => {
     if (
       draft.mode !== 'ai' ||
       !isAiSettingsOpen ||
-      draft.provider !== 'kilo' ||
+      !draft.apiKey.trim() ||
       loadedModelKey === modelRequestKey ||
       autoLoadedModelKeyRef.current === modelRequestKey ||
       isLoadingModels
@@ -151,7 +147,7 @@ export function CommentForm({
 
     autoLoadedModelKeyRef.current = modelRequestKey;
     loadModels();
-  }, [draft.mode, draft.provider, isAiSettingsOpen, isLoadingModels, loadModels, loadedModelKey, modelRequestKey]);
+  }, [draft.mode, draft.apiKey, isAiSettingsOpen, isLoadingModels, loadModels, loadedModelKey, modelRequestKey]);
 
   useEffect(() => {
     if (draft.mode !== 'ai') {
@@ -177,9 +173,7 @@ export function CommentForm({
         {draft.mode === 'ai' && (
           <div className="flex flex-wrap items-center gap-2 text-base font-medium leading-7 text-slate-700 dark:text-slate-200 sm:text-xs sm:leading-normal sm:text-slate-500 sm:dark:text-slate-400">
             <KeyRound className="h-4 w-4" aria-hidden="true" />
-            {usesServerApiKey
-              ? 'Kilo AI dùng API key cấu hình trong env, không hiển thị trên màn hình.'
-              : 'API key chỉ dùng cho request này, không lưu vào localStorage.'}
+            Token (API key) chỉ dùng cho request này, không lưu vào localStorage.
           </div>
         )}
       </div>
@@ -215,7 +209,6 @@ export function CommentForm({
               <AiProviderSettings
                 draft={draft}
                 onChange={onChange}
-                usesServerApiKey={usesServerApiKey}
                 currentModelOptions={currentModelOptions}
                 selectedModel={selectedModel}
                 isModelPickerOpen={isModelPickerOpen}

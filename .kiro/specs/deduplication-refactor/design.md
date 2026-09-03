@@ -118,7 +118,6 @@ export type ChatCompletionChunk = {
 };
 
 export const providerBaseUrls: Record<string, string> = {
-  kilo: 'https://api.kilo.ai/api/gateway',
   openrouter: 'https://openrouter.ai/api/v1',
 };
 

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { validateEnvAiPassword } from '../env-confirmation';
 import {
   compactText,
   isNonEmptyString,
@@ -15,7 +14,9 @@ export const dynamic = 'force-dynamic';
 
 type TaskNoteRequest = {
   mode?: unknown;
-  confirmPassword?: unknown;
+  token?: unknown;
+  baseUrl?: unknown;
+  model?: unknown;
   task?: unknown;
   learningPrompt?: unknown;
   isCompleted?: unknown;
@@ -46,7 +47,6 @@ function resolveTaskNoteConfig() {
       firstNonEmptyEnv(
         process.env.AI_TASK_NOTE_BASE_URL,
         process.env.AI_COMMENT_KILO_BASE_URL,
-        'https://api.kilo.ai/api/gateway'
       )
     ),
     model: firstNonEmptyEnv(
@@ -92,12 +92,6 @@ export async function POST(request: Request) {
     if (!editInstruction) {
       return jsonError('Thiếu yêu cầu chỉnh sửa note.', 400);
     }
-
-    const passwordError = validateEnvAiPassword(body.confirmPassword);
-
-    if (passwordError) {
-      return jsonError(passwordError.message, passwordError.status);
-    }
   }
 
   if (mode === 'auto' && !body.hasChildren) {
@@ -117,8 +111,20 @@ export async function POST(request: Request) {
   }
 
   const { apiKey, baseUrl, model } = resolveTaskNoteConfig();
+  const token = isNonEmptyString(body.token) ? body.token.trim() : '';
+  const effectiveApiKey = mode === 'rewrite' ? (token || apiKey) : apiKey;
+  const effectiveBaseUrl = mode === 'rewrite' && isNonEmptyString(body.baseUrl)
+    ? normalizeBaseUrl(body.baseUrl)
+    : baseUrl;
+  const effectiveModel = mode === 'rewrite' && isNonEmptyString(body.model)
+    ? body.model.trim()
+    : model;
 
-  if (!apiKey || !baseUrl || !model) {
+  if (!effectiveApiKey || !effectiveBaseUrl || !effectiveModel) {
+    if (mode === 'rewrite') {
+      return jsonError('Vui lòng nhập token (API key) hoặc cấu hình AI_TASK_NOTE_API_KEY trong env.', 400);
+    }
+
     return jsonError(
       'Chưa cấu hình AI_TASK_NOTE_API_KEY, AI_TASK_NOTE_BASE_URL hoặc AI_TASK_NOTE_MODEL trong env.',
       500
@@ -190,14 +196,14 @@ export async function POST(request: Request) {
         ];
 
   try {
-    const response = await fetch(`${baseUrl}/chat/completions`, {
+    const response = await fetch(`${effectiveBaseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${effectiveApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model,
+        model: effectiveModel,
         messages,
         temperature: 0.25,
       }),
@@ -222,7 +228,7 @@ export async function POST(request: Request) {
       note,
       source: {
         taskId: task.id,
-        model,
+        model: effectiveModel,
         generatedAt: new Date().toISOString(),
       },
     });
