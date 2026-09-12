@@ -197,7 +197,7 @@ export function SkillRoadmapTaskQuiz({ task }: { task: TaskContext }) {
       />
       {!activeQuiz ? (
         <Card>
-          <CardContent className="p-5 text-sm leading-6 text-gray-600 dark:text-gray-300">
+          <CardContent className="p-5 text-sm leading-6 text-[var(--fg-muted)]">
             Chưa có bài trắc nghiệm nào. Hãy tạo bài đầu tiên từ note và comment của task.
           </CardContent>
         </Card>

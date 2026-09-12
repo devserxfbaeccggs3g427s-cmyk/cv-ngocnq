@@ -56,24 +56,22 @@ export function QuizSessionPanel({
   return (
     <Card>
       <CardContent className="p-3 sm:p-5 md:p-6">
-        <div className="flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-[var(--line)] pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-base font-semibold leading-7 text-gray-700 dark:text-gray-200 sm:text-xs sm:uppercase sm:tracking-wide sm:text-gray-500 sm:dark:text-gray-400">
+            <p className="eyebrow">
               {activeQuiz.title} · {isReviewingAttempt ? 'Xem lại' : 'Làm bài'} · Câu {Math.min(activeQuestionIndex + 1, questions.length)}/{questions.length}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <div className="h-3 w-64 max-w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800 sm:h-2">
+              <div className="progress-track h-3 w-64 max-w-full sm:h-2">
                 <div
-                  className="h-full rounded-full bg-cyan-600 transition-all"
+                  className="progress-fill h-full"
                   style={{ width: `${questions.length ? (answeredCount / questions.length) * 100 : 0}%` }}
                 />
               </div>
               <span
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-base font-semibold sm:px-2 sm:py-1 sm:text-xs',
-                  quizStarted
-                    ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-200'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                  'badge',
+                  quizStarted ? 'badge-accent' : 'badge-ghost'
                 )}
               >
                 <Clock3 className="h-3.5 w-3.5" />
@@ -90,7 +88,7 @@ export function QuizSessionPanel({
               <button
                 type="button"
                 onClick={startQuiz}
-                className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-lg font-semibold text-white transition hover:bg-cyan-700 sm:h-9 sm:min-h-0 sm:w-fit sm:px-3 sm:py-0 sm:text-sm"
+                className="btn btn-primary w-full sm:w-fit"
               >
                 <Clock3 className="h-4 w-4" />
                 Bắt đầu làm bài
@@ -99,7 +97,7 @@ export function QuizSessionPanel({
             <button
               type="button"
               onClick={restartQuiz}
-              className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-lg font-semibold text-gray-800 transition hover:border-cyan-300 hover:text-cyan-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-cyan-700 dark:hover:text-cyan-300 sm:h-9 sm:min-h-0 sm:w-fit sm:px-3 sm:py-0 sm:text-sm"
+              className="btn btn-secondary w-full sm:w-fit"
             >
               <RotateCcw className="h-4 w-4" />
               Đặt lại màn làm
@@ -108,19 +106,19 @@ export function QuizSessionPanel({
         </div>
 
         {!quizStarted && !submitted && (
-          <div className="mt-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-4 text-lg leading-8 text-cyan-950 dark:border-cyan-900/60 dark:bg-cyan-950/30 dark:text-cyan-100 sm:py-3 sm:text-sm sm:leading-6">
+          <div className="card mt-5 border-[var(--accent)] px-4 py-4 text-lg leading-8 text-[var(--fg)] sm:py-3 sm:text-sm sm:leading-6">
             Bấm &quot;Bắt đầu làm bài&quot; để xác nhận vào lượt làm mới. Đồng hồ sẽ chạy ngay sau khi xác nhận và bài sẽ tự nộp khi hết giờ.
           </div>
         )}
 
         {submitted && activeAttempt?.submittedBy === 'timeout' && (
-          <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-4 text-lg font-medium leading-8 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 sm:py-3 sm:text-sm sm:leading-normal">
+          <div className="card mt-5 border-[var(--warn)] px-4 py-4 text-lg font-medium leading-8 text-[var(--warn)] sm:py-3 sm:text-sm sm:leading-normal">
             Đã hết thời gian, hệ thống đã tự động nộp bài.
           </div>
         )}
 
         {isReviewingAttempt && activeAttempt && (
-          <div className="mt-5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-4 text-lg leading-8 text-blue-950 dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-100 sm:py-3 sm:text-sm sm:leading-6">
+          <div className="card mt-5 border-[var(--accent)] px-4 py-4 text-lg leading-8 text-[var(--fg)] sm:py-3 sm:text-sm sm:leading-6">
             Đang xem lại lượt làm bắt đầu lúc {formatDate(activeAttempt.startedAt)}. Đáp án đã lưu được hiển thị kèm đúng/sai và giải thích.
           </div>
         )}
@@ -128,16 +126,16 @@ export function QuizSessionPanel({
         {activeQuestion && (
           <div className="mt-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-cyan-100 px-3 py-1.5 text-base font-semibold text-cyan-900 dark:bg-cyan-900/40 dark:text-cyan-100 sm:px-2 sm:py-0.5 sm:text-xs">
+              <span className="badge">
                 {activeQuestion.tag}
               </span>
               {submitted && answers[activeQuestion.id] !== undefined && (
                 <span
                   className={cn(
-                    'inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-base font-semibold sm:px-2 sm:py-0.5 sm:text-xs',
+                    'badge',
                     answers[activeQuestion.id] === activeQuestion.correctOptionIndex
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200'
-                      : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-200'
+                      ? 'border-[var(--success)] text-[var(--success)]'
+                      : 'border-[var(--warn)] text-[var(--warn)]'
                   )}
                 >
                   {answers[activeQuestion.id] === activeQuestion.correctOptionIndex ? (
@@ -150,7 +148,7 @@ export function QuizSessionPanel({
               )}
             </div>
 
-            <div className="quiz-markdown quiz-markdown-question mt-4 text-gray-950 dark:text-white">
+            <div className="quiz-markdown quiz-markdown-question mt-4 font-serif text-[var(--fg)]">
               <MarkdownPreview
                 content={activeQuestion.question}
                 enableBookReader
@@ -170,16 +168,16 @@ export function QuizSessionPanel({
                     onClick={() => answerQuestion(activeQuestion.id, optionIndex)}
                     disabled={!quizStarted || submitted}
                     className={cn(
-                      'flex w-full items-start gap-4 rounded-xl border px-4 py-5 text-left text-lg leading-8 transition sm:rounded-lg sm:gap-3 sm:py-3 sm:text-sm sm:leading-6',
+                      'flex w-full items-start gap-4 rounded-[var(--radius-card)] border px-4 py-5 text-left text-lg leading-8 transition sm:gap-3 sm:py-3 sm:text-sm sm:leading-6',
                       submitted && correct
-                        ? 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-100'
+                        ? 'border-[var(--success)] bg-[var(--surface-2)] text-[var(--fg)]'
                         : submitted && selected
-                          ? 'border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-100'
+                          ? 'border-[var(--warn)] bg-[var(--surface-2)] text-[var(--fg)]'
                           : selected
-                            ? 'border-cyan-400 bg-cyan-50 text-cyan-950 dark:border-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-100'
+                            ? 'border-[var(--fg)] bg-[var(--surface)] text-[var(--fg)]'
                             : quizStarted
-                              ? 'border-gray-200 bg-white text-gray-700 hover:border-cyan-300 hover:text-cyan-800 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-cyan-800 dark:hover:text-cyan-100'
-                              : 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-500'
+                              ? 'border-[var(--line)] bg-[var(--surface)] text-[var(--fg-muted)] hover:border-[var(--line-strong)] hover:text-[var(--fg)]'
+                              : 'cursor-not-allowed border-[var(--line)] bg-[var(--surface-2)] text-[var(--fg-subtle)]'
                     )}
                   >
                     <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-current text-base font-bold sm:h-6 sm:w-6 sm:border sm:text-xs">
@@ -194,10 +192,10 @@ export function QuizSessionPanel({
             </div>
 
             {submitted && (
-              <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4 text-lg leading-8 text-gray-800 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100 sm:text-sm sm:leading-6">
-                <div className="text-base font-semibold text-gray-700 dark:text-gray-200 sm:text-xs sm:uppercase sm:tracking-wide sm:text-gray-500 sm:dark:text-gray-400">
+              <div className="mt-5 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface-2)] p-4 text-lg leading-8 text-[var(--fg)] sm:text-sm sm:leading-6">
+                <span className="eyebrow">
                   Giải thích
-                </div>
+                </span>
                 <div className="quiz-markdown quiz-markdown-explanation mt-2">
                   <MarkdownPreview
                     content={activeQuestion.explanation || 'AI không trả về giải thích cho câu này.'}
@@ -213,7 +211,7 @@ export function QuizSessionPanel({
                 type="button"
                 onClick={() => setActiveQuestionIndex((current) => Math.max(current - 1, 0))}
                 disabled={activeQuestionIndex === 0}
-                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-lg font-semibold text-gray-800 transition hover:border-cyan-300 hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:text-gray-200 dark:hover:border-cyan-700 dark:hover:text-cyan-300 sm:h-10 sm:min-h-0 sm:py-0 sm:text-sm"
+                className="btn btn-secondary disabled:opacity-40"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Câu trước
@@ -224,7 +222,7 @@ export function QuizSessionPanel({
                     type="button"
                     onClick={() => submitQuiz('user')}
                     disabled={!quizStarted}
-                    className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-3 text-lg font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:bg-gray-300 dark:disabled:bg-gray-800 sm:h-10 sm:min-h-0 sm:py-0 sm:text-sm"
+                    className="btn btn-primary disabled:opacity-50"
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     Nộp bài
@@ -236,7 +234,7 @@ export function QuizSessionPanel({
                     setActiveQuestionIndex((current) => Math.min(current + 1, questions.length - 1))
                   }
                   disabled={activeQuestionIndex >= questions.length - 1}
-                  className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg bg-gray-950 px-4 py-3 text-lg font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200 sm:h-10 sm:min-h-0 sm:py-0 sm:text-sm"
+                  className="btn btn-primary disabled:opacity-40"
                 >
                   Câu sau
                   <ArrowRight className="h-4 w-4" />

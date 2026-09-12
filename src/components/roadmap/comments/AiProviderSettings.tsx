@@ -37,7 +37,7 @@ export function AiProviderSettings({
   return (
     <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
       <label className="block min-w-0">
-        <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <span className="eyebrow">
           Kênh AI
         </span>
         <select
@@ -50,7 +50,7 @@ export function AiProviderSettings({
               apiKey: draft.apiKey,
             });
           }}
-          className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm font-medium"
+          className="input-modern mt-1 w-full text-sm font-medium"
         >
           {providerOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -61,7 +61,7 @@ export function AiProviderSettings({
       </label>
 
       <label className="block min-w-0">
-        <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <span className="eyebrow">
           Model
         </span>
         {currentModelOptions.length > 0 ? (
@@ -69,19 +69,19 @@ export function AiProviderSettings({
             <button
               type="button"
               onClick={() => setIsModelPickerOpen(!isModelPickerOpen)}
-              className="input-modern flex min-h-10 w-full min-w-0 items-center justify-between gap-3 rounded-2xl px-3 py-2 text-left text-sm hover:border-blue-300"
+              className="input-modern flex min-h-10 w-full min-w-0 items-center justify-between gap-3 px-3 py-2 text-left text-sm"
               aria-expanded={isModelPickerOpen}
             >
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold text-slate-900 dark:text-slate-100">
+                <span className="block truncate font-semibold text-[var(--fg)]">
                   {selectedModel?.name || draft.model || 'Chọn model'}
                 </span>
-                <span className="mt-0.5 block truncate text-xs text-slate-500 dark:text-slate-400">
+                <span className="mt-0.5 block truncate text-xs text-[var(--fg-muted)]">
                   {selectedModel?.name ? selectedModel.id : selectedModel?.owner || `${currentModelOptions.length} model đã tải`}
                 </span>
               </span>
               <ChevronDown
-                className={cn('h-4 w-4 shrink-0 text-slate-400 transition', isModelPickerOpen && 'rotate-180')}
+                className={cn('h-4 w-4 shrink-0 text-[var(--fg-subtle)] transition', isModelPickerOpen && 'rotate-180')}
                 aria-hidden="true"
               />
             </button>
@@ -104,30 +104,30 @@ export function AiProviderSettings({
             value={draft.model}
             onChange={(event) => onChange({ model: event.target.value })}
             placeholder="Tải danh sách hoặc nhập model thủ công"
-            className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm"
+            className="input-modern mt-1 w-full text-sm"
           />
         )}
       </label>
 
       {draft.provider === 'custom' && (
         <label className="block min-w-0 md:col-span-2">
-          <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <span className="eyebrow">
             Base URL
           </span>
           <input
             value={draft.baseUrl}
             onChange={(event) => onChange({ baseUrl: event.target.value })}
             placeholder="https://.../v1"
-            className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm"
+            className="input-modern mt-1 w-full text-sm"
           />
-          <span className="mt-1 block text-xs text-slate-500 dark:text-slate-400">
+          <span className="mt-1 block text-xs text-[var(--fg-muted)]">
             {providerOptions.find((option) => option.value === draft.provider)?.hint}
           </span>
         </label>
       )}
 
       <label className="block min-w-0 md:col-span-2">
-        <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <span className="eyebrow">
           Token (API key)
         </span>
         <input
@@ -136,19 +136,19 @@ export function AiProviderSettings({
           type="password"
           placeholder="Nhập token để dùng AI"
           autoComplete="off"
-          className="input-modern mt-1 w-full rounded-2xl px-3 py-2 text-sm"
+          className="input-modern mt-1 w-full text-sm"
         />
       </label>
 
       <div className="flex flex-col gap-2 md:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-[var(--fg-muted)]">
           Tải danh sách model do kênh AI cung cấp. Token (API key) chỉ cần khi gửi câu hỏi; Base URL chỉ cần nhập khi chọn Custom.
         </p>
         <button
           type="button"
           onClick={loadModels}
           disabled={!canLoadModels || isLoadingModels}
-          className="inline-flex h-9 w-fit items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-950/55 dark:text-slate-200 dark:hover:border-blue-800 dark:hover:text-blue-300"
+          className="btn btn-secondary"
         >
           <RefreshCw className={cn('h-4 w-4', isLoadingModels && 'animate-spin')} aria-hidden="true" />
           {isLoadingModels ? 'Đang tải model...' : 'Tải danh sách model'}
@@ -156,7 +156,7 @@ export function AiProviderSettings({
       </div>
 
       {currentModelError && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200 md:col-span-2">
+        <div className="card border-[var(--warn)] px-3 py-2 text-xs font-medium text-[var(--warn)] md:col-span-2">
           {currentModelError}
         </div>
       )}

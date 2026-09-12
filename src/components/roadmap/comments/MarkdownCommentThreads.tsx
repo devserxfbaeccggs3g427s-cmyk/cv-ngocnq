@@ -144,14 +144,14 @@ export function MarkdownCommentThreads({
   };
 
   return (
-    <section className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950">
-      <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
+    <section className="card overflow-hidden">
+      <div className="flex flex-col gap-3 border-b border-[var(--line)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">Discussion</p>
-          <h2 className="mt-1 text-lg font-bold text-gray-950 dark:text-white">Comment & hỏi AI</h2>
+          <span className="eyebrow text-[var(--accent)]">Discussion</span>
+          <h2 className="mt-1 font-serif text-xl font-normal text-[var(--fg)]">Comment & hỏi AI</h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-semibold text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+          <div className="badge badge-ghost">
             <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
             {commentCount} comment
           </div>
@@ -168,14 +168,14 @@ export function MarkdownCommentThreads({
         />
 
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+          <div className="card border-[var(--accent)] px-3 py-2 text-sm font-medium text-[var(--accent)]">
             {error}
           </div>
         )}
 
         <div className="space-y-3">
           {commentTree.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-400">
+            <div className="rounded-[var(--radius-card)] border border-dashed border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-8 text-center text-sm text-[var(--fg-muted)]">
               Chưa có comment nào cho note này.
             </div>
           ) : (
@@ -192,7 +192,7 @@ export function MarkdownCommentThreads({
             <button
               type="button"
               onClick={() => setVisibleRootThreadCount((current) => current + visibleCommentStep)}
-              className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+              className="btn btn-secondary"
             >
               <ChevronDown className="h-4 w-4" aria-hidden="true" />
               Xem thêm {Math.min(hiddenRootThreadCount, visibleCommentStep)} thread cũ hơn

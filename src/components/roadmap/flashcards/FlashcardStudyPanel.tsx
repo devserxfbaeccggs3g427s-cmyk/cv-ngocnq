@@ -63,26 +63,26 @@ export function FlashcardStudyPanel({
           <FlashcardStat label="Cần ôn lại" value={String(hardCount)} />
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-3 py-3.5 dark:border-gray-800 dark:bg-gray-950 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
+        <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface-2)]">
+          <div className="flex flex-col gap-3 border-b border-[var(--line)] bg-[var(--surface)] px-3 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-violet-100 px-3 py-1.5 text-base font-semibold text-violet-900 dark:bg-violet-900/40 dark:text-violet-100 sm:px-2 sm:py-0.5 sm:text-xs">
+                <span className="badge">
                   {activeCard.tag}
                 </span>
-                <span className="text-base font-semibold text-gray-700 dark:text-gray-200 sm:text-xs sm:font-medium sm:text-gray-500 sm:dark:text-gray-400">
+                <span className="text-base font-semibold text-[var(--fg-muted)] sm:text-xs sm:font-medium">
                   Thẻ {activeIndex + 1}/{cards.length}
                 </span>
-                <span className="text-base font-medium leading-7 text-gray-700 dark:text-gray-200 sm:text-xs sm:leading-normal sm:text-gray-500 sm:dark:text-gray-400">
+                <span className="text-base font-medium leading-7 text-[var(--fg-muted)] sm:text-xs sm:leading-normal">
                   {deck.title} · {formatDate(deck.createdAt)}
                 </span>
                 {activeRating && (
                   <span
                     className={cn(
-                      'rounded-full px-3 py-1.5 text-base font-semibold sm:px-2 sm:py-0.5 sm:text-xs',
+                      'badge',
                       activeRating === 'good'
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200'
-                        : 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200'
+                        ? 'border-[var(--success)] text-[var(--success)]'
+                        : 'border-[var(--warn)] text-[var(--warn)]'
                     )}
                   >
                     {activeRating === 'good' ? 'Đã nhớ' : 'Cần ôn lại'}
@@ -99,7 +99,7 @@ export function FlashcardStudyPanel({
             <button
               type="button"
               onClick={onRestart}
-              className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-lg font-semibold text-gray-800 transition hover:border-violet-300 hover:text-violet-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-violet-700 dark:hover:text-violet-300 sm:h-9 sm:min-h-0 sm:w-fit sm:px-3 sm:py-0 sm:text-sm"
+              className="btn btn-secondary w-full sm:w-fit"
             >
               <RotateCcw className="h-4 w-4" />
               Ôn lại từ đầu
@@ -116,7 +116,7 @@ export function FlashcardStudyPanel({
             >
               <div
                 className={cn(
-                  'relative min-h-[27rem] rounded-xl transition-transform duration-500 ease-out [transform-style:preserve-3d] motion-reduce:transition-none sm:min-h-[22rem]',
+                  'relative min-h-[27rem] rounded-[var(--radius-card)] transition-transform duration-500 ease-out [transform-style:preserve-3d] motion-reduce:transition-none sm:min-h-[22rem]',
                   flipped ? '[transform:rotateY(180deg)]' : '[transform:rotateY(0deg)]'
                 )}
               >
@@ -125,11 +125,11 @@ export function FlashcardStudyPanel({
                   label={`Thẻ ${activeIndex + 1}/${cards.length}`}
                   tone="front"
                 >
-                  <div className="text-[1.72rem] font-bold leading-10 text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-2xl sm:leading-9">
+                  <div className="font-serif text-[1.72rem] font-normal leading-10 text-[var(--fg)] [overflow-wrap:anywhere] sm:text-2xl sm:leading-9">
                     {activeCard.front}
                   </div>
                   {activeCard.hint && (
-                    <div className="mt-6 rounded-lg border border-violet-100 bg-violet-50 px-4 py-4 text-lg leading-8 text-violet-950 dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-100 sm:py-3 sm:text-sm sm:leading-6">
+                    <div className="mt-6 rounded-md border border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-4 text-lg leading-8 text-[var(--fg)] sm:py-3 sm:text-sm sm:leading-6">
                       <span className="font-semibold">Gợi ý:</span> {activeCard.hint}
                     </div>
                   )}
@@ -141,31 +141,31 @@ export function FlashcardStudyPanel({
                   tone="back"
                   className="[transform:rotateY(180deg)]"
                 >
-                  <div className="max-h-72 overflow-y-auto pr-1 text-[1.45rem] font-semibold leading-10 text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:max-h-72 sm:text-xl sm:leading-8">
+                  <div className="max-h-72 overflow-y-auto pr-1 font-serif text-[1.45rem] font-normal leading-10 text-[var(--fg)] [overflow-wrap:anywhere] sm:max-h-72 sm:text-xl sm:leading-8">
                     {activeCard.back}
                   </div>
-                  <div className="mt-6 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-4 text-lg leading-8 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100 sm:py-3 sm:text-sm sm:leading-6">
+                  <div className="mt-6 rounded-md border border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-4 text-lg leading-8 text-[var(--fg)] sm:py-3 sm:text-sm sm:leading-6">
                     Tự đánh giá ngay sau khi đọc đáp án để theo dõi thẻ cần ôn lại.
                   </div>
                 </FlashcardFace>
               </div>
-              <div className="mt-4 flex items-center justify-center gap-2 text-base font-semibold text-gray-700 transition group-hover:text-violet-600 group-focus-visible:text-violet-600 dark:text-gray-200 dark:group-hover:text-violet-300 dark:group-focus-visible:text-violet-300 sm:text-xs sm:text-gray-500 sm:dark:text-gray-400">
+              <div className="mt-4 flex items-center justify-center gap-2 text-base font-semibold text-[var(--fg-muted)] transition group-hover:text-[var(--fg)] group-focus-visible:text-[var(--fg)] sm:text-xs">
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
                 {flipped ? 'Nhấn để quay lại câu hỏi' : 'Nhấn để lật xem đáp án'}
               </div>
             </button>
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-gray-200 bg-white px-3 py-4 dark:border-gray-800 dark:bg-gray-950 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+          <div className="flex flex-col gap-3 border-t border-[var(--line)] bg-[var(--surface)] px-3 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <div className="grid grid-cols-2 gap-2 sm:flex">
               <button
                 type="button"
                 onClick={() => onRate(activeCard.id, 'hard')}
                 className={cn(
-                  'inline-flex min-h-14 items-center justify-center gap-2 rounded-lg border px-3 py-3 text-lg font-semibold transition sm:h-9 sm:min-h-0 sm:py-0 sm:text-sm',
+                  'btn',
                   ratings[activeCard.id] === 'hard'
-                    ? 'border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-200'
-                    : 'border-gray-200 text-gray-700 hover:border-rose-300 hover:text-rose-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-rose-800 dark:hover:text-rose-200'
+                    ? 'btn-primary'
+                    : 'btn-secondary'
                 )}
               >
                 <X className="h-4 w-4" />
@@ -175,10 +175,10 @@ export function FlashcardStudyPanel({
                 type="button"
                 onClick={() => onRate(activeCard.id, 'good')}
                 className={cn(
-                  'inline-flex min-h-14 items-center justify-center gap-2 rounded-lg border px-3 py-3 text-lg font-semibold transition sm:h-9 sm:min-h-0 sm:py-0 sm:text-sm',
+                  'btn',
                   ratings[activeCard.id] === 'good'
-                    ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200'
-                    : 'border-gray-200 text-gray-700 hover:border-emerald-300 hover:text-emerald-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-emerald-800 dark:hover:text-emerald-200'
+                    ? 'btn-primary'
+                    : 'btn-secondary'
                 )}
               >
                 <Check className="h-4 w-4" />
@@ -191,7 +191,7 @@ export function FlashcardStudyPanel({
                 type="button"
                 onClick={onPrevious}
                 disabled={activeIndex === 0}
-                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-3 text-lg font-semibold text-gray-800 transition hover:border-violet-300 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:text-gray-200 dark:hover:border-violet-700 dark:hover:text-violet-300 sm:h-9 sm:min-h-0 sm:py-0 sm:text-sm"
+                className="btn btn-secondary disabled:opacity-40"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Trước
@@ -200,7 +200,7 @@ export function FlashcardStudyPanel({
                 type="button"
                 onClick={onNext}
                 disabled={activeIndex >= cards.length - 1}
-                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-lg bg-gray-950 px-3 py-3 text-lg font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200 sm:h-9 sm:min-h-0 sm:py-0 sm:text-sm"
+                className="btn btn-primary disabled:opacity-40"
               >
                 Sau
                 <ArrowRight className="h-4 w-4" />
@@ -227,9 +227,9 @@ export function FlashcardStudyPanel({
 
 function FlashcardStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-3.5 dark:border-gray-800 dark:bg-gray-900 sm:py-2">
-      <div className="text-2xl font-bold text-gray-950 dark:text-white sm:text-lg">{value}</div>
-      <div className="text-base font-semibold leading-6 text-gray-700 dark:text-gray-200 sm:text-xs sm:uppercase sm:tracking-wide sm:text-gray-500 sm:dark:text-gray-400">
+    <div className="rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] px-3 py-3.5 sm:py-2">
+      <div className="stat-number text-2xl text-[var(--fg)] sm:text-lg">{value}</div>
+      <div className="eyebrow mt-1">
         {label}
       </div>
     </div>

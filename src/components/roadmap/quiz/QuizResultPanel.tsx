@@ -29,13 +29,13 @@ export function QuizResultPanel({
     <>
       <Card>
         <CardContent className="p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <p className="eyebrow">
             Kết quả
           </p>
-          <div className="mt-3 text-3xl font-bold text-gray-950 dark:text-white">
+          <div className="stat-number mt-3 text-3xl text-[var(--fg)]">
             {submitted ? `${correctCount}/${questions.length}` : `${answeredCount}/${questions.length}`}
           </div>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+          <p className="mt-1 text-sm text-[var(--fg-muted)]">
             {submitted ? `Điểm tạm tính ${scorePercent}%` : 'Số câu đã chọn đáp án'}
           </p>
         </CardContent>
@@ -43,7 +43,7 @@ export function QuizResultPanel({
 
       <Card>
         <CardContent className="p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <p className="eyebrow">
             Danh sách câu
           </p>
           <div className="mt-3 grid grid-cols-5 gap-2">
@@ -57,16 +57,16 @@ export function QuizResultPanel({
                   type="button"
                   onClick={() => setActiveQuestionIndex(index)}
                   className={cn(
-                    'inline-flex h-9 items-center justify-center rounded-lg border text-sm font-semibold transition',
+                    'inline-flex h-9 items-center justify-center rounded-md border text-sm font-semibold transition',
                     activeQuestionIndex === index
-                      ? 'border-cyan-500 bg-cyan-50 text-cyan-800 dark:bg-cyan-950/30 dark:text-cyan-100'
+                      ? 'border-[var(--fg)] bg-[var(--surface)] text-[var(--fg)]'
                       : submitted && correct
-                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200'
+                        ? 'border-[var(--success)] bg-[var(--surface-2)] text-[var(--success)]'
                         : submitted && answered
-                          ? 'border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-200'
+                          ? 'border-[var(--warn)] bg-[var(--surface-2)] text-[var(--warn)]'
                           : answered
-                            ? 'border-gray-300 bg-gray-100 text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
-                            : 'border-gray-200 text-gray-500 hover:border-cyan-300 hover:text-cyan-700 dark:border-gray-800 dark:text-gray-400 dark:hover:border-cyan-800 dark:hover:text-cyan-200'
+                            ? 'border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg)]'
+                            : 'border-[var(--line)] text-[var(--fg-muted)] hover:border-[var(--line-strong)] hover:text-[var(--fg)]'
                   )}
                 >
                   {index + 1}

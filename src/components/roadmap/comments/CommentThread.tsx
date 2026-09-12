@@ -31,30 +31,36 @@ export function CommentThread({
   const href = getThreadHref(taskId, comment.id);
 
   return (
-    <article className={cn('rounded-lg border p-3', isAi ? 'border-blue-200 bg-blue-50/70 dark:border-blue-900/60 dark:bg-blue-950/20' : 'border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950')}>
+    <article className={cn(
+      'rounded-[var(--radius-card)] border p-3',
+      isAi ? 'border-[var(--line-strong)] bg-[var(--surface-2)]' : 'border-[var(--line)] bg-[var(--surface)]'
+    )}>
       <div className="flex min-w-0 items-start justify-between gap-3">
         <Link href={href} className="flex min-w-0 flex-1 items-center gap-2">
-          <span className={cn('inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full', isAi ? 'bg-blue-600 text-white' : 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-950')}>
+          <span className={cn(
+            'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+            isAi ? 'bg-[var(--fg)] text-[var(--bg)]' : 'border border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg-muted)]'
+          )}>
             {isAi ? <Bot className="h-4 w-4" aria-hidden="true" /> : <UserRound className="h-4 w-4" aria-hidden="true" />}
           </span>
           <span className="min-w-0">
             <span className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-bold text-gray-950 dark:text-white">
+              <span className="text-sm font-bold text-[var(--fg)]">
                 {isAi ? 'AI Assistant' : 'Bạn'}
               </span>
               {comment.model && (
-                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:ring-blue-900">
+                <span className="badge">
                   {comment.model}
                 </span>
               )}
               {hasStreamingReply && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+                <span className="badge badge-ghost">
                   <LoaderCircle className="h-3 w-3 animate-spin" aria-hidden="true" />
                   Đang nhận
                 </span>
               )}
             </span>
-            <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">
+            <span className="mt-0.5 block text-xs text-[var(--fg-muted)]">
               {formatDate(comment.createdAt)}
               {latestActivity !== comment.createdAt ? ` · mới nhất ${formatDate(latestActivity)}` : ''}
             </span>
@@ -63,7 +69,7 @@ export function CommentThread({
         <button
           type="button"
           onClick={() => onDelete(comment.id)}
-          className="inline-flex h-8 shrink-0 items-center justify-center rounded-lg border border-red-200 px-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/70 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200"
+          className="btn btn-ghost btn-sm shrink-0"
           aria-label="Xóa thread"
           title="Xóa thread"
         >
@@ -73,19 +79,19 @@ export function CommentThread({
 
       <Link
         href={href}
-        className="mt-3 block rounded-md bg-white/72 p-3 transition hover:bg-gray-50 dark:bg-gray-950/45 dark:hover:bg-gray-900/80"
+        className="mt-3 block rounded-md bg-[var(--surface-2)] p-3 transition hover:bg-[var(--surface)]"
       >
-        <p className="line-clamp-2 text-sm leading-6 text-gray-700 dark:text-gray-300">
+        <p className="line-clamp-2 text-sm leading-6 text-[var(--fg-muted)]">
           {comment.body ? plainTextPreview(comment.body) : 'AI đang soạn câu trả lời...'}
         </p>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold text-[var(--fg-muted)]">
           {nestedReplyCount > 0 && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-900">
+            <span className="badge badge-ghost">
               {nestedReplyCount} trả lời
             </span>
           )}
           {isAi && (
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-blue-700 dark:bg-blue-950 dark:text-blue-200">
+            <span className="badge">
               Câu trả lời AI
             </span>
           )}
@@ -96,7 +102,7 @@ export function CommentThread({
       <div className="mt-3 flex justify-end">
         <Link
           href={href}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-50 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+          className="btn btn-ghost btn-sm"
         >
           <Reply className="h-3.5 w-3.5" aria-hidden="true" />
           Mở thread

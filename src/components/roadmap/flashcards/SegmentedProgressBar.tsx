@@ -22,12 +22,13 @@ export function SegmentedProgressBar({
 
   return (
     <div
-      className="mt-3 flex h-3 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+      className="mt-3 flex h-3 overflow-hidden rounded-full bg-[var(--surface-2)]"
       role="list"
       aria-label="Tiến độ flashcard"
     >
       {cards.map((card, index) => {
         const rating = ratings[card.id];
+        const isActive = activeIndex === index;
 
         return (
           <button
@@ -35,16 +36,17 @@ export function SegmentedProgressBar({
             type="button"
             onClick={() => onSegmentClick(index)}
             className={cn(
-              'min-w-2 flex-1 transition hover:brightness-95 focus:outline-none focus-visible:brightness-90',
+              'min-w-2 flex-1 transition focus:outline-none',
               rating === 'good'
-                ? 'bg-emerald-500'
+                ? 'bg-[var(--success)]'
                 : rating === 'hard'
-                  ? 'bg-orange-400'
-                  : 'bg-gray-200 dark:bg-gray-700'
+                  ? 'bg-[var(--warn)]'
+                  : 'bg-[var(--line-strong)]',
+              isActive && 'ring-2 ring-[var(--fg)] ring-inset'
             )}
             role="listitem"
             aria-label={`Chuyển đến thẻ ${index + 1}`}
-            aria-current={activeIndex === index ? 'step' : undefined}
+            aria-current={isActive ? 'step' : undefined}
           />
         );
       })}

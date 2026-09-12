@@ -24,8 +24,8 @@ function ModeButton({
       className={cn(
         'rounded-full px-4 py-2.5 text-lg font-bold transition sm:px-3 sm:py-1.5 sm:text-sm',
         active
-          ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white'
+          ? 'bg-[var(--fg)] text-[var(--bg)]'
+          : 'text-[var(--fg-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--fg)]'
       )}
     >
       {children}
@@ -56,7 +56,6 @@ export function CommentForm({
   const autoLoadedModelKeyRef = useRef('');
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<{ key: string; message: string } | null>(null);
-  const usesServerApiKey = false;
   const modelRequestKey = [
     draft.provider,
     draft.provider === 'custom' ? draft.baseUrl.trim() : '',
@@ -159,9 +158,9 @@ export function CommentForm({
   }, [draft.mode]);
 
   return (
-    <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200/80 bg-white/60 p-3 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/55 sm:rounded-3xl">
+    <form onSubmit={onSubmit} className="card p-3 sm:rounded-3xl">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="inline-flex w-fit rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+        <div className="inline-flex w-fit rounded-full border border-[var(--line-strong)] bg-[var(--surface)] p-1">
           <ModeButton active={draft.mode === 'comment'} onClick={() => onChange({ mode: 'comment' })}>
             Comment thường
           </ModeButton>
@@ -171,7 +170,7 @@ export function CommentForm({
         </div>
 
         {draft.mode === 'ai' && (
-          <div className="flex flex-wrap items-center gap-2 text-base font-medium leading-7 text-slate-700 dark:text-slate-200 sm:text-xs sm:leading-normal sm:text-slate-500 sm:dark:text-slate-400">
+          <div className="flex flex-wrap items-center gap-2 text-base font-medium leading-7 text-[var(--fg-muted)] sm:text-xs sm:leading-normal">
             <KeyRound className="h-4 w-4" aria-hidden="true" />
             Token (API key) chỉ dùng cho request này, không lưu vào localStorage.
           </div>
@@ -179,33 +178,33 @@ export function CommentForm({
       </div>
 
       {draft.mode === 'ai' && (
-        <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white/75 dark:border-slate-800 dark:bg-slate-950/70">
+        <div className="mt-3 overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)]">
           <button
             type="button"
             onClick={() => setIsAiSettingsOpen((current) => !current)}
-            className="flex w-full items-center justify-between gap-3 px-3 py-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-900 sm:py-2"
+            className="flex w-full items-center justify-between gap-3 px-3 py-4 text-left transition hover:bg-[var(--surface-2)] sm:py-2"
             aria-expanded={isAiSettingsOpen}
           >
             <span className="flex min-w-0 items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+              <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--accent)]" aria-hidden="true" />
               <span className="min-w-0">
-                <span className="block text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-sm">
+                <span className="block text-lg font-bold text-[var(--fg)] sm:text-sm">
                   Cấu hình AI
                 </span>
-                <span className="block truncate text-base text-slate-700 dark:text-slate-200 sm:text-xs sm:text-slate-500 sm:dark:text-slate-400">
+                <span className="block truncate text-base text-[var(--fg-muted)] sm:text-xs">
                   {providerOptions.find((option) => option.value === draft.provider)?.label}
                   {draft.model ? ` · ${draft.model}` : ' · Chưa chọn model'}
                 </span>
               </span>
             </span>
             <ChevronDown
-              className={cn('h-4 w-4 shrink-0 text-slate-400 transition', isAiSettingsOpen && 'rotate-180')}
+              className={cn('h-4 w-4 shrink-0 text-[var(--fg-subtle)] transition', isAiSettingsOpen && 'rotate-180')}
               aria-hidden="true"
             />
           </button>
 
           {isAiSettingsOpen && (
-            <div className="border-t border-slate-200 p-3 dark:border-slate-800">
+            <div className="border-t border-[var(--line)] p-3">
               <AiProviderSettings
                 draft={draft}
                 onChange={onChange}
@@ -233,7 +232,7 @@ export function CommentForm({
           onChange={(event) => onChange({ body: event.target.value })}
           rows={4}
           placeholder={draft.mode === 'ai' ? 'Nhập câu hỏi cho AI...' : 'Viết comment...'}
-          className="input-modern w-full resize-y rounded-2xl px-4 py-4 text-lg leading-8 placeholder:text-slate-400 sm:px-3 sm:py-2 sm:text-sm sm:leading-6"
+          className="input-modern w-full resize-y px-4 py-4 text-lg leading-8 placeholder:text-[var(--fg-subtle)] sm:px-3 sm:py-2 sm:text-sm sm:leading-6"
         />
       </label>
 
@@ -242,7 +241,7 @@ export function CommentForm({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex min-h-14 items-center gap-2 rounded-full border border-slate-300 bg-white/70 px-5 py-3 text-lg font-bold text-slate-700 transition hover:bg-white hover:text-slate-950 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-200 dark:hover:bg-slate-950 dark:hover:text-white sm:h-9 sm:min-h-0 sm:border-slate-200 sm:px-3 sm:py-0 sm:text-sm sm:text-slate-600 sm:dark:border-slate-800 sm:dark:text-slate-300"
+            className="btn btn-ghost"
           >
             <X className="h-4 w-4" aria-hidden="true" />
             Hủy
@@ -251,7 +250,7 @@ export function CommentForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex min-h-14 items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 px-5 py-3 text-lg font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 sm:h-9 sm:min-h-0 sm:px-3.5 sm:py-0 sm:text-sm"
+          className="btn btn-primary"
         >
           <Send className="h-4 w-4" aria-hidden="true" />
           {isSubmitting ? 'Đang gửi...' : submitLabel}

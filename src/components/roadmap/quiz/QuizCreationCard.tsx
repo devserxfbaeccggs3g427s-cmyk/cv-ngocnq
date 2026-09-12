@@ -25,32 +25,32 @@ export function QuizHeader({ task, quizDecks, noteComments }: QuizHeaderProps) {
       <div className="min-w-0">
         <Link
           href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          className="link-editorial inline-flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
           Quay lại chi tiết task
         </Link>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="font-mono text-xs font-semibold uppercase text-gray-400">{task.id}</span>
-          <span className="rounded-full bg-cyan-100 px-2 py-0.5 text-xs font-semibold text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-200">
+          <span className="eyebrow">{task.id}</span>
+          <span className="badge badge-accent">
             Trắc nghiệm AI
           </span>
           {quizDecks.length > 0 && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+            <span className="badge badge-ghost">
               {quizDecks.length} bài
             </span>
           )}
         </div>
-        <h1 className="mt-2 text-2xl font-bold leading-tight text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-3xl">
+        <h1 className="mt-2 font-serif text-2xl font-normal leading-tight text-[var(--fg)] [overflow-wrap:anywhere] sm:text-3xl">
           {task.title}
         </h1>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--fg-muted)]">
           Bài trắc nghiệm được tạo từ toàn bộ note hiện tại và {noteComments.length} comment của task.
         </p>
       </div>
       <Link
         href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`}
-        className="inline-flex h-10 w-fit items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+        className="btn btn-secondary w-fit"
       >
         <FileText className="h-4 w-4" />
         Mở note
@@ -93,24 +93,24 @@ export function QuizCreationCard({
       <CardContent className="p-5 md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-600 dark:text-cyan-300">
+            <span className="eyebrow text-[var(--accent)]">
               Tạo bài kiểm tra
-            </p>
-            <h2 className="mt-1 flex items-center gap-2 text-lg font-bold text-gray-950 dark:text-white">
-              <CircleHelp className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />
+            </span>
+            <h2 className="mt-1 flex items-center gap-2 font-serif text-xl font-normal text-[var(--fg)]">
+              <CircleHelp className="h-5 w-5 text-[var(--accent)]" />
               Nhiều bài trắc nghiệm từ note và comment
             </h2>
-            <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm leading-6 text-[var(--fg-muted)]">
               Bạn có thể tạo nhiều bài khác nhau cho cùng task. Khi tạo bài mới, hệ thống gửi các câu đã có để AI đổi góc hỏi và chặn bài mới nếu trùng quá 50%.
             </p>
           </div>
           <div className="w-full shrink-0 space-y-2 md:w-72">
-            <label className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-950">
+            <label className="flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] px-3 py-2">
               <span className="min-w-0">
-                <span className="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <span className="block text-xs font-semibold uppercase tracking-wide text-[var(--fg-muted)]">
                   Chặn câu trùng
                 </span>
-                <span className="block text-xs text-gray-500 dark:text-gray-400">
+                <span className="block text-xs text-[var(--fg-muted)]">
                   Gửi câu đã có cho AI
                 </span>
               </span>
@@ -118,11 +118,11 @@ export function QuizCreationCard({
                 type="checkbox"
                 checked={duplicateDetectionEnabled}
                 onChange={(event) => setDuplicateDetectionEnabled(event.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                className="h-4 w-4 rounded border-[var(--line-strong)] accent-[var(--fg)]"
               />
             </label>
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <span className="eyebrow">
                 Token (API key)
               </span>
               <input
@@ -131,19 +131,14 @@ export function QuizCreationCard({
                 type="password"
                 placeholder="Nhập token để dùng AI"
                 autoComplete="off"
-                className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-cyan-400 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-100"
+                className="input-modern mt-1 w-full text-sm"
               />
             </label>
             <button
               type="button"
               onClick={createQuiz}
               disabled={!canCreateQuiz || generatingQuiz}
-              className={cn(
-                'inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition',
-                canCreateQuiz
-                  ? 'bg-cyan-600 text-white hover:bg-cyan-700 disabled:cursor-wait disabled:bg-cyan-400'
-                  : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
-              )}
+              className={cn('btn w-full', canCreateQuiz ? 'btn-primary' : 'btn-secondary')}
             >
               {generatingQuiz ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               {generatingQuiz ? 'Đang tạo' : quizDecks.length > 0 ? 'Tạo bài mới' : 'Tạo trắc nghiệm'}
@@ -152,13 +147,13 @@ export function QuizCreationCard({
         </div>
 
         {requirement && (
-          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+          <div className="card mt-4 border-[var(--warn)] px-4 py-3 text-sm font-medium text-[var(--warn)]">
             {requirement}
           </div>
         )}
 
         {quizError && (
-          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+          <div className="card mt-4 border-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--accent)]">
             {quizError}
           </div>
         )}
@@ -171,19 +166,21 @@ export function QuizCreationCard({
                 type="button"
                 onClick={() => selectQuiz(quiz.id)}
                 className={cn(
-                  'rounded-lg border p-4 text-left transition',
+                  'card p-4 text-left transition',
                   activeQuiz?.id === quiz.id
-                    ? 'border-cyan-400 bg-cyan-50 text-cyan-950 dark:border-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-100'
-                    : 'border-gray-200 bg-white text-gray-700 hover:border-cyan-300 hover:text-cyan-800 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:border-cyan-800 dark:hover:text-cyan-100'
+                    ? 'border-[var(--fg)] bg-[var(--surface)]'
+                    : 'hover:border-[var(--line-strong)]'
                 )}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold">{quiz.title || `Bài trắc nghiệm ${index + 1}`}</span>
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                  <span className="font-serif text-base font-semibold text-[var(--fg)]">
+                    {quiz.title || `Bài trắc nghiệm ${index + 1}`}
+                  </span>
+                  <span className="badge badge-ghost">
                     {quiz.questions.length} câu
                   </span>
                 </div>
-                <div className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                <div className="mt-2 text-xs font-medium text-[var(--fg-muted)]">
                   Tạo lúc {formatDate(quiz.createdAt)} · {quiz.durationMinutes} phút · {quiz.attempts.length} lượt
                 </div>
               </button>

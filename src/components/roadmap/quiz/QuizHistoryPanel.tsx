@@ -18,7 +18,7 @@ export function QuizHistoryPanel({
   return (
     <Card>
       <CardContent className="p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        <p className="eyebrow">
           Lịch sử làm bài
         </p>
         {activeQuiz.attempts.length > 0 ? (
@@ -29,13 +29,13 @@ export function QuizHistoryPanel({
                 type="button"
                 onClick={() => reviewAttempt(attempt)}
                 className={cn(
-                  'w-full rounded-lg border p-3 text-left text-xs leading-5 transition',
+                  'w-full rounded-[var(--radius-card)] border p-3 text-left text-xs leading-5 transition',
                   reviewingAttemptId === attempt.id
-                    ? 'border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-100'
-                    : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-blue-300 hover:text-blue-800 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300 dark:hover:border-blue-800 dark:hover:text-blue-100'
+                    ? 'border-[var(--fg)] bg-[var(--surface)] text-[var(--fg)]'
+                    : 'border-[var(--line)] bg-[var(--surface-2)] text-[var(--fg-muted)] hover:border-[var(--line-strong)] hover:text-[var(--fg)]'
                 )}
               >
-                <div className="font-semibold text-gray-900 dark:text-white">
+                <div className="font-semibold text-[var(--fg)]">
                   Lượt {activeQuiz.attempts.length - index}: {attempt.score ?? countCorrectAnswers(activeQuiz.questions, attempt.answers)}/{attempt.total}
                 </div>
                 <div>Bắt đầu: {formatDate(attempt.startedAt)}</div>
@@ -49,7 +49,7 @@ export function QuizHistoryPanel({
             ))}
           </div>
         ) : (
-          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Chưa có lượt làm nào.</p>
+          <p className="mt-3 text-sm text-[var(--fg-muted)]">Chưa có lượt làm nào.</p>
         )}
       </CardContent>
     </Card>

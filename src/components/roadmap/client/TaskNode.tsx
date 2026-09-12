@@ -12,21 +12,22 @@ interface TaskNodeProps {
   progress: ProgressFile;
   expandedTaskIds: Set<string>;
   savingTaskId: string | null;
+  isLastChild?: boolean;
   onToggle: (task: RoadmapTask) => void;
   onToggleExpanded: (taskId: string) => void;
   onTitleClick?: (taskId: string) => void;
 }
 
-function getTaskDepthStyle(depth: number): string {
-  if (depth === 0) return 'border-transparent bg-white/55 dark:bg-slate-900/30';
-  if (depth === 1) return 'border-sky-200 bg-sky-50/60 dark:border-sky-900/70 dark:bg-sky-950/18';
-  if (depth === 2) return 'border-violet-200 bg-violet-50/50 dark:border-violet-900/70 dark:bg-violet-950/18';
-  return 'border-amber-200 bg-amber-50/45 dark:border-amber-900/70 dark:bg-amber-950/18';
-}
-
 export function TaskNode({
-  task, depth, progress, expandedTaskIds,
-  savingTaskId, onToggle, onToggleExpanded, onTitleClick,
+  task,
+  depth,
+  progress,
+  expandedTaskIds,
+  savingTaskId,
+  isLastChild = false,
+  onToggle,
+  onToggleExpanded,
+  onTitleClick,
 }: TaskNodeProps) {
   const item = progress.items[task.id];
   const saving = savingTaskId === task.id;
@@ -48,16 +49,18 @@ export function TaskNode({
   const childProgressing = !effectivelyCompleted && hasStartedChildren;
   const isChild = depth > 0;
   const isExpanded = expandedTaskIds.has(task.id);
-  const depthStyle = getTaskDepthStyle(depth);
 
   return (
-    <div className="divide-y divide-slate-100/80 dark:divide-slate-800">
+    <div className="task-node">
       <div
         className={cn(
-          'task-node-row grid grid-cols-[auto_minmax(0,1fr)] gap-3 border-l-4 py-4 pr-4 transition sm:gap-4 sm:py-5 md:pr-6',
-          depthStyle,
-          childProgressing && 'border-amber-300 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/25',
-          effectivelyCompleted && 'border-emerald-300 bg-emerald-50/75 dark:border-emerald-800 dark:bg-emerald-950/25'
+          'task-node-row relative grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 py-3 transition sm:gap-4 sm:py-4',
+          // Parent (top-level) tasks — editorial container with strong left rail
+          !isChild && 'rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] px-4 sm:px-5',
+          !isChild && childProgressing && 'border-[var(--warn)] bg-[var(--surface)]',
+          !isChild && effectivelyCompleted && 'border-[var(--success)] bg-[var(--surface-2)]',
+          // Child tasks — compact, no card chrome, just tree guide line
+          isChild && 'rounded-md border border-transparent bg-transparent px-3 hover:bg-[var(--surface-2)] sm:px-4'
         )}
         style={{ '--task-depth': depth } as CSSProperties}
       >
@@ -66,9 +69,9 @@ export function TaskNode({
           onClick={hasChildren ? undefined : () => onToggle(task)}
           disabled={hasChildren}
           className={cn(
-            'mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-slate-200 bg-white/70 text-slate-400 shadow-sm transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-950/35 dark:hover:border-blue-700',
-            isChild && 'h-8 w-8',
-            hasChildren && 'cursor-default hover:border-slate-200 hover:text-slate-400 disabled:opacity-100 dark:hover:border-slate-700'
+            'mt-0.5 inline-flex shrink-0 items-center justify-center rounded-full border bg-[var(--surface)] text-[var(--fg-muted)] transition hover:border-[var(--fg)] hover:text-[var(--fg)]',
+            !isChild ? 'h-10 w-10' : 'h-8 w-8',
+            hasChildren && 'cursor-default hover:border-[var(--line)] hover:text-[var(--fg-muted)]'
           )}
           aria-label={
             hasChildren
@@ -82,7 +85,7 @@ export function TaskNode({
           {saving ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : effectivelyCompleted ? (
-            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+            <CheckCircle2 className="h-5 w-5 text-[var(--success)]" />
           ) : (
             <Circle className="h-5 w-5" />
           )}
@@ -90,23 +93,23 @@ export function TaskNode({
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-400">{task.id.toUpperCase()}</span>
+            <span className={cn('eyebrow', !isChild && 'text-[var(--fg)]')}>{task.id.toUpperCase()}</span>
             {isChild && (
-              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <span className="badge badge-ghost text-[10px]">
                 Mục con cấp {depth}
               </span>
             )}
-            <span className={cn('rounded-full px-2 py-0.5 text-xs font-semibold', levelStyles[task.level] ?? levelStyles['Trung cấp'])}>
+            <span className={cn('inline-flex items-center rounded-full border bg-[var(--bg)] px-2 py-0.5 text-xs font-semibold', levelStyles[task.level] ?? levelStyles['Trung cấp'])}>
               {task.level}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--fg-muted)]">
               <Clock3 className="h-3.5 w-3.5" />{task.estimateHours}h
             </span>
             {childCount > 0 && (
               <span className={cn(
-                'rounded-full px-2 py-0.5 text-xs font-semibold',
-                childProgressing ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
-                effectivelyCompleted && 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200'
+                'inline-flex items-center rounded-full border bg-[var(--bg)] px-2 py-0.5 text-xs font-semibold',
+                childProgressing ? 'border-[var(--warn)] text-[var(--warn)]' : 'border-[var(--line)] text-[var(--fg-muted)]',
+                effectivelyCompleted && 'border-[var(--success)] text-[var(--success)]'
               )}>
                 {completedChildren}/{childCount} mục con
               </span>
@@ -118,7 +121,7 @@ export function TaskNode({
               <button
                 type="button"
                 onClick={() => onToggleExpanded(task.id)}
-                className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/80 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[var(--fg-muted)] transition hover:bg-[var(--surface-2)] hover:text-[var(--fg)]"
                 aria-label={isExpanded ? 'Thu gọn mục con' : 'Mở mục con'}
                 aria-expanded={isExpanded}
               >
@@ -127,12 +130,15 @@ export function TaskNode({
             ) : (
               <span className="h-6 w-6 shrink-0" />
             )}
-            <h4 className={cn('min-w-0 font-bold leading-6 text-slate-950 dark:text-white', isChild ? 'text-sm' : 'text-base')}>
+            <h4 className={cn(
+              'min-w-0 font-bold leading-6 text-[var(--fg)]',
+              isChild ? 'text-sm' : 'text-base sm:text-lg'
+            )}>
               {onTitleClick ? (
                 <button
                   type="button"
                   onClick={() => onTitleClick(task.id)}
-                  className="max-w-full text-left transition-colors [overflow-wrap:anywhere] hover:text-blue-700 dark:hover:text-blue-300"
+                  className="max-w-full text-left transition-colors [overflow-wrap:anywhere] hover:text-[var(--accent)]"
                 >
                   {task.title}
                 </button>
@@ -141,12 +147,20 @@ export function TaskNode({
               )}
             </h4>
           </div>
-          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-            <span className="font-bold text-slate-800 dark:text-slate-100">Kết quả cần có:</span>{' '}
-            {task.deliverable}
-          </p>
+
+          {!isChild && (
+            <p className="mt-2 text-sm leading-6 text-[var(--fg-muted)]">
+              <span className="font-bold text-[var(--fg)]">Kết quả cần có:</span>{' '}
+              {task.deliverable}
+            </p>
+          )}
+          {isChild && (
+            <p className="mt-1 text-xs leading-5 text-[var(--fg-muted)] [overflow-wrap:anywhere]">
+              {task.deliverable}
+            </p>
+          )}
           {item?.completedAt && (
-            <p className="mt-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+            <p className="mt-2 text-xs font-medium text-[var(--fg-muted)]">
               Hoàn thành: {new Date(item.completedAt).toLocaleString('vi-VN')}
             </p>
           )}
@@ -154,20 +168,47 @@ export function TaskNode({
       </div>
 
       {hasChildren && isExpanded && (
-        <div>
-          {childTasks.map((child) => (
-            <TaskNode
-              key={child.id}
-              task={child}
-              depth={depth + 1}
-              progress={progress}
-              expandedTaskIds={expandedTaskIds}
-              savingTaskId={savingTaskId}
-              onToggle={onToggle}
-              onToggleExpanded={onToggleExpanded}
-              onTitleClick={onTitleClick}
-            />
-          ))}
+        <div className={cn(
+          'tree-children relative',
+          isChild ? 'ml-7 sm:ml-8' : 'mt-2 ml-7 sm:ml-10',
+          // Vertical guide line down the left side of the children group
+          !isLastChild && 'pb-1'
+        )}>
+          {/* Vertical tree guide line */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-3 top-0 w-px bg-[var(--line-strong)] sm:left-4"
+            style={{ height: 'calc(100% - 0.5rem)' }}
+          />
+          {childTasks.map((child, index) => {
+            const isLast = index === childTasks.length - 1;
+            return (
+              <div
+                key={child.id}
+                className={cn(
+                  'tree-child relative',
+                  index === 0 && 'pt-1'
+                )}
+              >
+                {/* Horizontal connector arm from vertical line into the row */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute left-3 top-[1.55rem] h-px w-3 bg-[var(--line-strong)] sm:left-4 sm:top-[1.85rem] sm:w-4"
+                />
+                <TaskNode
+                  task={child}
+                  depth={depth + 1}
+                  progress={progress}
+                  expandedTaskIds={expandedTaskIds}
+                  savingTaskId={savingTaskId}
+                  isLastChild={isLast}
+                  onToggle={onToggle}
+                  onToggleExpanded={onToggleExpanded}
+                  onTitleClick={onTitleClick}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

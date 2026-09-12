@@ -28,35 +28,35 @@ export function RoadmapTrackCard({
   const trackCompleted = trackTasks.filter(
     (task) => getTaskStudyState(task, progress).effectivelyCompleted
   ).length;
-  const trackRate = Math.round((trackCompleted / trackTasks.length) * 100);
+  const trackRate = trackTasks.length ? Math.round((trackCompleted / trackTasks.length) * 100) : 0;
 
   return (
     <Card className="overflow-hidden">
-      <div className="border-b border-slate-200/70 bg-white/55 px-5 py-5 dark:border-slate-800 dark:bg-slate-900/35 md:px-6">
+      <div className="border-b border-[var(--line)] bg-[var(--surface-2)] px-5 py-5 md:px-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <div className="mb-2 flex flex-wrap items-center gap-2">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
               <Badge>{track.duration}</Badge>
-              <Badge variant="secondary">{track.level}</Badge>
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              <Badge>{track.level}</Badge>
+              <span className="text-sm font-medium text-[var(--fg-muted)]">
                 {trackCompleted}/{trackTasks.length} task
               </span>
             </div>
-            <h2 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white">
+            <h2 className="font-serif text-2xl font-normal leading-tight text-[var(--fg)]">
               {track.title}
             </h2>
-            <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-[var(--fg-muted)]">
               {track.goal}
             </p>
           </div>
 
           <div className="min-w-32">
-            <div className="mb-1 text-right text-sm font-black text-slate-950 dark:text-white">
+            <div className="stat-number mb-1 text-right text-2xl text-[var(--fg)]">
               {trackRate}%
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-200/80 dark:bg-slate-800">
+            <div className="progress-track">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-400"
+                className="progress-fill"
                 style={{ width: `${trackRate}%` }}
               />
             </div>
@@ -67,7 +67,7 @@ export function RoadmapTrackCard({
           {track.skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-full border border-slate-200/70 bg-white/70 px-2.5 py-1 text-xs font-bold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300"
+              className="badge"
             >
               {skill}
             </span>
@@ -76,31 +76,45 @@ export function RoadmapTrackCard({
       </div>
 
       <CardContent className="p-0">
-        {track.modules.map((module) => (
-          <div key={module.id} className="border-b border-slate-100/80 last:border-b-0 dark:border-slate-800">
-            <div className="bg-slate-50/70 px-5 py-3 dark:bg-slate-950/45 md:px-6">
-              <h3 className="text-sm font-bold uppercase tracking-[0.16em] text-slate-700 dark:text-slate-300">
-                {module.title}
-              </h3>
-            </div>
+        {track.modules.map((module) => {
+          const moduleTasks = flattenTasks(module.tasks);
+          const moduleCompleted = moduleTasks.filter(
+            (task) => getTaskStudyState(task, progress).effectivelyCompleted
+          ).length;
+          const moduleRate = moduleTasks.length
+            ? Math.round((moduleCompleted / moduleTasks.length) * 100)
+            : 0;
+          return (
+            <div key={module.id} className="border-b border-[var(--line)] last:border-b-0">
+              <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] bg-[var(--bg)] px-5 py-3 md:px-6">
+                <h3 className="eyebrow">
+                  {module.title}
+                </h3>
+                <span className="badge badge-ghost text-[10px]">
+                  {moduleCompleted}/{moduleTasks.length} task · {moduleRate}%
+                </span>
+              </div>
 
-            <div className="divide-y divide-slate-100/80 dark:divide-slate-800">
-              {module.tasks.map((task) => (
-                <TaskNode
-                  key={task.id}
-                  task={task}
-                  depth={0}
-                  progress={progress}
-                  expandedTaskIds={expandedTaskIds}
-                  savingTaskId={savingTaskId}
-                  onToggle={onToggle}
-                  onToggleExpanded={onToggleExpanded}
-                  onTitleClick={onTitleClick}
-                />
-              ))}
+              {/* Top-level tasks render as cards with clear separation between them.
+                  Each TaskNode now visually wraps its own children inside. */}
+              <div className="flex flex-col gap-3 p-4 sm:gap-4 sm:p-5">
+                {module.tasks.map((task) => (
+                  <TaskNode
+                    key={task.id}
+                    task={task}
+                    depth={0}
+                    progress={progress}
+                    expandedTaskIds={expandedTaskIds}
+                    savingTaskId={savingTaskId}
+                    onToggle={onToggle}
+                    onToggleExpanded={onToggleExpanded}
+                    onTitleClick={onTitleClick}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );
