@@ -65,7 +65,7 @@ export function ContactForm() {
         <p className="mb-6 text-slate-600 dark:text-slate-300">
           Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi trong thời gian sớm nhất.
         </p>
-        <Button onClick={() => setStatus('idle')} variant="outline">
+        <Button onClick={() => setStatus('idle')} variant="secondary">
           Gửi lời nhắn khác
         </Button>
       </div>

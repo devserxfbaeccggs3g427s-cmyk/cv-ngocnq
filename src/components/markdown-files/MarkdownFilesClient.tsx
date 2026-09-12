@@ -240,44 +240,52 @@ export function MarkdownFilesClient() {
   }, [activeEntry, entries]);
 
   return (
-    <div className="space-y-6">
-      <div className="premium-ring relative overflow-hidden rounded-[2rem] border border-white/60 bg-white/70 p-6 shadow-[0_28px_100px_-70px_rgba(37,99,235,0.9)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/72 lg:flex lg:items-end lg:justify-between">
-        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
-        <div>
+    <div className="space-y-10">
+      <header className="border-b border-[var(--line)] pb-8">
+        <div className="mb-6">
           <Link
             href="/workspace"
-            className="relative inline-flex items-center gap-2 text-sm font-bold text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
+            className="group inline-flex items-center gap-2 text-sm font-medium text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Workspace
+            <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+            Quay lại Workspace
           </Link>
-          <h1 className="relative mt-3 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-4xl">
-            Kho tài liệu Markdown
-          </h1>
-          <p className="relative mt-3 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-            Tổ chức tài liệu thành thư mục cha con, tạo file Markdown ở bất kỳ cấp nào và preview nội dung độc lập với lộ trình ôn tập.
-          </p>
         </div>
 
-        <div className="relative mt-5 flex flex-wrap gap-2 lg:mt-0">
-          <button
-            type="button"
-            onClick={createFolder}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-2 text-sm font-bold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:text-blue-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-blue-700 dark:hover:text-blue-300"
-          >
-            <FolderPlus className="h-4 w-4" />
-            Tạo thư mục
-          </button>
-          <button
-            type="button"
-            onClick={createFile}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25"
-          >
-            <FilePlus2 className="h-4 w-4" />
-            Tạo file
-          </button>
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="rule-short" />
+              <span className="eyebrow">Workspace</span>
+            </div>
+            <h1 className="font-serif text-3xl font-normal leading-[1.05] tracking-tight text-[var(--fg)] sm:text-4xl md:text-5xl">
+              Kho tài liệu Markdown
+            </h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--fg-muted)]">
+              Tổ chức tài liệu thành thư mục cha con, tạo file Markdown ở bất kỳ cấp nào và preview nội dung độc lập với lộ trình ôn tập.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={createFolder}
+              className="btn btn-secondary"
+            >
+              <FolderPlus className="h-4 w-4" />
+              Tạo thư mục
+            </button>
+            <button
+              type="button"
+              onClick={createFile}
+              className="btn btn-primary"
+            >
+              <FilePlus2 className="h-4 w-4" />
+              Tạo file
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       <Card>
         <CardContent className="p-5 md:p-6">
@@ -289,10 +297,10 @@ export function MarkdownFilesClient() {
                 : 'lg:grid-cols-[320px_minmax(0,1fr)]'
             )}
           >
-            <aside className="rounded-3xl border border-slate-200/80 bg-slate-50/70 p-2 dark:border-slate-800 dark:bg-slate-950/60">
+            <aside className="rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface-2)] p-2">
               <div className={cn('mb-2 flex items-center gap-2', sidebarCollapsed ? 'justify-center' : 'justify-between')}>
                 {!sidebarCollapsed && (
-                  <span className="px-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+                  <span className="eyebrow px-2">
                     Tài liệu
                   </span>
                 )}
@@ -301,7 +309,7 @@ export function MarkdownFilesClient() {
                   onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
                   title={sidebarCollapsed ? 'Mở cây thư mục' : 'Thu gọn cây thư mục'}
                   aria-label={sidebarCollapsed ? 'Mở cây thư mục' : 'Thu gọn cây thư mục'}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-800 dark:hover:text-blue-200"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--bg)] text-[var(--fg-muted)] transition hover:border-[var(--fg)] hover:text-[var(--fg)]"
                 >
                   {sidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
                 </button>
@@ -311,11 +319,11 @@ export function MarkdownFilesClient() {
                 type="button"
                 onClick={() => selectEntry(null)}
                 className={cn(
-                  'mb-2 flex h-10 w-full items-center rounded-2xl text-left text-sm font-bold transition',
+                  'mb-2 flex h-10 w-full items-center rounded-[var(--radius-card)] text-left text-sm font-bold transition',
                   sidebarCollapsed ? 'justify-center px-0' : 'gap-2 px-3',
                   !activeEntry
-                    ? 'bg-blue-50 text-blue-800 dark:bg-blue-950/40 dark:text-blue-100'
-                    : 'text-slate-700 hover:bg-white hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white'
+                    ? 'bg-[var(--surface)] text-[var(--fg)]'
+                    : 'text-[var(--fg-muted)] hover:bg-[var(--surface)] hover:text-[var(--fg)]'
                 )}
                 title="Tất cả tài liệu"
               >
@@ -324,11 +332,11 @@ export function MarkdownFilesClient() {
               </button>
 
               {sidebarCollapsed ? (
-                <div className="flex min-h-44 items-center justify-center rounded-2xl border border-dashed border-slate-300 text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                <div className="flex min-h-44 items-center justify-center rounded-[var(--radius-card)] border border-dashed border-[var(--line)] text-[var(--fg-subtle)]">
                   <Folder className="h-5 w-5" />
                 </div>
               ) : entries.length === 0 ? (
-                <div className="flex min-h-44 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 px-4 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                <div className="flex min-h-44 flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed border-[var(--line)] px-4 text-center text-sm text-[var(--fg-muted)]">
                   <Folder className="mb-2 h-5 w-5" />
                   Chưa có thư mục hoặc file.
                 </div>
@@ -351,10 +359,10 @@ export function MarkdownFilesClient() {
 
             <section className="min-w-0">
               {activeEntry ? (
-                <div className="min-w-0 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 dark:border-slate-800 dark:bg-slate-950/55">
-                  <div className="border-b border-slate-200/70 p-4 dark:border-slate-800">
-                    <div className="mb-3 flex flex-wrap items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                      <button type="button" onClick={() => selectEntry(null)} className="font-semibold hover:text-blue-700 dark:hover:text-blue-300">
+                <div className="card min-w-0 overflow-hidden">
+                  <div className="border-b border-[var(--line)] p-4">
+                    <div className="mb-3 flex flex-wrap items-center gap-1 text-xs text-[var(--fg-muted)]">
+                      <button type="button" onClick={() => selectEntry(null)} className="font-semibold hover:text-[var(--fg)]">
                         Gốc
                       </button>
                       {activePath.map((entry) => (
@@ -364,8 +372,8 @@ export function MarkdownFilesClient() {
                             type="button"
                             onClick={() => selectEntry(entry.id)}
                             className={cn(
-                              'max-w-40 truncate hover:text-blue-700 dark:hover:text-blue-300',
-                              entry.id === activeEntry.id && 'font-semibold text-slate-800 dark:text-slate-100'
+                              'max-w-40 truncate hover:text-[var(--fg)]',
+                              entry.id === activeEntry.id && 'font-semibold text-[var(--fg)]'
                             )}
                           >
                             {entry.title || 'Chưa đặt tên'}
@@ -380,7 +388,7 @@ export function MarkdownFilesClient() {
                         <input
                           value={activeEntry.title}
                           onChange={(event) => updateActiveEntry({ title: event.target.value })}
-                          className="input-modern h-10 w-full rounded-2xl px-3 text-sm font-semibold"
+                          className="input-modern h-10 text-sm font-semibold"
                         />
                       </label>
 
@@ -388,7 +396,7 @@ export function MarkdownFilesClient() {
                         <select
                           value={activeEntry.parentId ?? ''}
                           onChange={(event) => updateActiveEntry({ parentId: event.target.value || null })}
-                          className="input-modern h-10 min-w-0 flex-1 rounded-2xl px-3 text-sm font-semibold sm:flex-none"
+                          className="input-modern h-10 min-w-0 flex-1 text-sm font-semibold sm:flex-none"
                         >
                           <option value="">Gốc</option>
                           {availableParentFolders.map((folder) => (
@@ -404,10 +412,8 @@ export function MarkdownFilesClient() {
                               type="button"
                               onClick={() => setMode('edit')}
                               className={cn(
-                                'inline-flex flex-1 items-center justify-center gap-2 rounded-full border px-3 py-2 text-sm font-bold transition sm:flex-none',
-                                mode === 'edit'
-                                  ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200'
-                                  : 'border-slate-200 text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600'
+                                'btn',
+                                mode === 'edit' ? 'btn-primary' : 'btn-secondary'
                               )}
                             >
                               <Pencil className="h-4 w-4" />
@@ -417,10 +423,8 @@ export function MarkdownFilesClient() {
                               type="button"
                               onClick={() => setMode('preview')}
                               className={cn(
-                                'inline-flex flex-1 items-center justify-center gap-2 rounded-full border px-3 py-2 text-sm font-bold transition sm:flex-none',
-                                mode === 'preview'
-                                  ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200'
-                                  : 'border-slate-200 text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600'
+                                'btn',
+                                mode === 'preview' ? 'btn-primary' : 'btn-secondary'
                               )}
                             >
                               <Eye className="h-4 w-4" />
@@ -432,7 +436,7 @@ export function MarkdownFilesClient() {
                         <button
                           type="button"
                           onClick={deleteActiveEntry}
-                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-red-200 px-3 py-2 text-sm font-bold text-red-700 transition hover:bg-red-50 dark:border-red-900/70 dark:text-red-300 dark:hover:bg-red-950/30 sm:flex-none"
+                          className="btn btn-ghost"
                         >
                           <Trash2 className="h-4 w-4" />
                           Xoá
@@ -542,16 +546,16 @@ function MarkdownFileEditPanel({
 
   return (
     <div className={cn('grid h-full min-h-0 gap-0', previewVisible && 'lg:grid-cols-2')}>
-      <div className="flex h-full min-h-0 flex-col border-gray-200 dark:border-gray-800 lg:border-r">
-        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-4 dark:border-gray-800">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+      <div className="flex h-full min-h-0 flex-col border-[var(--line)] lg:border-r">
+        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-[var(--line)] px-4">
+          <div className="eyebrow flex items-center gap-2">
             <Save className="h-4 w-4" />
             Editor
           </div>
           <button
             type="button"
             onClick={onTogglePreview}
-            className="inline-flex h-8 items-center gap-2 rounded-md border border-gray-200 px-2.5 text-xs font-semibold text-gray-600 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:text-gray-300 dark:hover:border-blue-800 dark:hover:text-blue-200"
+            className="btn btn-ghost btn-sm"
           >
             {previewVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             {previewVisible ? 'Ẩn preview' : 'Hiện preview'}
@@ -563,13 +567,13 @@ function MarkdownFileEditPanel({
           onChange={(event) => onChangeContent(event.target.value)}
           onScroll={() => syncScroll('editor')}
           spellCheck={false}
-          className="min-h-0 flex-1 resize-none border-0 bg-white p-4 font-mono text-sm leading-6 text-gray-900 outline-none dark:bg-gray-950 dark:text-gray-100"
+          className="min-h-0 flex-1 resize-none border-0 bg-[var(--bg)] p-4 font-mono text-sm leading-6 text-[var(--fg)] outline-none"
         />
       </div>
 
       {previewVisible && (
         <div className="hidden h-full min-h-0 min-w-0 flex-col lg:flex">
-          <div className="flex h-11 shrink-0 items-center gap-2 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
+          <div className="eyebrow flex h-11 shrink-0 items-center gap-2 border-b border-[var(--line)] px-4">
             <Eye className="h-4 w-4" />
             Preview
           </div>
@@ -612,14 +616,14 @@ function MarkdownFilePreviewPanel({ file }: { file: MarkdownFile }) {
   return (
     <div className="relative h-full min-h-0 min-w-0">
       <article ref={markdownArticleRef} className="flex h-full min-h-0 min-w-0 flex-col">
-        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        <div className="flex h-11 shrink-0 items-center justify-between gap-3 border-b border-[var(--line)] px-4">
+          <div className="eyebrow flex items-center gap-2">
             <Eye className="h-4 w-4" />
             Preview
           </div>
           <Link
             href={`/markdown-files/read/${encodeURIComponent(file.id)}`}
-            className="inline-flex h-8 items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 text-xs font-bold normal-case tracking-normal text-amber-900 transition hover:border-amber-300 hover:bg-amber-100 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100 dark:hover:border-amber-800 dark:hover:bg-amber-950/50"
+            className="btn btn-secondary btn-sm"
           >
             <BookOpen className="h-3.5 w-3.5" />
             Sách
@@ -665,35 +669,33 @@ function MarkdownFileAppendixDrawer({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="absolute bottom-4 right-4 z-20 inline-flex items-center gap-2 rounded-full bg-gray-950 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-gray-950/20 transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+        className="btn btn-primary absolute bottom-4 right-4 z-20 shadow-md"
         aria-haspopup="dialog"
         aria-expanded={open}
       >
         <ListTree className="h-4 w-4" aria-hidden="true" />
         Phụ lục
-        <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs dark:bg-gray-950/10">
-          {headings.length}
-        </span>
+        <span className="badge badge-inverse">{headings.length}</span>
       </button>
 
       {open && (
         <div className="absolute inset-0 z-30" role="dialog" aria-modal="true" aria-label="Phụ lục file Markdown">
           <button
             type="button"
-            className="absolute inset-0 bg-gray-950/45"
+            className="absolute inset-0 bg-[var(--fg)]/45"
             onClick={() => setOpen(false)}
             aria-label="Đóng phụ lục"
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[78%] rounded-t-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-950">
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+          <div className="absolute inset-x-0 bottom-0 max-h-[78%] rounded-t-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3">
               <div>
-                <h3 className="font-semibold text-gray-950 dark:text-white">Phụ lục</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{headings.length} mục trong file</p>
+                <h3 className="font-semibold text-[var(--fg)]">Phụ lục</h3>
+                <p className="text-xs text-[var(--fg-muted)]">{headings.length} mục trong file</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] text-[var(--fg-muted)] transition hover:bg-[var(--surface-2)] hover:text-[var(--fg)]"
                 aria-label="Đóng phụ lục"
               >
                 <X className="h-4 w-4" aria-hidden="true" />
@@ -708,9 +710,9 @@ function MarkdownFileAppendixDrawer({
                     onClick={() => handleNavigate(heading.id)}
                     aria-current={activeHeadingId === heading.id ? 'location' : undefined}
                     className={cn(
-                      'block w-full rounded-md border-l-2 border-transparent px-2 py-1.5 text-left text-sm font-medium leading-snug text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white',
+                      'block w-full rounded-md border-l-2 border-transparent px-2 py-1.5 text-left text-sm font-medium leading-snug text-[var(--fg-muted)] transition hover:bg-[var(--surface-2)] hover:text-[var(--fg)]',
                       activeHeadingId === heading.id &&
-                        'border-blue-500 bg-blue-50 text-blue-700 shadow-sm dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200'
+                        'border-[var(--accent)] bg-[var(--surface-2)] text-[var(--accent)]'
                     )}
                   >
                     {heading.text}
@@ -810,8 +812,8 @@ function TreeItem({
         className={cn(
           'flex items-center gap-1 rounded-md border border-transparent text-sm transition',
           activeEntryId === node.id
-            ? 'border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-100'
-            : 'text-gray-700 hover:border-gray-200 hover:bg-white hover:text-gray-950 dark:text-gray-300 dark:hover:border-gray-700 dark:hover:bg-gray-900 dark:hover:text-white'
+            ? 'border-[var(--fg)] bg-[var(--surface)] text-[var(--fg)]'
+            : 'text-[var(--fg-muted)] hover:border-[var(--line)] hover:bg-[var(--surface)] hover:text-[var(--fg)]'
         )}
         style={{ paddingLeft: `${8 + level * 16}px` }}
       >
@@ -819,7 +821,7 @@ function TreeItem({
           <button
             type="button"
             onClick={() => onToggleFolder(node.id)}
-            className="flex h-8 w-6 shrink-0 items-center justify-center text-gray-500 dark:text-gray-400"
+            className="flex h-8 w-6 shrink-0 items-center justify-center text-[var(--fg-muted)]"
             aria-label={expanded ? 'Thu gọn thư mục' : 'Mở thư mục'}
           >
             {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -871,13 +873,13 @@ function FolderDetail({
   onSelect: (entryId: string) => void;
 }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-950">
+    <div className="card p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-bold text-gray-950 dark:text-white">
+          <h2 className="font-serif text-xl leading-tight text-[var(--fg)]">
             {folder ? folder.title || 'Chưa đặt tên' : 'Tất cả tài liệu'}
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-[var(--fg-muted)]">
             {childEntries.length} mục trực tiếp
           </p>
         </div>
@@ -886,7 +888,7 @@ function FolderDetail({
           <button
             type="button"
             onClick={onCreateFolder}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+            className="btn btn-secondary"
           >
             <FolderPlus className="h-4 w-4" />
             Thư mục con
@@ -894,7 +896,7 @@ function FolderDetail({
           <button
             type="button"
             onClick={onCreateFile}
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+            className="btn btn-primary"
           >
             <FilePlus2 className="h-4 w-4" />
             File con
@@ -903,7 +905,7 @@ function FolderDetail({
       </div>
 
       {childEntries.length === 0 ? (
-        <div className="mt-5 flex min-h-64 items-center justify-center rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        <div className="mt-5 flex min-h-64 items-center justify-center rounded-[var(--radius-card)] border border-dashed border-[var(--line)] p-6 text-center text-sm text-[var(--fg-muted)]">
           Thư mục này chưa có tài liệu.
         </div>
       ) : (
@@ -913,19 +915,19 @@ function FolderDetail({
               key={entry.id}
               type="button"
               onClick={() => onSelect(entry.id)}
-              className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-left transition hover:border-blue-300 hover:bg-blue-50 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-800 dark:hover:bg-blue-950/30"
+              className="rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface-2)] p-4 text-left transition hover:border-[var(--fg-subtle)] hover:bg-[var(--surface)]"
             >
               <div className="flex items-start gap-3">
                 {entry.type === 'folder' ? (
-                  <Folder className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-300" />
+                  <Folder className="mt-0.5 h-5 w-5 shrink-0 text-[var(--fg-muted)]" />
                 ) : (
-                  <FileText className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-300" />
+                  <FileText className="mt-0.5 h-5 w-5 shrink-0 text-[var(--fg-muted)]" />
                 )}
                 <div className="min-w-0">
-                  <p className="line-clamp-2 text-sm font-bold text-gray-900 dark:text-white">
+                  <p className="line-clamp-2 text-sm font-bold text-[var(--fg)]">
                     {entry.title || 'Chưa đặt tên'}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-[var(--fg-muted)]">
                     {entry.type === 'folder' ? 'Thư mục' : 'Markdown'} · {new Date(entry.updatedAt).toLocaleString('vi-VN')}
                   </p>
                 </div>

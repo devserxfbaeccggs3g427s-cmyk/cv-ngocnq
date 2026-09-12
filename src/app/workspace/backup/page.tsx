@@ -14,50 +14,55 @@ export const metadata: Metadata = {
 export default function WorkspaceBackupPage() {
   return (
     <Container size="lg" className="py-10 md:py-12">
-      <div className="premium-ring relative mb-6 overflow-hidden rounded-[2rem] border border-white/60 bg-white/75 p-5 shadow-[0_28px_100px_-70px_rgba(37,99,235,0.9)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/75 md:p-7">
-        <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
+      {/* BACK LINK */}
+      <div className="mb-10">
+        <Link
+          href="/workspace"
+          className="group inline-flex items-center gap-2 text-sm font-medium text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+          Quay lại Workspace
+        </Link>
+      </div>
 
-        <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(260px,0.8fr)] lg:items-end">
-          <div>
-            <Link
-              href="/workspace"
-              className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Workspace
-            </Link>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Dữ liệu cá nhân
-            </div>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-4xl">
-              Workspace Backup
-            </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300 md:text-base md:leading-7">
-              Backup đã được tách khỏi Roadmap vì dữ liệu hiện không chỉ còn là
-              tiến độ học tập. File backup bao gồm roadmap, Markdown files, note
-              comments, flashcards, quiz, AI Context và AI Image Analysis history.
-            </p>
-          </div>
+      {/* HEADER */}
+      <header className="mb-12 border-b border-[var(--line)] pb-12">
+        <div className="mb-5 flex items-center gap-3">
+          <span className="rule-short" />
+          <span className="eyebrow">Backup</span>
+          <span className="badge ml-2">
+            <ShieldCheck className="h-3 w-3" />
+            Dữ liệu cá nhân
+          </span>
+        </div>
 
-          <div className="rounded-3xl border border-slate-200/80 bg-white/70 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-                <Download className="h-5 w-5" />
-              </span>
+        <h1 className="font-serif text-4xl font-normal leading-[1.05] tracking-tight text-[var(--fg)] sm:text-5xl md:text-6xl">
+          Workspace Backup
+        </h1>
+
+        <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--fg-muted)] md:text-lg">
+          Backup đã được tách khỏi Roadmap vì dữ liệu hiện không chỉ còn là
+          tiến độ học tập. File backup bao gồm roadmap, Markdown files, note
+          comments, flashcards, quiz, AI Context và AI Image Analysis history.
+        </p>
+
+        {/* Sub stats row */}
+        <dl className="mt-10 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-3">
+          {[
+            ['Export', 'Tải file .json về máy'],
+            ['Import', 'Khôi phục từ file backup'],
+            ['GitHub', 'Commit lên repository'],
+          ].map(([label, sub]) => (
+            <div key={label} className="flex items-baseline gap-3 border-t border-[var(--line)] pt-4">
+              <Download className="h-3.5 w-3.5 shrink-0 text-[var(--fg-subtle)]" />
               <div>
-                <p className="text-sm font-black text-slate-950 dark:text-white">
-                  Export / Import / GitHub
-                </p>
-                <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
-                  Một nơi duy nhất cho dữ liệu local của workspace.
-                </p>
+                <dt className="text-sm font-semibold text-[var(--fg)]">{label}</dt>
+                <dd className="mt-0.5 text-xs text-[var(--fg-subtle)]">{sub}</dd>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          ))}
+        </dl>
+      </header>
 
       <WorkspaceBackupClient roadmap={roadmap} />
     </Container>

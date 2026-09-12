@@ -3,7 +3,7 @@
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, BotMessageSquare, FileText, ListChecks, MessageSquareText, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, FileText, ListChecks, MessageSquareText, Search, Trash2 } from 'lucide-react';
 import { CommentBubble } from '@/components/roadmap/comments/CommentBubble';
 import { CommentForm } from '@/components/roadmap/comments/CommentForm';
 import {
@@ -495,55 +495,62 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="premium-ring overflow-hidden rounded-[2rem] border border-white/60 bg-white/70 shadow-[0_28px_100px_-70px_rgba(37,99,235,0.9)] backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/72">
-        <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between md:p-6">
+    <div className="space-y-10">
+      <header className="border-b border-[var(--line)] pb-8">
+        <div className="mb-6">
+          <Link
+            href="/workspace"
+            className="group inline-flex items-center gap-2 text-sm font-medium text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+            Quay lại Workspace
+          </Link>
+        </div>
+
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="min-w-0">
-            <Link
-              href="/workspace"
-              className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Workspace
-            </Link>
-            <h1 className="mt-3 flex items-center gap-2 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-4xl">
-              <BotMessageSquare className="h-8 w-8 text-blue-700 dark:text-blue-300" />
+            <div className="mb-4 flex items-center gap-3">
+              <span className="rule-short" />
+              <span className="eyebrow">AI Tools</span>
+            </div>
+            <h1 className="font-serif text-3xl font-normal leading-[1.05] tracking-tight text-[var(--fg)] sm:text-4xl md:text-5xl">
               AI Context
             </h1>
+            <p className="mt-3 max-w-xl text-base leading-7 text-[var(--fg-muted)]">
+              Chọn file Markdown hoặc task roadmap làm context rồi chat AI theo thread có lịch sử.
+            </p>
           </div>
 
-          <div className="grid w-full grid-cols-3 gap-2 md:w-auto sm:min-w-[360px]">
-            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Nguồn</p>
-              <p className="mt-1 text-lg font-black text-slate-950 dark:text-white">{selectedSourceCount}</p>
+          <dl className="grid grid-cols-3 gap-x-6 gap-y-1 md:gap-x-8">
+            <div className="border-t border-[var(--line)] pt-3">
+              <dt className="eyebrow">Nguồn</dt>
+              <dd className="stat-number mt-2 text-3xl text-[var(--fg)]">{selectedSourceCount}</dd>
             </div>
-            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Markdown</p>
-              <p className="mt-1 text-lg font-black text-blue-700 dark:text-blue-300">{selectedFiles.length}</p>
+            <div className="border-t border-[var(--line)] pt-3">
+              <dt className="eyebrow">Markdown</dt>
+              <dd className="stat-number mt-2 text-3xl text-[var(--accent)]">{selectedFiles.length}</dd>
             </div>
-            <div className="rounded-3xl border border-slate-200/80 bg-white/70 px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Task</p>
-              <p className="mt-1 text-lg font-black text-emerald-700 dark:text-emerald-300">{selectedTasks.length}</p>
+            <div className="border-t border-[var(--line)] pt-3">
+              <dt className="eyebrow">Task</dt>
+              <dd className="stat-number mt-2 text-3xl text-[var(--fg)]">{selectedTasks.length}</dd>
             </div>
-          </div>
+          </dl>
         </div>
-      </div>
+      </header>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(300px,400px)_minmax(0,1fr)] xl:gap-5 xl:grid-cols-[minmax(320px,420px)_minmax(0,1fr)]">
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <div className="glass-panel overflow-hidden rounded-3xl">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+          <div className="card overflow-hidden">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3">
               <div className="flex items-center gap-2">
-                <MessageSquareText className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                <h2 className="text-sm font-bold text-slate-950 dark:text-white">Lịch sử</h2>
+                <MessageSquareText className="h-5 w-5 text-[var(--fg-muted)]" />
+                <h2 className="text-sm font-semibold text-[var(--fg)]">Lịch sử</h2>
               </div>
-              <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-200">
-                {historyItems.length}
-              </span>
+              <span className="badge">{historyItems.length}</span>
             </div>
             <div className="max-h-48 space-y-2 overflow-y-auto p-3 lg:max-h-64">
               {historyItems.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-slate-200 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--line)] px-3 py-4 text-center text-sm text-[var(--fg-muted)]">
                   Chưa có lịch sử AI Context.
                 </p>
               ) : (
@@ -557,10 +564,10 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                     <div
                       key={item.rootId}
                       className={cn(
-                        'group flex items-start gap-2 rounded-2xl border p-2 transition',
+                        'group flex items-start gap-2 rounded-[var(--radius-card)] border p-2 transition',
                         isActive
-                          ? 'border-indigo-300 bg-indigo-50 shadow-sm dark:border-indigo-800 dark:bg-indigo-950/30'
-                          : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
+                          ? 'border-[var(--fg)] bg-[var(--surface-2)]'
+                          : 'border-[var(--line)] bg-[var(--surface)] hover:border-[var(--fg-subtle)] hover:bg-[var(--surface-2)]'
                       )}
                     >
                       <button
@@ -568,21 +575,21 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                         onClick={() => restoreHistoryContext(item)}
                         className="min-w-0 flex-1 p-1 text-left"
                       >
-                        <span className="block truncate text-sm font-semibold text-slate-950 dark:text-white">
+                        <span className="block truncate text-sm font-semibold text-[var(--fg)]">
                           {item.title}
                         </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--fg-muted)]">
                           <span>{item.summary}</span>
                           <span>{Math.max(item.commentCount - 1, 0)} trả lời</span>
                         </span>
-                        <span className="mt-2 block text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <span className="mt-2 block text-xs font-medium text-[var(--fg-subtle)]">
                           {formatHistoryDate(item.latestAt)}
                         </span>
                       </button>
                       <button
                         type="button"
                         onClick={() => deleteHistoryThread(item.rootId)}
-                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-red-500 opacity-100 transition hover:bg-red-50 hover:text-red-700 dark:text-red-300 dark:hover:bg-red-950/40 dark:hover:text-red-200 md:opacity-0 md:group-hover:opacity-100"
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[var(--fg-subtle)] opacity-100 transition hover:bg-[var(--surface-2)] hover:text-[var(--fg)] md:opacity-0 md:group-hover:opacity-100"
                         aria-label="Xóa lịch sử chat"
                         title="Xóa lịch sử chat"
                       >
@@ -595,29 +602,27 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             </div>
           </div>
 
-          <div className="glass-panel overflow-hidden rounded-3xl">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+          <div className="card overflow-hidden">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-sm font-bold text-slate-950 dark:text-white">File Markdown</h2>
+                <FileText className="h-5 w-5 text-[var(--fg-muted)]" />
+                <h2 className="text-sm font-semibold text-[var(--fg)]">File Markdown</h2>
               </div>
-              <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 dark:border-blue-800 dark:bg-blue-950/50 dark:text-blue-200">
-                {selectedFiles.length}/{markdownFiles.length}
-              </span>
+              <span className="badge">{selectedFiles.length}/{markdownFiles.length}</span>
             </div>
             <div className="space-y-3 p-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fg-subtle)]" />
                 <input
                   value={fileQuery}
                   onChange={(event) => setFileQuery(event.target.value)}
                   placeholder="Tìm file Markdown"
-                  className="input-modern min-h-10 w-full rounded-2xl py-2 pl-9 pr-3 text-sm"
+                  className="input-modern min-h-10 w-full py-2 pl-9 pr-3 text-sm"
                 />
               </div>
               <div className="max-h-56 space-y-2 overflow-y-auto pr-1 lg:max-h-72">
                 {filteredFiles.length === 0 ? (
-                  <p className="rounded-2xl border border-dashed border-slate-200 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                  <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--line)] px-3 py-4 text-center text-sm text-[var(--fg-muted)]">
                     Không có file phù hợp.
                   </p>
                 ) : (
@@ -625,21 +630,21 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                     <label
                       key={file.id}
                       className={cn(
-                        'flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition',
+                        'flex cursor-pointer items-start gap-3 rounded-[var(--radius-card)] border p-3 transition',
                         selectedFileIds.includes(file.id)
-                          ? 'border-blue-300 bg-blue-50 shadow-sm dark:border-blue-800 dark:bg-blue-950/30'
-                          : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
+                          ? 'border-[var(--fg)] bg-[var(--surface-2)]'
+                          : 'border-[var(--line)] bg-[var(--surface)] hover:border-[var(--fg-subtle)] hover:bg-[var(--surface-2)]'
                       )}
                     >
                       <input
                         type="checkbox"
                         checked={selectedFileIds.includes(file.id)}
                         onChange={() => toggleSelection(file.id, selectedFileIds, setSelectedFileIds)}
-                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="mt-1 h-4 w-4 rounded border-[var(--line-strong)] accent-[var(--accent)]"
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-slate-900 dark:text-white">{file.title}</span>
-                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-slate-500 dark:text-slate-400">
+                        <span className="block truncate text-sm font-semibold text-[var(--fg)]">{file.title}</span>
+                        <span className="mt-1 line-clamp-2 block text-xs leading-5 text-[var(--fg-muted)]">
                           {file.content.trim() || 'File đang trống.'}
                         </span>
                       </span>
@@ -650,29 +655,27 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             </div>
           </div>
 
-          <div className="glass-panel overflow-hidden rounded-3xl">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800">
+          <div className="card overflow-hidden">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3">
               <div className="flex items-center gap-2">
-                <ListChecks className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <h2 className="text-sm font-bold text-slate-950 dark:text-white">Task ôn tập</h2>
+                <ListChecks className="h-5 w-5 text-[var(--fg-muted)]" />
+                <h2 className="text-sm font-semibold text-[var(--fg)]">Task ôn tập</h2>
               </div>
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-                {selectedTasks.length}/{leafTasks.length}
-              </span>
+              <span className="badge">{selectedTasks.length}/{leafTasks.length}</span>
             </div>
             <div className="space-y-3 p-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fg-subtle)]" />
                 <input
                   value={taskQuery}
                   onChange={(event) => setTaskQuery(event.target.value)}
                   placeholder="Tìm task"
-                  className="input-modern min-h-10 w-full rounded-2xl py-2 pl-9 pr-3 text-sm"
+                  className="input-modern min-h-10 w-full py-2 pl-9 pr-3 text-sm"
                 />
               </div>
               <div className="max-h-60 space-y-2 overflow-y-auto pr-1 lg:max-h-80">
                 {filteredTasks.length === 0 ? (
-                  <p className="rounded-2xl border border-dashed border-slate-200 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                  <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--line)] px-3 py-4 text-center text-sm text-[var(--fg-muted)]">
                     Không có task phù hợp.
                   </p>
                 ) : (
@@ -683,31 +686,31 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                       <label
                         key={task.id}
                         className={cn(
-                          'flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition',
+                          'flex cursor-pointer items-start gap-3 rounded-[var(--radius-card)] border p-3 transition',
                           selectedTaskIds.includes(task.id)
-                            ? 'border-emerald-300 bg-emerald-50 shadow-sm dark:border-emerald-800 dark:bg-emerald-950/30'
-                            : 'border-slate-200 bg-white/55 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-950/35 dark:hover:border-slate-700 dark:hover:bg-slate-900'
+                            ? 'border-[var(--fg)] bg-[var(--surface-2)]'
+                            : 'border-[var(--line)] bg-[var(--surface)] hover:border-[var(--fg-subtle)] hover:bg-[var(--surface-2)]'
                         )}
                       >
                         <input
                           type="checkbox"
                           checked={selectedTaskIds.includes(task.id)}
                           onChange={() => toggleSelection(task.id, selectedTaskIds, setSelectedTaskIds)}
-                          className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                          className="mt-1 h-4 w-4 rounded border-[var(--line-strong)] accent-[var(--accent)]"
                         />
                         <span className="min-w-0 flex-1" title={[...parentPath, task.title].join(' / ')}>
-                          <span className="flex flex-wrap items-center gap-1 text-[11px] font-semibold uppercase leading-5 text-gray-500 dark:text-gray-400">
-                            <span className="rounded-md bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">{task.trackTitle}</span>
-                            <span className="text-gray-300 dark:text-gray-600">/</span>
-                            <span className="rounded-md bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">{task.moduleTitle}</span>
+                          <span className="flex flex-wrap items-center gap-1 text-[11px] font-semibold uppercase leading-5 text-[var(--fg-muted)]">
+                            <span className="rounded-md bg-[var(--surface-2)] px-1.5 py-0.5 text-[var(--fg-muted)]">{task.trackTitle}</span>
+                            <span className="text-[var(--fg-subtle)]">/</span>
+                            <span className="rounded-md bg-[var(--surface-2)] px-1.5 py-0.5 text-[var(--fg-muted)]">{task.moduleTitle}</span>
                           </span>
 
                           {task.parentTasks.length > 0 && (
-                            <span className="mt-2 block rounded-md border-l-2 border-emerald-200 bg-white/70 px-2 py-1 text-xs leading-5 text-gray-600 dark:border-emerald-900/70 dark:bg-gray-900/70 dark:text-gray-300">
-                              <span className="font-semibold text-gray-700 dark:text-gray-200">Cha: </span>
+                            <span className="mt-2 block rounded-md border-l-2 border-[var(--line-strong)] bg-[var(--surface-2)] px-2 py-1 text-xs leading-5 text-[var(--fg-muted)]">
+                              <span className="font-semibold text-[var(--fg)]">Cha: </span>
                               {task.parentTasks.map((parent, index) => (
                                 <span key={parent.id}>
-                                  {index > 0 && <span className="px-1 text-gray-400">/</span>}
+                                  {index > 0 && <span className="px-1 text-[var(--fg-subtle)]">/</span>}
                                   <span>{parent.title}</span>
                                 </span>
                               ))}
@@ -715,13 +718,13 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                           )}
 
                           <span
-                            className="mt-2 block border-l-2 border-emerald-500 pl-2"
+                            className="mt-2 block border-l-2 border-[var(--fg)] pl-2"
                             style={{ marginLeft: `${Math.min(task.depth, 4) * 6}px` }}
                           >
-                            <span className="block text-sm font-semibold leading-5 text-gray-900 dark:text-white">
+                            <span className="block text-sm font-semibold leading-5 text-[var(--fg)]">
                               {task.title}
                             </span>
-                            <span className="mt-1 flex flex-wrap items-center gap-2 text-xs leading-5 text-gray-500 dark:text-gray-400">
+                            <span className="mt-1 flex flex-wrap items-center gap-2 text-xs leading-5 text-[var(--fg-muted)]">
                               <span className="font-mono">{task.id}</span>
                               <span>{task.level}</span>
                               <span>{task.estimateHours}h</span>
@@ -738,13 +741,13 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
           </div>
         </aside>
 
-        <section className="glass-panel min-w-0 overflow-hidden rounded-3xl">
-          <div className="flex flex-col gap-3 border-b border-slate-200/70 px-4 py-3 dark:border-slate-800 md:flex-row md:items-center md:justify-between">
+        <section className="card min-w-0 overflow-hidden">
+          <div className="flex flex-col gap-3 border-b border-[var(--line)] px-4 py-3 md:flex-row md:items-center md:justify-between">
             <div className="flex min-w-0 items-center gap-2">
-              <MessageSquareText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <MessageSquareText className="h-5 w-5 text-[var(--fg-muted)]" />
               <div className="min-w-0">
-                <h2 className="text-sm font-bold text-slate-950 dark:text-white">Hội thoại</h2>
-                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                <h2 className="text-sm font-semibold text-[var(--fg)]">Hội thoại</h2>
+                <p className="truncate text-xs text-[var(--fg-muted)]">
                   {context ? `${commentTree.length} thread trong context đang mở` : 'Chọn lịch sử hoặc nguồn context'}
                 </p>
               </div>
@@ -757,7 +760,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
                   setSelectedTaskIds([]);
                   setSelectedHistoryRootId(null);
                 }}
-                className="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 bg-white/60 px-3 text-sm font-bold text-slate-600 transition hover:bg-white hover:text-slate-950 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-950 dark:hover:text-white"
+                className="btn btn-ghost"
               >
                 <Trash2 className="h-4 w-4" />
                 Bỏ chọn
@@ -768,7 +771,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
           <div className="p-3 sm:p-4">
 
         {!context && (
-          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200">
+          <div className="mb-4 border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm font-medium text-[var(--fg)]">
             Chọn ít nhất một nguồn context trước khi hỏi AI.
           </div>
         )}
@@ -778,7 +781,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             {context.sources.map((source) => (
               <span
                 key={`${source.type}:${source.id}`}
-                className="rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-bold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200"
+                className="badge"
               >
                 {source.type === 'markdown-file' ? 'Markdown' : 'Task'} · {source.title}
               </span>
@@ -795,14 +798,14 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
         />
 
         {error && (
-          <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+          <div className="mt-3 border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm font-medium text-[var(--fg)]">
             {error}
           </div>
         )}
 
         <div className="mt-4 space-y-3">
           {commentTree.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-slate-200 bg-white/50 px-3 py-4 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/35 dark:text-slate-400">
+            <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--line)] bg-[var(--surface-2)] px-3 py-4 text-center text-sm text-[var(--fg-muted)]">
               Chưa có lịch sử cho context này.
             </p>
           ) : (
@@ -857,7 +860,7 @@ export function AiContextWorkspace({ roadmap }: { roadmap: Roadmap }) {
             <button
               type="button"
               onClick={() => setVisibleCommentCount((current) => current + visibleStep)}
-              className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white/70 px-3 text-sm font-bold text-slate-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300 dark:hover:border-blue-700 dark:hover:text-blue-300"
+              className="btn btn-secondary"
             >
               Xem thêm {Math.min(visibleStep, hiddenCommentCount)} comment cũ hơn
             </button>

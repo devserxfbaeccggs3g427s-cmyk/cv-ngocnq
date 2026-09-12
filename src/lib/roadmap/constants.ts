@@ -17,10 +17,10 @@ export const autoTaskNoteStorageKey = 'skill-roadmap-auto-task-note:v1';
 export const shouldSyncProgressFile = process.env.NODE_ENV !== 'production';
 
 export const levelStyles: Record<string, string> = {
-  'Cơ bản': 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
-  'Trung cấp': 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  'Nâng cao': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-  'Chuyên sâu': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
+  'Cơ bản': 'border-[var(--line-strong)] text-[var(--fg-muted)]',
+  'Trung cấp': 'border-[var(--warn)] text-[var(--warn)]',
+  'Nâng cao': 'border-[var(--success)] text-[var(--success)]',
+  'Chuyên sâu': 'border-[var(--accent)] text-[var(--accent)]',
 };
 
 export const studyStatusOptions: Array<{ value: StudyStatusFilter; label: string }> = [

@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface SocialLinksProps {
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'inline';
   className?: string;
 }
 
@@ -14,7 +15,7 @@ const socialIcons = {
   website: Globe,
 };
 
-export function SocialLinks({ size = 'md', className }: SocialLinksProps) {
+export function SocialLinks({ size = 'md', variant = 'default', className }: SocialLinksProps) {
   const links = [
     { href: profile.github, icon: 'github', label: 'GitHub' },
     { href: profile.linkedin, icon: 'linkedin', label: 'LinkedIn' },
@@ -34,6 +35,28 @@ export function SocialLinks({ size = 'md', className }: SocialLinksProps) {
     lg: 'w-6 h-6',
   };
 
+  if (variant === 'inline') {
+    return (
+      <span className={cn('inline-flex items-center gap-3', className)}>
+        {links.map(({ href, label }, i) => (
+          <span key={label} className="inline-flex items-center gap-3">
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-editorial text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)]"
+            >
+              {label}
+            </a>
+            {i < links.length - 1 && (
+              <span className="text-[var(--fg-subtle)]" aria-hidden="true">·</span>
+            )}
+          </span>
+        ))}
+      </span>
+    );
+  }
+
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {links.map(({ href, icon, label }) => {
@@ -45,7 +68,7 @@ export function SocialLinks({ size = 'md', className }: SocialLinksProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              'flex items-center justify-center rounded-2xl border border-slate-200/70 bg-white/70 text-slate-600 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400 dark:hover:border-blue-800 dark:hover:bg-blue-950/30 dark:hover:text-blue-300',
+              'inline-flex items-center justify-center rounded-full border border-[var(--line)] text-[var(--fg-muted)] transition-colors duration-200 hover:border-[var(--fg)] hover:text-[var(--fg)]',
               sizes[size]
             )}
             aria-label={label}
