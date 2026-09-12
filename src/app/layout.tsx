@@ -1,10 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Fraunces } from 'next/font/google';
 import { Header, Footer, SideNav } from '@/components/layout';
 import { profile } from '@/data/profile';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  display: 'swap',
+  axes: ['opsz'],
+});
 
 export const metadata: Metadata = {
   title: `${profile.name} | ${profile.title}`,
@@ -24,14 +35,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className="scroll-smooth">
-      <body className={`${inter.className} overflow-x-hidden bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-100`}>
+    <html
+      lang="vi"
+      className={`${inter.variable} ${fraunces.variable} scroll-smooth`}
+    >
+      <body className="overflow-x-hidden antialiased">
         <a href="#main-content" className="skip-link">
           Bỏ qua điều hướng
         </a>
         <Header />
         <SideNav />
-        <main id="main-content" tabIndex={-1} className="relative pt-16" aria-label="Nội dung chính">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="relative pt-16"
+          aria-label="Nội dung chính"
+        >
           {children}
         </main>
         <Footer />

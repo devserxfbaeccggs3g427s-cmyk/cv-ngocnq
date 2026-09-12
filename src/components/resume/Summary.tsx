@@ -1,27 +1,37 @@
 import { profile } from '@/data/profile';
-import { CheckCircle } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 export function Summary() {
   return (
-    <div className="mb-12 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-      <div className="glass-panel rounded-3xl p-6 md:p-7">
-        <p className="text-lg leading-8 text-slate-700 dark:text-slate-200">
+    <section className="grid gap-10 pb-12 pt-4 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
+      {/* Editorial quote */}
+      <div className="relative">
+        <span className="rule-short mb-5" aria-hidden="true" />
+        <blockquote className="editorial-quote font-serif text-2xl leading-[1.18] text-[var(--fg)] sm:text-3xl md:text-[2rem]">
           {profile.summary}
-        </p>
+        </blockquote>
       </div>
 
       {/* Highlights */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-        {profile.highlights.map((highlight, index) => (
-          <div
-            key={index}
-            className="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white/70 p-4 text-slate-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-emerald-800"
-          >
-            <CheckCircle className="h-5 w-5 flex-shrink-0 text-emerald-500" />
-            <span className="font-medium leading-6">{highlight}</span>
-          </div>
-        ))}
+      <div>
+        <p className="eyebrow mb-5">Highlights</p>
+        <ul className="space-y-4">
+          {profile.highlights.map((highlight, index) => (
+            <li
+              key={index}
+              className="flex items-baseline gap-4 border-b border-[var(--line)] pb-4 last:border-b-0"
+            >
+              <span className="numeral text-sm text-[var(--fg-subtle)]">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span className="flex-1 text-base leading-6 text-[var(--fg)]">
+                {highlight}
+              </span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-[var(--fg-subtle)]" aria-hidden="true" />
+            </li>
+          ))}
+        </ul>
       </div>
-    </div>
+    </section>
   );
 }

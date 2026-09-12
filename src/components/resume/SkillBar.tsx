@@ -9,22 +9,22 @@ interface SkillBarProps {
 
 export function SkillBar({ skill }: SkillBarProps) {
   return (
-    <div className="mb-4">
-      <div className="flex justify-between mb-1.5">
-        <span className="font-medium text-gray-900 dark:text-white text-sm">
+    <div className="group mb-5">
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="text-sm font-medium text-[var(--fg)]">
           {skill.name}
         </span>
-        <span className="text-gray-500 dark:text-gray-400 text-sm">
-          {skill.level}%
+        <span className="numeral text-xs text-[var(--fg-subtle)] tabular-nums">
+          {skill.level}
         </span>
       </div>
-      <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="progress-track h-px bg-[var(--line)]">
         <motion.div
-          className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+          className="progress-fill h-full bg-[var(--fg)]"
           initial={{ width: 0 }}
           whileInView={{ width: `${skill.level}%` }}
-          transition={{ duration: 1, ease: 'easeOut' }}
-          viewport={{ once: true }}
+          transition={{ duration: 1.4, ease: [0.2, 0, 0, 1] }}
+          viewport={{ once: true, margin: '-50px' }}
         />
       </div>
     </div>

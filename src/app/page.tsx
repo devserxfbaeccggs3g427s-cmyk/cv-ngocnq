@@ -1,4 +1,6 @@
-import { Container } from '@/components/ui';
+import Link from 'next/link';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Container, Section } from '@/components/ui';
 import {
   ProfileHeader,
   Summary,
@@ -10,119 +12,194 @@ import {
 } from '@/components/resume';
 import { ContactSection } from '@/components/contact';
 import { ProjectGrid } from '@/components/portfolio';
-import { Section } from '@/components/ui';
-import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
 import { workspaceFeatures } from '@/config';
-import { cn } from '@/lib/utils';
+import { profile } from '@/data/profile';
+import { experience } from '@/data/experience';
+import { projects } from '@/data/projects';
+import { skills } from '@/data/skills';
 
-const workspaceAccentClasses = {
-  blue: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-200',
-  emerald:
-    'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200',
-  violet:
-    'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800 dark:bg-violet-950/40 dark:text-violet-200',
-  cyan: 'border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/40 dark:text-cyan-200',
-};
+function StatTile({
+  value,
+  label,
+  sub,
+  className,
+}: {
+  value: string;
+  label: string;
+  sub?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex flex-col justify-between rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors duration-300 hover:border-[var(--fg)] sm:p-7 ${
+        className ?? ''
+      }`}
+    >
+      <span className="stat-number text-[var(--fg)] text-5xl sm:text-6xl md:text-7xl">
+        {value}
+      </span>
+      <div className="mt-6">
+        <p className="font-serif text-base leading-tight text-[var(--fg)]">{label}</p>
+        {sub && (
+          <p className="mt-1 text-xs text-[var(--fg-subtle)]">{sub}</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
+  // Derived numbers
+  const yearsExp = (() => {
+    const earliest = experience
+      .map((e) => e.startDate)
+      .sort()[0];
+    if (!earliest) return 0;
+    const startYear = parseInt(earliest.slice(0, 4), 10);
+    const startMonth = parseInt(earliest.slice(5, 7), 10);
+    const now = new Date();
+    const years = now.getFullYear() - startYear + (now.getMonth() + 1 >= startMonth ? 0 : -1);
+    return years;
+  })();
+
+  const projectCount = projects.length;
+  const techCount = new Set(skills.map((s) => s.name)).size;
+
   return (
     <Container size="lg" className="py-10 md:py-14">
-      {/* About Section */}
-      <section id="about" className="mb-16">
-        <ProfileHeader />
-        <Summary />
+      {/* HERO */}
+      <ProfileHeader />
+      <Summary />
+
+      <div className="rule my-8 md:my-12" aria-hidden="true" />
+
+      {/* BENTO STATS — At a glance */}
+      <section className="mb-16 md:mb-24" aria-label="Tóm tắt nhanh">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="rule-short" />
+            <span className="eyebrow">At a glance</span>
+          </div>
+          <span className="hidden text-xs text-[var(--fg-subtle)] sm:inline">
+            Cập nhật {new Date().getFullYear()}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          <StatTile
+            value={`${yearsExp}+`}
+            label="Năm kinh nghiệm"
+            sub="Production banking"
+          />
+          <StatTile
+            value={`${projectCount}`}
+            label="Dự án"
+            sub="Trong nhiều lĩnh vực"
+          />
+          <StatTile
+            value={`${techCount}`}
+            label="Công nghệ"
+            sub="Stack đã sử dụng"
+          />
+          <StatTile
+            value="3"
+            label="Vai trò"
+            sub="Backend · Fullstack · Lead"
+          />
+        </div>
       </section>
 
-      {/* Experience Section */}
+      {/* EXPERIENCE */}
       <ExperienceTimeline />
 
-      {/* Skills Section */}
-      <SkillsSection />
+      {/* SKILLS + LANGUAGES */}
+      <section className="pb-16 md:pb-24">
+        <SkillsSection />
+        <LanguagesSection />
+      </section>
 
-      {/* Education Section */}
-      <EducationSection />
+      {/* EDUCATION + CERTIFICATIONS — 2-col on desktop */}
+      <section className="grid grid-cols-1 gap-x-16 gap-y-12 pb-16 md:pb-24 lg:grid-cols-2">
+        <EducationSection />
+        <CertificationsSection />
+      </section>
 
-      {/* Certifications Section */}
-      <CertificationsSection />
-
-      {/* Languages Section */}
-      <LanguagesSection />
-
-      {/* Featured Projects */}
-      <Section 
-        id="portfolio-preview" 
+      {/* FEATURED PROJECTS */}
+      <Section
+        eyebrow="Selected work"
         title="Dự án tiêu biểu"
         subtitle="Một số dự án gần đây trong lĩnh vực ngân hàng, thanh toán và hệ thống backend"
       >
         <ProjectGrid featuredOnly limit={3} showFilters={false} />
-        <div className="text-center mt-8">
+        <div className="mt-12 flex items-center justify-between border-t border-[var(--line)] pt-6">
+          <p className="text-sm text-[var(--fg-muted)]">
+            Xem tất cả dự án và contribution mới nhất
+          </p>
           <Link
             href="/portfolio"
-            className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-5 py-2.5 font-bold text-blue-700 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:border-blue-700"
+            className="group inline-flex items-center gap-1.5 text-sm font-medium text-[var(--fg)]"
           >
-            Xem tất cả dự án
-            <ArrowRight className="w-4 h-4" />
+            <span className="link-editorial">Tất cả dự án</span>
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>
       </Section>
 
+      {/* WORKSPACE — Bento grid nav */}
       <Section
-        id="workspace-preview"
-        title="Workspace học tập & AI tools"
+        id="workspace"
+        eyebrow="Workspace"
+        title="Học tập & AI tools"
         subtitle="Các workflow thao tác dài được gom riêng khỏi CV/portfolio để dễ tìm, dễ dùng và tối ưu hơn trên mobile."
-        className="pt-4"
       >
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--line)] md:grid-cols-2">
           {workspaceFeatures.map((feature) => {
             const Icon = feature.icon;
-
             return (
               <Link
                 key={feature.href}
                 href={feature.href}
-                className="group rounded-3xl border border-slate-200/80 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-950/5 dark:border-slate-800 dark:bg-slate-950/55 dark:hover:border-blue-800"
+                className="group relative flex flex-col justify-between bg-[var(--bg)] p-6 transition-colors duration-300 hover:bg-[var(--surface)] sm:p-8"
               >
-                <div className="flex items-start gap-3">
-                  <span
-                    className={cn(
-                      'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border',
-                      workspaceAccentClasses[feature.accent]
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-base font-black text-slate-950 dark:text-white">
-                      {feature.title}
-                    </span>
-                    <span className="mt-1 block text-sm leading-6 text-slate-600 dark:text-slate-300">
-                      {feature.description}
-                    </span>
-                    <span className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-blue-700 transition group-hover:gap-3 dark:text-blue-300">
-                      {feature.cta}
-                      <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </span>
+                <div className="mb-8 flex items-start justify-between gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] transition-colors duration-300 group-hover:border-[var(--fg)]">
+                    <Icon className="h-4 w-4 text-[var(--fg)]" />
+                  </div>
+                  <ArrowUpRight className="h-4 w-4 text-[var(--fg-subtle)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--fg)]" />
+                </div>
+                <div>
+                  <p className="eyebrow mb-2">{feature.eyebrow}</p>
+                  <h3 className="font-serif text-2xl leading-tight text-[var(--fg)]">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--fg-muted)]">
+                    {feature.description}
+                  </p>
                 </div>
               </Link>
             );
           })}
         </div>
 
-        <div className="mt-6 text-center">
-          <Link
-            href="/workspace"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 px-5 py-2.5 font-bold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/25"
-          >
-            <Sparkles className="h-4 w-4" />
+        <div className="mt-10 flex justify-center">
+          <Link href="/workspace" className="btn btn-primary btn-lg">
             Mở Workspace
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </Section>
 
-      {/* Contact Section */}
+      {/* CONTACT */}
       <ContactSection />
+
+      {/* FOOTER NOTE — colophon */}
+      <div className="rule mt-12" aria-hidden="true" />
+      <div className="mt-6 flex flex-col items-start justify-between gap-2 text-xs text-[var(--fg-subtle)] sm:flex-row sm:items-center">
+        <span>
+          {profile.name} — Backend / Full-Stack Engineer
+        </span>
+        <span>Last updated {new Date().toLocaleDateString('vi-VN')}</span>
+      </div>
     </Container>
   );
 }

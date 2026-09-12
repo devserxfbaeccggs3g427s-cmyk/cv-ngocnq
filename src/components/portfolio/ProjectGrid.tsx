@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { projects, projectCategories, getProjectsByCategory } from '@/data/projects';
 import { ProjectCard } from './ProjectCard';
 import { ProjectFilters } from './ProjectFilters';
@@ -33,26 +32,15 @@ export function ProjectGrid({ showFilters = true, limit, featuredOnly = false }:
         />
       )}
 
-      <motion.div layout className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {displayProjects.map((project) => (
-            <motion.div
-              key={project.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ProjectCard project={project} />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
+        {displayProjects.map((project) => (
+          <ProjectCard key={project.id} project={project} />
+        ))}
+      </div>
 
       {displayProjects.length === 0 && (
-        <div className="glass-panel rounded-3xl py-12 text-center">
-          <p className="text-slate-500 dark:text-slate-400">
+        <div className="border-y border-[var(--line)] py-12 text-center">
+          <p className="text-[var(--fg-muted)]">
             Không tìm thấy dự án trong nhóm này.
           </p>
         </div>

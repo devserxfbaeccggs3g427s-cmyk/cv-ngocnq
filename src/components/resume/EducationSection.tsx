@@ -1,59 +1,51 @@
-'use client';
-
-import { motion } from 'framer-motion';
-import { GraduationCap, MapPin, Award } from 'lucide-react';
 import { education } from '@/data/education';
-import { Section, Badge, Card, CardContent } from '@/components/ui';
+import { Section } from '@/components/ui';
+import { GraduationCap } from 'lucide-react';
 
 export function EducationSection() {
   return (
-    <Section id="education" title="Học vấn" subtitle="Nền tảng đào tạo và chuyên ngành">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
+    <Section
+      id="education"
+      eyebrow="Education"
+      title="Học vấn"
+      subtitle="Nền tảng đào tạo và chuyên ngành"
+    >
+      <div className="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
         {education.map((edu, index) => (
-          <motion.div
+          <article
             key={edu.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            viewport={{ once: true }}
+            className="flex items-baseline gap-5 border-t border-[var(--line)] pt-5"
           >
-            <Card hover className="h-full">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-600/20">
-                    <GraduationCap className="w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold tracking-tight text-slate-950 dark:text-white">
-                      {edu.degree} - {edu.field}
-                    </h3>
-                    <p className="font-semibold text-blue-700 dark:text-blue-300">
-                      {edu.school}
-                    </p>
-                    <div className="mt-2 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                      <MapPin className="w-4 h-4" />
-                      {edu.location} · {edu.startYear} - {edu.endYear}
-                    </div>
-                    {edu.gpa && (
-                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                        Điểm: {edu.gpa}
-                      </p>
-                    )}
-                    {edu.honors && edu.honors.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {edu.honors.map((honor) => (
-                          <Badge key={honor} variant="success" size="sm">
-                            <Award className="w-3 h-3 mr-1" />
-                            {honor}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+            <span className="numeral shrink-0 text-sm text-[var(--fg-subtle)]">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="eyebrow mb-2 text-[var(--fg-muted)]">
+                {edu.startYear} — {edu.endYear}
+              </div>
+              <h3 className="font-serif text-xl leading-tight text-[var(--fg)]">
+                {edu.degree} — {edu.field}
+              </h3>
+              <p className="mt-1.5 text-sm text-[var(--fg-muted)]">
+                {edu.school} · {edu.location}
+              </p>
+              {edu.gpa && (
+                <p className="mt-2 text-sm text-[var(--fg-subtle)]">
+                  GPA {edu.gpa}
+                </p>
+              )}
+              {edu.honors && edu.honors.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {edu.honors.map((honor) => (
+                    <span key={honor} className="badge badge-ghost">
+                      <GraduationCap className="h-3 w-3" />
+                      {honor}
+                    </span>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+              )}
+            </div>
+          </article>
         ))}
       </div>
     </Section>

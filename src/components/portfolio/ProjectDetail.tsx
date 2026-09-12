@@ -127,7 +127,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
               {/* Category */}
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Nhóm dự án</p>
-                <Badge variant="secondary" size="md">{project.category}</Badge>
+                <Badge variant="default" size="md">{project.category}</Badge>
               </div>
 
               {/* Action Buttons */}
@@ -139,7 +139,7 @@ export function ProjectDetail({ project }: ProjectDetailProps) {
                   </Button>
                 )}
                 {project.githubUrl && (
-                  <Button href={project.githubUrl} variant="outline" className="w-full">
+                  <Button href={project.githubUrl} variant="secondary" className="w-full">
                     <Github className="w-4 h-4 mr-2" />
                     Xem mã nguồn
                   </Button>

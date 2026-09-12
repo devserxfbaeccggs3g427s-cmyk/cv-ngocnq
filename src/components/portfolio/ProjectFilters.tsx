@@ -12,19 +12,25 @@ export function ProjectFilters({ categories, activeCategory, onCategoryChange }:
   const getCategoryLabel = (category: string) => (category === 'All' ? 'Tất cả' : category);
 
   return (
-    <div className="mb-8 flex flex-wrap gap-2 rounded-3xl border border-slate-200/80 bg-white/65 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/65">
+    <div className="mb-10 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-b border-[var(--line)] pb-4">
       {categories.map((category) => (
         <button
           key={category}
           onClick={() => onCategoryChange(category)}
           className={cn(
-            'rounded-2xl px-4 py-2 text-sm font-semibold transition-all',
+            'group relative pb-1 text-sm font-medium transition-colors',
             category === activeCategory
-              ? 'bg-slate-950 text-white shadow-md dark:bg-white dark:text-slate-950'
-              : 'text-slate-600 hover:bg-white hover:text-slate-950 hover:shadow-sm dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+              ? 'text-[var(--fg)]'
+              : 'text-[var(--fg-subtle)] hover:text-[var(--fg)]'
           )}
         >
           {getCategoryLabel(category)}
+          {category === activeCategory && (
+            <span
+              className="absolute inset-x-0 -bottom-[calc(1rem+1px)] h-px bg-[var(--fg)]"
+              aria-hidden="true"
+            />
+          )}
         </button>
       ))}
     </div>

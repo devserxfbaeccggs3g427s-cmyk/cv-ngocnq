@@ -1,10 +1,5 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ExternalLink, Github, ArrowRight } from 'lucide-react';
-import { Badge, Button } from '@/components/ui';
+import { ArrowUpRight, Github } from 'lucide-react';
 import type { Project } from '@/data/projects';
 
 interface ProjectCardProps {
@@ -12,44 +7,57 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      viewport={{ once: true }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group glass-panel card-hover relative overflow-hidden rounded-3xl"
-    >
-      {/* Thumbnail */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-slate-950 via-blue-900 to-violet-700">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.26),transparent_24%),radial-gradient(circle_at_80%_30%,rgba(34,211,238,0.25),transparent_28%)]" />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/70 to-transparent" />
-        {/* Placeholder gradient - replace with actual image when available */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-5xl font-black tracking-tight text-white/35">
-            {project.title.substring(0, 2).toUpperCase()}
+    <article className="group relative flex h-full flex-col border-t border-[var(--line)] pt-5 transition-colors duration-200 hover:border-[var(--fg)]">
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <span className="eyebrow">{project.category}</span>
+        {project.featured && (
+          <span className="text-xs font-medium text-[var(--accent)]">
+            ★ Featured
           </span>
-        </div>
-        
-        {/* Overlay on hover */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          className="absolute inset-0 bg-black/60 flex items-center justify-center gap-4"
-        >
+        )}
+      </div>
+
+      <h3 className="font-serif text-xl leading-tight text-[var(--fg)] transition-colors duration-200 group-hover:text-[var(--accent)]">
+        {project.title}
+      </h3>
+
+      <p className="mt-3 mb-5 line-clamp-3 text-sm leading-6 text-[var(--fg-muted)]">
+        {project.description}
+      </p>
+
+      <div className="mt-auto">
+        {/* Technologies */}
+        <ul className="mb-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--fg-subtle)]">
+          {project.technologies.slice(0, 5).map((tech, i) => (
+            <li key={tech} className="flex items-baseline gap-3">
+              {i > 0 && <span className="text-[var(--line-strong)]" aria-hidden="true">·</span>}
+              <span>{tech}</span>
+            </li>
+          ))}
+          {project.technologies.length > 5 && (
+            <li className="text-[var(--fg-subtle)]">
+              +{project.technologies.length - 5}
+            </li>
+          )}
+        </ul>
+
+        {/* Links */}
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/portfolio/${project.slug}`}
+            className="link-editorial inline-flex items-center gap-1 text-sm font-medium text-[var(--fg)]"
+          >
+            Chi tiết <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
           {project.liveUrl && (
             <a
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-white p-3 text-slate-900 shadow-xl transition-colors hover:bg-blue-600 hover:text-white"
-              aria-label="Xem website"
+              className="link-editorial text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)]"
             >
-              <ExternalLink className="w-5 h-5" />
+              Live
             </a>
           )}
           {project.githubUrl && (
@@ -57,58 +65,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-white p-3 text-slate-900 shadow-xl transition-colors hover:bg-slate-950 hover:text-white"
-              aria-label="Xem mã nguồn"
+              className="link-editorial inline-flex items-center gap-1 text-sm font-medium text-[var(--fg-muted)] hover:text-[var(--fg)]"
             >
-              <Github className="w-5 h-5" />
+              <Github className="h-3.5 w-3.5" /> Code
             </a>
           )}
-        </motion.div>
-
-        {/* Featured badge */}
-        {project.featured && (
-          <div className="absolute top-3 left-3">
-            <Badge variant="warning" size="sm">Tiêu biểu</Badge>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-6">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="text-lg font-bold tracking-tight text-slate-950 transition-colors group-hover:text-blue-700 dark:text-white dark:group-hover:text-blue-300">
-            {project.title}
-          </h3>
-          <Badge variant="secondary" size="sm">{project.category}</Badge>
         </div>
-
-        <p className="mb-4 line-clamp-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
-          {project.description}
-        </p>
-
-        {/* Technologies */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {project.technologies.slice(0, 4).map((tech) => (
-            <Badge key={tech} variant="default" size="sm">
-              {tech}
-            </Badge>
-          ))}
-          {project.technologies.length > 4 && (
-            <Badge variant="secondary" size="sm">
-              +{project.technologies.length - 4}
-            </Badge>
-          )}
-        </div>
-
-        {/* View Project Link */}
-        <Link
-          href={`/portfolio/${project.slug}`}
-          className="inline-flex items-center text-sm font-bold text-blue-700 transition-colors hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
-        >
-          Xem chi tiết
-          <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-        </Link>
       </div>
-    </motion.div>
+    </article>
   );
 }
