@@ -121,9 +121,10 @@ export function Modal({ isOpen, onClose, children, title, size = 'md', className
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             onClick={onClose}
             aria-hidden="true"
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-950/55 backdrop-blur-md"
           />
 
           {/* Modal */}
@@ -134,12 +135,12 @@ export function Modal({ isOpen, onClose, children, title, size = 'md', className
             aria-labelledby={title ? titleId : undefined}
             aria-label={title ? undefined : 'Hộp thoại'}
             tabIndex={-1}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.94, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'glass-panel relative w-full overflow-hidden rounded-3xl shadow-2xl',
+              'glass-panel relative w-full overflow-hidden rounded-3xl shadow-2xl shadow-slate-950/30',
               sizes[size],
               className
             )}
@@ -152,7 +153,7 @@ export function Modal({ isOpen, onClose, children, title, size = 'md', className
                   type="button"
                   onClick={onClose}
                   aria-label="Đóng hộp thoại"
-                  className="rounded-2xl p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                  className="rounded-2xl p-1.5 text-slate-400 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-110 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -160,7 +161,7 @@ export function Modal({ isOpen, onClose, children, title, size = 'md', className
             )}
 
             {/* Content */}
-            <div className="px-6 py-4 max-h-[80vh] overflow-y-auto">{children}</div>
+            <div className="px-6 py-5 max-h-[80vh] overflow-y-auto">{children}</div>
 
             {/* Close button if no title */}
             {!title && (
@@ -168,7 +169,7 @@ export function Modal({ isOpen, onClose, children, title, size = 'md', className
                 type="button"
                 onClick={onClose}
                 aria-label="Đóng hộp thoại"
-                className="absolute right-4 top-4 rounded-2xl p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                className="absolute right-4 top-4 rounded-2xl p-1.5 text-slate-400 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-110 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
               >
                 <X className="w-5 h-5" />
               </button>
