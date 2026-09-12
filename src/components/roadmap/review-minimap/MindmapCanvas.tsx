@@ -403,24 +403,23 @@ export function MindmapCanvas({ filteredTasks, progress, selectedTaskId, onSelec
   const getModuleKey = useCallback((id: string) => id.replace('module-', ''), []);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 bg-[radial-gradient(circle_at_1px_1px,rgba(100,116,139,0.18)_1px,transparent_0)] bg-[length:22px_22px] shadow-lg dark:border-gray-800 dark:bg-gray-950">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50/95 via-white/92 to-cyan-50/75 dark:from-gray-950/96 dark:via-slate-950/94 dark:to-cyan-950/20" />
+    <div className="card relative overflow-hidden p-0">
       {/* Toolbar left */}
-      <div className="absolute left-2 top-2 z-10 flex max-w-[calc(100%-1rem)] items-center gap-1 rounded-lg border border-gray-200/80 bg-white/95 px-1.5 py-1 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95 sm:left-3 sm:top-3">
-        <button type="button" onClick={expandAll} className="inline-flex min-h-12 items-center gap-1.5 rounded-md px-3 py-2 text-base font-semibold text-gray-800 transition hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 sm:min-h-8 sm:px-2 sm:py-1 sm:text-[11px] sm:font-medium sm:text-gray-600 sm:dark:text-gray-300" title="Mở rộng tất cả">
+      <div className="absolute left-2 top-2 z-10 flex max-w-[calc(100%-1rem)] items-center gap-1 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] px-1.5 py-1 sm:left-3 sm:top-3">
+        <button type="button" onClick={expandAll} className="btn btn-ghost btn-sm" title="Mở rộng tất cả">
           <Plus className="h-4 w-4 sm:h-3 sm:w-3" /> Mở hết
         </button>
-        <button type="button" onClick={collapseAll} className="inline-flex min-h-12 items-center gap-1.5 rounded-md px-3 py-2 text-base font-semibold text-gray-800 transition hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 sm:min-h-8 sm:px-2 sm:py-1 sm:text-[11px] sm:font-medium sm:text-gray-600 sm:dark:text-gray-300" title="Thu gọn tất cả">
+        <button type="button" onClick={collapseAll} className="btn btn-ghost btn-sm" title="Thu gọn tất cả">
           <Minus className="h-4 w-4 sm:h-3 sm:w-3" /> Thu hết
         </button>
       </div>
       {/* Zoom controls */}
-      <div className="absolute right-2 top-14 z-10 flex items-center gap-1 rounded-lg border border-gray-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95 sm:right-3 sm:top-3">
-        <button type="button" onClick={handleZoomIn} className="inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-800 transition hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 sm:h-8 sm:w-8 sm:text-gray-600 sm:dark:text-gray-300" aria-label="Phóng to"><ZoomIn className="h-5 w-5 sm:h-3.5 sm:w-3.5" /></button>
-        <span className="min-w-[3.8ch] text-center text-base font-semibold tabular-nums text-gray-700 dark:text-gray-200 sm:min-w-[3.5ch] sm:text-[11px] sm:text-gray-500 sm:dark:text-gray-400">{Math.round(zoom * 100)}%</span>
-        <button type="button" onClick={handleZoomOut} className="inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-800 transition hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 sm:h-8 sm:w-8 sm:text-gray-600 sm:dark:text-gray-300" aria-label="Thu nhỏ"><ZoomOut className="h-5 w-5 sm:h-3.5 sm:w-3.5" /></button>
-        <div className="mx-0.5 h-4 w-px bg-gray-200 dark:bg-gray-700" />
-        <button type="button" onClick={handleFit} className="inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-800 transition hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800 sm:h-8 sm:w-8 sm:text-gray-600 sm:dark:text-gray-300" aria-label="Fit to screen"><Maximize2 className="h-5 w-5 sm:h-3.5 sm:w-3.5" /></button>
+      <div className="absolute right-2 top-14 z-10 flex items-center gap-1 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] p-1 sm:right-3 sm:top-3">
+        <button type="button" onClick={handleZoomIn} className="btn btn-ghost btn-sm" aria-label="Phóng to"><ZoomIn className="h-5 w-5 sm:h-3.5 sm:w-3.5" /></button>
+        <span className="stat-number min-w-[3.8ch] text-center text-base text-[var(--fg)] sm:min-w-[3.5ch] sm:text-xs">{Math.round(zoom * 100)}%</span>
+        <button type="button" onClick={handleZoomOut} className="btn btn-ghost btn-sm" aria-label="Thu nhỏ"><ZoomOut className="h-5 w-5 sm:h-3.5 sm:w-3.5" /></button>
+        <div className="mx-0.5 h-4 w-px bg-[var(--line)]" />
+        <button type="button" onClick={handleFit} className="btn btn-ghost btn-sm" aria-label="Fit to screen"><Maximize2 className="h-5 w-5 sm:h-3.5 sm:w-3.5" /></button>
       </div>
 
       {/* Canvas */}
@@ -455,7 +454,7 @@ export function MindmapCanvas({ filteredTasks, progress, selectedTaskId, onSelec
         </div>
       </div>
       {/* Hint */}
-      <div className="absolute bottom-3 left-3 right-3 z-10 flex flex-wrap items-center justify-center gap-1.5 rounded-xl border border-gray-200/70 bg-white/95 px-3 py-3 text-base font-semibold text-gray-700 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/95 dark:text-gray-200 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:rounded-full sm:py-2 sm:text-[10px] sm:font-medium sm:text-gray-500 sm:dark:text-gray-400">
+      <div className="absolute bottom-3 left-3 right-3 z-10 flex flex-wrap items-center justify-center gap-1.5 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] px-3 py-3 text-base font-semibold text-[var(--fg)] sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:py-2 sm:text-xs">
         <Hand className="h-4 w-4 sm:h-3 sm:w-3" />
         <span className="hidden sm:inline">Kéo chuột/trackpad để di chuyển · Ctrl/⌘ + scroll để zoom · Click task để preview</span>
         <span className="sm:hidden">Kéo canvas · Chụm hai ngón để zoom · Chạm task để preview</span>
@@ -472,7 +471,7 @@ const EdgeLine = memo(function EdgeLine({ edge }: { edge: LayoutEdge }) {
   const cp1x = from.x + (dx > 0 ? cp : -cp);
   const cp2x = to.x + (dx > 0 ? -cp : cp);
   const d = `M${from.x},${from.y} C${cp1x},${from.y} ${cp2x},${to.y} ${to.x},${to.y}`;
-  const color = edge.type === 'root-track' ? 'var(--edge-root)' : edge.type === 'track-module' ? 'var(--edge-track)' : 'var(--edge-module)';
+  const color = edge.type === 'root-track' ? 'var(--accent)' : edge.type === 'track-module' ? 'var(--line-strong)' : 'var(--line)';
   const w = edge.type === 'root-track' ? 2.5 : edge.type === 'track-module' ? 2 : 1.5;
 
   return <path d={d} fill="none" stroke={color} strokeWidth={w} strokeLinecap="round" opacity={0.6} className="mindmap-edge" />;
@@ -499,14 +498,14 @@ const NodeEl = memo(function NodeEl({
     <div
       data-mindmap-node
       className={cn(
-        'mindmap-node absolute flex items-center gap-2 rounded-xl border px-3 text-sm font-semibold shadow-sm select-none transition-[box-shadow,transform,border-color,background-color] duration-150 active:scale-[0.98] sm:text-xs',
-        node.type === 'root' && 'justify-center rounded-2xl border-blue-200/80 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 dark:border-blue-800 dark:from-blue-700 dark:to-indigo-800',
-        node.type === 'track' && 'cursor-pointer border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50 text-violet-800 hover:shadow-md dark:border-violet-800/60 dark:from-violet-950/50 dark:to-fuchsia-950/30 dark:text-violet-200',
-        node.type === 'module' && 'cursor-pointer border-slate-200 bg-white text-slate-700 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200',
-        isTask && !isSelected && node.completed && 'cursor-pointer border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-800 hover:shadow-md dark:border-emerald-800/60 dark:from-emerald-950/40 dark:to-teal-950/30 dark:text-emerald-200',
-        isTask && !isSelected && !node.completed && node.hasNote && 'cursor-pointer border-amber-200/80 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-800 hover:shadow-md dark:border-amber-800/60 dark:from-amber-950/40 dark:to-orange-950/30 dark:text-amber-200',
-        isTask && !isSelected && !node.completed && !node.hasNote && 'cursor-pointer border-gray-200 bg-white text-gray-600 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300',
-        isTask && isSelected && 'cursor-pointer border-blue-400 bg-blue-50 text-blue-900 shadow-lg shadow-blue-500/20 ring-2 ring-blue-400/40 dark:border-blue-500 dark:bg-blue-950/60 dark:text-blue-100',
+        'mindmap-node absolute flex items-center gap-2 rounded-[var(--radius-card)] border px-3 text-sm font-semibold select-none transition-[box-shadow,transform,border-color,background-color] duration-150 active:scale-[0.98] sm:text-xs',
+        node.type === 'root' && 'justify-center rounded-2xl border-[var(--fg)] bg-[var(--fg)] text-[var(--bg)] shadow-lg',
+        node.type === 'track' && 'cursor-pointer border-[var(--line-strong)] bg-[var(--surface)] text-[var(--fg)] hover:bg-[var(--surface-2)] hover:shadow-md',
+        node.type === 'module' && 'cursor-pointer border-[var(--line)] bg-[var(--surface-2)] text-[var(--fg)] hover:bg-[var(--surface)] hover:shadow-md',
+        isTask && !isSelected && node.completed && 'cursor-pointer border-[var(--success)] bg-[var(--surface)] text-[var(--fg)] hover:bg-[var(--surface-2)] hover:shadow-md',
+        isTask && !isSelected && !node.completed && node.hasNote && 'cursor-pointer border-[var(--warn)] bg-[var(--surface)] text-[var(--fg)] hover:bg-[var(--surface-2)] hover:shadow-md',
+        isTask && !isSelected && !node.completed && !node.hasNote && 'cursor-pointer border-[var(--line)] bg-[var(--surface)] text-[var(--fg-muted)] hover:border-[var(--line-strong)] hover:text-[var(--fg)] hover:shadow-md',
+        isTask && isSelected && 'cursor-pointer border-[var(--fg)] bg-[var(--surface)] text-[var(--fg)] shadow-md ring-2 ring-[var(--fg)] ring-offset-1 ring-offset-[var(--bg)]',
       )}
       style={{ left: node.x, top: node.y, width: node.width, height: node.height }}
       onClick={handleClick}
@@ -527,11 +526,11 @@ const NodeEl = memo(function NodeEl({
         </span>
       )}
       {isTask && (
-        <span className={cn('inline-block h-3 w-3 shrink-0 rounded-full ring-2 ring-white dark:ring-gray-900', node.completed ? 'bg-emerald-500' : node.hasNote ? 'bg-amber-400' : 'bg-gray-300 dark:bg-gray-500')} />
+        <span className={cn('inline-block h-3 w-3 shrink-0 rounded-full ring-2 ring-[var(--surface)]', node.completed ? 'bg-[var(--success)]' : node.hasNote ? 'bg-[var(--warn)]' : 'bg-[var(--line-strong)]')} />
       )}
       <span className="min-w-0 truncate">{node.label}</span>
       {canCollapse && node.childCount != null && (
-        <span className={cn('shrink-0 rounded-full px-1.5 py-0.5 text-xs font-bold leading-none sm:text-[10px]', isLeft ? 'order-first' : 'ml-auto', node.type === 'track' ? 'bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400')}>
+        <span className={cn('shrink-0 badge badge-ghost text-[10px]', isLeft && 'order-first')}>
           {node.completedCount}/{node.childCount}
         </span>
       )}

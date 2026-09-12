@@ -39,16 +39,16 @@ export function ChildTaskRow({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold uppercase text-gray-400">{task.id}</span>
-            <span className={cn('rounded-full px-2 py-0.5 text-xs font-semibold', levelStyles[task.level] ?? levelStyles['Trung cấp'])}>
+            <span className="eyebrow font-mono normal-case tracking-normal">{task.id}</span>
+            <span className={cn('badge', levelStyles[task.level] ?? levelStyles['Trung cấp'])}>
               {task.level}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <span className="inline-flex items-center gap-1 text-xs text-[var(--fg-muted)]">
               <Clock3 className="h-3.5 w-3.5" />
               {task.estimateHours}h
             </span>
             {descendants.length > 0 && (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+              <span className="badge badge-ghost">
                 {completedDescendants}/{descendants.length} mục con
               </span>
             )}
@@ -58,7 +58,7 @@ export function ChildTaskRow({
               <button
                 type="button"
                 onClick={() => onToggleExpanded(task.id)}
-                className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[var(--fg-muted)] transition hover:bg-[var(--surface-2)] hover:text-[var(--fg)]"
                 aria-label={isExpanded ? 'Thu gọn task con' : 'Mở task con'}
                 aria-expanded={isExpanded}
               >
@@ -74,24 +74,24 @@ export function ChildTaskRow({
             <button
               type="button"
               onClick={() => onTitleClick?.(task.id)}
-              className="text-left text-sm font-semibold leading-6 text-gray-950 transition hover:text-blue-700 dark:text-white dark:hover:text-blue-300"
+              className="link-editorial text-left text-sm font-semibold leading-6"
             >
               {task.title}
             </button>
           </div>
-          <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+          <p className="mt-1 text-sm leading-6 text-[var(--fg-muted)]">
             {task.deliverable}
           </p>
         </div>
       </div>
       {completed && (
-        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
+        <div className="mt-3 badge border-[var(--success)] text-[var(--success)]">
           <CheckCircle2 className="h-3.5 w-3.5" />
           Đã học
         </div>
       )}
       {hasChildren && isExpanded ? (
-        <div className="mt-3 divide-y divide-gray-100 border-l border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+        <div className="mt-3 divide-y divide-[var(--line)] border-l border-[var(--line)]">
           {task.children?.map((child) => (
             <ChildTaskRow
               key={child.id}

@@ -36,22 +36,19 @@ export function TaskPageHeader({
     <>
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          <Link
-            href={backHref}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-          >
+          <Link href={backHref} className="link-editorial inline-flex min-h-10 items-center gap-2 sm:min-h-0 sm:text-sm">
             <ArrowLeft className="h-4 w-4" />
             {backLabel}
           </Link>
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold uppercase text-gray-400">{taskId}</span>
+            <span className="eyebrow font-mono normal-case tracking-normal">{taskId}</span>
             {deckCountBadge ? (
-              <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-800 dark:bg-violet-900/40 dark:text-violet-200">
+              <span className="badge badge-accent">
                 {deckCountBadge}
               </span>
             ) : null}
           </div>
-          <h1 className="mt-2 text-2xl font-bold leading-tight text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-3xl">
+          <h1 className="mt-2 font-serif text-2xl font-normal leading-tight text-[var(--fg)] [overflow-wrap:anywhere] sm:text-3xl">
             {title}
           </h1>
         </div>

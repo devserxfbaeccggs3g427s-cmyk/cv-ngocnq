@@ -11,6 +11,7 @@ import type { Roadmap, StudyStatusFilter, TaskContext } from '@/types';
 import {
   getLeafTaskContexts,
   getTaskStudyState,
+  studyStatusOptions,
 } from '@/lib/roadmap';
 import { useProgress } from '@/hooks';
 import { TaskPreviewSlidePanel } from './TaskPreviewSlidePanel';
@@ -87,38 +88,38 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* Header */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/80 md:flex-row md:items-start md:justify-between md:p-5">
+      <div className="card flex flex-col gap-4 p-4 md:flex-row md:items-start md:justify-between md:p-5">
         <div className="min-w-0">
           <Link
             href="/skill-roadmap"
-            className="inline-flex min-h-10 items-center gap-2 text-base font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 sm:min-h-0 sm:text-sm"
+            className="link-editorial inline-flex min-h-10 items-center gap-2 sm:min-h-0 sm:text-sm"
           >
             <ArrowLeft className="h-4 w-4" /> Quay lại roadmap
           </Link>
-          <h1 className="mt-3 flex items-center gap-2 text-[1.65rem] font-bold leading-tight text-gray-950 dark:text-white sm:text-3xl">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">
+          <h1 className="mt-3 flex items-center gap-2 font-serif text-[1.65rem] font-normal leading-tight text-[var(--fg)] sm:text-3xl">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface)] text-[var(--accent)]">
               <Grid3X3 className="h-5 w-5" />
             </span>
             <span className="min-w-0">Mindmap ôn tập</span>
           </h1>
-          <p className="mt-2 max-w-2xl text-base leading-7 text-gray-700 dark:text-gray-200 sm:text-sm sm:leading-relaxed sm:text-gray-600 sm:dark:text-gray-300">
+          <p className="mt-2 max-w-2xl text-base leading-7 text-[var(--fg-muted)] sm:text-sm sm:leading-relaxed">
             Tổng quan toàn bộ lộ trình theo track, module và task. Trên mobile có thể kéo canvas, chụm hai ngón để zoom và chạm task để mở preview.
           </p>
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800/70 dark:text-gray-200 sm:text-xs sm:text-gray-600 sm:dark:text-gray-300 md:max-w-xs">
-          <span className="font-semibold text-gray-500 dark:text-gray-400">Chú thích:</span>
+        <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--fg-muted)] md:max-w-xs">
+          <span className="font-semibold text-[var(--fg)]">Chú thích:</span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-5 rounded-full bg-emerald-500" />
+            <span className="inline-block h-3 w-5 rounded-full bg-[var(--success)]" />
             Hoàn thành
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-5 rounded-full bg-amber-400 dark:bg-amber-500" />
+            <span className="inline-block h-3 w-5 rounded-full bg-[var(--warn)]" />
             Có note
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-3 w-5 rounded-full bg-gray-300 dark:bg-gray-600" />
+            <span className="inline-block h-3 w-5 rounded-full bg-[var(--line-strong)]" />
             Chưa học
           </span>
         </div>
@@ -133,22 +134,22 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
       />
 
       {/* Filters */}
-      <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:grid-cols-[minmax(220px,1fr)_minmax(180px,auto)_minmax(180px,auto)]">
-        <div className="relative min-w-0">
-          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 sm:h-4 sm:w-4" />
+      <div className="card grid gap-3 p-3 sm:grid-cols-[minmax(220px,1fr)_minmax(180px,auto)_minmax(180px,auto)]">
+        <label className="relative min-w-0">
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--fg-subtle)] sm:h-4 sm:w-4" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm task..."
-            className="min-h-12 w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-3 text-base text-gray-900 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:min-h-11 sm:pl-9 sm:text-sm"
+            className="input-modern min-h-12 w-full py-2 pl-10 pr-3 text-base sm:min-h-11 sm:pl-9 sm:text-sm"
           />
-        </div>
+        </label>
 
         <select
           value={trackFilter}
           onChange={(e) => setTrackFilter(e.target.value)}
-          className="min-h-12 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 sm:min-h-11 sm:text-sm"
+          className="input-modern min-h-12 w-full px-3 py-2 text-base sm:min-h-11 sm:text-sm"
         >
           <option value="all">Tất cả track</option>
           {tracks.map((track) => (
@@ -161,12 +162,13 @@ export function SkillRoadmapReviewMinimap({ roadmap }: { roadmap: Roadmap }) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StudyStatusFilter)}
-          className="min-h-12 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-base text-gray-700 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 sm:min-h-11 sm:text-sm"
+          className="input-modern min-h-12 w-full px-3 py-2 text-base sm:min-h-11 sm:text-sm"
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="completed">Đã hoàn thành</option>
-          <option value="incomplete">Chưa hoàn thành</option>
-          <option value="with-note">Có note</option>
+          {studyStatusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
 

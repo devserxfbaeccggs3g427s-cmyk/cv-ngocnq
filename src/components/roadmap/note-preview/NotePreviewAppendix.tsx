@@ -25,9 +25,9 @@ export function AppendixLinks({
             onClick={onNavigate}
             aria-current={activeHeadingId === heading.id ? 'location' : undefined}
             className={cn(
-              'block rounded-md border-l-2 border-transparent px-2 py-1.5 text-sm font-medium leading-snug text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white',
+              'block rounded-md border-l-2 border-transparent px-2 py-1.5 text-sm font-medium leading-snug text-[var(--fg-muted)] transition hover:bg-[var(--surface-2)] hover:text-[var(--fg)]',
               activeHeadingId === heading.id &&
-                'border-blue-500 bg-blue-50 text-blue-700 shadow-sm dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-200'
+                'border-[var(--fg)] bg-[var(--surface-2)] text-[var(--fg)]'
             )}
           >
             {heading.text}
@@ -56,13 +56,13 @@ export function MobileAppendixDrawer({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-28 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-gray-950 px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-gray-950/20 transition hover:bg-gray-800 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200 sm:bottom-4 lg:hidden"
+        className="btn btn-primary fixed bottom-28 right-4 z-40 lg:hidden"
         aria-haspopup="dialog"
         aria-expanded={open}
       >
         <ListTree className="h-4 w-4" aria-hidden="true" />
         Phụ lục
-        <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs dark:bg-gray-950/10">
+        <span className="badge badge-ghost ml-1">
           {headings.length}
         </span>
       </button>
@@ -71,20 +71,20 @@ export function MobileAppendixDrawer({
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Phụ lục">
           <button
             type="button"
-            className="absolute inset-0 bg-gray-950/45"
+            className="absolute inset-0 bg-[var(--fg)]/45"
             onClick={() => setOpen(false)}
             aria-label="Đóng phụ lục"
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[76vh] rounded-t-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-950">
-            <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3 dark:border-gray-800">
+          <div className="card absolute inset-x-0 bottom-0 max-h-[76vh] rounded-t-[var(--radius-card)] rounded-b-none">
+            <div className="flex items-center justify-between gap-3 border-b border-[var(--line)] px-4 py-3">
               <div>
-                <h3 className="font-semibold text-gray-950 dark:text-white">Phụ lục</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{headings.length} mục trong note</p>
+                <h3 className="font-serif text-base font-normal text-[var(--fg)]">Phụ lục</h3>
+                <p className="text-xs text-[var(--fg-muted)]">{headings.length} mục trong note</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:bg-gray-100 hover:text-gray-950 dark:border-gray-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-white"
+                className="btn btn-ghost btn-sm"
                 aria-label="Đóng phụ lục"
               >
                 <X className="h-4 w-4" aria-hidden="true" />

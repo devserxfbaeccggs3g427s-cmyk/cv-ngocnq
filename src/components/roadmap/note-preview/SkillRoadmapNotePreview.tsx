@@ -56,36 +56,36 @@ export function SkillRoadmapNotePreview({
   return (
     <div className="grid min-w-0 max-w-full gap-4 pb-32 sm:pb-20 lg:grid-cols-[320px_minmax(0,1fr)] lg:pb-0">
       {/* Sidebar */}
-      <aside className="min-w-0 rounded-lg border border-gray-200 bg-white p-4 text-sm shadow-sm dark:border-gray-800 dark:bg-gray-950 lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:self-start">
-        <h2 className="font-bold text-gray-950 dark:text-white">Thông tin task</h2>
-        <dl className="mt-3 grid gap-3 text-gray-600 dark:text-gray-300 sm:grid-cols-2 lg:block lg:space-y-3">
+      <aside className="card min-w-0 p-4 text-sm lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:self-start">
+        <h2 className="font-serif text-base font-normal text-[var(--fg)]">Thông tin task</h2>
+        <dl className="mt-3 grid gap-3 text-[var(--fg-muted)] sm:grid-cols-2 lg:block lg:space-y-3">
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">ID</dt>
+            <dt className="eyebrow">ID</dt>
             <dd className="mt-1 break-all font-mono text-xs">{taskId}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">Track</dt>
+            <dt className="eyebrow">Track</dt>
             <dd className="mt-1">{task?.trackTitle ?? 'N/A'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">Module</dt>
+            <dt className="eyebrow">Module</dt>
             <dd className="mt-1">{task?.moduleTitle ?? 'N/A'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">Trạng thái</dt>
+            <dt className="eyebrow">Trạng thái</dt>
             <dd className="mt-1">{effectivelyCompleted ? 'Đã hoàn thành' : 'Chưa hoàn thành'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-wide text-gray-400">Cập nhật</dt>
+            <dt className="eyebrow">Cập nhật</dt>
             <dd className="mt-1">{formatDate(item?.updatedAt ?? null)}</dd>
           </div>
         </dl>
 
         {headings.length > 0 && (
-          <nav className="mt-5 hidden min-h-0 border-t border-gray-200 pt-4 dark:border-gray-800 lg:flex lg:flex-1 lg:flex-col" aria-label="Phụ lục">
+          <nav className="mt-5 hidden min-h-0 border-t border-[var(--line)] pt-4 lg:flex lg:flex-1 lg:flex-col" aria-label="Phụ lục">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">Phụ lục</h3>
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+              <span className="eyebrow">Phụ lục</span>
+              <span className="badge badge-ghost">
                 {headings.length} mục
               </span>
             </div>
@@ -108,9 +108,9 @@ export function SkillRoadmapNotePreview({
 
         <article
           ref={markdownArticleRef}
-          className="min-w-0 max-w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950"
+          className="card min-w-0 max-w-full overflow-hidden"
         >
-          <div className="min-w-0 overflow-hidden text-ellipsis border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 dark:border-gray-800 dark:text-gray-200">
+          <div className="min-w-0 overflow-hidden text-ellipsis border-b border-[var(--line)] px-4 py-3 font-mono text-sm text-[var(--fg-muted)]">
             {taskId}.md
           </div>
           <div className="min-w-0 max-w-full overflow-hidden p-4 sm:p-5">

@@ -84,7 +84,7 @@ export function SkillRoadmapTaskDetail({
   const completedDescendants = descendants.filter((child) =>
     progress ? getTaskStudyState(child, progress).effectivelyCompleted : false
   ).length;
-  const hasNote = Boolean(item?.note.trim());
+  const hasNote = Boolean(item?.note?.trim());
   const effectivelyCompleted = progress ? getTaskStudyState(task, progress).effectivelyCompleted : false;
   const childProgressing = !effectivelyCompleted && completedDescendants > 0;
   const totalChildHours = descendants.reduce((sum, child) => sum + child.estimateHours, 0);
@@ -255,26 +255,26 @@ export function SkillRoadmapTaskDetail({
     <div className="space-y-6 pb-24 sm:pb-0">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          <Link href="/skill-roadmap" className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+          <Link href="/skill-roadmap" className="link-editorial inline-flex min-h-10 items-center gap-2 sm:min-h-0 sm:text-sm">
             <ArrowLeft className="h-4 w-4" /> Quay lại roadmap
           </Link>
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold uppercase text-gray-400">{task.id}</span>
-            <span className={cn('rounded-full px-2 py-0.5 text-xs font-semibold', levelStyles[task.level] ?? levelStyles['Trung cấp'])}>{task.level}</span>
+            <span className="eyebrow font-mono normal-case tracking-normal">{task.id}</span>
+            <span className={cn('badge', levelStyles[task.level] ?? levelStyles['Trung cấp'])}>{task.level}</span>
             {task.parentTasks.length > 0 && (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">Task con cấp {task.depth}</span>
+              <span className="badge badge-ghost">Task con cấp {task.depth}</span>
             )}
           </div>
-          <h1 className="mt-2 text-2xl font-bold leading-tight text-gray-950 [overflow-wrap:anywhere] dark:text-white sm:text-3xl">{task.title}</h1>
+          <h1 className="mt-2 font-serif text-2xl font-normal leading-tight text-[var(--fg)] [overflow-wrap:anywhere] sm:text-3xl">{task.title}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}/flashcards`} className="inline-flex items-center justify-center gap-2 rounded-lg border border-violet-200 px-3 py-2 text-sm font-semibold text-violet-700 transition hover:border-violet-400 hover:text-violet-800 dark:border-violet-900/70 dark:text-violet-300 dark:hover:border-violet-700 dark:hover:text-violet-200">
+          <Link href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}/flashcards`} className="btn btn-secondary">
             <Brain className="h-4 w-4" /> Flashcard
           </Link>
-          <Link href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}/quiz`} className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-200 px-3 py-2 text-sm font-semibold text-cyan-700 transition hover:border-cyan-400 hover:text-cyan-800 dark:border-cyan-900/70 dark:text-cyan-300 dark:hover:border-cyan-700 dark:hover:text-cyan-200">
+          <Link href={`/skill-roadmap/tasks/${encodeURIComponent(task.id)}/quiz`} className="btn btn-secondary">
             <CircleHelp className="h-4 w-4" /> Trắc nghiệm
           </Link>
-          <Link href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`} className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-blue-300 hover:text-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-700 dark:hover:text-blue-300">
+          <Link href={`/skill-roadmap/notes/${encodeURIComponent(task.id)}`} className="btn btn-secondary">
             <FileText className="h-4 w-4" /> Mở note
           </Link>
         </div>
@@ -298,8 +298,8 @@ export function SkillRoadmapTaskDetail({
         <div className="space-y-6">
           <Card>
             <CardContent className="p-5 md:p-6">
-              <h2 className="flex items-center gap-2 text-lg font-bold text-gray-950 dark:text-white">
-                <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Thông tin task
+              <h2 className="flex items-center gap-2 font-serif text-xl font-normal text-[var(--fg)]">
+                <BookOpen className="h-5 w-5 text-[var(--accent)]" /> Thông tin task
               </h2>
               <dl className="mt-4 grid gap-4 text-sm md:grid-cols-2">
                 <DetailItem label="Track" value={task.trackTitle} />
@@ -309,9 +309,9 @@ export function SkillRoadmapTaskDetail({
                 <DetailItem label="Ước tính" value={`${task.estimateHours} giờ`} />
                 <DetailItem label="Tổng giờ task con" value={`${totalChildHours} giờ`} />
               </dl>
-              <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950">
-                <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Kết quả cần có</div>
-                <p className="mt-2 text-sm leading-6 text-gray-700 dark:text-gray-200">{task.deliverable}</p>
+              <div className="mt-5 card p-4">
+                <div className="eyebrow">Kết quả cần có</div>
+                <p className="mt-2 text-sm leading-6 text-[var(--fg)]">{task.deliverable}</p>
               </div>
             </CardContent>
           </Card>
@@ -323,11 +323,11 @@ export function SkillRoadmapTaskDetail({
 
           <Card>
             <CardContent className="p-5 md:p-6">
-              <h2 className="flex items-center gap-2 text-lg font-bold text-gray-950 dark:text-white">
-                <ListTree className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Task con
+              <h2 className="flex items-center gap-2 font-serif text-xl font-normal text-[var(--fg)]">
+                <ListTree className="h-5 w-5 text-[var(--accent)]" /> Task con
               </h2>
               {hasChildren ? (
-                <div className="mt-4 divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+                <div className="mt-4 divide-y divide-[var(--line)] card overflow-hidden">
                   {task.children?.map((child) => (
                     <ChildTaskRow
                       key={child.id}
@@ -341,7 +341,7 @@ export function SkillRoadmapTaskDetail({
                   ))}
                 </div>
               ) : (
-                <p className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-300">Task này không có task con.</p>
+                <p className="mt-4 card p-4 text-sm text-[var(--fg-muted)]">Task này không có task con.</p>
               )}
             </CardContent>
           </Card>
@@ -350,7 +350,7 @@ export function SkillRoadmapTaskDetail({
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <Card>
             <CardContent className="p-5">
-              <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">Vị trí trong lộ trình</h2>
+              <h2 className="eyebrow">Vị trí trong lộ trình</h2>
               <div className="mt-4 space-y-3 text-sm">
                 <PathLine label="Track" value={task.trackTitle} />
                 <PathLine label="Module" value={task.moduleTitle} />
