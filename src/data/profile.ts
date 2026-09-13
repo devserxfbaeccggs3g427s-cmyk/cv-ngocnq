@@ -111,18 +111,22 @@ export const profile: Profile = {
   // PROFESSIONAL SUMMARY
   // Keep this concise: 2-4 sentences that capture who you are professionally
   // -------------------------------------------------------------------------
-  summary: `Lập trình viên Backend / Full-Stack với hơn 4 năm kinh nghiệm xây dựng hệ thống tài chính - ngân hàng, bảo hiểm và sản phẩm cho khách hàng Nhật Bản. Thế mạnh ở Java 17, Spring Boot 3, kiến trúc Microservices, Oracle/PostgreSQL, Redis, Kafka, tích hợp Core Banking/ESB, bảo mật JWT/OAuth2/OTP và thiết kế API phục vụ nghiệp vụ có độ tin cậy cao. Đã tham gia các nền tảng thực tế cho SHB, MBBank và Bảo Việt, bao gồm cổng thanh toán dịch vụ công, Mobile Banking Campuchia, cổng xử lý nợ, hệ thống định giá tài sản thế chấp và bảo hiểm trực tuyến.`,
+  summary: `Lập trình viên Backend / Full-Stack với hơn 4 năm kinh nghiệm xây dựng hệ thống tài chính – ngân hàng, bảo hiểm và sản phẩm cho khách hàng Nhật Bản. Thế mạnh ở phát triển backend Java/Spring Boot theo kiến trúc Microservices và Event-Driven, tích hợp Core Banking, thiết kế API nghiệp vụ có độ tin cậy cao và tối ưu hiệu năng hệ thống xử lý dữ liệu lớn. Hiện đang phát triển nền tảng Sinh Lời Tự Động của Ngân hàng SHB cho cả khách hàng cá nhân (tính lãi sản phẩm tiết kiệm, chính sách lãi suất theo số dư bình quân, tái cấu trúc pipeline tính lãi) và khách hàng doanh nghiệp (tính lãi sản phẩm Chứng chỉ Tiền gửi, tổng hợp lãi dự trả tháng). Đã tham gia các nền tảng thực tế cho SHB, MBBank và Bảo Việt, bao gồm cổng thanh toán dịch vụ công, Mobile Banking Campuchia, cổng xử lý nợ, hệ thống định giá tài sản thế chấp và bảo hiểm trực tuyến.`,
 
   // ---------------------------------------------------------------------------
   // KEY HIGHLIGHTS
   // 3-5 achievement statements with metrics when possible
   // ---------------------------------------------------------------------------
   highlights: [
+    'Phát triển nền tảng Sinh Lời Tự Động của SHB cho cả khách hàng cá nhân và khách hàng doanh nghiệp, vận hành song song với cơ chế cô lập hoàn toàn giữa hai luồng',
+    'Tham gia tái cấu trúc pipeline tính lãi hàng ngày của nền tảng Sinh Lời giúp xử lý hiệu quả và ổn định hơn, đồng thời thiết kế cơ chế chuyển đổi có thể quay lại phiên bản cũ bất kỳ lúc nào mà không cần cập nhật hệ thống',
+    'Đề xuất công thức tính lãi dạng đóng cho khách hàng doanh nghiệp, loại bỏ sai số làm tròn tích lũy qua nhiều ngày và đảm bảo tính chính xác dài hạn',
+    'Thiết kế và xây dựng hệ thống quản lý chính sách lãi suất với quy trình phê duyệt nhiều cấp và kiểm soát rủi ro thay đổi lãi suất cho ngân hàng',
+    'Xây dựng cơ chế giám sát và tự động xử lý lỗi cho hệ thống tính lãi, tự động thử lại các giao dịch tính toán bị lỗi và có API cho phép vận hành viên xử lý thủ công khi cần, đảm bảo hệ thống vận hành liên tục 24/7',
     'Xây dựng backend cổng thanh toán dịch vụ công với luồng tạo QR, truy vấn, hoàn tiền, chi hộ và đối soát',
-    'Phát triển 3 Microservices cho SHB Mobile Banking Campuchia: Identity, Account, Fund Transfer',
-    'Thiết kế Gateway, Maker-Checker Workflow, MinIO file service và report module cho SHB Debit Collection Portal',
-    'Tích hợp AI giảm 60% khối lượng nhập tay trong hệ thống CMV MBBank',
-    'Kinh nghiệm tích hợp Core Banking, ESB, Napas, Oracle Stored Procedures, Kafka và Signature Service',
+    'Phát triển 3 dịch vụ backend cho Mobile Banking SHB tại Campuchia: xác thực, tài khoản và chuyển tiền',
+    'Tích hợp AI giúp giảm đáng kể khối lượng nhập liệu thủ công trong hệ thống định giá tài sản thế chấp của MBBank',
+    'Viết tài liệu kỹ thuật và tài liệu nghiệp vụ cho 7 hệ thống ngân hàng với hơn 40 luồng xử lý được mô tả bằng sơ đồ',
   ],
 };
 

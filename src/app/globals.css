@@ -1180,7 +1180,7 @@ body {
    PRINT
    ========================================================= */
 @media print {
-  .no-print, header:not(.print-header), footer, nav, .side-nav, button:not(.print-button) { display: none !important; }
+  .no-print, header:not(.print-header), footer, nav, .side-nav, .skip-link, button:not(.print-button) { display: none !important; }
   .print-only { display: block !important; }
   * { background: white !important; color: black !important; box-shadow: none !important; text-shadow: none !important; }
   @page { margin: 1cm; size: A4; }

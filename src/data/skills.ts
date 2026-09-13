@@ -251,6 +251,24 @@ export const skills: Skill[] = [
     yearsOfExperience: 3,
   },
   {
+    name: 'Oracle PL/SQL',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'Lập trình tiến trình chạy nền (Scheduler)',
+    level: 80,
+    category: 'Backend',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'Mẫu thiết kế (Design Patterns)',
+    level: 85,
+    category: 'Backend',
+    yearsOfExperience: 3,
+  },
+  {
     name: 'JWT / Nimbus JOSE',
     level: 80,
     category: 'Backend',
@@ -280,9 +298,15 @@ export const skills: Skill[] = [
   },
   {
     name: 'Apache Kafka',
-    level: 80,
+    level: 82,
     category: 'Architecture',
     yearsOfExperience: 2,
+  },
+  {
+    name: 'Tái cấu trúc hệ thống & Tối ưu hiệu năng',
+    level: 82,
+    category: 'Architecture',
+    yearsOfExperience: 3,
   },
   {
     name: 'Core Banking / ESB Integration',

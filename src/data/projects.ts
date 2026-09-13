@@ -145,7 +145,50 @@ export const projectCategories: string[] = [
  */
 export const projects: Project[] = [
   // ---------------------------------------------------------------------------
-  // FEATURED PROJECT 1 – GOV Payment Service
+  // FEATURED PROJECT 1 – IBS Wealth Management (Sinh Lời Tự Động – KHCN & KHDN)
+  // ---------------------------------------------------------------------------
+  {
+    id: 'proj-8',
+    slug: 'ibs-wealth-management-sinhloi',
+    title: 'IBS - Nền tảng sinh lời tự động',
+    description:
+      'Hệ thống quản lý sản phẩm tiết kiệm và tính lãi tự động áp dụng cho cả khách hàng cá nhân và khách hàng doanh nghiệp của Ngân hàng SHB, gồm tính lãi hàng ngày, chính sách lãi suất, ưu đãi theo số dư bình quân và tổng hợp lãi dự trả tháng cho doanh nghiệp.',
+    longDescription: 'Nền tảng Sinh Lời Tự Động là hệ thống quản lý sản phẩm tiết kiệm và tính lãi tự động của Ngân hàng TMCP Sài Gòn – Hà Nội (SHB), áp dụng cho cả khách hàng cá nhân (sản phẩm tiết kiệm có kỳ hạn) và khách hàng doanh nghiệp (sản phẩm Chứng chỉ Tiền gửi CD). Với khách hàng cá nhân, hệ thống tự động tính lãi hàng ngày cho hợp đồng tiết kiệm, quản lý chính sách lãi suất qua quy trình phê duyệt nhiều cấp và áp dụng ưu đãi lãi suất theo số dư bình quân cho khách hàng thân thiết. Với khách hàng doanh nghiệp, hệ thống bổ sung luồng tính lãi dự chi ngày (daily accrued interest) và luồng tổng hợp lãi dự trả tháng (monthly prepaid interest). Hai luồng khách hàng vận hành song song và cô lập hoàn toàn thông qua các kênh xử lý và vùng dữ liệu riêng biệt, đảm bảo mọi thay đổi hoặc sự cố ở một luồng không ảnh hưởng đến luồng còn lại. Trong dự án này, tôi đảm nhận vai trò kỹ sư backend chính: (1) Xây dựng hệ thống quản lý chính sách lãi suất với quy trình tạo – phê duyệt – ban hành nhiều cấp; (2) Tham gia tái cấu trúc toàn bộ pipeline tính lãi hàng ngày giúp xử lý hiệu quả và ổn định hơn, đồng thời thiết kế cơ chế chuyển đổi có thể quay lại phiên bản cũ bất kỳ lúc nào; (3) Tích hợp cơ chế phối hợp xử lý phân tán với khóa tạm thời có thời hạn và kiểm tra trùng lặp hai lớp, kèm hệ thống giám sát và tự động xử lý lỗi đảm bảo vận hành liên tục 24/7; (4) Viết bộ tài liệu nghiệp vụ và kỹ thuật cho 7 hệ thống backend với hơn 40 luồng xử lý được mô tả bằng sơ đồ trực quan, phục vụ đào tạo nhân sự mới và bàn giao giữa các đội phát triển.',
+    thumbnail: '/projects/ibs-wealth-thumb.jpg',
+    images: [],
+    technologies: [
+      'Java 17',
+      'Spring Boot 3',
+      'Spring Data JPA',
+      'Oracle Database',
+      'PL/SQL',
+      'Stored Procedures',
+      'Apache Kafka',
+      'Quartz Scheduler',
+      'Redis',
+      'Microservices',
+      'Event-Driven Architecture',
+      'Docker',
+      'Kubernetes',
+      'GitLab CI/CD',
+    ],
+    category: 'Tài chính – Ngân hàng',
+    role: 'Lập trình viên Backend',
+    duration: '07-2026 – Nay',
+    featured: true,
+    highlights: [
+      'Phát triển nền tảng Sinh Lời Tự Động cho cả khách hàng cá nhân (tính lãi sản phẩm tiết kiệm, ưu đãi lãi suất theo số dư bình quân) và khách hàng doanh nghiệp (tính lãi Chứng chỉ Tiền gửi, tổng hợp lãi dự trả tháng)',
+      'Tham gia tái cấu trúc pipeline tính lãi hàng ngày của nền tảng Sinh Lời giúp xử lý hiệu quả và ổn định hơn; thiết kế cơ chế chuyển đổi có thể quay lại phiên bản cũ bất kỳ lúc nào mà không cần cập nhật hệ thống',
+      'Xây dựng hệ thống quản lý chính sách lãi suất với quy trình tạo – phê duyệt – ban hành nhiều cấp, đảm bảo kiểm soát rủi ro và tính liên tục của nghiệp vụ',
+      'Xây dựng luồng tổng hợp lãi dự trả tháng tự động cho khách hàng doanh nghiệp, đảm bảo dữ liệu lãi tổng hợp luôn sẵn sàng cho nghiệp vụ chi trả',
+      'Tích hợp cơ chế giám sát và tự động xử lý lỗi cho hệ thống tính lãi, tự động thử lại các giao dịch tính toán bị lỗi và cung cấp công cụ cho phép vận hành viên xử lý thủ công khi cần, đảm bảo hệ thống vận hành liên tục 24/7',
+      'Viết kịch bản xử lý dữ liệu lịch sử giúp tính toán lại số dư bình quân cho toàn bộ khách hàng đang tham gia chương trình, đảm bảo triển khai go-live an toàn và chính xác',
+      'Viết tài liệu nghiệp vụ và tài liệu kỹ thuật chi tiết cho 7 hệ thống backend của nền tảng Sinh Lời, mô tả hơn 40 luồng xử lý bằng sơ đồ trực quan, phục vụ đào tạo nhân sự mới và bàn giao giữa các đội phát triển',
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // FEATURED PROJECT 2 – GOV Payment Service
   // ---------------------------------------------------------------------------
   {
     id: 'proj-1',
@@ -284,7 +327,7 @@ export const projects: Project[] = [
     title: 'Collateral Management & Valuation (CMV) – MBBank',
     description:
       'Hệ thống thẩm định và quản lý tài sản thế chấp ngân hàng MBBank theo kiến trúc Microservices, tích hợp AI và Kafka.',
-    longDescription: `CMV phục vụ nghiệp vụ thẩm định tài sản thế chấp tại MBBank. Hệ thống được xây dựng theo kiến trúc Microservices và Event-Driven Architecture với Apache Kafka, tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ pháp lý/hình ảnh và phát hiện trùng lặp tài sản. API được quản lý qua Apigee Gateway với ECDH Encryption; luồng ETL dùng Pentaho PDI để đồng bộ dữ liệu sang CMV MBV (S600); hệ thống được giám sát bằng ELK Stack.`,
+    longDescription: `CMV (Collateral Management & Valuation) là hệ thống phục vụ nghiệp vụ thẩm định và quản lý tài sản thế chấp tại MBBank. Hệ thống được xây dựng theo kiến trúc Microservices và Event-Driven Architecture với Apache Kafka, đáp ứng các yêu cầu nghiệp vụ phức tạp của quy trình tín dụng và thẩm định tài sản ngân hàng, đảm bảo hiệu năng cao và tiêu chuẩn bảo mật nghiêm ngặt. Hệ thống tích hợp AI Platform để tự động trích xuất dữ liệu từ hồ sơ pháp lý và hình ảnh, phát hiện trùng lặp tài sản; đồng thời tích hợp với kho hàng CMS thông qua Kafka để xử lý bất đồng bộ. API được quản lý qua Apigee Gateway với RSA Encryption cho trao đổi dữ liệu bảo mật; luồng ETL dùng Pentaho PDI để đồng bộ dữ liệu sang hệ thống OCB (S600); giám sát vận hành bằng ELK Stack.`,
     thumbnail: '/projects/cmv-thumb.jpg',
     images: [],
     technologies: [
@@ -294,6 +337,7 @@ export const projects: Project[] = [
       'OracleDB',
       'Redis',
       'Apigee API Gateway',
+      'RSA Encryption',
       'Pentaho PDI',
       'ELK Stack',
       'Microservices',
@@ -304,11 +348,12 @@ export const projects: Project[] = [
     duration: '05-2023 – 10-2025',
     featured: false,
     highlights: [
-      'Giảm 60% khối lượng nhập tay nhờ tích hợp AI trích xuất dữ liệu và phát hiện trùng lặp hình ảnh',
-      'Triển khai Microservices và Event-Driven Architecture với Kafka cho tích hợp CMS/kho hàng',
-      'Bảo mật API qua Apigee Gateway với ECDH Encryption và quản lý dữ liệu ngân hàng nhạy cảm',
-      'Xây dựng luồng ETL Pentaho PDI đồng bộ CMV MBBank sang CMV MBV',
-      'Phát triển các phân hệ định giá tài sản, định giá lại, tư vấn giá, kho giá và tích hợp dữ liệu thời gian thực',
+      'Tham gia phát triển và vận hành hệ thống Microservices phục vụ quy trình tín dụng và thẩm định tài sản của ngân hàng, đáp ứng yêu cầu nghiệp vụ phức tạp với tiêu chuẩn cao về hiệu năng và bảo mật',
+      'Tích hợp với hệ thống AI để thực hiện bóc tách dữ liệu từ hồ sơ pháp lý và hình ảnh, giúp giảm thiểu quá trình nhập liệu của RM (Relationship Manager); đồng thời phát hiện trùng lặp hình ảnh tài sản, tăng tính minh bạch cho báo cáo thẩm định và nâng cao khả năng phát hiện gian lận',
+      'Thiết kế và triển khai kiến trúc Event-Driven: tích hợp hệ thống thẩm định tài sản (CMV) với kho hàng CMS qua Apache Kafka để xử lý bất đồng bộ, giúp giảm đáng kể thời gian phản hồi và nâng cao độ ổn định cho hệ thống',
+      'Xây dựng và bảo mật API cung cấp cho đối tác bên ngoài ngân hàng qua Apigee Gateway, áp dụng chính sách bảo mật và kiểm soát truy cập chặt chẽ; tích hợp RSA Encryption cho trao đổi file và dữ liệu nhạy cảm',
+      'Xây dựng và tối ưu luồng ETL bằng Pentaho PDI để đồng bộ dữ liệu cấu hình và bảng giá từ hệ thống CMV sang hệ thống OCB (S600), giải quyết các bài toán biến đổi dữ liệu phức tạp và đảm bảo tính nhất quán giữa hai hệ thống',
+      'Phụ trách phát triển các phân hệ nghiệp vụ cốt lõi, bao gồm: quy trình thẩm định tài sản; phân hệ định giá lại tài sản (hỗ trợ cả luồng tự động và luồng chuyên gia thẩm định); phân hệ định giá tài sản hợp thửa (gộp nhiều tài sản con thành một thực thể thống nhất); phân hệ quản lý tài sản hàng hoá với quy trình kiểm kê và tích hợp dữ liệu thời gian thực từ kho CMS; kho giá chung và kho giá cụ thể phục vụ tư vấn giá',
     ],
   },
 

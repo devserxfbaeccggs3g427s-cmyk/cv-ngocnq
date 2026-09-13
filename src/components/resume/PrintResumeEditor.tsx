@@ -31,7 +31,7 @@ export function PrintResumeEditor() {
   const [hasDraft, setHasDraft] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
 
-  const printProjects = projects.slice(0, 4);
+  const printProjects = projects.slice(0, 5);
   const skillLimits: Record<string, number> = {
     Languages: 5,
     Frontend: 4,
@@ -92,7 +92,7 @@ export function PrintResumeEditor() {
       </div>
       <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">{exp.description}</p>
       <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
-        {exp.achievements.slice(0, exp.id === 'exp-0' ? 4 : 2).map((achievement) => (
+        {exp.achievements.slice(0, exp.id === 'exp-0' ? 5 : 3).map((achievement) => (
           <li key={achievement}>{achievement}</li>
         ))}
       </ul>
@@ -116,7 +116,10 @@ export function PrintResumeEditor() {
         {project.description}
       </p>
       <ul className="mt-1.5 list-disc space-y-0.5 pl-4 text-[13px] leading-[1.42] text-slate-800">
-        {project.highlights.slice(0, index < 3 ? 3 : 2).map((highlight) => (
+        {project.highlights.slice(0,
+            index < 3 ? 3 : 2
+            // project.highlights.length
+        ).map((highlight) => (
           <li key={highlight}>{highlight}</li>
         ))}
       </ul>
@@ -159,6 +162,10 @@ export function PrintResumeEditor() {
           {isEditing
             ? 'Đang chỉnh sửa: bấm trực tiếp vào nội dung CV, sau đó chọn Lưu PDF.'
             : 'Bật Chỉnh sửa CV để thay đổi nội dung ngay trên bản in trước khi lưu PDF.'}
+          <br />
+          <span className="text-slate-500">
+            Mẹo: Trong hộp thoại in của trình duyệt, tắt mục &ldquo;Headers and footers&rdquo; / &ldquo;Tiêu đề và chân trang&rdquo; để bản PDF không kèm đường link URL.
+          </span>
         </p>
       </div>
 
