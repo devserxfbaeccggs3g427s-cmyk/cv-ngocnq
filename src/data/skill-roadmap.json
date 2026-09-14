@@ -9,11 +9,29 @@
   },
   "tracks": [
     {
-      "id": "test.post-incident-improvement.postmortem-khong-do-loi-va-action",
-      "title": "Postmortem không đổ lỗi và action item đo được",
-      "level": "Nâng cao",
-      "estimateHours": 1,
-      "deliverable": "Viết mẫu postmortem gồm timeline, impact, root cause, detection gap, prevention và owner/deadline."
+      "id": "summary",
+      "title": "Summary",
+      "level": "Cơ bản đến nâng cao",
+      "duration": "3 tuần",
+      "goal": "Alls.",
+      "skills": [
+        "Summary"
+      ],
+      "modules": [
+        {
+          "id": "summary-001",
+          "title": "Ôn tập",
+          "tasks": [
+            {
+              "id": "summary-001.alls",
+              "title": "Toàn bộ DEV",
+              "level": "Nâng cao",
+              "estimateHours": 1,
+              "deliverable": "Alls."
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "java-core",
