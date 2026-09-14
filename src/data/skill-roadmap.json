@@ -3396,7 +3396,14 @@
                   ]
                 }
               ]
-            }
+            },
+            {
+                      "id": "test.post-incident-improvement.postmortem-khong-do-loi-va-action",
+                      "title": "Postmortem không đổ lỗi và action item đo được",
+                      "level": "Nâng cao",
+                      "estimateHours": 1,
+                      "deliverable": "Viết mẫu postmortem gồm timeline, impact, root cause, detection gap, prevention và owner/deadline."
+                    }
           ]
         }
       ]
