@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PrintResumeEditor } from '@/components/resume/PrintResumeEditor';
+import { PrintBankingResume } from '@/components/resume/PrintBankingResume';
 import {
   CV_VARIANT_STORAGE_KEY,
   DEFAULT_CV_VARIANT,
   VariantToggle,
   type CvVariant,
 } from '@/components/resume/VariantToggle';
-import type { Language } from '@/data/cv-i18n';
+import type { Language } from '@/data/cv-banking-i18n';
 
 const LANGUAGE_STORAGE_KEY = 'cv-language';
 
@@ -25,19 +25,19 @@ function readVariant(): CvVariant {
   }
 }
 
-export default function PrintPage() {
+export default function PrintBankingPage() {
   const router = useRouter();
   const [language, setLanguage] = useState<Language>('vi');
   const [variant, setVariant] = useState<CvVariant>(DEFAULT_CV_VARIANT);
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-      if (stored === 'en' || stored === 'vi') {
-        window.queueMicrotask(() => setLanguage(stored));
+      const storedLang = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (storedLang === 'en' || storedLang === 'vi') {
+        window.queueMicrotask(() => setLanguage(storedLang));
       }
     } catch {
-      // ignore
+      // ignore localStorage failures (private mode / quota)
     }
   }, []);
 
@@ -58,11 +58,11 @@ export default function PrintPage() {
     try {
       window.localStorage.setItem(CV_VARIANT_STORAGE_KEY, next);
     } catch {
-      // ignore
+      // ignore quota / private-mode failures
     }
     setVariant(next);
-    if (next === 'banking') {
-      router.push('/print-banking');
+    if (next === 'technical') {
+      router.push('/print');
     }
   }
 
@@ -71,7 +71,7 @@ export default function PrintPage() {
       <div className="print:hidden">
         <VariantToggle value={variant} onChange={handleVariantChange} language={language} />
       </div>
-      <PrintResumeEditor language={language} onLanguageChange={setLanguage} />
+      <PrintBankingResume language={language} onLanguageChange={setLanguage} />
     </div>
   );
 }

@@ -44,9 +44,9 @@ export function ProfileHeader() {
           Xem dự án
           <ArrowRight className="h-4 w-4" />
         </Button>
-        <Button href="/print" variant="secondary" size="lg">
+        <Button href="/print-banking" variant="secondary" size="lg">
           <Download className="h-4 w-4" />
-          Bản in PDF
+          Tải CV Senior Banking
         </Button>
       </div>
     </header>

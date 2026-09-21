@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>CV — Nguyễn Quang Ngọc | Senior Backend Engineer</title>
+<style>
+  /* ====== RESET & BASE ====== */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.45;
+    color: #1a1a1a;
+    background: #fff;
+  }
+
+  /* ====== PAGE LAYOUT (A4) ====== */
+  @page {
+    size: A4;
+    margin: 12mm 14mm 12mm 14mm;
+  }
+  body {
+    max-width: 210mm;
+    margin: 0 auto;
+    padding: 8mm 14mm;
+  }
+
+  /* ====== HEADER ====== */
+  .header {
+    border-bottom: 2.5pt solid #0f172a;
+    padding-bottom: 8pt;
+    margin-bottom: 10pt;
+  }
+  .header h1 {
+    font-size: 22pt;
+    font-weight: 800;
+    letter-spacing: -0.5pt;
+    color: #0f172a;
+    line-height: 1.1;
+  }
+  .header .role {
+    font-size: 11.5pt;
+    font-weight: 600;
+    color: #2563eb;
+    margin-top: 3pt;
+    letter-spacing: 0.3pt;
+  }
+  .header .contact {
+    margin-top: 6pt;
+    font-size: 9.5pt;
+    color: #475569;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4pt 14pt;
+  }
+  .header .contact span { white-space: nowrap; }
+  .header .contact strong { color: #0f172a; font-weight: 600; }
+
+  /* ====== SECTION ====== */
+  .section {
+    margin-bottom: 11pt;
+    break-inside: avoid;
+  }
+  .section-title {
+    font-size: 11pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2pt;
+    color: #0f172a;
+    border-bottom: 1pt solid #cbd5e1;
+    padding-bottom: 3pt;
+    margin-bottom: 6pt;
+  }
+
+  /* ====== SUMMARY ====== */
+  .summary {
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: #1e293b;
+    text-align: justify;
+  }
+  .summary .lead {
+    font-size: 10.8pt;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4pt;
+  }
+  .strengths {
+    margin-top: 6pt;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3pt 14pt;
+    font-size: 9.8pt;
+  }
+  .strengths li {
+    list-style: none;
+    padding-left: 12pt;
+    position: relative;
+    color: #1e293b;
+    line-height: 1.4;
+  }
+  .strengths li::before {
+    content: "▸";
+    color: #2563eb;
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+
+  /* ====== EXPERIENCE ====== */
+  .exp-item {
+    margin-bottom: 10pt;
+    break-inside: avoid;
+  }
+  .exp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8pt;
+    margin-bottom: 2pt;
+  }
+  .exp-title {
+    font-size: 10.8pt;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .exp-title .level {
+    color: #2563eb;
+    font-weight: 700;
+  }
+  .exp-period {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+  }
+  .exp-company {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4pt;
+  }
+  .exp-company .badge {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 1pt 5pt;
+    border-radius: 2pt;
+    font-size: 8.5pt;
+    font-weight: 700;
+    margin-left: 4pt;
+    text-transform: uppercase;
+    letter-spacing: 0.4pt;
+  }
+  .exp-intro {
+    font-size: 9.8pt;
+    color: #334155;
+    font-style: italic;
+    margin-bottom: 4pt;
+    padding-left: 8pt;
+    border-left: 2pt solid #cbd5e1;
+  }
+  .exp-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .exp-list li {
+    position: relative;
+    padding-left: 14pt;
+    margin-bottom: 3pt;
+    font-size: 9.8pt;
+    line-height: 1.42;
+    color: #1e293b;
+  }
+  .exp-list li::before {
+    content: "●";
+    color: #2563eb;
+    position: absolute;
+    left: 2pt;
+    top: 0;
+    font-size: 7pt;
+  }
+  .exp-list li strong {
+    color: #0f172a;
+    font-weight: 700;
+  }
+  .exp-list li em {
+    font-style: normal;
+    color: #0f172a;
+    font-weight: 700;
+    background: linear-gradient(transparent 60%, #fef08a 60%);
+    padding: 0 1pt;
+  }
+
+  /* ====== SKILLS ====== */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6pt 16pt;
+  }
+  .skill-block {
+    break-inside: avoid;
+  }
+  .skill-block h4 {
+    font-size: 10pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2pt;
+    display: flex;
+    align-items: center;
+    gap: 4pt;
+  }
+  .skill-block p {
+    font-size: 9.6pt;
+    color: #334155;
+    line-height: 1.45;
+  }
+
+  /* ====== EDUCATION ====== */
+  .edu-item {
+    margin-bottom: 4pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8pt;
+  }
+  .edu-info { flex: 1; }
+  .edu-title {
+    font-size: 10.2pt;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .edu-school {
+    font-size: 9.6pt;
+    color: #334155;
+  }
+  .edu-year {
+    font-size: 9.6pt;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+  }
+
+  /* ====== CERTIFICATIONS ====== */
+  .cert-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4pt 14pt;
+    font-size: 9.7pt;
+    color: #1e293b;
+  }
+  .cert-list span strong {
+    color: #0f172a;
+    font-weight: 700;
+  }
+  .cert-list .dot {
+    color: #94a3b8;
+  }
+
+  /* ====== TWO-COLUMN FOOTER ====== */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 16pt;
+  }
+
+  /* ====== PRINT-SPECIFIC ====== */
+  @media print {
+    body { padding: 0; }
+    .section, .exp-item, .skill-block { break-inside: avoid; page-break-inside: avoid; }
+    a { color: #1e293b; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== HEADER ====== -->
+<header class="header">
+  <h1>NGUYỄN QUANG NGỌC</h1>
+  <p class="role">SENIOR BACKEND ENGINEER  ·  BANKING DOMAIN SPECIALIST</p>
+  <p class="contact">
+    <span>📞 <strong>0346 238 899</strong></span>
+    <span>✉ <strong>quangngoc201197@gmail.com</strong></span>
+    <span>📍 Hà Nội, Việt Nam</span>
+    <span>🔗 <strong>fb.com/coding97</strong></span>
+  </p>
+</header>
+
+<!-- ====== TÓM TẮT CHUYÊN GIA ====== -->
+<section class="section">
+  <h2 class="section-title">Hồ sơ chuyên gia</h2>
+  <p class="summary">
+    <span class="lead">Senior Backend Engineer với gần 5 năm kinh nghiệm đột phá trong lĩnh vực Tài chính – Ngân hàng – Bảo hiểm.</span>
+    Trực tiếp <strong>dẫn dắt thiết kế và triển khai</strong> các nền tảng trọng điểm cho Ngân hàng SHB, MBBank và Bảo Việt — phục vụ khách hàng cá nhân và doanh nghiệp với yêu cầu zero-downtime, tuân thủ chuẩn ngân hàng. Thế mạnh chiến lược ở kiến trúc Microservices, Event-Driven, tích hợp Core Banking và tối ưu hiệu năng hệ thống xử lý dữ liệu lớn.
+  </p>
+  <ul class="strengths">
+    <li>Chuyên gia Wealth Management, Payment Gateway, Core Banking</li>
+    <li>Tối ưu đột phá: giảm <strong>50x</strong> khối lượng xử lý, tăng <strong>5-6x</strong> performance</li>
+    <li>Dẫn dắt team nhỏ, đề xuất giải pháp kiến trúc cho hệ thống tải cao</li>
+    <li>Tư duy chiến lược: trade-off, rollback plan, feature flag, canary rollout</li>
+  </ul>
+</section>
+
+<!-- ====== KINH NGHIỆM LÀM VIỆC ====== -->
+<section class="section">
+  <h2 class="section-title">Kinh nghiệm làm việc</h2>
+
+  <!-- SHB -->
+  <article class="exp-item">
+    <div class="exp-head">
+      <div class="exp-title">
+        <span class="level">Senior Backend Engineer</span> · Ngân hàng SHB (Outsourced qua Alphaway Technology)
+      </div>
+      <div class="exp-period">11/2025 – Hiện tại</div>
+    </div>
+    <p class="exp-company">
+      Dẫn dắt 4 dự án chiến lược của Ngân hàng SHB
+      <span class="badge">Banking Core</span>
+    </p>
+    <p class="exp-intro">
+      Phụ trách thiết kế và triển khai các nền tảng trọng điểm: Sinh Lời Tự Động (Retail + Corporate), Cổng Thanh toán Dịch vụ Công, Mobile Banking Campuchia và Cổng Xử lý Nợ.
+    </p>
+    <ul class="exp-list">
+      <li><strong>Tối ưu đột phá</strong> pipeline tính lãi hàng ngày: <em>giảm 50x khối lượng xử lý</em> (từ 500K xuống 10K records/ngày), tăng 5-6x performance, snapshot time từ 5-10 phút xuống dưới 1 phút.</li>
+      <li><strong>Đề xuất và áp dụng</strong> công thức closed-form "giá bán" cho KHDN — loại bỏ hoàn toàn sai số rounding cộng dồn, đảm bảo tính chính xác tài chính dài hạn.</li>
+      <li><strong>Kiến trúc cô lập 6 lớp</strong> (topic / consumer group / DB table / Redis flag / stored procedure / listener) cho luồng KHCN/KHDN — failure isolation tuyệt đối, rollback safety không ảnh hưởng luồng còn lại.</li>
+      <li><strong>Dẫn dắt thiết kế</strong> hệ thống tính lãi real-time với idempotency 2 lớp, distributed lease (Redis), retry + DLT pattern — vận hành 24/7 zero-downtime.</li>
+      <li><strong>Xây dựng</strong> cổng thanh toán dịch vụ công với 7 API nghiệp vụ, tích hợp Napas, Citad, KBNN, xử lý triệu giao dịch/ngày.</li>
+      <li><strong>Phát triển</strong> 3 dịch vụ backend cho Mobile Banking SHB Campuchia — đa ngôn ngữ (Anh – Việt – Khmer), đa tiền tệ (USD/KHR).</li>
+      <li><strong>Viết tài liệu chi tiết</strong> cho 7 hệ thống backend, 40+ luồng nghiệp vụ với Mermaid sequence diagram, phục vụ onboarding và bàn giao giữa các team.</li>
+    </ul>
+  </article>
+
+  <!-- MBBank -->
+  <article class="exp-item">
+    <div class="exp-head">
+      <div class="exp-title">
+        <span class="level">Full Stack Developer</span> · Ngân hàng MBBank (Outsourced qua Paraline Software)
+      </div>
+      <div class="exp-period">05/2023 – 10/2025</div>
+    </div>
+    <p class="exp-company">
+      Tham gia xây dựng hệ thống Collateral Management & Valuation (CMV)
+      <span class="badge">Banking</span>
+    </p>
+    <p class="exp-intro">
+      Phục vụ nghiệp vụ thẩm định tài sản ngân hàng MBBank với quy trình tín dụng phức tạp, tiêu chuẩn cao về hiệu năng và bảo mật.
+    </p>
+    <ul class="exp-list">
+      <li><strong>Thiết kế Event-Driven</strong> tích hợp CMV với CMS qua Apache Kafka — giảm đáng kể thời gian phản hồi, nâng cao độ ổn định hệ thống.</li>
+      <li><strong>Tích hợp AI Platform</strong> tự động bóc tách dữ liệu pháp lý và phát hiện trùng lặp tài sản — giảm khối lượng nhập liệu thủ công cho RM, nâng cao năng lực phát hiện gian lận.</li>
+      <li><strong>Xây dựng API</strong> qua Apigee Gateway với RSA Encryption cho đối tác ngoài MBBank.</li>
+      <li><strong>Phát triển</strong> 6 phân hệ nghiệp vụ cốt lõi: thẩm định, định giá lại, định giá hợp thửa, quản lý tài sản hàng hóa, kho giá.</li>
+      <li><strong>ETL Pentaho PDI</strong> đồng bộ dữ liệu CMV → OCB (S600) với logic biến đổi phức tạp.</li>
+    </ul>
+  </article>
+
+  <!-- Bảo Việt -->
+  <article class="exp-item">
+    <div class="exp-head">
+      <div class="exp-title">
+        <span class="level">Backend Developer</span> · Bảo Hiểm Bảo Việt
+      </div>
+      <div class="exp-period">11/2022 – 05/2023</div>
+    </div>
+    <p class="exp-company">
+      Tham gia xây dựng nền tảng bảo hiểm trực tuyến MyBV Life
+      <span class="badge">Insurance</span>
+    </p>
+    <ul class="exp-list">
+      <li><strong>Xây dựng</strong> API thanh toán hợp đồng bảo hiểm qua Napas Gateway.</li>
+      <li><strong>Thiết kế</strong> API giao nhận e-Contract và đồng bộ IMS Core, tối ưu hiệu năng truy vấn với DCS.</li>
+      <li>Đảm bảo <strong>an toàn, toàn vẹn dữ liệu</strong> theo chuẩn ngành tài chính.</li>
+    </ul>
+  </article>
+
+  <!-- GMO -->
+  <article class="exp-item">
+    <div class="exp-head">
+      <div class="exp-title">
+        <span class="level">Full Stack Developer</span> · GMO-Z.com RUNSYSTEM (Khách hàng Nhật)
+      </div>
+      <div class="exp-period">11/2021 – 11/2022</div>
+    </div>
+    <p class="exp-company">
+      Tham gia phát triển sản phẩm cho khách hàng Nhật Bản
+      <span class="badge">Japan Market</span>
+    </p>
+    <ul class="exp-list">
+      <li><strong>Quản lý tiến độ, phân chia task, estimate effort</strong> cho dự án nhỏ theo phong cách kỷ luật – chính xác – tinh gọn kiểu Nhật.</li>
+      <li>Phát triển Veritas (quản lý phòng khám thẩm mỹ) và Hywork (đặt chỗ làm việc) trên Spring Boot.</li>
+      <li>Làm việc theo mô hình <strong>Agile – CI/CD</strong>, tiếp thu quy trình kỷ luật chuẩn Nhật Bản.</li>
+    </ul>
+  </article>
+</section>
+
+<!-- ====== KỸ NĂNG ====== -->
+<section class="section">
+  <h2 class="section-title">Năng lực cốt lõi</h2>
+  <div class="skills-grid">
+
+    <div class="skill-block">
+      <h4>🎯 Lãnh đạo & Quản lý dự án</h4>
+      <p>Dẫn dắt team nhỏ 3-5 thành viên; phân chia task, estimate effort, review code; quản lý đa dự án song song với Go/No-Go criteria; viết spec & traceability theo Spec-Driven Development.</p>
+    </div>
+
+    <div class="skill-block">
+      <h4>🧠 Tư duy chiến lược</h4>
+      <p>Thiết kế kiến trúc cho hệ thống tải cao đảm bảo zero-downtime; đề xuất giải pháp tối ưu dựa trên phân tích trade-off; quản lý rủi ro với rollback plan, feature flag, canary rollout; đàm phán với BA/DBA/Product.</p>
+    </div>
+
+    <div class="skill-block">
+      <h4>💼 Banking Domain Expertise</h4>
+      <p>Core Banking (Oracle, PL/SQL, Intellect); sản phẩm CD, tiết kiệm, tín dụng, thanh toán; chuẩn an toàn dữ liệu tài chính; tích hợp Napas, KBNN, KSO, VietQR; EOD, snapshot, reconciliation.</p>
+    </div>
+
+    <div class="skill-block">
+      <h4>🏗️ Kiến trúc & Thiết kế hệ thống</h4>
+      <p>Microservices, Event-Driven (Kafka); DDD, Bounded Context, CQRS; reliability patterns (Idempotency 2 lớp, Distributed Lock, Circuit Breaker, DLT); API Design (RESTful, OpenAPI, contract-first).</p>
+    </div>
+
+    <div class="skill-block">
+      <h4>🛠️ Tech Stack chính</h4>
+      <p>Java 17, Spring Boot 3, Spring Cloud, Spring Security, Spring Data JPA; Oracle DB + PL/SQL Packages, Stored Procedures, REF CURSOR; Kafka, Redis, Quartz Scheduler.</p>
+    </div>
+
+    <div class="skill-block">
+      <h4>📦 DevOps & Quality</h4>
+      <p>Docker, Kubernetes, GitLab CI/CD; JUnit 5, Mockito, jqwik (Property-Based Testing); Structured Logging, Observability; tích hợp AI Coding Agents vào workflow (Claude Code, Kiro, Kilo Code).</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== HỌC VẤN & CHỨNG CHỈ ====== -->
+<section class="section">
+  <div class="bottom-grid">
+    <div>
+      <h2 class="section-title">Học vấn</h2>
+      <div class="edu-item">
+        <div class="edu-info">
+          <div class="edu-title">Cử nhân Công nghệ Thông tin — Phát triển phần mềm</div>
+          <div class="edu-school">Trường Đại học Giao thông vận tải</div>
+        </div>
+        <div class="edu-year">2023 – 2025</div>
+      </div>
+      <div class="edu-item">
+        <div class="edu-info">
+          <div class="edu-title">Cử nhân Công nghệ Thông tin — Ứng dụng phần mềm</div>
+          <div class="edu-school">Cao đẳng FPT Polytechnic</div>
+        </div>
+        <div class="edu-year">2020 – 2022</div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="section-title">Chứng chỉ & Ngôn ngữ</h2>
+      <div class="cert-list">
+        <span><strong>Top Notch 2</strong> — Tiếng Anh</span>
+        <span class="dot">•</span>
+        <span><strong>Tin học Văn phòng</strong></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
