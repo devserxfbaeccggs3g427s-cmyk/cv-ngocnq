@@ -205,6 +205,39 @@ export function formatMonthYearI18n(date: string, lang: Language): string {
   return `${monthLabel} ${year}`;
 }
 
+/**
+ * Localize a project duration string of the form "MM-YYYY – MM-YYYY" or
+ * "MM-YYYY – Nay". Each token is rewritten per language:
+ *   - "Nay" → "Present" in English
+ *   - "MM-YYYY" → "Mon YYYY" in English (Vietnamese keeps "MM-YYYY")
+ * If the input doesn't match the expected shape, it's returned untouched.
+ */
+export function formatProjectDurationI18n(
+  duration: string,
+  lang: Language
+): string {
+  const tokens = duration.split(/\s*[–—\-]\s*/);
+  const localized = tokens.map((token) => {
+    const trimmed = token.trim();
+    if (!trimmed) return trimmed;
+    if (trimmed === 'Nay' || trimmed === 'nay') {
+      return lang === 'vi' ? 'Nay' : 'Present';
+    }
+    if (/^\d{2}-\d{4}$/.test(trimmed)) {
+      return formatMonthYearI18n(trimmed, lang);
+    }
+    return trimmed;
+  });
+  // Preserve the original dash style where possible — most of the source data
+  // uses the en-dash "–"; fall back to a regular hyphen-with-spaces otherwise.
+  const dash = duration.includes('–')
+    ? ' – '
+    : duration.includes('—')
+      ? ' — '
+      : ' - ';
+  return localized.join(dash);
+}
+
 // ---------------------------------------------------------------------------
 // Per-locale profile data (mirrors fields rendered by PrintResumeEditor)
 // ---------------------------------------------------------------------------
@@ -670,6 +703,32 @@ export const skillNameOverridesI18n: Record<Language, Record<string, string>> = 
 
 export function localizeSkillName(name: string, lang: Language): string {
   return skillNameOverridesI18n[lang][name] ?? name;
+}
+
+// ---------------------------------------------------------------------------
+// Project category labels (parallel to projectCategories in src/data/projects.ts)
+// ---------------------------------------------------------------------------
+
+export const projectCategoryLabelsI18n: Record<Language, Record<string, string>> = {
+  vi: {
+    'Tài chính – Ngân hàng': 'Tài chính – Ngân hàng',
+    'Payment Gateway': 'Payment Gateway',
+    'Bảo hiểm': 'Bảo hiểm',
+    'Nhật Bản': 'Nhật Bản',
+  },
+  en: {
+    'Tài chính – Ngân hàng': 'Finance – Banking',
+    'Payment Gateway': 'Payment Gateway',
+    'Bảo hiểm': 'Insurance',
+    'Nhật Bản': 'Japan',
+  },
+};
+
+export function localizeProjectCategory(
+  category: string,
+  lang: Language
+): string {
+  return projectCategoryLabelsI18n[lang][category] ?? category;
 }
 
 // ---------------------------------------------------------------------------

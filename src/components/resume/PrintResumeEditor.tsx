@@ -16,7 +16,9 @@ import {
   educationI18n,
   experienceI18n,
   formatMonthYearI18n,
+  formatProjectDurationI18n,
   languageLevelLabelsI18n,
+  localizeProjectCategory,
   localizeSkillName,
   profileI18n,
   projectsI18n,
@@ -185,11 +187,11 @@ export function PrintResumeEditor({
               {localized.title}
             </h3>
             <p className="text-[13px] font-bold leading-tight text-slate-700">
-              {localized.role} | {shared?.category ?? ''}
+              {localized.role} | {shared ? localizeProjectCategory(shared.category, language) : ''}
             </p>
           </div>
           <p className="whitespace-nowrap text-[13px] font-bold leading-tight text-slate-700">
-            {shared?.duration ?? ''}
+            {shared ? formatProjectDurationI18n(shared.duration, language) : ''}
           </p>
         </div>
         <p className="mt-1 text-[13px] leading-[1.45] text-slate-700">
