@@ -41,6 +41,8 @@ export function PrintResumeEditor() {
     DevOps: 5,
     Security: 4,
     Monitoring: 4,
+    Tools: 5,
+    AI: 7,
   };
 
   useEffect(() => {

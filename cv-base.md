@@ -167,7 +167,9 @@ Công cụ & Môi trường lập trình
 
 •Công cụ cơ sở dữ liệu: DataGrip, DBeaver
 
-•Trợ lý AI và công cụ hỗ trợ năng suất: ChatGPT, DeepSeek, Gemini, JetBrains AI
+•AI Coding Agents (tích hợp IDE, hỗ trợ code & refactor trực tiếp): Claude Code, Kiro, Kilo Code
+
+•AI Chat Assistants: ChatGPT, DeepSeek, Gemini, JetBrains AI
 
 •Quản lý mã nguồn và cộng tác: Git, GitHub, GitLab, Jira
 

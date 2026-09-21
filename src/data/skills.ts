@@ -90,6 +90,8 @@ export const skillCategories: string[] = [
   'DevOps',         // DevOps tools & practices
   'Security',       // Security & encryption
   'Monitoring',     // Monitoring & logging
+  'Tools',          // IDE & productivity tools
+  'AI',             // AI coding agents & assistants
 ];
 
 /**
@@ -468,6 +470,86 @@ export const skills: Skill[] = [
     category: 'Monitoring',
     yearsOfExperience: 2,
   },
+
+  // ---------------------------------------------------------------------------
+  // TOOLS — IDE & productivity
+  // ---------------------------------------------------------------------------
+  {
+    name: 'IntelliJ IDEA',
+    level: 90,
+    category: 'Tools',
+    yearsOfExperience: 4,
+  },
+  {
+    name: 'VS Code',
+    level: 82,
+    category: 'Tools',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'WebStorm',
+    level: 78,
+    category: 'Tools',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'DataGrip',
+    level: 80,
+    category: 'Tools',
+    yearsOfExperience: 3,
+  },
+  {
+    name: 'DBeaver',
+    level: 72,
+    category: 'Tools',
+    yearsOfExperience: 2,
+  },
+
+  // ---------------------------------------------------------------------------
+  // AI — Coding agents & assistants
+  // ---------------------------------------------------------------------------
+  {
+    name: 'Claude Code (AI Coding Agent)',
+    level: 80,
+    category: 'AI',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'Kiro (AI Coding Agent, Spec-Driven Development)',
+    level: 85,
+    category: 'AI',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'Kilo Code (AI Coding Agent)',
+    level: 75,
+    category: 'AI',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'ChatGPT',
+    level: 85,
+    category: 'AI',
+    yearsOfExperience: 2,
+  },
+  {
+    name: 'DeepSeek',
+    level: 75,
+    category: 'AI',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'Gemini',
+    level: 72,
+    category: 'AI',
+    yearsOfExperience: 1,
+  },
+  {
+    name: 'JetBrains AI Assistant',
+    level: 75,
+    category: 'AI',
+    yearsOfExperience: 1,
+  },
 ];
 
 /**
@@ -491,6 +573,8 @@ export const skillCategoryLabels: Record<string, string> = {
   DevOps: 'DevOps',
   Security: 'Bảo mật',
   Monitoring: 'Giám sát & Logging',
+  Tools: 'Công cụ lập trình',
+  AI: 'Công cụ AI',
 };
 
 export const languageLevelLabels: Record<Language['level'], string> = {
