@@ -56,7 +56,7 @@ export const ui: Record<
   vi: {
     pageTitle: 'CV Senior Banking | Nguyễn Quang Ngọc',
     pageDescription: 'CV ứng tuyển vị trí Senior tại ngân hàng — phong cách leadership & business impact',
-    sectionSummary: 'Hồ sơ chuyên gia',
+    sectionSummary: 'Hồ sơ',
     sectionStrengths: 'Năng lực cốt lõi',
     sectionExperience: 'Kinh nghiệm làm việc',
     sectionSkills: 'Năng lực kỹ thuật',
@@ -85,7 +85,7 @@ export const ui: Record<
   en: {
     pageTitle: 'Senior Banking CV | Nguyen Quang Ngoc',
     pageDescription: 'Senior banking CV — leadership & business impact focused',
-    sectionSummary: 'Executive Profile',
+    sectionSummary: 'Profile',
     sectionStrengths: 'Core Capabilities',
     sectionExperience: 'Work Experience',
     sectionSkills: 'Technical Capabilities',

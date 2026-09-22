@@ -290,14 +290,14 @@
 <section class="section">
   <h2 class="section-title">Hồ sơ chuyên môn</h2>
   <p class="summary">
-    <span class="lead">Senior Backend Engineer với gần 5 năm kinh nghiệm xây dựng hệ thống trong lĩnh vực Tài chính – Ngân hàng – Bảo hiểm.</span>
-    Trực tiếp <strong>tham gia thiết kế và triển khai</strong> các nền tảng trọng điểm cho Ngân hàng SHB, MBBank và Bảo Việt — phục vụ khách hàng cá nhân và doanh nghiệp với yêu cầu zero-downtime, tuân thủ chuẩn ngân hàng. Thế mạnh ở kiến trúc Microservices, Event-Driven, tích hợp Core Banking và tối ưu hiệu năng hệ thống xử lý dữ liệu lớn.
+    <span class="lead">Lập trình viên Backend với gần 5 năm kinh nghiệm xây dựng hệ thống trong lĩnh vực Tài chính – Ngân hàng – Bảo hiểm.</span>
+    Trực tiếp <strong>tham gia thiết kế và triển khai</strong> các nền tảng trọng điểm cho Ngân hàng SHB, MBBank và Bảo Việt — phục vụ khách hàng cá nhân và doanh nghiệp, tuân thủ quy trình vận hành chuẩn ngân hàng. Từng làm việc với kiến trúc vi dịch vụ (Microservices), hướng sự kiện (Event-Driven), tích hợp Core Banking và tối ưu hiệu năng hệ thống xử lý dữ liệu lớn.
   </p>
   <ul class="strengths">
-    <li>Có kinh nghiệm thực tế với Wealth Management, Payment Gateway và Core Banking</li>
-    <li>Đã tham gia refactor pipeline tính lãi giảm từ <strong>~500K</strong> xuống <strong>~10K</strong> bản ghi/ngày</li>
+    <li>Có kinh nghiệm thực tế với Sinh lời tự động (IBS), cổng thanh toán dịch vụ công (Payment Gateway) và Core Banking</li>
+    <li>Đã tham gia tái cấu trúc pipeline tính lãi, giảm số bản ghi chốt từ <strong>~500K</strong> xuống <strong>~10K</strong> mỗi ngày</li>
     <li>Có kinh nghiệm lead team nhỏ và đề xuất giải pháp kiến trúc cho hệ thống tải cao</li>
-    <li>Tư duy thực dụng: trade-off, feature flag, rollback plan, canary rollout</li>
+    <li>Tư duy thực dụng: cân nhắc ưu nhược điểm, cờ tính năng (feature flag), kế hoạch khôi phục, triển khai thử nghiệm (canary)</li>
   </ul>
 </section>
 
@@ -321,13 +321,13 @@
       Tham gia 4 dự án trọng điểm của Ngân hàng SHB: Sinh Lời Tự Động (Retail + Corporate), Cổng Thanh toán Dịch vụ Công, Mobile Banking Campuchia và Cổng Xử lý Nợ.
     </p>
     <ul class="exp-list">
-      <li><strong>Tham gia tái cấu trúc</strong> pipeline tính lãi hàng ngày từ mô hình per-seri sang per-contract: giảm số bản ghi snapshot từ khoảng <em>500K xuống ~10K mỗi ngày</em>, thời gian chạy snapshot từ 5-10 phút xuống dưới 1 phút (đo từ log batch EOD).</li>
-      <li><strong>Đề xuất và áp dụng</strong> công thức closed-form "giá bán" cho KHDN — loại bỏ hoàn toàn sai số rounding cộng dồn, đảm bảo tính chính xác tài chính dài hạn.</li>
-      <li><strong>Tham gia thiết kế</strong> kiến trúc cô lập 6 lớp (topic / consumer group / DB table / Redis flag / stored procedure / listener) cho luồng KHCN/KHDN — failure isolation tuyệt đối, rollback safety không ảnh hưởng luồng còn lại.</li>
-      <li><strong>Tham gia thiết kế</strong> hệ thống tính lãi real-time với idempotency 2 lớp, distributed lease (Redis), retry + DLT pattern — vận hành 24/7 zero-downtime.</li>
-      <li><strong>Xây dựng</strong> cổng thanh toán dịch vụ công với 7 API nghiệp vụ, tích hợp Napas, Citad, KBNN, xử lý triệu giao dịch/ngày.</li>
+      <li><strong>Tham gia tái cấu trúc</strong> pipeline tính lãi hàng ngày từ mô hình theo seri sang theo hợp đồng: giảm số bản ghi chốt từ khoảng <em>500K xuống ~10K mỗi ngày</em>, thời gian chạy chốt từ 5–10 phút xuống dưới 1 phút (đo từ log xử lý cuối ngày).</li>
+      <li><strong>Đề xuất và áp dụng</strong> công thức tính giá bán dạng đóng cho KHDN — hạn chế sai số làm tròn cộng dồn qua nhiều kỳ, cải thiện tính nhất quán số liệu tài chính dài hạn.</li>
+      <li><strong>Tham gia thiết kế</strong> kiến trúc cô lập 6 lớp (topic / consumer group / DB table / Redis flag / stored procedure / listener) cho luồng KHCN và KHDN — sự cố ở một luồng không ảnh hưởng luồng còn lại, có cơ chế khôi phục an toàn.</li>
+      <li><strong>Tham gia thiết kế</strong> hệ thống tính lãi theo thời gian thực với cơ chế chống trùng lặp 2 lớp, khóa phân tán qua Redis, tự động thử lại và hàng đợi thư chết (DLT) — hỗ trợ vận hành liên tục.</li>
+      <li><strong>Xây dựng</strong> cổng thanh toán dịch vụ công với 7 API nghiệp vụ, tích hợp Napas, Citad, KBNN; hệ thống xử lý lượng lớn giao dịch mỗi ngày.</li>
       <li><strong>Phát triển</strong> 3 dịch vụ backend cho Mobile Banking SHB Campuchia — đa ngôn ngữ (Anh – Việt – Khmer), đa tiền tệ (USD/KHR).</li>
-      <li><strong>Viết tài liệu chi tiết</strong> cho 7 hệ thống backend, 40+ luồng nghiệp vụ với Mermaid sequence diagram, phục vụ onboarding và bàn giao giữa các team.</li>
+      <li><strong>Viết tài liệu chi tiết</strong> cho 7 hệ thống backend, hơn 40 luồng nghiệp vụ với Mermaid sequence diagram, phục vụ onboarding và bàn giao giữa các team.</li>
     </ul>
   </article>
 
@@ -348,10 +348,10 @@
     </p>
     <ul class="exp-list">
       <li><strong>Tham gia thiết kế Event-Driven</strong> tích hợp CMV với CMS qua Apache Kafka — cải thiện thời gian phản hồi và độ ổn định hệ thống.</li>
-      <li><strong>Tích hợp AI Platform</strong> tự động bóc tách dữ liệu pháp lý và phát hiện trùng lặp tài sản — hỗ trợ giảm nhập liệu thủ công cho RM và hỗ trợ phát hiện gian lận.</li>
-      <li><strong>Tham gia xây dựng API</strong> qua Apigee Gateway với RSA Encryption cho đối tác ngoài MBBank.</li>
+      <li><strong>Tích hợp nền tảng AI</strong> để bóc tách dữ liệu pháp lý và phát hiện trùng lặp tài sản — hỗ trợ giảm nhập liệu thủ công cho chuyên viên quan hệ khách hàng (RM) và hỗ trợ phát hiện gian lận.</li>
+      <li><strong>Tham gia xây dựng API</strong> qua Apigee Gateway với mã hóa RSA cho đối tác ngoài MBBank.</li>
       <li><strong>Phát triển</strong> 6 phân hệ nghiệp vụ cốt lõi: thẩm định, định giá lại, định giá hợp thửa, quản lý tài sản hàng hóa, kho giá.</li>
-      <li><strong>Xây dựng ETL</strong> Pentaho PDI đồng bộ dữ liệu CMV → OCB (S600) với logic biến đổi phức tạp.</li>
+      <li><strong>Xây dựng luồng ETL</strong> bằng Pentaho PDI đồng bộ dữ liệu CMV sang OCB (S600) với logic biến đổi phức tạp.</li>
     </ul>
   </article>
 
@@ -368,9 +368,9 @@
       <span class="badge">Insurance</span>
     </p>
     <ul class="exp-list">
-      <li><strong>Xây dựng</strong> API thanh toán hợp đồng bảo hiểm qua Napas Gateway.</li>
-      <li><strong>Thiết kế</strong> API giao nhận e-Contract và đồng bộ IMS Core, tối ưu hiệu năng truy vấn với DCS.</li>
-      <li>Đảm bảo <strong>an toàn, toàn vẹn dữ liệu</strong> theo chuẩn ngành tài chính.</li>
+      <li><strong>Xây dựng</strong> API thanh toán hợp đồng bảo hiểm qua cổng Napas.</li>
+      <li><strong>Thiết kế</strong> API giao nhận hợp đồng điện tử (e-Contract) và đồng bộ với hệ thống lõi IMS; tối ưu hiệu năng truy vấn với hệ thống đối tác DCS.</li>
+      <li>Đảm bảo <strong>an toàn và toàn vẹn dữ liệu</strong> theo tiêu chuẩn ngành tài chính.</li>
     </ul>
   </article>
 
@@ -387,9 +387,9 @@
       <span class="badge">Japan Market</span>
     </p>
     <ul class="exp-list">
-      <li><strong>Quản lý tiến độ, phân chia task, estimate effort</strong> cho dự án nhỏ theo phong cách kỷ luật – chính xác – tinh gọn kiểu Nhật.</li>
+      <li><strong>Quản lý tiến độ, phân chia công việc và ước lượng</strong> cho các dự án nhỏ theo phong cách kỷ luật – chính xác – tinh gọn kiểu Nhật.</li>
       <li>Phát triển Veritas (quản lý phòng khám thẩm mỹ) và Hywork (đặt chỗ làm việc) trên Spring Boot.</li>
-      <li>Làm việc theo mô hình <strong>Agile – CI/CD</strong>, tiếp thu quy trình kỷ luật chuẩn Nhật Bản.</li>
+      <li>Làm việc theo mô hình <strong>Agile và tích hợp liên tục (CI/CD)</strong>, tiếp thu quy trình làm việc kỷ luật chuẩn Nhật Bản.</li>
     </ul>
   </article>
 </section>
@@ -401,32 +401,32 @@
 
     <div class="skill-block">
       <h4>🎯 Lãnh đạo & Quản lý dự án</h4>
-      <p>Có kinh nghiệm lead team nhỏ 3-5 thành viên; phân chia task, estimate effort, review code; quản lý đa dự án song song với Go/No-Go criteria; viết spec & traceability theo Spec-Driven Development.</p>
+      <p>Có kinh nghiệm dẫn dắt nhóm nhỏ 3–5 thành viên; phân chia công việc, ước lượng, review code; quản lý đa dự án song song với tiêu chí quyết định rõ ràng; viết đặc tả và truy vết theo phương pháp Spec-Driven Development.</p>
     </div>
 
     <div class="skill-block">
       <h4>🧠 Tư duy thiết kế</h4>
-      <p>Tham gia thiết kế kiến trúc cho hệ thống tải cao, đảm bảo zero-downtime; phân tích trade-off khi đề xuất giải pháp; quản lý rủi ro với rollback plan, feature flag, canary rollout; trao đổi với BA/DBA/Product về giải pháp kỹ thuật.</p>
+      <p>Tham gia thiết kế kiến trúc cho hệ thống tải cao, hạn chế thời gian chết; phân tích ưu nhược điểm khi đề xuất giải pháp; quản lý rủi ro với kế hoạch khôi phục, cờ tính năng (feature flag), triển khai thử nghiệm (canary); trao đổi với BA, DBA và Product về hướng kỹ thuật.</p>
     </div>
 
     <div class="skill-block">
       <h4>💼 Kinh nghiệm ngân hàng</h4>
-      <p>Core Banking (Oracle, PL/SQL, Intellect); sản phẩm CD, tiết kiệm, tín dụng, thanh toán; chuẩn an toàn dữ liệu tài chính; tích hợp Napas, KBNN, VietQR; EOD, snapshot, reconciliation.</p>
+      <p>Core Banking (Oracle, PL/SQL, Intellect); sản phẩm chứng chỉ tiền gửi (CD), tiết kiệm, tín dụng, thanh toán; tiêu chuẩn an toàn dữ liệu tài chính; tích hợp với Napas, KBNN, VietQR; xử lý cuối ngày (EOD), chốt số liệu và đối soát.</p>
     </div>
 
     <div class="skill-block">
       <h4>🏗️ Kiến trúc & Thiết kế hệ thống</h4>
-      <p>Microservices, Event-Driven (Kafka); DDD, Bounded Context, CQRS; reliability patterns (Idempotency 2 lớp, Distributed Lock, Circuit Breaker, DLT); API Design (RESTful, OpenAPI, contract-first).</p>
+      <p>Microservices, Event-Driven (Kafka); thiết kế hướng miền (DDD), phạm vi nghiệp vụ (Bounded Context), tách lệnh–truy vấn (CQRS); các mẫu đảm bảo độ tin cậy (chống trùng lặp hai lớp, khóa phân tán, ngắt mạch khi lỗi, hàng đợi thư chết DLT); thiết kế API theo RESTful, OpenAPI và hợp đồng trước (contract-first).</p>
     </div>
 
     <div class="skill-block">
       <h4>🛠️ Tech Stack chính</h4>
-      <p>Java 17, Spring Boot 3, Spring Cloud, Spring Security, Spring Data JPA; Oracle DB + PL/SQL Packages, Stored Procedures, REF CURSOR; Kafka, Redis, Quartz Scheduler.</p>
+      <p>Java 17, Spring Boot 3, Spring Cloud, Spring Security, Spring Data JPA; Oracle DB với package PL/SQL, thủ tục lưu trữ, REF CURSOR; Kafka, Redis, Quartz Scheduler.</p>
     </div>
 
     <div class="skill-block">
       <h4>📦 DevOps & Quality</h4>
-      <p>Docker, Kubernetes, GitLab CI/CD; JUnit 5, Mockito, jqwik (Property-Based Testing); Structured Logging, Observability; tích hợp AI Coding Agents vào workflow (Claude Code, Kiro, Kilo Code).</p>
+      <p>Docker, Kubernetes, GitLab CI/CD; JUnit 5, Mockito; log có cấu trúc, giám sát hệ thống; tích hợp các trợ lý lập trình AI vào quy trình làm việc (Claude Code, Kiro, Kilo Code).</p>
     </div>
 
   </div>
