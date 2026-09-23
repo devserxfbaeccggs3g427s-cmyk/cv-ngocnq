@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Fraunces } from 'next/font/google';
-import { Header, Footer, SideNav } from '@/components/layout';
+import { SiteShell } from '@/components/layout/SiteShell';
 import { profile } from '@/data/profile';
 import './globals.css';
 
@@ -43,17 +43,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Bỏ qua điều hướng
         </a>
-        <Header />
-        <SideNav />
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="relative pt-16"
-          aria-label="Nội dung chính"
-        >
-          {children}
-        </main>
-        <Footer />
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );
