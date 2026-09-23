@@ -2,7 +2,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { isProtectedPath } from '@/config/auth.config';
+import { isProtectedPath, isPublicSurface } from '@/config/auth.config';
 import { useAuth } from '@/components/auth/AuthContext';
 
 interface AuthGuardProps {
@@ -10,12 +10,23 @@ interface AuthGuardProps {
 }
 
 /**
- * Wraps protected content. On the first mount after hydration, redirects
- * any protected-but-unauthenticated route to `/unlock?next=<path>` and
- * renders nothing until the redirect kicks in (no flash of protected UI).
+ * Wraps protected content. Once the auth context has hydrated, it routes
+ * unauthenticated visitors to a safe landing surface:
  *
- * Public routes (`/`, `/print`, `/unlock`, `/api/*`, anything else not in
- * PROTECTED_PATH_PREFIXES) pass through unconditionally.
+ *   - Protected route (`/workspace`, `/portfolio`, …) → `/unlock?next=<path>`
+ *     so the user can authenticate and bounce back to where they were going.
+ *   - Unknown route (anything not protected and not a public surface, e.g.
+ *     `/foo`) → `/print` so casual visitors don't leak the workspace's URL
+ *     shape via the 404 page chrome.
+ *   - Public surface (`/`, `/print`, `/print-banking`, `/unlock`, `/api/*`)
+ *     → render through, no redirect.
+ *
+ * Authenticated users pass through on every path.
+ *
+ * Before hydration we don't yet know whether the user is authed, so we
+ * suppress anything that isn't already known to be a public surface —
+ * that prevents protected UI from flashing on first paint and stops the
+ * default 404 from rendering for unknown URLs.
  *
  * Re-runs the redirect effect whenever `pathname` or `isAuthed` flips, so
  * the gate stays correct across client-side navigation without a full reload.
@@ -25,24 +36,34 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const { isAuthed, hydrated } = useAuth();
   const protectedRoute = isProtectedPath(pathname);
+  const publicSurface = isPublicSurface(pathname);
 
   useEffect(() => {
     if (!hydrated) return;
-    if (protectedRoute && !isAuthed) {
+    if (isAuthed) return;
+    if (protectedRoute) {
       const next = encodeURIComponent(pathname);
       router.replace(`/unlock?next=${next}`);
+      return;
     }
-  }, [hydrated, isAuthed, protectedRoute, pathname, router]);
+    if (!publicSurface) {
+      // Unknown URL (not in the protected list and not a public surface).
+      // Bounce to the public CV instead of letting a 404 leak the page list
+      // via the footer.
+      router.replace('/print');
+    }
+  }, [hydrated, isAuthed, protectedRoute, publicSurface, pathname, router]);
 
   // Before hydration we don't yet know whether the user is authed, so we
-  // can't safely render protected content. Public content can still render
-  // — its visibility is independent of auth state.
+  // can't safely render protected content. Public surfaces can still render
+  // — their visibility is independent of auth state. Unknown paths are held
+  // back until hydration completes so the redirect can fire cleanly.
   if (!hydrated) {
-    if (protectedRoute) return null;
-    return <>{children}</>;
+    if (publicSurface) return <>{children}</>;
+    return null;
   }
 
-  if (protectedRoute && !isAuthed) return null;
+  if (!isAuthed && (protectedRoute || !publicSurface)) return null;
 
   return <>{children}</>;
 }

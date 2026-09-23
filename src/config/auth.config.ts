@@ -37,7 +37,12 @@ export const PROTECTED_PATH_PREFIXES: readonly string[] = [
 ];
 
 /** Paths that are always reachable, even without an unlock. */
-const PUBLIC_PATH_EXACT: readonly string[] = ['/', '/print', '/print-banking', '/unlock'];
+export const PUBLIC_PATH_EXACT: readonly string[] = [
+  '/',
+  '/print',
+  '/print-banking',
+  '/unlock',
+];
 
 function startsWithApi(pathname: string): boolean {
   return pathname === '/api' || pathname.startsWith('/api/');
@@ -60,6 +65,18 @@ export function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PATH_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
+}
+
+/**
+ * Returns true if `pathname` is one of the surfaces that anyone — authed or
+ * not — is allowed to visit directly: `/`, the printable CV surfaces, the
+ * unlock form, and `/api/*` server route handlers. Use this to gate the
+ * "redirect unknown URLs to /print" branch in `AuthGuard`.
+ */
+export function isPublicSurface(pathname: string): boolean {
+  if (!pathname) return false;
+  if (startsWithApi(pathname)) return true;
+  return PUBLIC_PATH_EXACT.includes(pathname);
 }
 
 /**
